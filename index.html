@@ -1,1 +1,706 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-[#0a0e1a]">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0a0e1a" />
+    <title>Earn &amp; Play</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- GOOGLE IDENTITY SERVICES -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- MONETAG OFFICIAL REWARDED INTERSTITIAL SCRIPT -->
+    <script src="//libroot.net/p/tag.min.js" data-zone="11590181" async></script>
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              ink: "#0a0e1a",
+              surface: "#12182b",
+              "surface-2": "#1b2136",
+              line: "#2a3350",
+              gold: "#f5c344",
+              "gold-deep": "#e0a92b",
+              violet: "#7c5cff",
+            },
+            fontFamily: {
+              sans: ['Inter', 'system-ui', 'sans-serif'],
+              display: ['Sora', 'system-ui', 'sans-serif'],
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      body { -webkit-tap-highlight-color: transparent; }
+      .glow-gold { box-shadow: 0 10px 40px -12px rgba(245,195,68,0.55); }
+      .coin-pop { animation: coinPop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+      @keyframes coinPop {
+        0% { transform: scale(1); }
+        40% { transform: scale(1.25); color: #f5c344; }
+        100% { transform: scale(1); }
+      }
+      .toast-in { animation: toastIn 0.35s ease forwards; }
+      @keyframes toastIn {
+        from { opacity: 0; transform: translate(-50%, 20px); }
+        to { opacity: 1; transform: translate(-50%, 0); }
+      }
+      .shimmer::after {
+        content: "";
+        position: absolute; inset: 0;
+        background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,0.28) 50%, transparent 65%);
+        transform: translateX(-100%);
+        animation: shimmer 2.6s infinite;
+      }
+      @keyframes shimmer { to { transform: translateX(100%); } }
+      .nav-active { color: #f5c344; }
+      .nav-active .nav-dot { opacity: 1; }
+      .spin { transition: transform 2.4s cubic-bezier(0.15,0.9,0.25,1); }
+      .flip-face { backface-visibility: hidden; }
+      .flip3d { transform-style: preserve-3d; transition: transform 0.9s ease; }
+      .flip-back { transform: rotateY(180deg); }
+      .modal-in { animation: modalIn 0.25s ease forwards; }
+      @keyframes modalIn { from { opacity:0; transform: scale(0.94) } to { opacity:1; transform: scale(1) } }
+    </style>
+</head>
+
+<body class="bg-ink text-slate-100 font-sans flex flex-col min-h-screen antialiased selection:bg-gold/30">
+
+    <!-- Welcome / Login Overlay -->
+    <div id="loginOverlay" class="fixed inset-0 bg-ink/95 backdrop-blur-sm z-[100] flex items-center justify-center p-6 hidden">
+        <div class="bg-surface w-full max-w-sm rounded-3xl border border-line p-8 text-center shadow-2xl">
+            <div class="mx-auto mb-6 grid h-20 w-20 place-items-center rounded-2xl bg-gradient-to-br from-gold to-gold-deep glow-gold">
+                <span class="text-4xl">🪙</span>
+            </div>
+            <h2 class="font-display text-2xl font-bold tracking-tight">Welcome to Earn &amp; Play</h2>
+            <p class="mt-2 mb-7 text-sm leading-relaxed text-slate-400">Sign in with Google to start earning coins for every ad you watch.</p>
+
+            <div id="googleBtn" class="flex justify-center"></div>
+
+            <div id="googleFallback" class="hidden">
+                <button onclick="activateAccount()" class="w-full rounded-2xl bg-gradient-to-b from-gold to-gold-deep py-4 font-display font-bold text-ink transition active:scale-[0.98] glow-gold">
+                    Continue as Guest
+                </button>
+                <p class="mt-3 text-xs text-slate-500">Google Sign-In unavailable right now.</p>
+            </div>
+
+            <p class="mt-5 text-[11px] leading-relaxed text-slate-600">By continuing you agree to our Terms &amp; Privacy Policy.</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="sticky top-0 z-30 border-b border-line/70 bg-ink/80 backdrop-blur-md">
+        <div class="mx-auto flex w-full max-w-md items-center justify-between px-4 py-3">
+            <div class="flex items-center gap-3">
+                <div id="userAvatar" class="grid h-11 w-11 place-items-center overflow-hidden rounded-xl bg-surface-2 text-xl ring-1 ring-line">🪙</div>
+                <div class="leading-tight">
+                    <p id="userName" class="text-[11px] font-medium uppercase tracking-wider text-slate-500">Balance</p>
+                    <div class="flex items-baseline gap-1">
+                        <h2 id="coinBalance" class="font-display text-xl font-bold text-gold">0</h2>
+                        <span class="text-xs font-medium text-slate-500">coins</span>
+                    </div>
+                </div>
+            </div>
+            <button onclick="openTab('wallet')" class="rounded-xl bg-surface-2 px-4 py-2.5 text-sm font-semibold text-gold ring-1 ring-line transition active:scale-95">
+                Withdraw
+            </button>
+        </div>
+    </header>
+
+    <main class="mx-auto w-full max-w-md flex-1 px-4 pb-28 pt-5">
+
+        <!-- HOME -->
+        <div id="tab-home" class="tab-content space-y-5">
+            <section class="relative overflow-hidden rounded-3xl border border-line bg-surface p-6">
+                <div class="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gold/10 blur-2xl"></div>
+                <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-500">Your Balance</p>
+                <div class="mt-1 flex items-end gap-2">
+                    <span id="coinBalanceBig" class="font-display text-5xl font-extrabold leading-none text-gold">0</span>
+                    <span class="mb-1 text-sm font-medium text-slate-400">coins</span>
+                </div>
+                <div class="mt-6">
+                    <div class="mb-2 flex items-center justify-between text-xs">
+                        <span class="font-medium text-slate-400">Goal: <span class="text-slate-200">1100 coins</span> = ₹10</span>
+                        <span id="progressLabel" class="font-semibold text-gold">0%</span>
+                    </div>
+                    <div class="h-2.5 w-full overflow-hidden rounded-full bg-surface-2">
+                        <div id="progressBar" class="h-full rounded-full bg-gradient-to-r from-gold-deep to-gold transition-all duration-500" style="width:0%"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Watch ad card -->
+            <section class="relative overflow-hidden rounded-3xl border border-violet/40 bg-gradient-to-br from-violet/25 via-surface to-surface p-6">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <h2 class="font-display text-lg font-bold">Watch &amp; Earn</h2>
+                        <p class="mt-1 text-sm text-slate-400">Get <span class="font-semibold text-gold">+1 to +10 coins</span> per ad.</p>
+                    </div>
+                    <span class="text-3xl">📺</span>
+                </div>
+                <button id="watchAdBtn" onclick="watchAd()" class="shimmer relative mt-6 w-full overflow-hidden rounded-2xl bg-gradient-to-b from-gold to-gold-deep py-4 font-display font-bold text-ink transition active:scale-[0.98] glow-gold disabled:opacity-60">
+                    Watch Ad
+                </button>
+            </section>
+
+            <button onclick="openTab('games')" class="w-full rounded-3xl border border-line bg-surface p-5 text-left transition active:scale-[0.99]">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="font-display font-bold">Play Games</h3>
+                        <p class="mt-1 text-sm text-slate-400">4 games · win 1–10 coins each</p>
+                    </div>
+                    <span class="text-2xl">🎮</span>
+                </div>
+            </button>
+        </div>
+
+        <!-- GAMES -->
+        <div id="tab-games" class="tab-content hidden space-y-4">
+            <div class="flex items-center justify-between">
+                <h2 class="font-display text-lg font-bold">Play &amp; Win</h2>
+                <span class="text-xs text-slate-500">Win 1–10 coins per game</span>
+            </div>
+
+            <button onclick="openGame('flip')" class="flex w-full items-center gap-4 rounded-2xl border border-line bg-surface p-4 transition active:scale-[0.99]">
+                <div class="grid h-12 w-12 place-items-center rounded-xl bg-surface-2 text-2xl">🪙</div>
+                <div class="flex-1 text-left">
+                    <p class="font-display font-semibold">Coin Flip</p>
+                    <p class="text-xs text-slate-400">Guess heads or tails</p>
+                </div>
+                <span class="text-slate-500">›</span>
+            </button>
+
+            <button onclick="openGame('spin')" class="flex w-full items-center gap-4 rounded-2xl border border-line bg-surface p-4 transition active:scale-[0.99]">
+                <div class="grid h-12 w-12 place-items-center rounded-xl bg-surface-2 text-2xl">🎡</div>
+                <div class="flex-1 text-left">
+                    <p class="font-display font-semibold">Spin Wheel</p>
+                    <p class="text-xs text-slate-400">Spin for random coins</p>
+                </div>
+                <span class="text-slate-500">›</span>
+            </button>
+
+            <button onclick="openGame('box')" class="flex w-full items-center gap-4 rounded-2xl border border-line bg-surface p-4 transition active:scale-[0.99]">
+                <div class="grid h-12 w-12 place-items-center rounded-xl bg-surface-2 text-2xl">🎁</div>
+                <div class="flex-1 text-left">
+                    <p class="font-display font-semibold">Lucky Box</p>
+                    <p class="text-xs text-slate-400">Pick 1 of 3 mystery boxes</p>
+                </div>
+                <span class="text-slate-500">›</span>
+            </button>
+
+            <button onclick="openGame('dice')" class="flex w-full items-center gap-4 rounded-2xl border border-line bg-surface p-4 transition active:scale-[0.99]">
+                <div class="grid h-12 w-12 place-items-center rounded-xl bg-surface-2 text-2xl">🎲</div>
+                <div class="flex-1 text-left">
+                    <p class="font-display font-semibold">Dice Roll</p>
+                    <p class="text-xs text-slate-400">Roll and collect coins</p>
+                </div>
+                <span class="text-slate-500">›</span>
+            </button>
+        </div>
+
+        <!-- REFER -->
+        <div id="tab-refer" class="tab-content hidden space-y-5">
+            <section class="rounded-3xl border border-line bg-surface p-6 text-center">
+                <div class="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-violet to-indigo-600 text-3xl">🤝</div>
+                <h2 class="font-display text-lg font-bold">Refer &amp; Earn</h2>
+                <p class="mt-1 text-sm text-slate-400">Invite friends. You both get <span class="font-semibold text-gold">+50 coins</span> when they join.</p>
+
+                <div class="mt-5 grid grid-cols-2 gap-3">
+                    <div class="rounded-2xl bg-surface-2 p-4 ring-1 ring-line">
+                        <p id="refCount" class="font-display text-2xl font-bold text-gold">0</p>
+                        <p class="text-xs text-slate-400">Friends joined</p>
+                    </div>
+                    <div class="rounded-2xl bg-surface-2 p-4 ring-1 ring-line">
+                        <p id="refEarned" class="font-display text-2xl font-bold text-gold">0</p>
+                        <p class="text-xs text-slate-400">Coins earned</p>
+                    </div>
+                </div>
+
+                <label class="mt-6 block text-xs font-medium uppercase tracking-wider text-slate-500">Your invite link</label>
+                <div class="mt-2 flex items-center gap-2 rounded-2xl border border-line bg-surface-2 p-2 pl-4">
+                    <span id="refLink" class="flex-1 truncate text-left text-xs text-slate-300">—</span>
+                    <button onclick="copyRefLink()" class="rounded-xl bg-gold px-3 py-2 text-xs font-bold text-ink">Copy</button>
+                </div>
+                <button onclick="shareRefLink()" class="mt-3 w-full rounded-2xl bg-gradient-to-b from-violet to-indigo-600 py-3.5 font-display font-bold text-white transition active:scale-[0.98]">
+                    Share Invite
+                </button>
+            </section>
+
+            <div class="rounded-2xl border border-line/60 bg-surface/60 p-4 text-xs leading-relaxed text-slate-500">
+                Anti-fraud active: self-referral blocked, one bonus per friend, and only real Telegram accounts count. Repeated fake attempts are ignored.
+            </div>
+        </div>
+
+        <!-- WALLET -->
+        <div id="tab-wallet" class="tab-content hidden space-y-5">
+            <section class="rounded-3xl border border-line bg-surface p-6">
+                <h2 class="font-display text-lg font-bold">Withdraw Coins</h2>
+                <p class="mt-1 text-sm text-slate-400">1100 coins = <span class="font-semibold text-gold">₹10</span></p>
+
+                <div class="mt-5 rounded-2xl bg-surface-2 p-4 ring-1 ring-line">
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-slate-400">Available</span>
+                        <span id="coinBalanceWallet" class="font-display font-bold text-gold">0 coins</span>
+                    </div>
+                </div>
+
+                <label class="mt-5 block text-xs font-medium uppercase tracking-wider text-slate-500">Payout method</label>
+                <div class="mt-2 grid grid-cols-3 gap-2">
+                    <button type="button" data-method="upi" onclick="selectMethod('upi')" class="method-btn rounded-2xl border border-line bg-surface-2 px-2 py-3 text-center transition">
+                        <div class="text-xl">🏦</div>
+                        <p class="mt-1 text-[11px] font-semibold text-slate-300">UPI</p>
+                    </button>
+                    <button type="button" data-method="amazon" onclick="selectMethod('amazon')" class="method-btn rounded-2xl border border-line bg-surface-2 px-2 py-3 text-center transition">
+                        <div class="text-xl">📦</div>
+                        <p class="mt-1 text-[11px] font-semibold text-slate-300">Amazon</p>
+                    </button>
+                    <button type="button" data-method="playstore" onclick="selectMethod('playstore')" class="method-btn rounded-2xl border border-line bg-surface-2 px-2 py-3 text-center transition">
+                        <div class="text-xl">▶️</div>
+                        <p class="mt-1 text-[11px] font-semibold text-slate-300">Play Store</p>
+                    </button>
+                </div>
+
+                <label id="payoutLabel" class="mt-5 block text-xs font-medium uppercase tracking-wider text-slate-500">UPI ID</label>
+                <input type="text" id="payoutDetails" placeholder="yourname@upi"
+                    class="mt-2 w-full rounded-2xl border border-line bg-surface-2 p-4 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-gold/60 focus:ring-2 focus:ring-gold/20" />
+
+                <button onclick="requestWithdrawal()" class="mt-4 w-full rounded-2xl bg-gradient-to-b from-emerald-500 to-emerald-600 py-4 font-display font-bold text-white transition active:scale-[0.98]">
+                    Redeem
+                </button>
+                <p class="mt-3 text-center text-xs text-slate-500">Requests are processed within 24–48 hours.</p>
+            </section>
+        </div>
+    </main>
+
+    <!-- Game Modal -->
+    <div id="gameModal" class="fixed inset-0 z-[90] hidden items-end justify-center bg-ink/80 backdrop-blur-sm p-0 sm:items-center sm:p-6">
+        <div class="modal-in w-full max-w-md rounded-t-3xl border border-line bg-surface p-6 sm:rounded-3xl">
+            <div class="mb-5 flex items-center justify-between">
+                <h3 id="gameTitle" class="font-display text-lg font-bold">Game</h3>
+                <button onclick="closeGame()" class="grid h-9 w-9 place-items-center rounded-full bg-surface-2 text-slate-400 ring-1 ring-line">✕</button>
+            </div>
+            <div id="gameBody" class="min-h-[220px]"></div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed inset-x-0 bottom-0 z-30 border-t border-line/70 bg-ink/90 backdrop-blur-md">
+        <div class="mx-auto flex w-full max-w-md items-center justify-around px-4 py-3" style="padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));">
+            <button id="nav-home" onclick="openTab('home')" class="nav-active flex flex-col items-center gap-1 text-slate-500 transition">
+                <span class="text-lg">🏠</span><span class="text-[11px] font-semibold">Home</span>
+                <span class="nav-dot h-1 w-1 rounded-full bg-gold opacity-0 transition"></span>
+            </button>
+            <button id="nav-games" onclick="openTab('games')" class="flex flex-col items-center gap-1 text-slate-500 transition">
+                <span class="text-lg">🎮</span><span class="text-[11px] font-semibold">Games</span>
+                <span class="nav-dot h-1 w-1 rounded-full bg-gold opacity-0 transition"></span>
+            </button>
+            <button id="nav-refer" onclick="openTab('refer')" class="flex flex-col items-center gap-1 text-slate-500 transition">
+                <span class="text-lg">🤝</span><span class="text-[11px] font-semibold">Refer</span>
+                <span class="nav-dot h-1 w-1 rounded-full bg-gold opacity-0 transition"></span>
+            </button>
+            <button id="nav-wallet" onclick="openTab('wallet')" class="flex flex-col items-center gap-1 text-slate-500 transition">
+                <span class="text-lg">👛</span><span class="text-[11px] font-semibold">Wallet</span>
+                <span class="nav-dot h-1 w-1 rounded-full bg-gold opacity-0 transition"></span>
+            </button>
+        </div>
+    </nav>
+
+    <div id="toast" class="pointer-events-none fixed bottom-24 left-1/2 z-[110] hidden -translate-x-1/2"></div>
+
+    <script>
+        // 👉 Config — apni values daalein
+        const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
+        const BOT_USERNAME = "YourBot";        // t.me/<BOT_USERNAME>
+        const APP_SHORT_NAME = "app";          // Telegram web app short name
+
+        const WITHDRAW_THRESHOLD = 1100;
+        const AD_COOLDOWN_MS = 5000;           // 5 sec ad cooldown
+        const GAME_COOLDOWN_MS = 8000;         // per-game cooldown
+        const REFERRAL_BONUS = 50;
+
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        try { tg.setHeaderColor && tg.setHeaderColor("#0a0e1a"); } catch (e) {}
+
+        let userId = tg.initDataUnsafe?.user?.id || "guest_user";
+        let coins = parseInt(localStorage.getItem(`coins_${userId}`)) || 0;
+        let isActivated = localStorage.getItem(`activated_${userId}`);
+        let selectedMethod = "upi";
+
+        const rand1to10 = () => Math.floor(Math.random() * 10) + 1;
+        const now = () => Date.now();
+
+        function save() { localStorage.setItem(`coins_${userId}`, coins); }
+        function addCoins(n) { coins += n; save(); updateUI(true); }
+
+        function toast(message, type = "info") {
+            const host = document.getElementById("toast");
+            const bg = type === "success" ? "from-emerald-500 to-emerald-600"
+                     : type === "error"   ? "from-rose-500 to-rose-600"
+                     : "from-surface-2 to-surface-2";
+            const ring = type === "info" ? "ring-1 ring-line" : "";
+            host.innerHTML = `<div class="toast-in flex items-center gap-2 rounded-2xl bg-gradient-to-b ${bg} ${ring} px-5 py-3 text-sm font-semibold text-white shadow-xl">${message}</div>`;
+            host.classList.remove("hidden");
+            clearTimeout(host._t);
+            host._t = setTimeout(() => host.classList.add("hidden"), 2600);
+        }
+
+        /* ---------- Google Sign-In ---------- */
+        function decodeJwt(token) {
+            try {
+                const base64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+                const json = decodeURIComponent(atob(base64).split("").map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)).join(""));
+                return JSON.parse(json);
+            } catch (e) { return null; }
+        }
+        function applyProfile(profile) {
+            if (!profile) return;
+            const nameEl = document.getElementById("userName");
+            if (nameEl && profile.name) {
+                nameEl.classList.remove("uppercase", "tracking-wider", "text-slate-500");
+                nameEl.classList.add("text-slate-300");
+                nameEl.innerText = "Hi, " + (profile.given_name || profile.name);
+            }
+            const avatar = document.getElementById("userAvatar");
+            if (avatar && profile.picture) {
+                avatar.innerHTML = `<img src="${profile.picture}" alt="${profile.name || "User"}" class="h-full w-full object-cover" referrerpolicy="no-referrer" />`;
+            }
+        }
+        function handleGoogleCredential(response) {
+            const profile = decodeJwt(response.credential);
+            if (!profile) return toast("Sign-in failed, try again", "error");
+            localStorage.setItem(`activated_${userId}`, "true");
+            localStorage.setItem(`profile_${userId}`, JSON.stringify({ name: profile.name, email: profile.email, picture: profile.picture, given_name: profile.given_name }));
+            document.getElementById("loginOverlay").classList.add("hidden");
+            applyProfile(profile);
+            processReferralOnJoin();
+            toast(`Welcome, ${profile.given_name || profile.name} 🎉`, "success");
+        }
+        function initGoogleSignIn() {
+            const configured = GOOGLE_CLIENT_ID && !GOOGLE_CLIENT_ID.startsWith("YOUR_");
+            if (!configured || !window.google || !google.accounts || !google.accounts.id) {
+                document.getElementById("googleBtn").classList.add("hidden");
+                document.getElementById("googleFallback").classList.remove("hidden");
+                return;
+            }
+            google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleGoogleCredential });
+            google.accounts.id.renderButton(document.getElementById("googleBtn"), { theme: "filled_black", size: "large", shape: "pill", text: "signin_with", width: 280 });
+        }
+
+        /* ---------- UI ---------- */
+        function updateUI(animate) {
+            const pct = Math.min(100, Math.round((coins / WITHDRAW_THRESHOLD) * 100));
+            document.getElementById("coinBalance").innerText = coins;
+            const big = document.getElementById("coinBalanceBig"); if (big) big.innerText = coins;
+            const wallet = document.getElementById("coinBalanceWallet"); if (wallet) wallet.innerText = coins + " coins";
+            const bar = document.getElementById("progressBar"); if (bar) bar.style.width = pct + "%";
+            const label = document.getElementById("progressLabel"); if (label) label.innerText = pct + "%";
+            if (animate) {
+                [document.getElementById("coinBalance"), big].forEach((el) => {
+                    if (!el) return; el.classList.remove("coin-pop"); void el.offsetWidth; el.classList.add("coin-pop");
+                });
+            }
+        }
+
+        /* ---------- Referral (client-side safety) ---------- */
+        function myRefLink() {
+            return `https://t.me/${BOT_USERNAME}/${APP_SHORT_NAME}?startapp=ref_${userId}`;
+        }
+        function renderRefStats() {
+            const list = JSON.parse(localStorage.getItem(`refs_${userId}`) || "[]");
+            document.getElementById("refCount").innerText = list.length;
+            document.getElementById("refEarned").innerText = list.length * REFERRAL_BONUS;
+            document.getElementById("refLink").innerText = myRefLink();
+        }
+        function processReferralOnJoin() {
+            // Naya user jab referral link se aata hai
+            const param = tg.initDataUnsafe?.start_param || "";
+            if (!param.startsWith("ref_")) return;
+            const referrer = param.slice(4);
+
+            // Safety 1: self-referral block
+            if (String(referrer) === String(userId)) return;
+            // Safety 2: guest users (no real Telegram id) count nahi hote
+            if (userId === "guest_user") return;
+            // Safety 3: ye user pehle se kisi ka refer count ho chuka? (one-time)
+            if (localStorage.getItem(`referredBy_${userId}`)) return;
+
+            localStorage.setItem(`referredBy_${userId}`, referrer);
+            // Naye user ko welcome bonus (uske device pe)
+            addCoins(REFERRAL_BONUS);
+            toast(`Referral bonus +${REFERRAL_BONUS} coins 🎉`, "success");
+            // NOTE: referrer ko credit karna backend ke bina possible nahi (dusra device).
+        }
+        function copyRefLink() {
+            const link = myRefLink();
+            navigator.clipboard?.writeText(link).then(() => toast("Invite link copied!", "success"))
+                .catch(() => toast("Copy failed", "error"));
+        }
+        function shareRefLink() {
+            const link = myRefLink();
+            const text = "Join Earn & Play and get 50 bonus coins! " + link;
+            if (tg.openTelegramLink) {
+                tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent("Join Earn & Play & get 50 bonus coins!")}`);
+            } else if (navigator.share) {
+                navigator.share({ title: "Earn & Play", text, url: link });
+            } else { copyRefLink(); }
+        }
+
+        window.onload = () => {
+            const saved = localStorage.getItem(`profile_${userId}`);
+            if (saved) applyProfile(JSON.parse(saved));
+            if (!isActivated) {
+                document.getElementById("loginOverlay").classList.remove("hidden");
+                setTimeout(initGoogleSignIn, 400);
+            } else {
+                processReferralOnJoin();
+            }
+            selectMethod("upi");
+            renderRefStats();
+            updateUI(false);
+        };
+
+        function activateAccount() {
+            localStorage.setItem(`activated_${userId}`, "true");
+            document.getElementById("loginOverlay").classList.add("hidden");
+            processReferralOnJoin();
+            toast("Account activated 🎉", "success");
+        }
+
+        /* ---------- Watch Ad (5s cooldown, 1-10 coins) ---------- */
+        let adCoolingDown = false;
+        function watchAd() {
+            const btn = document.getElementById("watchAdBtn");
+            if (adCoolingDown) return toast("Please wait for cooldown", "error");
+            if (typeof show_11590181 === "function") {
+                show_11590181().then(() => {
+                    const earned = rand1to10();
+                    addCoins(earned);
+                    toast(`+${earned} coins earned!`, "success");
+                    startAdCooldown(btn);
+                }).catch((err) => {
+                    console.log("Ad closed early or failed", err);
+                    toast("Ad closed early — no reward", "error");
+                });
+            } else {
+                toast("Ad is still loading, try again", "error");
+            }
+        }
+        function startAdCooldown(btn) {
+            adCoolingDown = true;
+            let remaining = Math.ceil(AD_COOLDOWN_MS / 1000);
+            btn.disabled = true;
+            btn.innerText = `Wait ${remaining}s`;
+            const iv = setInterval(() => {
+                remaining--;
+                if (remaining <= 0) {
+                    clearInterval(iv);
+                    adCoolingDown = false;
+                    btn.disabled = false;
+                    btn.innerText = "Watch Ad";
+                } else {
+                    btn.innerText = `Wait ${remaining}s`;
+                }
+            }, 1000);
+        }
+
+        /* ---------- Games ---------- */
+        function gameOnCooldown(key) {
+            const last = parseInt(localStorage.getItem(`glast_${key}_${userId}`) || "0");
+            const left = GAME_COOLDOWN_MS - (now() - last);
+            return left > 0 ? Math.ceil(left / 1000) : 0;
+        }
+        function setGameCooldown(key) { localStorage.setItem(`glast_${key}_${userId}`, String(now())); }
+
+        function openTab(t) {
+            document.querySelectorAll(".tab-content").forEach((el) => el.classList.add("hidden"));
+            document.getElementById("tab-" + t).classList.remove("hidden");
+            ["home", "games", "refer", "wallet"].forEach((name) => {
+                const el = document.getElementById("nav-" + name);
+                if (el) el.classList.toggle("nav-active", name === t);
+            });
+            if (t === "refer") renderRefStats();
+            updateUI(false);
+        }
+
+        function openGame(key) {
+            const modal = document.getElementById("gameModal");
+            modal.classList.remove("hidden");
+            modal.classList.add("flex");
+            const title = { flip: "Coin Flip", spin: "Spin Wheel", box: "Lucky Box", dice: "Dice Roll" }[key];
+            document.getElementById("gameTitle").innerText = title;
+            renderGame(key);
+        }
+        function closeGame() {
+            const modal = document.getElementById("gameModal");
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+        }
+        function rewardGame(key) {
+            const earned = rand1to10();
+            addCoins(earned);
+            setGameCooldown(key);
+            toast(`You won +${earned} coins! 🎉`, "success");
+            return earned;
+        }
+
+        function renderGame(key) {
+            const body = document.getElementById("gameBody");
+            const cd = gameOnCooldown(key);
+
+            if (key === "flip") {
+                body.innerHTML = `
+                    <div class="text-center">
+                        <div class="mx-auto mb-6 grid h-28 w-28 place-items-center rounded-full bg-surface-2 text-6xl ring-1 ring-line" id="flipCoin">🪙</div>
+                        <p class="mb-4 text-sm text-slate-400">Pick your side</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="playFlip('H')" class="rounded-2xl bg-gradient-to-b from-gold to-gold-deep py-3.5 font-display font-bold text-ink">Heads</button>
+                            <button onclick="playFlip('T')" class="rounded-2xl bg-surface-2 py-3.5 font-display font-bold text-slate-100 ring-1 ring-line">Tails</button>
+                        </div>
+                    </div>`;
+            } else if (key === "spin") {
+                body.innerHTML = `
+                    <div class="text-center">
+                        <div class="relative mx-auto mb-6 h-40 w-40">
+                            <div class="absolute left-1/2 top-0 z-10 -translate-x-1/2 text-gold">▼</div>
+                            <div id="wheel" class="spin grid h-40 w-40 place-items-center rounded-full text-4xl ring-4 ring-line"
+                                style="background: conic-gradient(#f5c344 0 60deg,#7c5cff 60deg 120deg,#e0a92b 120deg 180deg,#12182b 180deg 240deg,#f5c344 240deg 300deg,#7c5cff 300deg 360deg)">🎡</div>
+                        </div>
+                        <button onclick="playSpin()" id="spinBtn" class="w-full rounded-2xl bg-gradient-to-b from-gold to-gold-deep py-3.5 font-display font-bold text-ink">Spin Now</button>
+                    </div>`;
+            } else if (key === "box") {
+                body.innerHTML = `
+                    <div class="text-center">
+                        <p class="mb-5 text-sm text-slate-400">Choose one mystery box</p>
+                        <div class="grid grid-cols-3 gap-3">
+                            ${[0,1,2].map(i => `<button onclick="playBox(${i})" class="box-item grid aspect-square place-items-center rounded-2xl bg-surface-2 text-4xl ring-1 ring-line transition active:scale-95">🎁</button>`).join("")}
+                        </div>
+                    </div>`;
+            } else if (key === "dice") {
+                body.innerHTML = `
+                    <div class="text-center">
+                        <div id="dice" class="mx-auto mb-6 grid h-28 w-28 place-items-center rounded-3xl bg-surface-2 text-6xl ring-1 ring-line">🎲</div>
+                        <button onclick="playDice()" id="diceBtn" class="w-full rounded-2xl bg-gradient-to-b from-gold to-gold-deep py-3.5 font-display font-bold text-ink">Roll Dice</button>
+                    </div>`;
+            }
+
+            if (cd > 0) lockGame(key, cd);
+        }
+
+        function lockGame(key, seconds) {
+            const body = document.getElementById("gameBody");
+            const overlay = document.createElement("div");
+            overlay.className = "mt-4 rounded-2xl bg-surface-2 p-3 text-center text-sm text-slate-400 ring-1 ring-line";
+            overlay.id = "cdNote";
+            body.appendChild(overlay);
+            body.querySelectorAll("button").forEach(b => { b.disabled = true; b.classList.add("opacity-50", "pointer-events-none"); });
+            let remaining = seconds;
+            const tick = () => { overlay.innerText = `Next play in ${remaining}s`; };
+            tick();
+            const iv = setInterval(() => {
+                remaining--;
+                if (remaining <= 0) { clearInterval(iv); renderGame(key); } else tick();
+            }, 1000);
+        }
+
+        function playFlip(choice) {
+            if (gameOnCooldown("flip")) return;
+            const coin = document.getElementById("flipCoin");
+            const result = Math.random() < 0.5 ? "H" : "T";
+            coin.style.transition = "transform 0.8s ease";
+            coin.style.transform = "rotateY(1080deg)";
+            document.querySelectorAll("#gameBody button").forEach(b => b.disabled = true);
+            setTimeout(() => {
+                coin.innerText = result === "H" ? "😎" : "🎯";
+                if (result === choice) { rewardGame("flip"); } 
+                else { setGameCooldown("flip"); toast("Not this time, try again!", "error"); }
+                setTimeout(() => renderGame("flip"), 900);
+            }, 850);
+        }
+
+        function playSpin() {
+            if (gameOnCooldown("spin")) return;
+            const wheel = document.getElementById("wheel");
+            const btn = document.getElementById("spinBtn");
+            btn.disabled = true;
+            const turns = 4 + Math.random() * 3;
+            wheel.style.transform = `rotate(${turns * 360}deg)`;
+            setTimeout(() => { rewardGame("spin"); setTimeout(() => renderGame("spin"), 900); }, 2500);
+        }
+
+        function playBox(i) {
+            if (gameOnCooldown("box")) return;
+            const boxes = document.querySelectorAll(".box-item");
+            boxes.forEach(b => b.disabled = true);
+            const earned = rand1to10();
+            coins += earned; save(); updateUI(true);
+            setGameCooldown("box");
+            boxes[i].innerText = "🪙";
+            boxes[i].classList.add("ring-2", "ring-gold");
+            toast(`You won +${earned} coins! 🎉`, "success");
+            setTimeout(() => renderGame("box"), 1100);
+        }
+
+        function playDice() {
+            if (gameOnCooldown("dice")) return;
+            const dice = document.getElementById("dice");
+            const btn = document.getElementById("diceBtn");
+            btn.disabled = true;
+            const faces = ["⚀","⚁","⚂","⚃","⚄","⚅"];
+            let ticks = 0;
+            const iv = setInterval(() => {
+                dice.innerText = faces[Math.floor(Math.random() * 6)];
+                ticks++;
+                if (ticks > 10) {
+                    clearInterval(iv);
+                    rewardGame("dice");
+                    setTimeout(() => renderGame("dice"), 900);
+                }
+            }, 90);
+        }
+
+        /* ---------- Wallet ---------- */
+        const methodConfig = {
+            upi:       { label: "UPI ID", placeholder: "yourname@upi" },
+            amazon:    { label: "Amazon account email", placeholder: "email for Amazon gift card" },
+            playstore: { label: "Google Play email", placeholder: "email for Play Store gift card" },
+        };
+        function selectMethod(m) {
+            selectedMethod = m;
+            document.querySelectorAll(".method-btn").forEach((btn) => {
+                const active = btn.dataset.method === m;
+                btn.classList.toggle("border-gold", active);
+                btn.classList.toggle("ring-2", active);
+                btn.classList.toggle("ring-gold/40", active);
+                btn.classList.toggle("border-line", !active);
+            });
+            const cfg = methodConfig[m];
+            document.getElementById("payoutLabel").innerText = cfg.label;
+            const input = document.getElementById("payoutDetails");
+            input.placeholder = cfg.placeholder;
+            input.value = "";
+        }
+        function requestWithdrawal() {
+            if (coins < WITHDRAW_THRESHOLD) {
+                return toast(`Need ${WITHDRAW_THRESHOLD - coins} more coins`, "error");
+            }
+            const details = document.getElementById("payoutDetails").value.trim();
+            if (!details) return toast(`Enter your ${methodConfig[selectedMethod].label}`, "error");
+            coins -= WITHDRAW_THRESHOLD; save(); updateUI(true);
+            document.getElementById("payoutDetails").value = "";
+            const nice = { upi: "UPI", amazon: "Amazon gift card", playstore: "Play Store gift card" }[selectedMethod];
+            toast(`${nice} withdrawal submitted!`, "success");
+        }
+    </script>
+</body>
+</html>
