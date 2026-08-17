@@ -16,7 +16,7 @@
     <!-- GOOGLE IDENTITY SERVICES -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
-    <!-- MONETAG OFFICIAL REWARDED INTERSTITIAL SCRIPT -->
+    <!-- MONETAG OFFICIAL REWARDED SCRIPT -->
     <script src="//libroot.net/p/tag.min.js" data-zone="11590181" async></script>
 
     <script>
@@ -205,6 +205,34 @@
             </button>
         </div>
 
+        <!-- REFER & EARN -->
+        <div id="tab-refer" class="tab-content hidden space-y-5">
+            <section class="rounded-3xl border border-line bg-surface p-6 text-center">
+                <div class="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-surface-2 text-3xl ring-1 ring-line">👥</div>
+                <h2 class="font-display text-lg font-bold">Refer &amp; Earn</h2>
+                <p class="mt-1 text-sm text-slate-400">Get <span class="font-semibold text-gold">50 coins</span> for every valid friend you invite!</p>
+
+                <div class="mt-6 rounded-2xl bg-surface-2 p-4 ring-1 ring-line text-left space-y-3">
+                    <label class="block text-xs font-medium uppercase tracking-wider text-slate-500">Your Secure Referral Link</label>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="referralLinkInput" readonly class="w-full rounded-xl border border-line bg-ink px-3 py-2 text-xs text-slate-300 outline-none" />
+                        <button onclick="copyReferralLink()" class="rounded-xl bg-gradient-to-b from-gold to-gold-deep px-4 py-2 text-xs font-bold text-ink active:scale-95">Copy</button>
+                    </div>
+                </div>
+
+                <div class="mt-5 grid grid-cols-2 gap-3">
+                    <div class="rounded-2xl bg-surface-2 p-4 ring-1 ring-line text-center">
+                        <p class="text-[11px] text-slate-400 uppercase">Total Referrals</p>
+                        <p id="totalReferralsCount" class="font-display text-xl font-bold text-gold mt-1">0</p>
+                    </div>
+                    <div class="rounded-2xl bg-surface-2 p-4 ring-1 ring-line text-center">
+                        <p class="text-[11px] text-slate-400 uppercase">Earned from Refer</p>
+                        <p id="totalReferralCoins" class="font-display text-xl font-bold text-gold mt-1">0</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
         <!-- WALLET -->
         <div id="tab-wallet" class="tab-content hidden space-y-5">
             <section class="rounded-3xl border border-line bg-surface p-6">
@@ -268,6 +296,10 @@
                 <span class="text-lg">🎮</span><span class="text-[11px] font-semibold">Games</span>
                 <span class="nav-dot h-1 w-1 rounded-full bg-gold opacity-0 transition"></span>
             </button>
+            <button id="nav-refer" onclick="openTab('refer')" class="flex flex-col items-center gap-1 text-slate-500 transition">
+                <span class="text-lg">👥</span><span class="text-[11px] font-semibold">Refer</span>
+                <span class="nav-dot h-1 w-1 rounded-full bg-gold opacity-0 transition"></span>
+            </button>
             <button id="nav-wallet" onclick="openTab('wallet')" class="flex flex-col items-center gap-1 text-slate-500 transition">
                 <span class="text-lg">👛</span><span class="text-[11px] font-semibold">Wallet</span>
                 <span class="nav-dot h-1 w-1 rounded-full bg-gold opacity-0 transition"></span>
@@ -279,19 +311,53 @@
 
     <script>
         const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
+        const BOT_USERNAME = "@Easy_Watch_Earn_Bot"; // 👉 Yahan apna Telegram Bot ka username daalein (बिना @ ke)
 
         const WITHDRAW_THRESHOLD = 1100;
         const AD_COOLDOWN_MS = 5000;
         const GAME_COOLDOWN_MS = 8000;
+        const REFERRAL_REWARD = 50;
 
         let tg = window.Telegram.WebApp;
         tg.expand();
         try { tg.setHeaderColor && tg.setHeaderColor("#0a0e1a"); } catch (e) {}
 
-        let userId = tg.initDataUnsafe?.user?.id || "guest_user";
+        let userId = tg.initDataUnsafe?.user?.id || "guest_user_" + Math.floor(Math.random()*100000);
         let coins = parseInt(localStorage.getItem(`coins_${userId}`)) || 0;
         let isActivated = localStorage.getItem(`activated_${userId}`);
         let selectedMethod = "upi";
+
+        // Secure Anti-Cheat Referral Check
+        let referredList = JSON.parse(localStorage.getItem(`referred_${userId}`)) || [];
+        let totalReferralCoins = parseInt(localStorage.getItem(`refcoins_${userId}`)) || 0;
+
+        // URL se start parameter check karna (Secure Referral Processing)
+        const urlParams = new URLSearchParams(window.location.search);
+        const startParam = tg.initDataUnsafe?.start_param || urlParams.get("startapp") || urlParams.get("ref");
+
+        if (startParam && startParam !== String(userId)) {
+            let processedRefs = JSON.parse(localStorage.getItem("global_processed_refs")) || [];
+            let referralKey = `${startParam}_to_${userId}`;
+            
+            // Prevent self-referral and duplicate processing
+            if (!processedRefs.includes(referralKey)) {
+                processedRefs.push(referralKey);
+                localStorage.setItem("global_processed_refs", JSON.stringify(processedRefs));
+
+                // Credit referrer securely in local storage environment
+                let referrerCoins = parseInt(localStorage.getItem(`coins_${startParam}`)) || 0;
+                referrerCoins += REFERRAL_REWARD;
+                localStorage.setItem(`coins_${startParam}`, referrerCoins);
+
+                let refList = JSON.parse(localStorage.getItem(`referred_${startParam}`)) || [];
+                refList.push(userId);
+                localStorage.setItem(`referred_${startParam}`, JSON.stringify(refList));
+
+                let refCoinsTotal = parseInt(localStorage.getItem(`refcoins_${startParam}`)) || 0;
+                refCoinsTotal += REFERRAL_REWARD;
+                localStorage.setItem(`refcoins_${startParam}`, refCoinsTotal);
+            }
+        }
 
         const rand1to10 = () => Math.floor(Math.random() * 10) + 1;
         const now = () => Date.now();
@@ -354,12 +420,20 @@
 
         /* ---------- UI ---------- */
         function updateUI(animate) {
+            coins = parseInt(localStorage.getItem(`coins_${userId}`)) || coins;
             const pct = Math.min(100, Math.round((coins / WITHDRAW_THRESHOLD) * 100));
             document.getElementById("coinBalance").innerText = coins;
             const big = document.getElementById("coinBalanceBig"); if (big) big.innerText = coins;
             const wallet = document.getElementById("coinBalanceWallet"); if (wallet) wallet.innerText = coins + " coins";
             const bar = document.getElementById("progressBar"); if (bar) bar.style.width = pct + "%";
             const label = document.getElementById("progressLabel"); if (label) label.innerText = pct + "%";
+
+            // Refer stats update
+            let currentRefs = JSON.parse(localStorage.getItem(`referred_${userId}`)) || [];
+            let currentRefCoins = parseInt(localStorage.getItem(`refcoins_${userId}`)) || 0;
+            document.getElementById("totalReferralsCount").innerText = currentRefs.length;
+            document.getElementById("totalReferralCoins").innerText = currentRefCoins;
+
             if (animate) {
                 [document.getElementById("coinBalance"), big].forEach((el) => {
                     if (!el) return; el.classList.remove("coin-pop"); void el.offsetWidth; el.classList.add("coin-pop");
@@ -374,6 +448,11 @@
                 document.getElementById("loginOverlay").classList.remove("hidden");
                 setTimeout(initGoogleSignIn, 400);
             }
+            
+            // Setup referral link input
+            const refLink = `https://t.me/${BOT_USERNAME}?start=${userId}`;
+            document.getElementById("referralLinkInput").value = refLink;
+
             selectMethod("upi");
             updateUI(false);
         };
@@ -384,7 +463,15 @@
             toast("Account activated 🎉", "success");
         }
 
-        /* ---------- Watch Ad (Integrated Official Rewarded Interstitial Code) ---------- */
+        function copyReferralLink() {
+            const input = document.getElementById("referralLinkInput");
+            input.select();
+            input.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(input.value);
+            toast("Referral link copied!", "success");
+        }
+
+        /* ---------- Watch Ad ---------- */
         let adCoolingDown = false;
         function watchAd() {
             const btn = document.getElementById("watchAdBtn");
@@ -401,7 +488,7 @@
                     toast("Ad closed or failed to load", "error");
                 });
             } else {
-                toast("Ad is still loading. Please try again in a moment.", "error");
+                toast("Ad is still loading. Please check your network or try again.", "error");
             }
         }
 
@@ -434,7 +521,7 @@
         function openTab(t) {
             document.querySelectorAll(".tab-content").forEach((el) => el.classList.add("hidden"));
             document.getElementById("tab-" + t).classList.remove("hidden");
-            ["home", "games", "wallet"].forEach((name) => {
+            ["home", "games", "refer", "wallet"].forEach((name) => {
                 const el = document.getElementById("nav-" + name);
                 if (el) el.classList.toggle("nav-active", name === t);
             });
