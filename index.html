@@ -384,7 +384,7 @@
             toast("Account activated 🎉", "success");
         }
 
-        /* ---------- Watch Ad with Fallback ---------- */
+        /* ---------- Watch Ad (Strict Monetag Interstitial) ---------- */
         let adCoolingDown = false;
         function watchAd() {
             const btn = document.getElementById("watchAdBtn");
@@ -397,22 +397,12 @@
                     toast(`You have seen an ad! +${earned} coins earned!`, "success");
                     startAdCooldown(btn);
                 }).catch((err) => {
-                    console.log("Ad error or closed early", err);
-                    triggerFallbackAd(btn);
+                    console.log("Ad closed early or failed", err);
+                    toast("Ad closed early or failed", "error");
                 });
             } else {
-                // Agar script load nahi hui toh fallback direct link khol dega aur reward de dega
-                triggerFallbackAd(btn);
+                toast("Ad script is still loading, try again in a moment", "error");
             }
-        }
-
-        function triggerFallbackAd(btn) {
-            toast("Opening sponsor link...", "info");
-            window.open("https://omg10.com/4/11583899", "_blank"); // Yahan apna direct link daal sakte hain
-            const earned = rand1to10();
-            addCoins(earned);
-            toast(`+${earned} coins credited!`, "success");
-            startAdCooldown(btn);
         }
 
         function startAdCooldown(btn) {
