@@ -246,6 +246,17 @@
         </div>
     </main>
 
+    <!-- Ad Modal (In-App Browser for Direct Links) -->
+    <div id="adModal" class="fixed inset-0 z-[120] hidden flex-col bg-ink/95 backdrop-blur-md">
+        <div class="flex items-center justify-between border-b border-line bg-surface px-4 py-3">
+            <span class="font-display font-bold text-gold">Watch Sponsor Ad</span>
+            <button onclick="closeAdModal()" class="rounded-full bg-surface-2 px-3 py-1 text-xs font-bold text-slate-300 ring-1 ring-line">Close &amp; Claim</button>
+        </div>
+        <div class="flex-1 w-full bg-white relative">
+            <iframe id="adFrame" src="" class="w-full h-full border-0"></iframe>
+        </div>
+    </div>
+
     <!-- Game Modal -->
     <div id="gameModal" class="fixed inset-0 z-[90] hidden items-end justify-center bg-ink/80 backdrop-blur-sm p-0 sm:items-center sm:p-6">
         <div class="modal-in w-full max-w-md rounded-t-3xl border border-line bg-surface p-6 sm:rounded-3xl">
@@ -279,6 +290,7 @@
 
     <script>
         const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
+        const DIRECT_LINK = "YOUR_DIRECT_LINK_HERE"; // 👉 Yahan apna Monetag ka Direct Link paste karein
 
         const WITHDRAW_THRESHOLD = 1100;
         const AD_COOLDOWN_MS = 5000;
@@ -384,7 +396,7 @@
             toast("Account activated 🎉", "success");
         }
 
-        /* ---------- Watch Ad (Strict Monetag Interstitial) ---------- */
+        /* ---------- Watch Ad with In-App Modal Fallback ---------- */
         let adCoolingDown = false;
         function watchAd() {
             const btn = document.getElementById("watchAdBtn");
@@ -398,10 +410,39 @@
                     startAdCooldown(btn);
                 }).catch((err) => {
                     console.log("Ad closed early or failed", err);
-                    toast("Ad closed early or failed", "error");
+                    openAdModal(btn);
                 });
             } else {
-                toast("Ad script is still loading, try again in a moment", "error");
+                openAdModal(btn);
+            }
+        }
+
+        function openAdModal(btn) {
+            if (DIRECT_LINK && !DIRECT_LINK.startsWith("YOUR_")) {
+                const modal = document.getElementById("adModal");
+                const frame = document.getElementById("adFrame");
+                frame.src = DIRECT_LINK;
+                modal.classList.remove("hidden");
+                modal.classList.add("flex");
+                window._currentAdBtn = btn;
+            } else {
+                toast("Ad script is loading. Please wait a moment.", "error");
+            }
+        }
+
+        function closeAdModal() {
+            const modal = document.getElementById("adModal");
+            const frame = document.getElementById("adFrame");
+            frame.src = "";
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+
+            // Reward user when they close the ad modal
+            const earned = rand1to10();
+            addCoins(earned);
+            toast(`+${earned} coins credited successfully!`, "success");
+            if (window._currentAdBtn) {
+                startAdCooldown(window._currentAdBtn);
             }
         }
 
