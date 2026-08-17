@@ -13,8 +13,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
+    <!-- GOOGLE IDENTITY SERVICES -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
+    <!-- MONETAG OFFICIAL REWARDED INTERSTITIAL SCRIPT -->
     <script src="//libroot.net/p/tag.min.js" data-zone="11590181" async></script>
 
     <script>
@@ -71,6 +73,7 @@
 
 <body class="bg-ink text-slate-100 font-sans flex flex-col min-h-screen antialiased selection:bg-gold/30">
 
+    <!-- Welcome / Login Overlay -->
     <div id="loginOverlay" class="fixed inset-0 bg-ink/95 backdrop-blur-sm z-[100] flex items-center justify-center p-6 hidden">
         <div class="bg-surface w-full max-w-sm rounded-3xl border border-line p-8 text-center shadow-2xl">
             <div class="mx-auto mb-6 grid h-20 w-20 place-items-center rounded-2xl bg-gradient-to-br from-gold to-gold-deep glow-gold">
@@ -92,6 +95,7 @@
         </div>
     </div>
 
+    <!-- Header -->
     <header class="sticky top-0 z-30 border-b border-line/70 bg-ink/80 backdrop-blur-md">
         <div class="mx-auto flex w-full max-w-md items-center justify-between px-4 py-3">
             <div class="flex items-center gap-3">
@@ -112,6 +116,7 @@
 
     <main class="mx-auto w-full max-w-md flex-1 px-4 pb-28 pt-5">
 
+        <!-- HOME -->
         <div id="tab-home" class="tab-content space-y-5">
             <section class="relative overflow-hidden rounded-3xl border border-line bg-surface p-6">
                 <div class="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gold/10 blur-2xl"></div>
@@ -131,6 +136,7 @@
                 </div>
             </section>
 
+            <!-- Watch ad card -->
             <section class="relative overflow-hidden rounded-3xl border border-violet/40 bg-gradient-to-br from-violet/25 via-surface to-surface p-6">
                 <div class="flex items-start justify-between">
                     <div>
@@ -155,6 +161,7 @@
             </button>
         </div>
 
+        <!-- GAMES -->
         <div id="tab-games" class="tab-content hidden space-y-4">
             <div class="flex items-center justify-between">
                 <h2 class="font-display text-lg font-bold">Play &amp; Win</h2>
@@ -198,6 +205,7 @@
             </button>
         </div>
 
+        <!-- WALLET -->
         <div id="tab-wallet" class="tab-content hidden space-y-5">
             <section class="rounded-3xl border border-line bg-surface p-6">
                 <h2 class="font-display text-lg font-bold">Withdraw Coins</h2>
@@ -238,6 +246,7 @@
         </div>
     </main>
 
+    <!-- Game Modal -->
     <div id="gameModal" class="fixed inset-0 z-[90] hidden items-end justify-center bg-ink/80 backdrop-blur-sm p-0 sm:items-center sm:p-6">
         <div class="modal-in w-full max-w-md rounded-t-3xl border border-line bg-surface p-6 sm:rounded-3xl">
             <div class="mb-5 flex items-center justify-between">
@@ -248,6 +257,7 @@
         </div>
     </div>
 
+    <!-- Bottom Navigation -->
     <nav class="fixed inset-x-0 bottom-0 z-30 border-t border-line/70 bg-ink/90 backdrop-blur-md">
         <div class="mx-auto flex w-full max-w-md items-center justify-around px-4 py-3" style="padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));">
             <button id="nav-home" onclick="openTab('home')" class="nav-active flex flex-col items-center gap-1 text-slate-500 transition">
@@ -374,7 +384,7 @@
             toast("Account activated 🎉", "success");
         }
 
-        /* ---------- Watch Ad (Pure Official Monetag Trigger) ---------- */
+        /* ---------- Watch Ad (Integrated Official Rewarded Interstitial Code) ---------- */
         let adCoolingDown = false;
         function watchAd() {
             const btn = document.getElementById("watchAdBtn");
@@ -388,10 +398,10 @@
                     startAdCooldown(btn);
                 }).catch((err) => {
                     console.log("Ad closed or failed", err);
-                    toast("Ad closed or skipped", "error");
+                    toast("Ad closed or failed to load", "error");
                 });
             } else {
-                toast("Ad is still loading. Please check your network or try again.", "error");
+                toast("Ad is still loading. Please try again in a moment.", "error");
             }
         }
 
@@ -573,7 +583,6 @@
             amazon:    { label: "Amazon account email", placeholder: "email for Amazon gift card" },
             playstore: { label: "Google Play email", placeholder: "email for Play Store gift card" },
         };
-        function selectMessageMethod(m) {} // dummy handler
         function selectMethod(m) {
             selectedMethod = m;
             document.querySelectorAll(".method-btn").forEach((btn) => {
