@@ -324,8 +324,8 @@
         const APP_SHORT_NAME = "app";          // Telegram web app short name
 
         const WITHDRAW_THRESHOLD = 1100;
-        const AD_COOLDOWN_MS = 5000;           // 5 sec ad cooldown
-        const GAME_COOLDOWN_MS = 8000;         // per-game cooldown
+        const AD_COOLDOWN_MS = 5000;             // 5 sec ad cooldown
+        const GAME_COOLDOWN_MS = 8000;           // per-game cooldown
         const REFERRAL_BONUS = 50;
 
         let tg = window.Telegram.WebApp;
@@ -423,23 +423,17 @@
             document.getElementById("refLink").innerText = myRefLink();
         }
         function processReferralOnJoin() {
-            // Naya user jab referral link se aata hai
             const param = tg.initDataUnsafe?.start_param || "";
             if (!param.startsWith("ref_")) return;
             const referrer = param.slice(4);
 
-            // Safety 1: self-referral block
             if (String(referrer) === String(userId)) return;
-            // Safety 2: guest users (no real Telegram id) count nahi hote
             if (userId === "guest_user") return;
-            // Safety 3: ye user pehle se kisi ka refer count ho chuka? (one-time)
             if (localStorage.getItem(`referredBy_${userId}`)) return;
 
             localStorage.setItem(`referredBy_${userId}`, referrer);
-            // Naye user ko welcome bonus (uske device pe)
             addCoins(REFERRAL_BONUS);
             toast(`Referral bonus +${REFERRAL_BONUS} coins 🎉`, "success");
-            // NOTE: referrer ko credit karna backend ke bina possible nahi (dusra device).
         }
         function copyRefLink() {
             const link = myRefLink();
@@ -477,25 +471,27 @@
             toast("Account activated 🎉", "success");
         }
 
-        /* ---------- Watch Ad (5s cooldown, 1-10 coins) ---------- */
+        /* ---------- Watch Ad (Integrated Monetag Rewarded Interstitial) ---------- */
         let adCoolingDown = false;
         function watchAd() {
             const btn = document.getElementById("watchAdBtn");
             if (adCoolingDown) return toast("Please wait for cooldown", "error");
+
             if (typeof show_11590181 === "function") {
                 show_11590181().then(() => {
                     const earned = rand1to10();
                     addCoins(earned);
-                    toast(`+${earned} coins earned!`, "success");
+                    toast(`You have seen an ad! +${earned} coins earned!`, "success");
                     startAdCooldown(btn);
                 }).catch((err) => {
                     console.log("Ad closed early or failed", err);
                     toast("Ad closed early — no reward", "error");
                 });
             } else {
-                toast("Ad is still loading, try again", "error");
+                toast("Ad script is still loading, try again", "error");
             }
         }
+
         function startAdCooldown(btn) {
             adCoolingDown = true;
             let remaining = Math.ceil(AD_COOLDOWN_MS / 1000);
