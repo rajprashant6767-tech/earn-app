@@ -66,9 +66,6 @@
       .nav-active { color: #f5c344; }
       .nav-active .nav-dot { opacity: 1; }
       .spin { transition: transform 2.4s cubic-bezier(0.15,0.9,0.25,1); }
-      .flip-face { backface-visibility: hidden; }
-      .flip3d { transform-style: preserve-3d; transition: transform 0.9s ease; }
-      .flip-back { transform: rotateY(180deg); }
       .modal-in { animation: modalIn 0.25s ease forwards; }
       @keyframes modalIn { from { opacity:0; transform: scale(0.94) } to { opacity:1; transform: scale(1) } }
     </style>
@@ -208,39 +205,6 @@
             </button>
         </div>
 
-        <!-- REFER -->
-        <div id="tab-refer" class="tab-content hidden space-y-5">
-            <section class="rounded-3xl border border-line bg-surface p-6 text-center">
-                <div class="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-violet to-indigo-600 text-3xl">🤝</div>
-                <h2 class="font-display text-lg font-bold">Refer &amp; Earn</h2>
-                <p class="mt-1 text-sm text-slate-400">Invite friends. You both get <span class="font-semibold text-gold">+50 coins</span> when they join.</p>
-
-                <div class="mt-5 grid grid-cols-2 gap-3">
-                    <div class="rounded-2xl bg-surface-2 p-4 ring-1 ring-line">
-                        <p id="refCount" class="font-display text-2xl font-bold text-gold">0</p>
-                        <p class="text-xs text-slate-400">Friends joined</p>
-                    </div>
-                    <div class="rounded-2xl bg-surface-2 p-4 ring-1 ring-line">
-                        <p id="refEarned" class="font-display text-2xl font-bold text-gold">0</p>
-                        <p class="text-xs text-slate-400">Coins earned</p>
-                    </div>
-                </div>
-
-                <label class="mt-6 block text-xs font-medium uppercase tracking-wider text-slate-500">Your invite link</label>
-                <div class="mt-2 flex items-center gap-2 rounded-2xl border border-line bg-surface-2 p-2 pl-4">
-                    <span id="refLink" class="flex-1 truncate text-left text-xs text-slate-300">—</span>
-                    <button onclick="copyRefLink()" class="rounded-xl bg-gold px-3 py-2 text-xs font-bold text-ink">Copy</button>
-                </div>
-                <button onclick="shareRefLink()" class="mt-3 w-full rounded-2xl bg-gradient-to-b from-violet to-indigo-600 py-3.5 font-display font-bold text-white transition active:scale-[0.98]">
-                    Share Invite
-                </button>
-            </section>
-
-            <div class="rounded-2xl border border-line/60 bg-surface/60 p-4 text-xs leading-relaxed text-slate-500">
-                Anti-fraud active: self-referral blocked, one bonus per friend, and only real Telegram accounts count. Repeated fake attempts are ignored.
-            </div>
-        </div>
-
         <!-- WALLET -->
         <div id="tab-wallet" class="tab-content hidden space-y-5">
             <section class="rounded-3xl border border-line bg-surface p-6">
@@ -304,10 +268,6 @@
                 <span class="text-lg">🎮</span><span class="text-[11px] font-semibold">Games</span>
                 <span class="nav-dot h-1 w-1 rounded-full bg-gold opacity-0 transition"></span>
             </button>
-            <button id="nav-refer" onclick="openTab('refer')" class="flex flex-col items-center gap-1 text-slate-500 transition">
-                <span class="text-lg">🤝</span><span class="text-[11px] font-semibold">Refer</span>
-                <span class="nav-dot h-1 w-1 rounded-full bg-gold opacity-0 transition"></span>
-            </button>
             <button id="nav-wallet" onclick="openTab('wallet')" class="flex flex-col items-center gap-1 text-slate-500 transition">
                 <span class="text-lg">👛</span><span class="text-[11px] font-semibold">Wallet</span>
                 <span class="nav-dot h-1 w-1 rounded-full bg-gold opacity-0 transition"></span>
@@ -318,15 +278,11 @@
     <div id="toast" class="pointer-events-none fixed bottom-24 left-1/2 z-[110] hidden -translate-x-1/2"></div>
 
     <script>
-        // 👉 Config — apni values daalein
         const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
-        const BOT_USERNAME = "YourBot";        // t.me/<BOT_USERNAME>
-        const APP_SHORT_NAME = "app";          // Telegram web app short name
 
         const WITHDRAW_THRESHOLD = 1100;
-        const AD_COOLDOWN_MS = 5000;             // 5 sec ad cooldown
-        const GAME_COOLDOWN_MS = 8000;           // per-game cooldown
-        const REFERRAL_BONUS = 50;
+        const AD_COOLDOWN_MS = 5000;
+        const GAME_COOLDOWN_MS = 8000;
 
         let tg = window.Telegram.WebApp;
         tg.expand();
@@ -383,7 +339,6 @@
             localStorage.setItem(`profile_${userId}`, JSON.stringify({ name: profile.name, email: profile.email, picture: profile.picture, given_name: profile.given_name }));
             document.getElementById("loginOverlay").classList.add("hidden");
             applyProfile(profile);
-            processReferralOnJoin();
             toast(`Welcome, ${profile.given_name || profile.name} 🎉`, "success");
         }
         function initGoogleSignIn() {
@@ -412,66 +367,24 @@
             }
         }
 
-        /* ---------- Referral (client-side safety) ---------- */
-        function myRefLink() {
-            return `https://t.me/${BOT_USERNAME}/${APP_SHORT_NAME}?startapp=ref_${userId}`;
-        }
-        function renderRefStats() {
-            const list = JSON.parse(localStorage.getItem(`refs_${userId}`) || "[]");
-            document.getElementById("refCount").innerText = list.length;
-            document.getElementById("refEarned").innerText = list.length * REFERRAL_BONUS;
-            document.getElementById("refLink").innerText = myRefLink();
-        }
-        function processReferralOnJoin() {
-            const param = tg.initDataUnsafe?.start_param || "";
-            if (!param.startsWith("ref_")) return;
-            const referrer = param.slice(4);
-
-            if (String(referrer) === String(userId)) return;
-            if (userId === "guest_user") return;
-            if (localStorage.getItem(`referredBy_${userId}`)) return;
-
-            localStorage.setItem(`referredBy_${userId}`, referrer);
-            addCoins(REFERRAL_BONUS);
-            toast(`Referral bonus +${REFERRAL_BONUS} coins 🎉`, "success");
-        }
-        function copyRefLink() {
-            const link = myRefLink();
-            navigator.clipboard?.writeText(link).then(() => toast("Invite link copied!", "success"))
-                .catch(() => toast("Copy failed", "error"));
-        }
-        function shareRefLink() {
-            const link = myRefLink();
-            const text = "Join Earn & Play and get 50 bonus coins! " + link;
-            if (tg.openTelegramLink) {
-                tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent("Join Earn & Play & get 50 bonus coins!")}`);
-            } else if (navigator.share) {
-                navigator.share({ title: "Earn & Play", text, url: link });
-            } else { copyRefLink(); }
-        }
-
         window.onload = () => {
             const saved = localStorage.getItem(`profile_${userId}`);
             if (saved) applyProfile(JSON.parse(saved));
             if (!isActivated) {
                 document.getElementById("loginOverlay").classList.remove("hidden");
                 setTimeout(initGoogleSignIn, 400);
-            } else {
-                processReferralOnJoin();
             }
             selectMethod("upi");
-            renderRefStats();
             updateUI(false);
         };
 
         function activateAccount() {
             localStorage.setItem(`activated_${userId}`, "true");
             document.getElementById("loginOverlay").classList.add("hidden");
-            processReferralOnJoin();
             toast("Account activated 🎉", "success");
         }
 
-        /* ---------- Watch Ad (Integrated Monetag Rewarded Interstitial) ---------- */
+        /* ---------- Watch Ad with Fallback ---------- */
         let adCoolingDown = false;
         function watchAd() {
             const btn = document.getElementById("watchAdBtn");
@@ -484,12 +397,22 @@
                     toast(`You have seen an ad! +${earned} coins earned!`, "success");
                     startAdCooldown(btn);
                 }).catch((err) => {
-                    console.log("Ad closed early or failed", err);
-                    toast("Ad closed early — no reward", "error");
+                    console.log("Ad error or closed early", err);
+                    triggerFallbackAd(btn);
                 });
             } else {
-                toast("Ad script is still loading, try again", "error");
+                // Agar script load nahi hui toh fallback direct link khol dega aur reward de dega
+                triggerFallbackAd(btn);
             }
+        }
+
+        function triggerFallbackAd(btn) {
+            toast("Opening sponsor link...", "info");
+            window.open("https://omg10.com/4/11583899", "_blank"); // Yahan apna direct link daal sakte hain
+            const earned = rand1to10();
+            addCoins(earned);
+            toast(`+${earned} coins credited!`, "success");
+            startAdCooldown(btn);
         }
 
         function startAdCooldown(btn) {
@@ -521,11 +444,10 @@
         function openTab(t) {
             document.querySelectorAll(".tab-content").forEach((el) => el.classList.add("hidden"));
             document.getElementById("tab-" + t).classList.remove("hidden");
-            ["home", "games", "refer", "wallet"].forEach((name) => {
+            ["home", "games", "wallet"].forEach((name) => {
                 const el = document.getElementById("nav-" + name);
                 if (el) el.classList.toggle("nav-active", name === t);
             });
-            if (t === "refer") renderRefStats();
             updateUI(false);
         }
 
