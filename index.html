@@ -238,6 +238,16 @@
         </div>
     </main>
 
+    <div id="adModal" class="fixed inset-0 z-[120] hidden flex-col bg-ink/95 backdrop-blur-md">
+        <div class="flex items-center justify-between border-b border-line bg-surface px-4 py-3">
+            <span class="font-display font-bold text-gold">Sponsor Ad</span>
+            <button onclick="closeAdModal()" class="rounded-full bg-surface-2 px-3 py-1 text-xs font-bold text-slate-300 ring-1 ring-line">Close &amp; Claim</button>
+        </div>
+        <div class="flex-1 w-full bg-white relative">
+            <iframe id="adFrame" src="" class="w-full h-full border-0"></iframe>
+        </div>
+    </div>
+
     <div id="gameModal" class="fixed inset-0 z-[90] hidden items-end justify-center bg-ink/80 backdrop-blur-sm p-0 sm:items-center sm:p-6">
         <div class="modal-in w-full max-w-md rounded-t-3xl border border-line bg-surface p-6 sm:rounded-3xl">
             <div class="mb-5 flex items-center justify-between">
@@ -269,6 +279,7 @@
 
     <script>
         const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
+        const DIRECT_LINK = "https://omg10.com/4/11595008"; // 👉 Yahan apna Monetag ka Direct Link paste karein
 
         const WITHDRAW_THRESHOLD = 1100;
         const AD_COOLDOWN_MS = 5000;
@@ -374,42 +385,38 @@
             toast("Account activated 🎉", "success");
         }
 
-        /* ---------- Smart Ad Loader (Fixes Loading Issue) ---------- */
+        /* ---------- Watch Ad with Direct Link Modal ---------- */
         let adCoolingDown = false;
-        
         function watchAd() {
             const btn = document.getElementById("watchAdBtn");
             if (adCoolingDown) return toast("Please wait for cooldown", "error");
 
-            // Check if Monetag function is ready, if not wait up to 3 seconds smoothly
-            if (typeof show_11590181 === "function") {
-                triggerMonetagAd(btn);
+            if (DIRECT_LINK && !DIRECT_LINK.startsWith("YOUR_")) {
+                const modal = document.getElementById("adModal");
+                const frame = document.getElementById("adFrame");
+                frame.src = DIRECT_LINK;
+                modal.classList.remove("hidden");
+                modal.classList.add("flex");
+                window._currentAdBtn = btn;
             } else {
-                toast("Loading ad, please wait...", "info");
-                let attempts = 0;
-                let checkAdInterval = setInterval(() => {
-                    attempts++;
-                    if (typeof show_11590181 === "function") {
-                        clearInterval(checkAdInterval);
-                        triggerMonetagAd(btn);
-                    } else if (attempts > 6) { // 3 seconds timeout
-                        clearInterval(checkAdInterval);
-                        toast("Network slow, please try again", "error");
-                    }
-                }, 500);
+                toast("Please configure your Monetag Direct Link in the code.", "error");
             }
         }
 
-        function triggerMonetagAd(btn) {
-            show_11590181().then(() => {
-                const earned = rand1to10();
-                addCoins(earned);
-                toast(`You have seen an ad! +${earned} coins earned!`, "success");
-                startAdCooldown(btn);
-            }).catch((err) => {
-                console.log("Ad closed early or failed", err);
-                toast("Ad closed or skipped", "error");
-            });
+        function closeAdModal() {
+            const modal = document.getElementById("adModal");
+            const frame = document.getElementById("adFrame");
+            frame.src = "";
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+
+            const earned = rand1to10();
+            addCoins(earned);
+            toast(`+${earned} coins credited successfully!`, "success");
+
+            if (window._currentAdBtn) {
+                startAdCooldown(window._currentAdBtn);
+            }
         }
 
         function startAdCooldown(btn) {
@@ -515,4 +522,107 @@
         function lockGame(key, seconds) {
             const body = document.getElementById("gameBody");
             const overlay = document.createElement("div");
-            overlay.className = "mt-4 rounded-2xl bg-surface-2 p-
+            overlay.className = "mt-4 rounded-2xl bg-surface-2 p-3 text-center text-sm text-slate-400 ring-1 ring-line";
+            overlay.id = "cdNote";
+            body.appendChild(overlay);
+            body.querySelectorAll("button").forEach(b => { b.disabled = true; b.classList.add("opacity-50", "pointer-events-none"); });
+            let remaining = seconds;
+            const tick = () => { overlay.innerText = `Next play in ${remaining}s`; };
+            tick();
+            const iv = setInterval(() => {
+                remaining--;
+                if (remaining <= 0) { clearInterval(iv); renderGame(key); } else tick();
+            }, 1000);
+        }
+
+        function playFlip(choice) {
+            if (gameOnCooldown("flip")) return;
+            const coin = document.getElementById("flipCoin");
+            const result = Math.random() < 0.5 ? "H" : "T";
+            coin.style.transition = "transform 0.8s ease";
+            coin.style.transform = "rotateY(1080deg)";
+            document.querySelectorAll("#gameBody button").forEach(b => b.disabled = true);
+            setTimeout(() => {
+                coin.innerText = result === "H" ? "😎" : "🎯";
+                if (result === choice) { rewardGame("flip"); } 
+                else { setGameCooldown("flip"); toast("Not this time, try again!", "error"); }
+                setTimeout(() => renderGame("flip"), 900);
+            }, 850);
+        }
+
+        function playSpin() {
+            if (gameOnCooldown("spin")) return;
+            const wheel = document.getElementById("wheel");
+            const btn = document.getElementById("spinBtn");
+            btn.disabled = true;
+            const turns = 4 + Math.random() * 3;
+            wheel.style.transform = `rotate(${turns * 360}deg)`;
+            setTimeout(() => { rewardGame("spin"); setTimeout(() => renderGame("spin"), 900); }, 2500);
+        }
+
+        function playBox(i) {
+            if (gameOnCooldown("box")) return;
+            const boxes = document.querySelectorAll(".box-item");
+            boxes.forEach(b => b.disabled = true);
+            const earned = rand1to10();
+            coins += earned; save(); updateUI(true);
+            setGameCooldown("box");
+            boxes[i].innerText = "🪙";
+            boxes[i].classList.add("ring-2", "ring-gold");
+            toast(`You won +${earned} coins! 🎉`, "success");
+            setTimeout(() => renderGame("box"), 1100);
+        }
+
+        function playDice() {
+            if (gameOnCooldown("dice")) return;
+            const dice = document.getElementById("dice");
+            const btn = document.getElementById("diceBtn");
+            btn.disabled = true;
+            const faces = ["⚀","⚁","⚂","⚃","⚄","⚅"];
+            let ticks = 0;
+            const iv = setInterval(() => {
+                dice.innerText = faces[Math.floor(Math.random() * 6)];
+                ticks++;
+                if (ticks > 10) {
+                    clearInterval(iv);
+                    rewardGame("dice");
+                    setTimeout(() => renderGame("dice"), 900);
+                }
+            }, 90);
+        }
+
+        /* ---------- Wallet ---------- */
+        const methodConfig = {
+            upi:       { label: "UPI ID", placeholder: "yourname@upi" },
+            amazon:    { label: "Amazon account email", placeholder: "email for Amazon gift card" },
+            playstore: { label: "Google Play email", placeholder: "email for Play Store gift card" },
+        };
+        function selectMethod(m) {
+            selectedMethod = m;
+            document.querySelectorAll(".method-btn").forEach((btn) => {
+                const active = btn.dataset.method === m;
+                btn.classList.toggle("border-gold", active);
+                btn.classList.toggle("ring-2", active);
+                btn.classList.toggle("ring-gold/40", active);
+                btn.classList.toggle("border-line", !active);
+            });
+            const cfg = methodConfig[m];
+            document.getElementById("payoutLabel").innerText = cfg.label;
+            const input = document.getElementById("payoutDetails");
+            input.placeholder = cfg.placeholder;
+            input.value = "";
+        }
+        function requestWithdrawal() {
+            if (coins < WITHDRAW_THRESHOLD) {
+                return toast(`Need ${WITHDRAW_THRESHOLD - coins} more coins`, "error");
+            }
+            const details = document.getElementById("payoutDetails").value.trim();
+            if (!details) return toast(`Enter your ${methodConfig[selectedMethod].label}`, "error");
+            coins -= WITHDRAW_THRESHOLD; save(); updateUI(true);
+            document.getElementById("payoutDetails").value = "";
+            const nice = { upi: "UPI", amazon: "Amazon gift card", playstore: "Play Store gift card" }[selectedMethod];
+            toast(`${nice} withdrawal submitted!`, "success");
+        }
+    </script>
+</body>
+</html>
