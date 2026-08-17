@@ -16,7 +16,7 @@
     <!-- GOOGLE IDENTITY SERVICES -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
-    <!-- MONETAG SCRIPT -->
+    <!-- 👉 MONETAG OFFICIAL REWARDED SCRIPT -->
     <script src="//libroot.net/p/tag.min.js" data-zone="11590181" async></script>
 
     <script>
@@ -246,26 +246,6 @@
         </div>
     </main>
 
-    <!-- Simulated Rewarded Ad Popup Modal (Jaise screenshot mein timer aur continue hota hai) -->
-    <div id="rewardAdModal" class="fixed inset-0 z-[120] hidden flex-col items-center justify-center bg-ink/95 backdrop-blur-md p-4">
-        <div class="w-full max-w-sm rounded-3xl border border-line bg-surface p-6 text-center shadow-2xl space-y-5">
-            <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-slate-400">sponsored ad</span>
-                <span id="adTimerBadge" class="rounded-full bg-gold/20 px-3 py-1 text-xs font-bold text-gold">00:10</span>
-            </div>
-            
-            <div class="rounded-2xl bg-surface-2 p-6 border border-line">
-                <div class="text-4xl mb-2">🎁</div>
-                <h3 class="font-display text-lg font-bold text-white">Watch &amp; Support</h3>
-                <p class="text-xs text-slate-400 mt-1">Please wait while the sponsor offer is active...</p>
-            </div>
-
-            <button id="claimRewardBtn" onclick="claimAdReward()" disabled class="w-full rounded-2xl bg-surface-2 py-4 font-display font-bold text-slate-500 transition border border-line">
-                Please wait (10s)
-            </button>
-        </div>
-    </div>
-
     <!-- Game Modal -->
     <div id="gameModal" class="fixed inset-0 z-[90] hidden items-end justify-center bg-ink/80 backdrop-blur-sm p-0 sm:items-center sm:p-6">
         <div class="modal-in w-full max-w-md rounded-t-3xl border border-line bg-surface p-6 sm:rounded-3xl">
@@ -299,7 +279,6 @@
 
     <script>
         const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
-        const DIRECT_LINK = "YOUR_DIRECT_LINK_HERE"; // 👉 Yahan apna Monetag ka Direct Link daalein
 
         const WITHDRAW_THRESHOLD = 1100;
         const AD_COOLDOWN_MS = 5000;
@@ -405,15 +384,12 @@
             toast("Account activated 🎉", "success");
         }
 
-        /* ---------- Watch Ad with Timer Modal (Screenshot Style) ---------- */
+        /* ---------- Watch Ad (Direct Monetag Integration) ---------- */
         let adCoolingDown = false;
-        let adTimerInterval = null;
-
         function watchAd() {
             const btn = document.getElementById("watchAdBtn");
             if (adCoolingDown) return toast("Please wait for cooldown", "error");
 
-            // Pehle official function try karega, agar load nahi hua toh timer modal khol dega
             if (typeof show_11590181 === "function") {
                 show_11590181().then(() => {
                     const earned = rand1to10();
@@ -421,60 +397,11 @@
                     toast(`You have seen an ad! +${earned} coins earned!`, "success");
                     startAdCooldown(btn);
                 }).catch((err) => {
-                    console.log("Ad failed, opening timer modal", err);
-                    openRewardAdModal(btn);
+                    console.log("Ad closed early or failed", err);
+                    toast("Ad closed or failed to load", "error");
                 });
             } else {
-                openRewardAdModal(btn);
-            }
-        }
-
-        function openRewardAdModal(btn) {
-            window._currentAdBtn = btn;
-            const modal = document.getElementById("rewardAdModal");
-            const badge = document.getElementById("adTimerBadge");
-            const claimBtn = document.getElementById("claimRewardBtn");
-            
-            modal.classList.remove("hidden");
-            modal.classList.add("flex");
-
-            // Open direct link in background or new tab safely if available
-            if (DIRECT_LINK && !DIRECT_LINK.startsWith("YOUR_")) {
-                window.open(DIRECT_LINK, "_blank");
-            }
-
-            let timeLeft = 10; // 10 seconds timer
-            badge.innerText = `00:${timeLeft < 10 ? '0' + timeLeft : timeLeft}`;
-            claimBtn.disabled = true;
-            claimBtn.className = "w-full rounded-2xl bg-surface-2 py-4 font-display font-bold text-slate-500 transition border border-line";
-            claimBtn.innerText = `Please wait (${timeLeft}s)`;
-
-            clearInterval(adTimerInterval);
-            adTimerInterval = setInterval(() => {
-                timeLeft--;
-                badge.innerText = `00:${timeLeft < 10 ? '0' + timeLeft : timeLeft}`;
-                if (timeLeft > 0) {
-                    claimBtn.innerText = `Please wait (${timeLeft}s)`;
-                } else {
-                    clearInterval(adTimerInterval);
-                    claimBtn.disabled = false;
-                    claimBtn.className = "w-full rounded-2xl bg-gradient-to-b from-gold to-gold-deep py-4 font-display font-bold text-ink transition active:scale-[0.98] glow-gold";
-                    claimBtn.innerText = "Continue / Get Reward";
-                }
-            }, 1000);
-        }
-
-        function claimAdReward() {
-            const modal = document.getElementById("rewardAdModal");
-            modal.classList.add("hidden");
-            modal.classList.remove("flex");
-
-            const earned = rand1to10();
-            addCoins(earned);
-            toast(`You earned +${earned} coins! 🎉`, "success");
-
-            if (window._currentAdBtn) {
-                startAdCooldown(window._currentAdBtn);
+                toast("Ad is initializing, please click again in 2 seconds", "error");
             }
         }
 
