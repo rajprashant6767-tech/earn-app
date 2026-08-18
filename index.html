@@ -13,8 +13,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-
+    <!-- MONETAG OFFICIAL REWARDED SCRIPT -->
     <script src="//libroot.net/p/tag.min.js" data-zone="11590181" async></script>
 
     <script>
@@ -71,6 +70,7 @@
 
 <body class="bg-ink text-slate-100 font-sans flex flex-col min-h-screen antialiased selection:bg-gold/30">
 
+    <!-- Welcome / Login Overlay -->
     <div id="loginOverlay" class="fixed inset-0 bg-ink/95 backdrop-blur-sm z-[100] flex items-center justify-center p-6 hidden">
         <div class="bg-surface w-full max-w-sm rounded-3xl border border-line p-8 text-center shadow-2xl">
             <div class="mx-auto mb-6 grid h-20 w-20 place-items-center rounded-2xl bg-gradient-to-br from-gold to-gold-deep glow-gold">
@@ -79,19 +79,21 @@
             <h2 class="font-display text-2xl font-bold tracking-tight">Welcome to Earn &amp; Play</h2>
             <p class="mt-2 mb-7 text-sm leading-relaxed text-slate-400">Sign in with Google to start earning coins for every ad you watch.</p>
 
-            <div id="googleBtn" class="flex justify-center"></div>
-
-            <div id="googleFallback" class="hidden">
-                <button onclick="activateAccount()" class="w-full rounded-2xl bg-gradient-to-b from-gold to-gold-deep py-4 font-display font-bold text-ink transition active:scale-[0.98] glow-gold">
-                    Continue as Guest
-                </button>
-                <p class="mt-3 text-xs text-slate-500">Google Sign-In unavailable right now.</p>
-            </div>
+            <button onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-3 rounded-2xl bg-white py-4 font-display font-bold text-slate-800 transition active:scale-[0.98] shadow-lg">
+                <svg class="h-5 w-5" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.15 21.32 7.23 24 12 24z"/>
+                    <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.18C.43 8.13 0 9.87 0 12s.43 3.87 1.18 5.39l4.09-3.15z"/>
+                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.15 2.68 1.18 6.61l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/>
+                </svg>
+                Sign in with Google
+            </button>
 
             <p class="mt-5 text-[11px] leading-relaxed text-slate-600">By continuing you agree to our Terms &amp; Privacy Policy.</p>
         </div>
     </div>
 
+    <!-- Header -->
     <header class="sticky top-0 z-30 border-b border-line/70 bg-ink/80 backdrop-blur-md">
         <div class="mx-auto flex w-full max-w-md items-center justify-between px-4 py-3">
             <div class="flex items-center gap-3">
@@ -112,6 +114,7 @@
 
     <main class="mx-auto w-full max-w-md flex-1 px-4 pb-28 pt-5">
 
+        <!-- HOME -->
         <div id="tab-home" class="tab-content space-y-5">
             <section class="relative overflow-hidden rounded-3xl border border-line bg-surface p-6">
                 <div class="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gold/10 blur-2xl"></div>
@@ -131,6 +134,7 @@
                 </div>
             </section>
 
+            <!-- Watch ad card -->
             <section class="relative overflow-hidden rounded-3xl border border-violet/40 bg-gradient-to-br from-violet/25 via-surface to-surface p-6">
                 <div class="flex items-start justify-between">
                     <div>
@@ -155,6 +159,7 @@
             </button>
         </div>
 
+        <!-- GAMES -->
         <div id="tab-games" class="tab-content hidden space-y-4">
             <div class="flex items-center justify-between">
                 <h2 class="font-display text-lg font-bold">Play &amp; Win</h2>
@@ -198,6 +203,7 @@
             </button>
         </div>
 
+        <!-- REFER & EARN -->
         <div id="tab-refer" class="tab-content hidden space-y-5">
             <section class="rounded-3xl border border-line bg-surface p-6 text-center">
                 <div class="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-surface-2 text-3xl ring-1 ring-line">🎟️</div>
@@ -233,6 +239,7 @@
             </section>
         </div>
 
+        <!-- WALLET -->
         <div id="tab-wallet" class="tab-content hidden space-y-5">
             <section class="rounded-3xl border border-line bg-surface p-6">
                 <h2 class="font-display text-lg font-bold">Withdraw Coins</h2>
@@ -273,6 +280,7 @@
         </div>
     </main>
 
+    <!-- Game Modal -->
     <div id="gameModal" class="fixed inset-0 z-[90] hidden items-end justify-center bg-ink/80 backdrop-blur-sm p-0 sm:items-center sm:p-6">
         <div class="modal-in w-full max-w-md rounded-t-3xl border border-line bg-surface p-6 sm:rounded-3xl">
             <div class="mb-5 flex items-center justify-between">
@@ -283,6 +291,7 @@
         </div>
     </div>
 
+    <!-- Bottom Navigation -->
     <nav class="fixed inset-x-0 bottom-0 z-30 border-t border-line/70 bg-ink/90 backdrop-blur-md">
         <div class="mx-auto flex w-full max-w-md items-center justify-around px-4 py-3" style="padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));">
             <button id="nav-home" onclick="openTab('home')" class="nav-active flex flex-col items-center gap-1 text-slate-500 transition">
@@ -306,35 +315,95 @@
 
     <div id="toast" class="pointer-events-none fixed bottom-24 left-1/2 z-[110] hidden -translate-x-1/2"></div>
 
-    <script>
-        const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
+        const firebaseConfig = {
+          apiKey: "AIzaSyB3Jnitvrvot8iyJQdv-b71PDeSR3OGXhg",
+          authDomain: "watch-and-earn-16b69.firebaseapp.com",
+          projectId: "watch-and-earn-16b69",
+          storageBucket: "watch-and-earn-16b69.firebasestorage.app",
+          messagingSenderId: "979991411346",
+          appId: "1:979991411346:web:45136b6e8624099964c44b",
+          measurementId: "G-CRFRSJJZSY"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        window.loginWithGoogle = function() {
+            signInWithPopup(auth, provider).then((result) => {
+                const user = result.user;
+                handleUserLogin(user);
+            }).catch((error) => {
+                console.error(error);
+                window.showToast("Login failed. Try again.", "error");
+            });
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                handleUserLogin(user);
+            } else {
+                document.getElementById("loginOverlay").classList.remove("hidden");
+            }
+        });
+
+        function handleUserLogin(user) {
+            window.userId = user.uid;
+            localStorage.setItem(`activated_${window.userId}`, "true");
+            localStorage.setItem(`profile_${window.userId}`, JSON.stringify({
+                name: user.displayName,
+                email: user.email,
+                picture: user.photoURL,
+                given_name: user.displayName ? user.displayName.split(" ")[0] : "User"
+            }));
+            
+            document.getElementById("loginOverlay").classList.add("hidden");
+            window.applyProfile({
+                name: user.displayName,
+                picture: user.photoURL,
+                given_name: user.displayName ? user.displayName.split(" ")[0] : "User"
+            });
+            window.initUserData();
+            window.showToast(`Welcome, ${user.displayName || "User"}! 🎉`, "success");
+        }
+    </script>
+
+    <script>
         const WITHDRAW_THRESHOLD = 1100;
         const AD_COOLDOWN_MS = 5000;
         const GAME_COOLDOWN_MS = 8000;
-        const REFERRAL_REWARD = 100; // 100 Coins reward
+        const REFERRAL_REWARD = 100;
 
         let tg = window.Telegram.WebApp;
         tg.expand();
         try { tg.setHeaderColor && tg.setHeaderColor("#0a0e1a"); } catch (e) {}
 
-        let tgUserId = tg.initDataUnsafe?.user?.id;
-        let userId = tgUserId ? String(tgUserId) : (localStorage.getItem("local_user_id") || "USER_" + Math.floor(100000 + Math.random() * 900000));
-        if (!tgUserId && !localStorage.getItem("local_user_id")) {
-            localStorage.setItem("local_user_id", userId);
+        window.userId = tg.initDataUnsafe?.user?.id ? String(tg.initDataUnsafe.user.id) : (localStorage.getItem("local_user_id") || "USER_" + Math.floor(100000 + Math.random() * 900000));
+        if (!tg.initDataUnsafe?.user?.id && !localStorage.getItem("local_user_id")) {
+            localStorage.setItem("local_user_id", window.userId);
         }
 
-        let coins = parseInt(localStorage.getItem(`coins_${userId}`)) || 0;
-        let isActivated = localStorage.getItem(`activated_${userId}`);
+        let coins = 0;
         let selectedMethod = "upi";
+
+        window.initUserData = function() {
+            coins = parseInt(localStorage.getItem(`coins_${window.userId}`)) || 0;
+            document.getElementById("myReferralCode").value = window.userId;
+            updateUI(false);
+        };
 
         const rand1to10 = () => Math.floor(Math.random() * 10) + 1;
         const now = () => Date.now();
 
-        function save() { localStorage.setItem(`coins_${userId}`, coins); }
+        function save() { localStorage.setItem(`coins_${window.userId}`, coins); }
         function addCoins(n) { coins += n; save(); updateUI(true); }
 
-        function toast(message, type = "info") {
+        window.showToast = function(message, type = "info") {
             const host = document.getElementById("toast");
             const bg = type === "success" ? "from-emerald-500 to-emerald-600"
                      : type === "error"   ? "from-rose-500 to-rose-600"
@@ -346,15 +415,7 @@
             host._t = setTimeout(() => host.classList.add("hidden"), 2600);
         }
 
-        /* ---------- Google Sign-In ---------- */
-        function decodeJwt(token) {
-            try {
-                const base64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
-                const json = decodeURIComponent(atob(base64).split("").map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)).join(""));
-                return JSON.parse(json);
-            } catch (e) { return null; }
-        }
-        function applyProfile(profile) {
+        window.applyProfile = function(profile) {
             if (!profile) return;
             const nameEl = document.getElementById("userName");
             if (nameEl && profile.name) {
@@ -367,70 +428,39 @@
                 avatar.innerHTML = `<img src="${profile.picture}" alt="${profile.name || "User"}" class="h-full w-full object-cover" referrerpolicy="no-referrer" />`;
             }
         }
-        function handleGoogleCredential(response) {
-            const profile = decodeJwt(response.credential);
-            if (!profile) return toast("Sign-in failed, try again", "error");
-            localStorage.setItem(`activated_${userId}`, "true");
-            localStorage.setItem(`profile_${userId}`, JSON.stringify({ name: profile.name, email: profile.email, picture: profile.picture, given_name: profile.given_name }));
-            document.getElementById("loginOverlay").classList.add("hidden");
-            applyProfile(profile);
-            toast(`Welcome, ${profile.given_name || profile.name} 🎉`, "success");
-        }
-        function initGoogleSignIn() {
-            const configured = GOOGLE_CLIENT_ID && !GOOGLE_CLIENT_ID.startsWith("YOUR_");
-            if (!configured || !window.google || !google.accounts || !google.accounts.id) {
-                document.getElementById("googleBtn").classList.add("hidden");
-                document.getElementById("googleFallback").classList.remove("hidden");
-                return;
-            }
-            google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleGoogleCredential });
-            google.accounts.id.renderButton(document.getElementById("googleBtn"), { theme: "filled_black", size: "large", shape: "pill", text: "signin_with", width: 280 });
-        }
 
-        /* ---------- Unique Referral System Logic ---------- */
         function redeemFriendCode() {
             const inputField = document.getElementById("friendCodeInput");
             const code = inputField.value.trim().toUpperCase();
 
-            if (!code) return toast("Please enter a referral code", "error");
-            if (code === userId) return toast("You cannot use your own referral code!", "error");
+            if (!code) return window.showToast("Please enter a referral code", "error");
+            if (code === window.userId) return window.showToast("You cannot use your own referral code!", "error");
 
-            let hasRedeemed = localStorage.getItem(`redeemed_code_${userId}`);
-            if (hasRedeemed) return toast("You have already used a referral code!", "error");
+            let hasRedeemed = localStorage.getItem(`redeemed_code_${window.userId}`);
+            if (hasRedeemed) return window.showToast("You have already used a referral code!", "error");
 
-            // Check if referrer exists in storage registry
-            let referrerCoins = parseInt(localStorage.getItem(`coins_${code}`)) || 0;
-            // If referrer doesn't exist explicitly in local storage registry, create virtual entry or validate
-            // For robust multi-user simulation:
-            localStorage.setItem(`redeemed_code_${userId}`, code);
-
-            // Give 100 coins to current user
+            localStorage.setItem(`redeemed_code_${window.userId}`, code);
             addCoins(REFERRAL_REWARD);
 
-            // Record referral stats for referrer
             let refList = JSON.parse(localStorage.getItem(`referred_${code}`)) || [];
-            if (!refList.includes(userId)) {
-                refList.push(userId);
+            if (!refList.includes(window.userId)) {
+                refList.push(window.userId);
                 localStorage.setItem(`referred_${code}`, JSON.stringify(refList));
                 let refCoinsTotal = parseInt(localStorage.getItem(`refcoins_${code}`)) || 0;
                 refCoinsTotal += REFERRAL_REWARD;
                 localStorage.setItem(`refcoins_${code}`, refCoinsTotal);
                 
-                // If referrer is online/cached locally
                 let currentRefCoinsEarned = parseInt(localStorage.getItem(`coins_${code}`)) || 0;
-                if(currentRefCoinsEarned > 0) {
-                    localStorage.setItem(`coins_${code}`, currentRefCoinsEarned + REFERRAL_REWARD);
-                }
+                localStorage.setItem(`coins_${code}`, currentRefCoinsEarned + REFERRAL_REWARD);
             }
 
             inputField.value = "";
             document.getElementById("redeemSection").innerHTML = `<div class="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-3 text-center text-xs text-emerald-400 font-bold">Code Redeemed Successfully! +100 Coins Added 🎉</div>`;
-            toast("Successfully claimed 100 coins! 🎉", "success");
+            window.showToast("Successfully claimed 100 coins! 🎉", "success");
         }
 
-        /* ---------- UI ---------- */
         function updateUI(animate) {
-            coins = parseInt(localStorage.getItem(`coins_${userId}`)) || coins;
+            coins = parseInt(localStorage.getItem(`coins_${window.userId}`)) || coins;
             const pct = Math.min(100, Math.round((coins / WITHDRAW_THRESHOLD) * 100));
             document.getElementById("coinBalance").innerText = coins;
             const big = document.getElementById("coinBalanceBig"); if (big) big.innerText = coins;
@@ -438,13 +468,12 @@
             const bar = document.getElementById("progressBar"); if (bar) bar.style.width = pct + "%";
             const label = document.getElementById("progressLabel"); if (label) label.innerText = pct + "%";
 
-            // Refer stats update
-            let currentRefs = JSON.parse(localStorage.getItem(`referred_${userId}`)) || [];
-            let currentRefCoins = parseInt(localStorage.getItem(`refcoins_${userId}`)) || 0;
+            let currentRefs = JSON.parse(localStorage.getItem(`referred_${window.userId}`)) || [];
+            let currentRefCoins = parseInt(localStorage.getItem(`refcoins_${window.userId}`)) || 0;
             document.getElementById("totalReferralsCount").innerText = currentRefs.length;
             document.getElementById("totalReferralCoins").innerText = currentRefCoins;
 
-            if (localStorage.getItem(`redeemed_code_${userId}`)) {
+            if (localStorage.getItem(`redeemed_code_${window.userId}`)) {
                 const redeemSec = document.getElementById("redeemSection");
                 if (redeemSec && !redeemSec.innerHTML.includes("Successfully")) {
                     redeemSec.innerHTML = `<div class="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-3 text-center text-xs text-emerald-400 font-bold">Referral Code Already Redeemed ✓</div>`;
@@ -459,52 +488,38 @@
         }
 
         window.onload = () => {
-            const saved = localStorage.getItem(`profile_${userId}`);
-            if (saved) applyProfile(JSON.parse(saved));
-            if (!isActivated) {
-                document.getElementById("loginOverlay").classList.remove("hidden");
-                setTimeout(initGoogleSignIn, 400);
-            }
-            
-            // Set unique code in input
-            document.getElementById("myReferralCode").value = userId;
-
+            const saved = localStorage.getItem(`profile_${window.userId}`);
+            if (saved) window.applyProfile(JSON.parse(saved));
+            window.initUserData();
             selectMethod("upi");
-            updateUI(false);
         };
-
-        function activateAccount() {
-            localStorage.setItem(`activated_${userId}`, "true");
-            document.getElementById("loginOverlay").classList.add("hidden");
-            toast("Account activated 🎉", "success");
-        }
 
         function copyMyCode() {
             const input = document.getElementById("myReferralCode");
             input.select();
             input.setSelectionRange(0, 99999);
             navigator.clipboard.writeText(input.value);
-            toast("Referral code copied!", "success");
+            window.showToast("Referral code copied!", "success");
         }
 
         /* ---------- Watch Ad ---------- */
         let adCoolingDown = false;
         function watchAd() {
             const btn = document.getElementById("watchAdBtn");
-            if (adCoolingDown) return toast("Please wait for cooldown", "error");
+            if (adCoolingDown) return window.showToast("Please wait for cooldown", "error");
 
             if (typeof show_11590181 === "function") {
                 show_11590181().then(() => {
                     const earned = rand1to10();
                     addCoins(earned);
-                    toast(`You have seen an ad! +${earned} coins earned!`, "success");
+                    window.showToast(`You have seen an ad! +${earned} coins earned!`, "success");
                     startAdCooldown(btn);
                 }).catch((err) => {
                     console.log("Ad closed or failed", err);
-                    toast("Ad closed or failed to load", "error");
+                    window.showToast("Ad closed or failed to load", "error");
                 });
             } else {
-                toast("Ad is still loading. Please check your network or try again.", "error");
+                window.showToast("Ad is still loading. Please check your network or try again.", "error");
             }
         }
 
@@ -528,11 +543,11 @@
 
         /* ---------- Games ---------- */
         function gameOnCooldown(key) {
-            const last = parseInt(localStorage.getItem(`glast_${key}_${userId}`) || "0");
+            const last = parseInt(localStorage.getItem(`glast_${key}_${window.userId}`) || "0");
             const left = GAME_COOLDOWN_MS - (now() - last);
             return left > 0 ? Math.ceil(left / 1000) : 0;
         }
-        function setGameCooldown(key) { localStorage.setItem(`glast_${key}_${userId}`, String(now())); }
+        function setGameCooldown(key) { localStorage.setItem(`glast_${key}_${window.userId}`, String(now())); }
 
         function openTab(t) {
             document.querySelectorAll(".tab-content").forEach((el) => el.classList.add("hidden"));
@@ -561,7 +576,7 @@
             const earned = rand1to10();
             addCoins(earned);
             setGameCooldown(key);
-            toast(`You won +${earned} coins! 🎉`, "success");
+            window.showToast(`You won +${earned} coins! 🎉`, "success");
             return earned;
         }
 
@@ -634,7 +649,7 @@
             setTimeout(() => {
                 coin.innerText = result === "H" ? "😎" : "🎯";
                 if (result === choice) { rewardGame("flip"); } 
-                else { setGameCooldown("flip"); toast("Not this time, try again!", "error"); }
+                else { setGameCooldown("flip"); window.showToast("Not this time, try again!", "error"); }
                 setTimeout(() => renderGame("flip"), 900);
             }, 850);
         }
@@ -658,7 +673,7 @@
             setGameCooldown("box");
             boxes[i].innerText = "🪙";
             boxes[i].classList.add("ring-2", "ring-gold");
-            toast(`You won +${earned} coins! 🎉`, "success");
+            window.showToast(`You won +${earned} coins! 🎉`, "success");
             setTimeout(() => renderGame("box"), 1100);
         }
 
@@ -703,14 +718,14 @@
         }
         function requestWithdrawal() {
             if (coins < WITHDRAW_THRESHOLD) {
-                return toast(`Need ${WITHDRAW_THRESHOLD - coins} more coins`, "error");
+                return window.showToast(`Need ${WITHDRAW_THRESHOLD - coins} more coins`, "error");
             }
             const details = document.getElementById("payoutDetails").value.trim();
-            if (!details) return toast(`Enter your ${methodConfig[selectedMethod].label}`, "error");
+            if (!details) return window.showToast(`Enter your ${methodConfig[selectedMethod].label}`, "error");
             coins -= WITHDRAW_THRESHOLD; save(); updateUI(true);
             document.getElementById("payoutDetails").value = "";
             const nice = { upi: "UPI", amazon: "Amazon gift card", playstore: "Play Store gift card" }[selectedMethod];
-            toast(`${nice} withdrawal submitted!`, "success");
+            window.showToast(`${nice} withdrawal submitted!`, "success");
         }
     </script>
 </body>
