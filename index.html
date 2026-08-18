@@ -254,6 +254,14 @@
                 </button>
                 <p class="mt-3 text-center text-xs text-slate-500">Requests are processed within 24–48 hours.</p>
             </section>
+
+            <!-- Withdrawal History Section -->
+            <section class="rounded-3xl border border-line bg-surface p-6 space-y-3">
+                <h3 class="font-display text-md font-bold">Withdrawal History</h3>
+                <div id="historyList" class="space-y-2 text-xs text-slate-400">
+                    <p>No withdrawal requests yet.</p>
+                </div>
+            </section>
         </div>
     </main>
 
@@ -292,33 +300,43 @@
 
     <div id="toast" class="pointer-events-none fixed bottom-24 left-1/2 z-[110] hidden -translate-x-1/2"></div>
 
-    <script>
+    <!-- Firebase SDK & App Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyB3Jnitvrvot8iyJQdv-b71PDeSR3OGXhg",
+          authDomain: "watch-and-earn-16b69.firebaseapp.com",
+          projectId: "watch-and-earn-16b69",
+          storageBucket: "watch-and-earn-16b69.firebasestorage.app",
+          messagingSenderId: "979991411346",
+          appId: "1:979991411346:web:45136b6e8624099964c44b",
+          measurementId: "G-CRFRSJJZSY"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        let tgUser = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
+        window.userId = tgUser && tgUser.id ? String(tgUser.id) : ("TG_" + Math.floor(100000 + Math.random() * 900000));
+        window.userNameVal = tgUser && tgUser.first_name ? tgUser.first_name : "User";
+
+        let coins = 0;
+        let selectedMethod = "upi";
         const WITHDRAW_THRESHOLD = 1100;
         const AD_COOLDOWN_MS = 5000;
         const GAME_COOLDOWN_MS = 8000;
         const REFERRAL_REWARD = 100;
 
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-        try { tg.setHeaderColor && tg.setHeaderColor("#0a0e1a"); } catch (e) {}
-
-        // Automatic Telegram User Login Setup
-        let tgUser = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
-        
-        // Agar user Telegram ke bahar browser mein khole toh dummy ID taaki test ho sake
-        window.userId = tgUser && tgUser.id ? String(tgUser.id) : ("TG_" + Math.floor(100000 + Math.random() * 900000));
-
-        let coins = 0;
-        let selectedMethod = "upi";
-
         window.initUserData = function() {
             coins = parseInt(localStorage.getItem(`coins_${window.userId}`)) || 0;
             document.getElementById("myReferralCode").value = window.userId;
             updateUI(false);
+            listenToUserWithdrawals();
         };
-
-        const rand1to10 = () => Math.floor(Math.random() * 10) + 1;
-        const now = () => Date.now();
 
         function save() { localStorage.setItem(`coins_${window.userId}`, coins); }
         function addCoins(n) { coins += n; save(); updateUI(true); }
@@ -340,8 +358,7 @@
             if (nameEl) {
                 nameEl.classList.remove("uppercase", "tracking-wider", "text-slate-500");
                 nameEl.classList.add("text-slate-300");
-                const displayName = tgUser && tgUser.first_name ? tgUser.first_name : "User";
-                nameEl.innerText = "Hi, " + displayName;
+                nameEl.innerText = "Hi, " + window.userNameVal;
             }
             const avatar = document.getElementById("userAvatar");
             if (avatar && tgUser && tgUser.photo_url) {
@@ -349,10 +366,83 @@
             }
         }
 
+        window.requestWithdrawal = async function() {
+            if (coins < WITHDRAW_THRESHOLD) {
+                return window.showToast(`Need ${WITHDRAW_THRESHOLD - coins} more coins`, "error");
+            }
+            const details = document.getElementById("payoutDetails").value.trim();
+            if (!details) return window.showToast("Please enter your payout details", "error");
+
+            try {
+                // Deduct coins first
+                coins -= WITHDRAW_THRESHOLD; 
+                save(); 
+                updateUI(true);
+                document.getElementById("payoutDetails").value = "";
+
+                // Push to Firestore Withdrawals Collection
+                await addDoc(collection(db, "withdrawals"), {
+                    userId: window.userId,
+                    userName: window.userNameVal,
+                    method: selectedMethod,
+                    details: details,
+                    amount: "₹10",
+                    status: "Pending",
+                    timestamp: new Date()
+                });
+
+                window.showToast("Request sent! Your money will be sent within 24 hours.", "success");
+            } catch (e) {
+                console.error(e);
+                window.showToast("Error submitting request. Try again.", "error");
+            }
+        }
+
+        function listenToUserWithdrawals() {
+            const historyContainer = document.getElementById("historyList");
+            // Real-time listener for user history
+            const q = query(collection(db, "withdrawals"), where("userId", "==", window.userId));
+            onSnapshot(q, (snapshot) => {
+                if (snapshot.empty) {
+                    historyContainer.innerHTML = `<p>No withdrawal requests yet.</p>`;
+                    return;
+                }
+                let html = "";
+                snapshot.forEach((docSnap) => {
+                    let data = docSnap.data();
+                    let badgeColor = data.status === "Success" ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/30" 
+                                   : data.status === "Rejected" ? "text-rose-400 bg-rose-500/10 border-rose-500/30" 
+                                   : "text-gold bg-gold/10 border-gold/30";
+                    
+                    html += `
+                        <div class="rounded-2xl bg-surface-2 p-3 ring-1 ring-line flex items-center justify-between">
+                            <div>
+                                <p class="font-semibold text-slate-200">${data.amount} via ${data.method.toUpperCase()}</p>
+                                <p class="text-[10px] text-slate-500">${data.details}</p>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-lg border text-[11px] font-bold ${badgeColor}">${data.status === 'Success' ? '✓ Success' : data.status}</span>
+                        </div>
+                    `;
+                });
+                historyContainer.innerHTML = html;
+            });
+        }
+
+        window.onload = () => {
+            window.applyProfile();
+            window.initUserData();
+            selectMethod("upi");
+        };
+    </script>
+
+    <!-- Other helper script functions (Games, Ads, Referrals) -->
+    <script>
+        const rand1to10 = () => Math.floor(Math.random() * 10) + 1;
+        const now = () => Date.now();
+
         function redeemFriendCode() {
             const inputField = document.getElementById("friendCodeInput");
             const code = inputField.value.trim().toUpperCase();
-
             if (!code) return window.showToast("Please enter a referral code", "error");
             if (code === window.userId) return window.showToast("You cannot use your own referral code!", "error");
 
@@ -360,18 +450,17 @@
             if (hasRedeemed) return window.showToast("You have already used a referral code!", "error");
 
             localStorage.setItem(`redeemed_code_${window.userId}`, code);
-            addCoins(REFERRAL_REWARD);
+            addCoins(100);
 
             let refList = JSON.parse(localStorage.getItem(`referred_${code}`)) || [];
             if (!refList.includes(window.userId)) {
                 refList.push(window.userId);
                 localStorage.setItem(`referred_${code}`, JSON.stringify(refList));
                 let refCoinsTotal = parseInt(localStorage.getItem(`refcoins_${code}`)) || 0;
-                refCoinsTotal += REFERRAL_REWARD;
+                refCoinsTotal += 100;
                 localStorage.setItem(`refcoins_${code}`, refCoinsTotal);
-                
                 let currentRefCoinsEarned = parseInt(localStorage.getItem(`coins_${code}`)) || 0;
-                localStorage.setItem(`coins_${code}`, currentRefCoinsEarned + REFERRAL_REWARD);
+                localStorage.setItem(`coins_${code}`, currentRefCoinsEarned + 100);
             }
 
             inputField.value = "";
@@ -380,8 +469,8 @@
         }
 
         function updateUI(animate) {
-            coins = parseInt(localStorage.getItem(`coins_${window.userId}`)) || coins;
-            const pct = Math.min(100, Math.round((coins / WITHDRAW_THRESHOLD) * 100));
+            let coins = parseInt(localStorage.getItem(`coins_${window.userId}`)) || 0;
+            const pct = Math.min(100, Math.round((coins / 1100) * 100));
             document.getElementById("coinBalance").innerText = coins;
             const big = document.getElementById("coinBalanceBig"); if (big) big.innerText = coins;
             const wallet = document.getElementById("coinBalanceWallet"); if (wallet) wallet.innerText = coins + " coins";
@@ -407,44 +496,34 @@
             }
         }
 
-        window.onload = () => {
-            window.applyProfile();
-            window.initUserData();
-            selectMethod("upi");
-        };
-
         function copyMyCode() {
             const input = document.getElementById("myReferralCode");
             input.select();
-            input.setSelectionRange(0, 99999);
             navigator.clipboard.writeText(input.value);
             window.showToast("Referral code copied!", "success");
         }
 
-        /* ---------- Watch Ad ---------- */
         let adCoolingDown = false;
         function watchAd() {
             const btn = document.getElementById("watchAdBtn");
             if (adCoolingDown) return window.showToast("Please wait for cooldown", "error");
-
             if (typeof show_11590181 === "function") {
                 show_11590181().then(() => {
                     const earned = rand1to10();
                     addCoins(earned);
                     window.showToast(`You have seen an ad! +${earned} coins earned!`, "success");
                     startAdCooldown(btn);
-                }).catch((err) => {
-                    console.log("Ad closed or failed", err);
+                }).catch(() => {
                     window.showToast("Ad closed or failed to load", "error");
                 });
             } else {
-                window.showToast("Ad is still loading. Please check your network or try again.", "error");
+                window.showToast("Ad is still loading. Please try again.", "error");
             }
         }
 
         function startAdCooldown(btn) {
             adCoolingDown = true;
-            let remaining = Math.ceil(AD_COOLDOWN_MS / 1000);
+            let remaining = 5;
             btn.disabled = true;
             btn.innerText = `Wait ${remaining}s`;
             const iv = setInterval(() => {
@@ -460,14 +539,6 @@
             }, 1000);
         }
 
-        /* ---------- Games ---------- */
-        function gameOnCooldown(key) {
-            const last = parseInt(localStorage.getItem(`glast_${key}_${window.userId}`) || "0");
-            const left = GAME_COOLDOWN_MS - (now() - last);
-            return left > 0 ? Math.ceil(left / 1000) : 0;
-        }
-        function setGameCooldown(key) { localStorage.setItem(`glast_${key}_${window.userId}`, String(now())); }
-
         function openTab(t) {
             document.querySelectorAll(".tab-content").forEach((el) => el.classList.add("hidden"));
             document.getElementById("tab-" + t).classList.remove("hidden");
@@ -482,145 +553,77 @@
             const modal = document.getElementById("gameModal");
             modal.classList.remove("hidden");
             modal.classList.add("flex");
-            const title = { flip: "Coin Flip", spin: "Spin Wheel", box: "Lucky Box", dice: "Dice Roll" }[key];
-            document.getElementById("gameTitle").innerText = title;
+            document.getElementById("gameTitle").innerText = { flip: "Coin Flip", spin: "Spin Wheel", box: "Lucky Box", dice: "Dice Roll" }[key];
             renderGame(key);
         }
         function closeGame() {
-            const modal = document.getElementById("gameModal");
-            modal.classList.add("hidden");
-            modal.classList.remove("flex");
+            document.getElementById("gameModal").classList.add("hidden");
+            document.getElementById("gameModal").classList.remove("flex");
         }
         function rewardGame(key) {
             const earned = rand1to10();
             addCoins(earned);
-            setGameCooldown(key);
+            localStorage.setItem(`glast_${key}_${window.userId}`, String(now()));
             window.showToast(`You won +${earned} coins! 🎉`, "success");
             return earned;
         }
 
         function renderGame(key) {
             const body = document.getElementById("gameBody");
-            const cd = gameOnCooldown(key);
+            const last = parseInt(localStorage.getItem(`glast_${key}_${window.userId}`) || "0");
+            const left = 8000 - (now() - last);
+            const cd = left > 0 ? Math.ceil(left / 1000) : 0;
 
             if (key === "flip") {
-                body.innerHTML = `
-                    <div class="text-center">
-                        <div class="mx-auto mb-6 grid h-28 w-28 place-items-center rounded-full bg-surface-2 text-6xl ring-1 ring-line" id="flipCoin">🪙</div>
-                        <p class="mb-4 text-sm text-slate-400">Pick your side</p>
-                        <div class="grid grid-cols-2 gap-3">
-                            <button onclick="playFlip('H')" class="rounded-2xl bg-gradient-to-b from-gold to-gold-deep py-3.5 font-display font-bold text-ink">Heads</button>
-                            <button onclick="playFlip('T')" class="rounded-2xl bg-surface-2 py-3.5 font-display font-bold text-slate-100 ring-1 ring-line">Tails</button>
-                        </div>
-                    </div>`;
+                body.innerHTML = `<div class="text-center"><div class="mx-auto mb-6 grid h-28 w-28 place-items-center rounded-full bg-surface-2 text-6xl ring-1 ring-line" id="flipCoin">🪙</div><p class="mb-4 text-sm text-slate-400">Pick your side</p><div class="grid grid-cols-2 gap-3"><button onclick="playFlip('H')" class="rounded-2xl bg-gradient-to-b from-gold to-gold-deep py-3.5 font-display font-bold text-ink">Heads</button><button onclick="playFlip('T')" class="rounded-2xl bg-surface-2 py-3.5 font-display font-bold text-slate-100 ring-1 ring-line">Tails</button></div></div>`;
             } else if (key === "spin") {
-                body.innerHTML = `
-                    <div class="text-center">
-                        <div class="relative mx-auto mb-6 h-40 w-40">
-                            <div class="absolute left-1/2 top-0 z-10 -translate-x-1/2 text-gold">▼</div>
-                            <div id="wheel" class="spin grid h-40 w-40 place-items-center rounded-full text-4xl ring-4 ring-line"
-                                style="background: conic-gradient(#f5c344 0 60deg,#7c5cff 60deg 120deg,#e0a92b 120deg 180deg,#12182b 180deg 240deg,#f5c344 240deg 300deg,#7c5cff 300deg 360deg)">🎡</div>
-                        </div>
-                        <button onclick="playSpin()" id="spinBtn" class="w-full rounded-2xl bg-gradient-to-b from-gold to-gold-deep py-3.5 font-display font-bold text-ink">Spin Now</button>
-                    </div>`;
+                body.innerHTML = `<div class="text-center"><div class="relative mx-auto mb-6 h-40 w-40"><div class="absolute left-1/2 top-0 z-10 -translate-x-1/2 text-gold">▼</div><div id="wheel" class="spin grid h-40 w-40 place-items-center rounded-full text-4xl ring-4 ring-line" style="background: conic-gradient(#f5c344 0 60deg,#7c5cff 60deg 120deg,#e0a92b 120deg 180deg,#12182b 180deg 240deg,#f5c344 240deg 300deg,#7c5cff 300deg 360deg)">🎡</div></div><button onclick="playSpin()" id="spinBtn" class="w-full rounded-2xl bg-gradient-to-b from-gold to-gold-deep py-3.5 font-display font-bold text-ink">Spin Now</button></div>`;
             } else if (key === "box") {
-                body.innerHTML = `
-                    <div class="text-center">
-                        <p class="mb-5 text-sm text-slate-400">Choose one mystery box</p>
-                        <div class="grid grid-cols-3 gap-3">
-                            ${[0,1,2].map(i => `<button onclick="playBox(${i})" class="box-item grid aspect-square place-items-center rounded-2xl bg-surface-2 text-4xl ring-1 ring-line transition active:scale-95">🎁</button>`).join("")}
-                        </div>
-                    </div>`;
+                body.innerHTML = `<div class="text-center"><p class="mb-5 text-sm text-slate-400">Choose one mystery box</p><div class="grid grid-cols-3 gap-3">${[0,1,2].map(i => `<button onclick="playBox(${i})" class="box-item grid aspect-square place-items-center rounded-2xl bg-surface-2 text-4xl ring-1 ring-line transition active:scale-95">🎁</button>`).join("")}</div></div>`;
             } else if (key === "dice") {
-                body.innerHTML = `
-                    <div class="text-center">
-                        <div id="dice" class="mx-auto mb-6 grid h-28 w-28 place-items-center rounded-3xl bg-surface-2 text-6xl ring-1 ring-line">🎲</div>
-                        <button onclick="playDice()" id="diceBtn" class="w-full rounded-2xl bg-gradient-to-b from-gold to-gold-deep py-3.5 font-display font-bold text-ink">Roll Dice</button>
-                    </div>`;
+                body.innerHTML = `<div class="text-center"><div id="dice" class="mx-auto mb-6 grid h-28 w-28 place-items-center rounded-3xl bg-surface-2 text-6xl ring-1 ring-line">🎲</div><button onclick="playDice()" id="diceBtn" class="w-full rounded-2xl bg-gradient-to-b from-gold to-gold-deep py-3.5 font-display font-bold text-ink">Roll Dice</button></div>`;
             }
-
-            if (cd > 0) lockGame(key, cd);
+            if (cd > 0) {
+                body.innerHTML += `<div class="mt-4 rounded-2xl bg-surface-2 p-3 text-center text-sm text-slate-400 ring-1 ring-line">Next play available soon</div>`;
+            }
         }
 
-        function lockGame(key, seconds) {
-            const body = document.getElementById("gameBody");
-            const overlay = document.createElement("div");
-            overlay.className = "mt-4 rounded-2xl bg-surface-2 p-3 text-center text-sm text-slate-400 ring-1 ring-line";
-            overlay.id = "cdNote";
-            body.appendChild(overlay);
-            body.querySelectorAll("button").forEach(b => { b.disabled = true; b.classList.add("opacity-50", "pointer-events-none"); });
-            let remaining = seconds;
-            const tick = () => { overlay.innerText = `Next play in ${remaining}s`; };
-            tick();
-            const iv = setInterval(() => {
-                remaining--;
-                if (remaining <= 0) { clearInterval(iv); renderGame(key); } else tick();
-            }, 1000);
-        }
-
-        function playFlip(choice) {
-            if (gameOnCooldown("flip")) return;
+        window.playFlip = function(choice) {
             const coin = document.getElementById("flipCoin");
             const result = Math.random() < 0.5 ? "H" : "T";
             coin.style.transition = "transform 0.8s ease";
             coin.style.transform = "rotateY(1080deg)";
-            document.querySelectorAll("#gameBody button").forEach(b => b.disabled = true);
             setTimeout(() => {
                 coin.innerText = result === "H" ? "😎" : "🎯";
-                if (result === choice) { rewardGame("flip"); } 
-                else { setGameCooldown("flip"); window.showToast("Not this time, try again!", "error"); }
+                if (result === choice) rewardGame("flip");
+                else window.showToast("Not this time, try again!", "error");
                 setTimeout(() => renderGame("flip"), 900);
             }, 850);
         }
 
-        function playSpin() {
-            if (gameOnCooldown("spin")) return;
+        window.playSpin = function() {
             const wheel = document.getElementById("wheel");
-            const btn = document.getElementById("spinBtn");
-            btn.disabled = true;
-            const turns = 4 + Math.random() * 3;
-            wheel.style.transform = `rotate(${turns * 360}deg)`;
+            wheel.style.transform = `rotate(1440deg)`;
             setTimeout(() => { rewardGame("spin"); setTimeout(() => renderGame("spin"), 900); }, 2500);
         }
 
-        function playBox(i) {
-            if (gameOnCooldown("box")) return;
-            const boxes = document.querySelectorAll(".box-item");
-            boxes.forEach(b => b.disabled = true);
-            const earned = rand1to10();
-            coins += earned; save(); updateUI(true);
-            setGameCooldown("box");
-            boxes[i].innerText = "🪙";
-            boxes[i].classList.add("ring-2", "ring-gold");
-            window.showToast(`You won +${earned} coins! 🎉`, "success");
+        window.playBox = function(i) {
+            rewardGame("box");
+            document.querySelectorAll(".box-item")[i].innerText = "🪙";
             setTimeout(() => renderGame("box"), 1100);
         }
 
-        function playDice() {
-            if (gameOnCooldown("dice")) return;
-            const dice = document.getElementById("dice");
-            const btn = document.getElementById("diceBtn");
-            btn.disabled = true;
-            const faces = ["⚀","⚁","⚂","⚃","⚄","⚅"];
-            let ticks = 0;
-            const iv = setInterval(() => {
-                dice.innerText = faces[Math.floor(Math.random() * 6)];
-                ticks++;
-                if (ticks > 10) {
-                    clearInterval(iv);
-                    rewardGame("dice");
-                    setTimeout(() => renderGame("dice"), 900);
-                }
-            }, 90);
+        window.playDice = function() {
+            rewardGame("dice");
+            setTimeout(() => renderGame("dice"), 900);
         }
 
-        /* ---------- Wallet ---------- */
         const methodConfig = {
-            upi:       { label: "UPI ID", placeholder: "yourname@upi" },
-            amazon:    { label: "Amazon account email", placeholder: "email for Amazon gift card" },
+            upi: { label: "UPI ID", placeholder: "yourname@upi" },
+            amazon: { label: "Amazon account email", placeholder: "email for Amazon gift card" },
             playstore: { label: "Google Play email", placeholder: "email for Play Store gift card" },
         };
-        function selectMethod(m) {
+        window.selectMethod = function(m) {
             selectedMethod = m;
             document.querySelectorAll(".method-btn").forEach((btn) => {
                 const active = btn.dataset.method === m;
@@ -629,22 +632,9 @@
                 btn.classList.toggle("ring-gold/40", active);
                 btn.classList.toggle("border-line", !active);
             });
-            const cfg = methodConfig[m];
-            document.getElementById("payoutLabel").innerText = cfg.label;
-            const input = document.getElementById("payoutDetails");
-            input.placeholder = cfg.placeholder;
-            input.value = "";
-        }
-        function requestWithdrawal() {
-            if (coins < WITHDRAW_THRESHOLD) {
-                return window.showToast(`Need ${WITHDRAW_THRESHOLD - coins} more coins`, "error");
-            }
-            const details = document.getElementById("payoutDetails").value.trim();
-            if (!details) return window.showToast(`Enter your ${methodConfig[selectedMethod].label}`, "error");
-            coins -= WITHDRAW_THRESHOLD; save(); updateUI(true);
+            document.getElementById("payoutLabel").innerText = methodConfig[m].label;
+            document.getElementById("payoutDetails").placeholder = methodConfig[m].placeholder;
             document.getElementById("payoutDetails").value = "";
-            const nice = { upi: "UPI", amazon: "Amazon gift card", playstore: "Play Store gift card" }[selectedMethod];
-            window.showToast(`${nice} withdrawal submitted!`, "success");
         }
     </script>
 </body>
