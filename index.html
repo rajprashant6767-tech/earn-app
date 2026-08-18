@@ -70,29 +70,6 @@
 
 <body class="bg-ink text-slate-100 font-sans flex flex-col min-h-screen antialiased selection:bg-gold/30">
 
-    <!-- Welcome / Login Overlay (Visible instantly) -->
-    <div id="loginOverlay" class="fixed inset-0 bg-ink/95 backdrop-blur-sm z-[100] flex items-center justify-center p-6">
-        <div class="bg-surface w-full max-w-sm rounded-3xl border border-line p-8 text-center shadow-2xl">
-            <div class="mx-auto mb-6 grid h-20 w-20 place-items-center rounded-2xl bg-gradient-to-br from-gold to-gold-deep glow-gold">
-                <span class="text-4xl">🪙</span>
-            </div>
-            <h2 class="font-display text-2xl font-bold tracking-tight">Welcome to Earn &amp; Play</h2>
-            <p class="mt-2 mb-7 text-sm leading-relaxed text-slate-400">Sign in with your Gmail to securely save your data &amp; start earning.</p>
-
-            <button onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-3 rounded-2xl bg-white py-4 font-display font-bold text-slate-800 transition active:scale-[0.98] shadow-lg">
-                <svg class="h-5 w-5" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
-                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.15 21.32 7.23 24 12 24z"/>
-                    <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.18C.43 8.13 0 9.87 0 12s.43 3.87 1.18 5.39l4.09-3.15z"/>
-                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.15 2.68 1.18 6.61l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/>
-                </svg>
-                Sign in with Gmail
-            </button>
-
-            <p class="mt-5 text-[11px] leading-relaxed text-slate-600">By continuing you agree to our Terms &amp; Privacy Policy.</p>
-        </div>
-    </div>
-
     <!-- Header -->
     <header class="sticky top-0 z-30 border-b border-line/70 bg-ink/80 backdrop-blur-md">
         <div class="mx-auto flex w-full max-w-md items-center justify-between px-4 py-3">
@@ -315,66 +292,6 @@
 
     <div id="toast" class="pointer-events-none fixed bottom-24 left-1/2 z-[110] hidden -translate-x-1/2"></div>
 
-    <!-- Firebase SDKs with Instant Auth Check -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-        const firebaseConfig = {
-          apiKey: "AIzaSyB3Jnitvrvot8iyJQdv-b71PDeSR3OGXhg",
-          authDomain: "watch-and-earn-16b69.firebaseapp.com",
-          projectId: "watch-and-earn-16b69",
-          storageBucket: "watch-and-earn-16b69.firebasestorage.app",
-          messagingSenderId: "979991411346",
-          appId: "1:979991411346:web:45136b6e8624099964c44b",
-          measurementId: "G-CRFRSJJZSY"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
-
-        window.loginWithGoogle = function() {
-            signInWithRedirect(auth, provider);
-        };
-
-        getRedirectResult(auth).then((result) => {
-            if (result && result.user) {
-                handleUserLogin(result.user);
-            }
-        }).catch((error) => {
-            console.error(error);
-            window.showToast("Login failed. Try again.", "error");
-        });
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                handleUserLogin(user);
-            } else {
-                document.getElementById("loginOverlay").classList.remove("hidden");
-            }
-        });
-
-        function handleUserLogin(user) {
-            window.userId = user.uid;
-            localStorage.setItem(`activated_${window.userId}`, "true");
-            localStorage.setItem(`profile_${window.userId}`, JSON.stringify({
-                name: user.displayName,
-                email: user.email,
-                picture: user.photoURL,
-                given_name: user.displayName ? user.displayName.split(" ")[0] : "User"
-            }));
-            
-            document.getElementById("loginOverlay").classList.add("hidden");
-            window.applyProfile({
-                name: user.displayName,
-                picture: user.photoURL,
-                given_name: user.displayName ? user.displayName.split(" ")[0] : "User"
-            });
-            window.initUserData();
-        }
-    </script>
-
     <script>
         const WITHDRAW_THRESHOLD = 1100;
         const AD_COOLDOWN_MS = 5000;
@@ -385,7 +302,11 @@
         tg.expand();
         try { tg.setHeaderColor && tg.setHeaderColor("#0a0e1a"); } catch (e) {}
 
-        window.userId = "GMAIL_USER";
+        // Automatic Telegram User Login Setup
+        let tgUser = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
+        
+        // Agar user Telegram ke bahar browser mein khole toh dummy ID taaki test ho sake
+        window.userId = tgUser && tgUser.id ? String(tgUser.id) : ("TG_" + Math.floor(100000 + Math.random() * 900000));
 
         let coins = 0;
         let selectedMethod = "upi";
@@ -414,17 +335,17 @@
             host._t = setTimeout(() => host.classList.add("hidden"), 2600);
         }
 
-        window.applyProfile = function(profile) {
-            if (!profile) return;
+        window.applyProfile = function() {
             const nameEl = document.getElementById("userName");
-            if (nameEl && profile.name) {
+            if (nameEl) {
                 nameEl.classList.remove("uppercase", "tracking-wider", "text-slate-500");
                 nameEl.classList.add("text-slate-300");
-                nameEl.innerText = "Hi, " + (profile.given_name || profile.name);
+                const displayName = tgUser && tgUser.first_name ? tgUser.first_name : "User";
+                nameEl.innerText = "Hi, " + displayName;
             }
             const avatar = document.getElementById("userAvatar");
-            if (avatar && profile.picture) {
-                avatar.innerHTML = `<img src="${profile.picture}" alt="${profile.name || "User"}" class="h-full w-full object-cover" referrerpolicy="no-referrer" />`;
+            if (avatar && tgUser && tgUser.photo_url) {
+                avatar.innerHTML = `<img src="${tgUser.photo_url}" alt="User" class="h-full w-full object-cover" />`;
             }
         }
 
@@ -487,8 +408,8 @@
         }
 
         window.onload = () => {
-            const saved = localStorage.getItem(`profile_${window.userId}`);
-            if (saved) window.applyProfile(JSON.parse(saved));
+            window.applyProfile();
+            window.initUserData();
             selectMethod("upi");
         };
 
