@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-slate-950">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earn & Play - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans p-5 max-w-2xl mx-auto">
+    <h1 class="text-2xl font-bold mb-5 text-amber-400">Admin Withdrawal Requests</h1>
+    <div id="requestsList" class="space-y-4">
+        <p class="text-slate-400">Loading requests...</p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyB3Jnitvrvot8iyJQdv-b71PDeSR3OGXhg",
+          authDomain: "watch-and-earn-16b69.firebaseapp.com",
+          projectId: "watch-and-earn-16b69",
+          storageBucket: "watch-and-earn-16b69.firebasestorage.app",
+          messagingSenderId: "979991411346",
+          appId: "1:979991411346:web:45136b6e8624099964c44b",
+          measurementId: "G-CRFRSJJZSY"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadRequests() {
+            const container = document.getElementById("requestsList");
+            const querySnapshot = await getDocs(collection(db, "withdrawals"));
+            if (querySnapshot.empty) {
+                container.innerHTML = `<p class="text-slate-500">No requests found.</p>`;
+                return;
+            }
+
+            let html = "";
+            querySnapshot.forEach((documentSnap) => {
+                let data = documentSnap.data();
+                let docId = documentSnap.id;
+
+                html += `
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col gap-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-amber-400">${data.userName || 'User'} (${data.userId})</span>
+                            <span class="text-xs px-2 py-1 rounded bg-slate-800 text-slate-300">Status: <b>${data.status}</b></span>
+                        </div>
+                        <p class="text-sm text-slate-300"><b>Amount:</b> ${data.amount} (${data.method.toUpperCase()})</p>
+                        <p class="text-sm text-slate-300"><b>Details/UPI:</b> <span class="text-emerald-400 font-mono">${data.details}</span></p>
+                        
+                        <div class="flex gap-2 mt-2">
+                            <button onclick="updateStatus('${docId}', 'Success')" class="bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded-xl text-xs font-bold text-white">Accept (Success ✓)</button>
+                            <button onclick="updateStatus('${docId}', 'Rejected')" class="bg-rose-600 hover:bg-rose-500 px-4 py-2 rounded-xl text-xs font-bold text-white">Reject ✕</button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        window.updateStatus = async function(id, newStatus) {
+            const docRef = doc(db, "withdrawals", id);
+            await updateDoc(docRef, { status: newStatus });
+            alert("Request updated to " + newStatus);
+            loadRequests();
+        }
+
+        loadRequests();
+    </script>
+</body>
+</html>
