@@ -13,8 +13,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <!-- MONETAG OFFICIAL REWARDED SCRIPT -->
-    <script src="//libroot.net/p/tag.min.js" data-zone="11590181" async></script>
+    <!-- ADSGRAM OFFICIAL SDK -->
+    <script src="https://sad.adsgram.ai/js/adsgram.js"></script>
 
     <script>
       tailwind.config = {
@@ -93,7 +93,6 @@
 
         <!-- HOME -->
         <div id="tab-home" class="tab-content space-y-5">
-            <!-- Goal & Percentage hata kar sirf Clean Balance Card kar diya gaya hai -->
             <section class="relative overflow-hidden rounded-3xl border border-line bg-surface p-6">
                 <div class="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gold/10 blur-2xl"></div>
                 <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-500">Your Balance</p>
@@ -606,26 +605,27 @@
             window.showToast("Referral code copied!", "success");
         }
 
+        // ==========================================
+        // ADSGRAM REWARDED VIDEO AD INTEGRATION (ID: 43622)
+        // ==========================================
+        const AdController = window.Adsgram.init({ blockId: "43622" });
         let adCoolingDown = false;
-        
-        // REWARDED INTERSTITIAL FUNCTION INTEGRATION
-        function watchAd() {
+
+        window.watchAd = function() {
             const btn = document.getElementById("watchAdBtn");
             if (adCoolingDown) return window.showToast("Please wait for cooldown", "error");
             
-            if (typeof show_11590181 === "function") {
-                show_11590181().then(() => {
+            AdController.show()
+                .then((result) => {
                     const earned = rand1to10();
                     addCoins(earned);
-                    window.showToast(`You have seen an ad! +${earned} coins earned!`, "success");
+                    window.showToast(`You watched the ad! +${earned} coins earned! 🎉`, "success");
                     startAdCooldown(btn);
-                }).catch((err) => {
-                    console.error(err);
-                    window.showToast("Ad closed or failed to load", "error");
+                })
+                .catch((result) => {
+                    console.error("Ad error:", result);
+                    window.showToast("Ad skipped or failed to load", "error");
                 });
-            } else {
-                window.showToast("Ad script is loading, please wait a moment.", "error");
-            }
         }
 
         function startAdCooldown(btn) {
