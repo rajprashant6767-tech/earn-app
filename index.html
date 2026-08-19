@@ -134,6 +134,28 @@
                     <span class="text-2xl">🎮</span>
                 </div>
             </button>
+
+            <!-- PROMO CODE SECTION (HOME PAGE KE NICHE) -->
+            <section class="rounded-3xl border border-line bg-surface p-6 text-center space-y-4">
+                <div class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-surface-2 text-2xl ring-1 ring-line">🎁</div>
+                <div>
+                    <h2 class="font-display text-md font-bold">Have a Promo Code?</h2>
+                    <p class="mt-0.5 text-xs text-slate-400">Get free coins instantly from our channel.</p>
+                </div>
+
+                <!-- Telegram Channel Icon Button -->
+                <a href="https://t.me/+2vDL5Gmbee0zNDFl" target="_blank" class="inline-flex items-center gap-2 rounded-full bg-violet/20 px-4 py-2 text-xs font-bold text-violet-400 border border-violet/30 active:scale-95 transition">
+                    <span>📢</span> Join Telegram for Codes
+                </a>
+
+                <div class="rounded-2xl bg-surface-2 p-3 ring-1 ring-line text-left space-y-2">
+                    <label class="block text-[11px] font-medium uppercase tracking-wider text-slate-500">Enter Promo Code</label>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="promoCodeInput" placeholder="e.g. BONUS50" class="w-full rounded-xl border border-line bg-ink px-3 py-2.5 text-xs text-slate-200 uppercase outline-none focus:border-gold/60" />
+                        <button onclick="redeemPromoCode()" class="rounded-xl bg-gradient-to-b from-gold to-gold-deep px-4 py-2.5 text-xs font-bold text-ink active:scale-95">Claim</button>
+                    </div>
+                </div>
+            </section>
         </div>
 
         <!-- GAMES -->
@@ -303,7 +325,7 @@
     <!-- Firebase SDK & App Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, where, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs, onSnapshot, doc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyB3Jnitvrvot8iyJQdv-b71PDeSR3OGXhg",
@@ -327,9 +349,6 @@
         let coins = 0;
         let selectedMethod = "upi";
         const WITHDRAW_THRESHOLD = 1100;
-        const AD_COOLDOWN_MS = 5000;
-        const GAME_COOLDOWN_MS = 8000;
-        const REFERRAL_REWARD = 100;
 
         window.initUserData = function() {
             coins = parseInt(localStorage.getItem(`coins_${window.userId}`)) || 0;
@@ -366,6 +385,42 @@
             }
         }
 
+        // Promo Code Claim Function
+        window.redeemPromoCode = async function() {
+            const codeInput = document.getElementById("promoCodeInput");
+            const code = codeInput.value.trim().toUpperCase();
+            if (!code) return window.showToast("Please enter a promo code", "error");
+
+            try {
+                const promoRef = doc(db, "promocodes", code);
+                const promoSnap = await getDoc(promoRef);
+
+                if (!promoSnap.exists()) {
+                    return window.showToast("Invalid promo code!", "error");
+                }
+
+                let promoData = promoSnap.data();
+                let usedByList = promoData.usedBy || [];
+
+                if (usedByList.includes(window.userId)) {
+                    return window.showToast("You have already used this promo code!", "error");
+                }
+
+                // Add user to usedBy list and reward coins
+                let rewardCoins = promoData.coins || 50;
+                usedByList.push(window.userId);
+
+                await updateDoc(promoRef, { usedBy: usedByList });
+
+                addCoins(rewardCoins);
+                codeInput.value = "";
+                window.showToast(`Success! +${rewardCoins} coins added! 🎉`, "success");
+            } catch (e) {
+                console.error(e);
+                window.showToast("Error claiming promo code", "error");
+            }
+        }
+
         window.requestWithdrawal = async function() {
             if (coins < WITHDRAW_THRESHOLD) {
                 return window.showToast(`Need ${WITHDRAW_THRESHOLD - coins} more coins`, "error");
@@ -374,13 +429,11 @@
             if (!details) return window.showToast("Please enter your payout details", "error");
 
             try {
-                // Deduct coins first
                 coins -= WITHDRAW_THRESHOLD; 
                 save(); 
                 updateUI(true);
                 document.getElementById("payoutDetails").value = "";
 
-                // Push to Firestore Withdrawals Collection
                 await addDoc(collection(db, "withdrawals"), {
                     userId: window.userId,
                     userName: window.userNameVal,
@@ -400,7 +453,6 @@
 
         function listenToUserWithdrawals() {
             const historyContainer = document.getElementById("historyList");
-            // Real-time listener for user history
             const q = query(collection(db, "withdrawals"), where("userId", "==", window.userId));
             onSnapshot(q, (snapshot) => {
                 if (snapshot.empty) {
