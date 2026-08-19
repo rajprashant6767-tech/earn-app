@@ -102,7 +102,7 @@
                 </div>
                 <div class="mt-6">
                     <div class="mb-2 flex items-center justify-between text-xs">
-                        <span class="font-medium text-slate-400">Goal: <span class="text-slate-200">1100 coins</span> = ₹10</span>
+                        <span class="font-medium text-slate-400">Goal: <span class="text-slate-200">1200 coins</span> = ₹10</span>
                         <span id="progressLabel" class="font-semibold text-gold">0%</span>
                     </div>
                     <div class="h-2.5 w-full overflow-hidden rounded-full bg-surface-2">
@@ -206,8 +206,8 @@
         <div id="tab-refer" class="tab-content hidden space-y-5">
             <section class="rounded-3xl border border-line bg-surface p-6 text-center">
                 <div class="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-surface-2 text-3xl ring-1 ring-line">🎟️</div>
-                <h2 class="font-display text-lg font-bold">Refer &amp; Earn 100 Coins</h2>
-                <p class="mt-1 text-sm text-slate-400">Apna unique code dosto ko share karein. Code enter karne par dono ko <span class="font-semibold text-gold">100 coins</span> milenge!</p>
+                <h2 class="font-display text-lg font-bold">Refer &amp; Earn 300 Coins</h2>
+                <p class="mt-1 text-sm text-slate-400">Apna unique code dosto ko share karein. Code enter karne par dono ko <span class="font-semibold text-gold">300 coins</span> milenge!</p>
 
                 <div class="mt-6 rounded-2xl bg-surface-2 p-4 ring-1 ring-line text-left space-y-2">
                     <label class="block text-xs font-medium uppercase tracking-wider text-slate-500">Aapka Unique Referral Code</label>
@@ -221,7 +221,7 @@
                     <label class="block text-xs font-medium uppercase tracking-wider text-slate-500">Friends Code Enter Karein</label>
                     <div class="flex items-center gap-2">
                         <input type="text" id="friendCodeInput" placeholder="Enter code here..." class="w-full rounded-xl border border-line bg-ink px-3 py-3 text-xs text-slate-200 uppercase outline-none focus:border-gold/60" />
-                        <button onclick="redeemFriendCode()" class="rounded-xl bg-gradient-to-b from-emerald-500 to-emerald-600 px-4 py-3 text-xs font-bold text-white active:scale-95">Claim 100</button>
+                        <button onclick="redeemFriendCode()" class="rounded-xl bg-gradient-to-b from-emerald-500 to-emerald-600 px-4 py-3 text-xs font-bold text-white active:scale-95">Claim 300</button>
                     </div>
                 </div>
 
@@ -240,19 +240,18 @@
 
         <!-- WALLET -->
         <div id="tab-wallet" class="tab-content hidden space-y-5">
-            <section class="rounded-3xl border border-line bg-surface p-6">
+            <section class="rounded-3xl border border-line bg-surface p-6 space-y-4">
                 <h2 class="font-display text-lg font-bold">Withdraw Coins</h2>
-                <p class="mt-1 text-sm text-slate-400">1100 coins = <span class="font-semibold text-gold">₹10</span></p>
-
-                <div class="mt-5 rounded-2xl bg-surface-2 p-4 ring-1 ring-line">
+                
+                <div class="rounded-2xl bg-surface-2 p-4 ring-1 ring-line">
                     <div class="flex items-center justify-between text-sm">
-                        <span class="text-slate-400">Available</span>
+                        <span class="text-slate-400">Available Balance</span>
                         <span id="coinBalanceWallet" class="font-display font-bold text-gold">0 coins</span>
                     </div>
                 </div>
 
-                <label class="mt-5 block text-xs font-medium uppercase tracking-wider text-slate-500">Payout method</label>
-                <div class="mt-2 grid grid-cols-3 gap-2">
+                <label class="block text-xs font-medium uppercase tracking-wider text-slate-500">Select Payout Method</label>
+                <div class="grid grid-cols-3 gap-2">
                     <button type="button" data-method="upi" onclick="selectMethod('upi')" class="method-btn rounded-2xl border border-line bg-surface-2 px-2 py-3 text-center transition">
                         <div class="text-xl">🏦</div>
                         <p class="mt-1 text-[11px] font-semibold text-slate-300">UPI</p>
@@ -267,14 +266,48 @@
                     </button>
                 </div>
 
-                <label id="payoutLabel" class="mt-5 block text-xs font-medium uppercase tracking-wider text-slate-500">UPI ID</label>
-                <input type="text" id="payoutDetails" placeholder="yourname@upi"
-                    class="mt-2 w-full rounded-2xl border border-line bg-surface-2 p-4 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-gold/60 focus:ring-2 focus:ring-gold/20" />
+                <!-- Plans Selection -->
+                <label class="block text-xs font-medium uppercase tracking-wider text-slate-500 pt-2">Select Amount Plan</label>
+                
+                <!-- ₹2 UPI Plan (Only for UPI & 5 times limit) -->
+                <div id="upiPlanBox">
+                    <button type="button" onclick="selectPlan(300, '₹2', '300 coins')" id="planBtn_300" class="plan-btn w-full rounded-2xl border border-gold/40 bg-surface-2 p-3.5 text-left transition flex justify-between items-center ring-2 ring-gold/30">
+                        <div>
+                            <p class="font-bold text-gold text-sm">₹2 via UPI <span class="text-[10px] bg-gold/20 text-gold px-2 py-0.5 rounded-full ml-1">Limit: 5 Times</span></p>
+                            <p class="text-xs text-slate-400">Cost: 300 coins</p>
+                        </div>
+                        <span class="text-xs font-bold text-gold">Selected ✓</span>
+                    </button>
+                </div>
 
-                <button onclick="requestWithdrawal()" class="mt-4 w-full rounded-2xl bg-gradient-to-b from-emerald-500 to-emerald-600 py-4 font-display font-bold text-white transition active:scale-[0.98]">
-                    Redeem
+                <!-- Other Plans Grid -->
+                <div class="grid grid-cols-2 gap-2.5 pt-1">
+                    <button type="button" onclick="selectPlan(1200, '₹10', '1200 coins')" id="planBtn_1200" class="plan-btn rounded-2xl border border-line bg-surface-2 p-3 text-center transition active:scale-95">
+                        <p class="font-bold text-sm">₹10</p>
+                        <p class="text-[11px] text-slate-400">1200 coins</p>
+                    </button>
+                    <button type="button" onclick="selectPlan(3550, '₹30', '3550 coins')" id="planBtn_3550" class="plan-btn rounded-2xl border border-line bg-surface-2 p-3 text-center transition active:scale-95">
+                        <p class="font-bold text-sm">₹30</p>
+                        <p class="text-[11px] text-slate-400">3550 coins</p>
+                    </button>
+                    <button type="button" onclick="selectPlan(5900, '₹50', '5900 coins')" id="planBtn_5900" class="plan-btn rounded-2xl border border-line bg-surface-2 p-3 text-center transition active:scale-95">
+                        <p class="font-bold text-sm">₹50</p>
+                        <p class="text-[11px] text-slate-400">5900 coins</p>
+                    </button>
+                    <button type="button" onclick="selectPlan(11500, '₹100', '11500 coins')" id="planBtn_11500" class="plan-btn rounded-2xl border border-line bg-surface-2 p-3 text-center transition active:scale-95">
+                        <p class="font-bold text-sm">₹100</p>
+                        <p class="text-[11px] text-slate-400">11500 coins</p>
+                    </button>
+                </div>
+
+                <label id="payoutLabel" class="block text-xs font-medium uppercase tracking-wider text-slate-500 pt-2">UPI ID</label>
+                <input type="text" id="payoutDetails" placeholder="yourname@upi"
+                    class="w-full rounded-2xl border border-line bg-surface-2 p-4 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-gold/60 focus:ring-2 focus:ring-gold/20" />
+
+                <button onclick="requestWithdrawal()" class="w-full rounded-2xl bg-gradient-to-b from-emerald-500 to-emerald-600 py-4 font-display font-bold text-white transition active:scale-[0.98]">
+                    Redeem Now
                 </button>
-                <p class="mt-3 text-center text-xs text-slate-500">Requests are processed within 24–48 hours.</p>
+                <p class="text-center text-xs text-slate-500">Requests are processed within 24–48 hours.</p>
             </section>
 
             <!-- Withdrawal History Section -->
@@ -325,7 +358,7 @@
     <!-- Firebase SDK & App Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, where, getDocs, onSnapshot, doc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs, onSnapshot, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyB3Jnitvrvot8iyJQdv-b71PDeSR3OGXhg",
@@ -348,7 +381,8 @@
 
         let coins = 0;
         let selectedMethod = "upi";
-        const WITHDRAW_THRESHOLD = 1100;
+        let selectedCoinsRequired = 300;
+        let selectedPlanTitle = "₹2";
 
         window.initUserData = function() {
             coins = parseInt(localStorage.getItem(`coins_${window.userId}`)) || 0;
@@ -385,6 +419,28 @@
             }
         }
 
+        // Plan Selection Logic
+        window.selectPlan = function(coinsNeeded, title) {
+            selectedCoinsRequired = coinsNeeded;
+            selectedPlanTitle = title;
+            
+            document.querySelectorAll(".plan-btn").forEach(btn => {
+                btn.classList.remove("border-gold/40", "ring-2", "ring-gold/30");
+                btn.classList.add("border-line");
+                let span = btn.querySelector("span");
+                if(span) span.remove();
+            });
+
+            let activeBtn = document.getElementById(`planBtn_${coinsNeeded}`);
+            if(activeBtn) {
+                activeBtn.classList.remove("border-line");
+                activeBtn.classList.add("border-gold/40", "ring-2", "ring-gold/30");
+                if(!activeBtn.querySelector("span")) {
+                    activeBtn.insertAdjacentHTML('beforeend', `<span class="text-xs font-bold text-gold">Selected ✓</span>`);
+                }
+            }
+        };
+
         // Promo Code Claim Function
         window.redeemPromoCode = async function() {
             const codeInput = document.getElementById("promoCodeInput");
@@ -406,7 +462,6 @@
                     return window.showToast("You have already used this promo code!", "error");
                 }
 
-                // Add user to usedBy list and reward coins
                 let rewardCoins = promoData.coins || 50;
                 usedByList.push(window.userId);
 
@@ -422,14 +477,26 @@
         }
 
         window.requestWithdrawal = async function() {
-            if (coins < WITHDRAW_THRESHOLD) {
-                return window.showToast(`Need ${WITHDRAW_THRESHOLD - coins} more coins`, "error");
+            // Check limit for ₹2 plan (300 coins)
+            if (selectedCoinsRequired === 300) {
+                if (selectedMethod !== 'upi') {
+                    return window.showToast("₹2 plan is only available for UPI method!", "error");
+                }
+                let used2rs = parseInt(localStorage.getItem(`used2rs_${window.userId}`)) || 0;
+                if (used2rs >= 5) {
+                    return window.showToast("Limit reached! You can only use the ₹2 plan 5 times.", "error");
+                }
+                localStorage.setItem(`used2rs_${window.userId}`, used2rs + 1);
+            }
+
+            if (coins < selectedCoinsRequired) {
+                return window.showToast(`Need ${selectedCoinsRequired - coins} more coins for this plan`, "error");
             }
             const details = document.getElementById("payoutDetails").value.trim();
             if (!details) return window.showToast("Please enter your payout details", "error");
 
             try {
-                coins -= WITHDRAW_THRESHOLD; 
+                coins -= selectedCoinsRequired; 
                 save(); 
                 updateUI(true);
                 document.getElementById("payoutDetails").value = "";
@@ -439,7 +506,7 @@
                     userName: window.userNameVal,
                     method: selectedMethod,
                     details: details,
-                    amount: "₹10",
+                    amount: selectedPlanTitle,
                     status: "Pending",
                     timestamp: new Date()
                 });
@@ -502,27 +569,27 @@
             if (hasRedeemed) return window.showToast("You have already used a referral code!", "error");
 
             localStorage.setItem(`redeemed_code_${window.userId}`, code);
-            addCoins(100);
+            addCoins(300);
 
             let refList = JSON.parse(localStorage.getItem(`referred_${code}`)) || [];
             if (!refList.includes(window.userId)) {
                 refList.push(window.userId);
                 localStorage.setItem(`referred_${code}`, JSON.stringify(refList));
                 let refCoinsTotal = parseInt(localStorage.getItem(`refcoins_${code}`)) || 0;
-                refCoinsTotal += 100;
+                refCoinsTotal += 300;
                 localStorage.setItem(`refcoins_${code}`, refCoinsTotal);
                 let currentRefCoinsEarned = parseInt(localStorage.getItem(`coins_${code}`)) || 0;
-                localStorage.setItem(`coins_${code}`, currentRefCoinsEarned + 100);
+                localStorage.setItem(`coins_${code}`, currentRefCoinsEarned + 300);
             }
 
             inputField.value = "";
-            document.getElementById("redeemSection").innerHTML = `<div class="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-3 text-center text-xs text-emerald-400 font-bold">Code Redeemed Successfully! +100 Coins Added 🎉</div>`;
-            window.showToast("Successfully claimed 100 coins! 🎉", "success");
+            document.getElementById("redeemSection").innerHTML = `<div class="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-3 text-center text-xs text-emerald-400 font-bold">Code Redeemed Successfully! +300 Coins Added 🎉</div>`;
+            window.showToast("Successfully claimed 300 coins! 🎉", "success");
         }
 
         function updateUI(animate) {
             let coins = parseInt(localStorage.getItem(`coins_${window.userId}`)) || 0;
-            const pct = Math.min(100, Math.round((coins / 1100) * 100));
+            const pct = Math.min(100, Math.round((coins / 1200) * 100));
             document.getElementById("coinBalance").innerText = coins;
             const big = document.getElementById("coinBalanceBig"); if (big) big.innerText = coins;
             const wallet = document.getElementById("coinBalanceWallet"); if (wallet) wallet.innerText = coins + " coins";
@@ -675,6 +742,7 @@
             amazon: { label: "Amazon account email", placeholder: "email for Amazon gift card" },
             playstore: { label: "Google Play email", placeholder: "email for Play Store gift card" },
         };
+        
         window.selectMethod = function(m) {
             selectedMethod = m;
             document.querySelectorAll(".method-btn").forEach((btn) => {
@@ -684,6 +752,18 @@
                 btn.classList.toggle("ring-gold/40", active);
                 btn.classList.toggle("border-line", !active);
             });
+            
+            // Show/Hide ₹2 UPI Plan depending on whether UPI is selected
+            const upiBox = document.getElementById("upiPlanBox");
+            if (m === 'upi') {
+                upiBox.style.display = "block";
+            } else {
+                upiBox.style.display = "none";
+                if(selectedCoinsRequired === 300) {
+                    selectPlan(1200, '₹10'); // Default to ₹10 if switching away from UPI
+                }
+            }
+
             document.getElementById("payoutLabel").innerText = methodConfig[m].label;
             document.getElementById("payoutDetails").placeholder = methodConfig[m].placeholder;
             document.getElementById("payoutDetails").value = "";
