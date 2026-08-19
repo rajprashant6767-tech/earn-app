@@ -619,6 +619,8 @@
         }
 
         let adCoolingDown = false;
+        
+        // REWARDED INTERSTITIAL FUNCTION INTEGRATION
         function watchAd() {
             const btn = document.getElementById("watchAdBtn");
             if (adCoolingDown) return window.showToast("Please wait for cooldown", "error");
@@ -629,7 +631,8 @@
                     addCoins(earned);
                     window.showToast(`You have seen an ad! +${earned} coins earned!`, "success");
                     startAdCooldown(btn);
-                }).catch(() => {
+                }).catch((err) => {
+                    console.error(err);
                     window.showToast("Ad closed or failed to load", "error");
                 });
             } else {
@@ -686,7 +689,7 @@
 
         function renderGame(key) {
             const body = document.getElementById("gameBody");
-            const last = parseInt(localStorage.getItem(`glst_${key}_${window.userId}`) || "0");
+            const last = parseInt(localStorage.getItem(`glast_${key}_${window.userId}`) || "0");
             const left = 8000 - (now() - last);
             const cd = left > 0 ? Math.ceil(left / 1000) : 0;
 
