@@ -13,8 +13,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <!-- ADSTERRA OFFICIAL SCRIPT -->
-    <script src="https://pl30921779.effectivecpmnetwork.com/b7/22/38/b7223888162b7757dd4ebb77ef4bdc12.js"></script>
+    <!-- MONETAG OFFICIAL REWARDED SCRIPT -->
+    <script src="//libroot.net/p/tag.min.js" data-zone="11590181" async></script>
 
     <script>
       tailwind.config = {
@@ -618,15 +618,44 @@
             window.showToast("Referral code copied!", "success");
         }
 
-        // ADSTERRA WATCH AD FUNCTION
+        let adCoolingDown = false;
+        
+        // REWARDED INTERSTITIAL FUNCTION INTEGRATION
         function watchAd() {
-            // For Direct Link, just open it in a new window/tab
-            window.open("https://pl30921779.effectivecpmnetwork.com/b7/22/38/b7223888162b7757dd4ebb77ef4bdc12.js", "_blank");
+            const btn = document.getElementById("watchAdBtn");
+            if (adCoolingDown) return window.showToast("Please wait for cooldown", "error");
             
-            // Add rewards immediately for now as Direct Link doesn't have a callback
-            const earned = rand1to10();
-            addCoins(earned);
-            window.showToast(`Ad link opened! +${earned} coins added!`, "success");
+            if (typeof show_11590181 === "function") {
+                show_11590181().then(() => {
+                    const earned = rand1to10();
+                    addCoins(earned);
+                    window.showToast(`You have seen an ad! +${earned} coins earned!`, "success");
+                    startAdCooldown(btn);
+                }).catch((err) => {
+                    console.error(err);
+                    window.showToast("Ad closed or failed to load", "error");
+                });
+            } else {
+                window.showToast("Ad script is loading, please wait a moment.", "error");
+            }
+        }
+
+        function startAdCooldown(btn) {
+            adCoolingDown = true;
+            let remaining = 5;
+            btn.disabled = true;
+            btn.innerText = `Wait ${remaining}s`;
+            const iv = setInterval(() => {
+                remaining--;
+                if (remaining <= 0) {
+                    clearInterval(iv);
+                    adCoolingDown = false;
+                    btn.disabled = false;
+                    btn.innerText = "Watch Ad";
+                } else {
+                    btn.innerText = `Wait ${remaining}s`;
+                }
+            }, 1000);
         }
 
         function openTab(t) {
