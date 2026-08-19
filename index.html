@@ -135,7 +135,7 @@
                 </div>
             </button>
 
-            <!-- PROMO CODE SECTION (HOME PAGE KE NICHE) -->
+            <!-- PROMO CODE SECTION -->
             <section class="rounded-3xl border border-line bg-surface p-6 text-center space-y-4">
                 <div class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-surface-2 text-2xl ring-1 ring-line">🎁</div>
                 <div>
@@ -269,9 +269,9 @@
                 <!-- Plans Selection -->
                 <label class="block text-xs font-medium uppercase tracking-wider text-slate-500 pt-2">Select Amount Plan</label>
                 
-                <!-- ₹2 UPI Plan (Only for UPI & 5 times limit) -->
+                <!-- ₹2 UPI Plan -->
                 <div id="upiPlanBox">
-                    <button type="button" onclick="selectPlan(300, '₹2', '300 coins')" id="planBtn_300" class="plan-btn w-full rounded-2xl border border-gold/40 bg-surface-2 p-3.5 text-left transition flex justify-between items-center ring-2 ring-gold/30">
+                    <button type="button" onclick="selectPlan(300, '₹2')" id="planBtn_300" class="plan-btn w-full rounded-2xl border border-gold/40 bg-surface-2 p-3.5 text-left transition flex justify-between items-center ring-2 ring-gold/30">
                         <div>
                             <p class="font-bold text-gold text-sm">₹2 via UPI <span class="text-[10px] bg-gold/20 text-gold px-2 py-0.5 rounded-full ml-1">Limit: 5 Times</span></p>
                             <p class="text-xs text-slate-400">Cost: 300 coins</p>
@@ -282,19 +282,19 @@
 
                 <!-- Other Plans Grid -->
                 <div class="grid grid-cols-2 gap-2.5 pt-1">
-                    <button type="button" onclick="selectPlan(1200, '₹10', '1200 coins')" id="planBtn_1200" class="plan-btn rounded-2xl border border-line bg-surface-2 p-3 text-center transition active:scale-95">
+                    <button type="button" onclick="selectPlan(1200, '₹10')" id="planBtn_1200" class="plan-btn rounded-2xl border border-line bg-surface-2 p-3 text-center transition active:scale-95">
                         <p class="font-bold text-sm">₹10</p>
                         <p class="text-[11px] text-slate-400">1200 coins</p>
                     </button>
-                    <button type="button" onclick="selectPlan(3550, '₹30', '3550 coins')" id="planBtn_3550" class="plan-btn rounded-2xl border border-line bg-surface-2 p-3 text-center transition active:scale-95">
+                    <button type="button" onclick="selectPlan(3550, '₹30')" id="planBtn_3550" class="plan-btn rounded-2xl border border-line bg-surface-2 p-3 text-center transition active:scale-95">
                         <p class="font-bold text-sm">₹30</p>
                         <p class="text-[11px] text-slate-400">3550 coins</p>
                     </button>
-                    <button type="button" onclick="selectPlan(5900, '₹50', '5900 coins')" id="planBtn_5900" class="plan-btn rounded-2xl border border-line bg-surface-2 p-3 text-center transition active:scale-95">
+                    <button type="button" onclick="selectPlan(5900, '₹50')" id="planBtn_5900" class="plan-btn rounded-2xl border border-line bg-surface-2 p-3 text-center transition active:scale-95">
                         <p class="font-bold text-sm">₹50</p>
                         <p class="text-[11px] text-slate-400">5900 coins</p>
                     </button>
-                    <button type="button" onclick="selectPlan(11500, '₹100', '11500 coins')" id="planBtn_11500" class="plan-btn rounded-2xl border border-line bg-surface-2 p-3 text-center transition active:scale-95">
+                    <button type="button" onclick="selectPlan(11500, '₹100')" id="planBtn_11500" class="plan-btn rounded-2xl border border-line bg-surface-2 p-3 text-center transition active:scale-95">
                         <p class="font-bold text-sm">₹100</p>
                         <p class="text-[11px] text-slate-400">11500 coins</p>
                     </button>
@@ -419,7 +419,6 @@
             }
         }
 
-        // Plan Selection Logic
         window.selectPlan = function(coinsNeeded, title) {
             selectedCoinsRequired = coinsNeeded;
             selectedPlanTitle = title;
@@ -441,7 +440,6 @@
             }
         };
 
-        // Promo Code Claim Function
         window.redeemPromoCode = async function() {
             const codeInput = document.getElementById("promoCodeInput");
             const code = codeInput.value.trim().toUpperCase();
@@ -477,7 +475,6 @@
         }
 
         window.requestWithdrawal = async function() {
-            // Check limit for ₹2 plan (300 coins)
             if (selectedCoinsRequired === 300) {
                 if (selectedMethod !== 'upi') {
                     return window.showToast("₹2 plan is only available for UPI method!", "error");
@@ -554,7 +551,6 @@
         };
     </script>
 
-    <!-- Other helper script functions (Games, Ads, Referrals) -->
     <script>
         const rand1to10 = () => Math.floor(Math.random() * 10) + 1;
         const now = () => Date.now();
@@ -626,6 +622,7 @@
         function watchAd() {
             const btn = document.getElementById("watchAdBtn");
             if (adCoolingDown) return window.showToast("Please wait for cooldown", "error");
+            
             if (typeof show_11590181 === "function") {
                 show_11590181().then(() => {
                     const earned = rand1to10();
@@ -636,7 +633,7 @@
                     window.showToast("Ad closed or failed to load", "error");
                 });
             } else {
-                window.showToast("Ad is still loading. Please try again.", "error");
+                window.showToast("Ad script is loading, please wait a moment.", "error");
             }
         }
 
@@ -689,7 +686,7 @@
 
         function renderGame(key) {
             const body = document.getElementById("gameBody");
-            const last = parseInt(localStorage.getItem(`glast_${key}_${window.userId}`) || "0");
+            const last = parseInt(localStorage.getItem(`glst_${key}_${window.userId}`) || "0");
             const left = 8000 - (now() - last);
             const cd = left > 0 ? Math.ceil(left / 1000) : 0;
 
@@ -701,9 +698,6 @@
                 body.innerHTML = `<div class="text-center"><p class="mb-5 text-sm text-slate-400">Choose one mystery box</p><div class="grid grid-cols-3 gap-3">${[0,1,2].map(i => `<button onclick="playBox(${i})" class="box-item grid aspect-square place-items-center rounded-2xl bg-surface-2 text-4xl ring-1 ring-line transition active:scale-95">🎁</button>`).join("")}</div></div>`;
             } else if (key === "dice") {
                 body.innerHTML = `<div class="text-center"><div id="dice" class="mx-auto mb-6 grid h-28 w-28 place-items-center rounded-3xl bg-surface-2 text-6xl ring-1 ring-line">🎲</div><button onclick="playDice()" id="diceBtn" class="w-full rounded-2xl bg-gradient-to-b from-gold to-gold-deep py-3.5 font-display font-bold text-ink">Roll Dice</button></div>`;
-            }
-            if (cd > 0) {
-                body.innerHTML += `<div class="mt-4 rounded-2xl bg-surface-2 p-3 text-center text-sm text-slate-400 ring-1 ring-line">Next play available soon</div>`;
             }
         }
 
@@ -753,14 +747,13 @@
                 btn.classList.toggle("border-line", !active);
             });
             
-            // Show/Hide ₹2 UPI Plan depending on whether UPI is selected
             const upiBox = document.getElementById("upiPlanBox");
             if (m === 'upi') {
                 upiBox.style.display = "block";
             } else {
                 upiBox.style.display = "none";
                 if(selectedCoinsRequired === 300) {
-                    selectPlan(1200, '₹10'); // Default to ₹10 if switching away from UPI
+                    selectPlan(1200, '₹10');
                 }
             }
 
