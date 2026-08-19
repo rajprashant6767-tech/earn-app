@@ -13,7 +13,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <!-- ADSGRAM OFFICIAL SDK -->
+    <!-- ADSGRAM OFFICIAL REWARDED SCRIPT -->
     <script src="https://sad.adsgram.ai/js/adsgram.js"></script>
 
     <script>
@@ -100,6 +100,15 @@
                     <span id="coinBalanceBig" class="font-display text-5xl font-extrabold leading-none text-gold">0</span>
                     <span class="mb-1 text-sm font-medium text-slate-400">coins</span>
                 </div>
+                <div class="mt-6">
+                    <div class="mb-2 flex items-center justify-between text-xs">
+                        <span class="font-medium text-slate-400">Goal: <span class="text-slate-200">1200 coins</span> = ₹10</span>
+                        <span id="progressLabel" class="font-semibold text-gold">0%</span>
+                    </div>
+                    <div class="h-2.5 w-full overflow-hidden rounded-full bg-surface-2">
+                        <div id="progressBar" class="h-full rounded-full bg-gradient-to-r from-gold-deep to-gold transition-all duration-500" style="width:0%"></div>
+                    </div>
+                </div>
             </section>
 
             <!-- Watch ad card -->
@@ -134,6 +143,7 @@
                     <p class="mt-0.5 text-xs text-slate-400">Get free coins instantly from our channel.</p>
                 </div>
 
+                <!-- Telegram Channel Icon Button -->
                 <a href="https://t.me/+2vDL5Gmbee0zNDFl" target="_blank" class="inline-flex items-center gap-2 rounded-full bg-violet/20 px-4 py-2 text-xs font-bold text-violet-400 border border-violet/30 active:scale-95 transition">
                     <span>📢</span> Join Telegram for Codes
                 </a>
@@ -575,9 +585,12 @@
 
         function updateUI(animate) {
             let coins = parseInt(localStorage.getItem(`coins_${window.userId}`)) || 0;
+            const pct = Math.min(100, Math.round((coins / 1200) * 100));
             document.getElementById("coinBalance").innerText = coins;
             const big = document.getElementById("coinBalanceBig"); if (big) big.innerText = coins;
             const wallet = document.getElementById("coinBalanceWallet"); if (wallet) wallet.innerText = coins + " coins";
+            const bar = document.getElementById("progressBar"); if (bar) bar.style.width = pct + "%";
+            const label = document.getElementById("progressLabel"); if (label) label.innerText = pct + "%";
 
             let currentRefs = JSON.parse(localStorage.getItem(`referred_${window.userId}`)) || [];
             let currentRefCoins = parseInt(localStorage.getItem(`refcoins_${window.userId}`)) || 0;
@@ -608,24 +621,36 @@
         // ==========================================
         // ADSGRAM REWARDED VIDEO AD INTEGRATION (ID: 43622)
         // ==========================================
-        const AdController = window.Adsgram.init({ blockId: "43622" });
-        let adCoolingDown = false;
+        let AdController = null;
+        try {
+            if (window.Adsgram) {
+                AdController = window.Adsgram.init({ blockId: "43622" });
+            }
+        } catch(e) {
+            console.error(e);
+        }
 
-        window.watchAd = function() {
+        let adCoolingDown = false;
+        
+        function watchAd() {
             const btn = document.getElementById("watchAdBtn");
             if (adCoolingDown) return window.showToast("Please wait for cooldown", "error");
             
-            AdController.show()
-                .then((result) => {
-                    const earned = rand1to10();
-                    addCoins(earned);
-                    window.showToast(`You watched the ad! +${earned} coins earned! 🎉`, "success");
-                    startAdCooldown(btn);
-                })
-                .catch((result) => {
-                    console.error("Ad error:", result);
-                    window.showToast("Ad skipped or failed to load", "error");
-                });
+            if (AdController) {
+                AdController.show()
+                    .then(() => {
+                        const earned = rand1to10();
+                        addCoins(earned);
+                        window.showToast(`You have seen an ad! +${earned} coins earned!`, "success");
+                        startAdCooldown(btn);
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                        window.showToast("Ad closed or failed to load", "error");
+                    });
+            } else {
+                window.showToast("Ad system is loading, please wait a moment.", "error");
+            }
         }
 
         function startAdCooldown(btn) {
