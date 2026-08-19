@@ -100,15 +100,6 @@
                     <span id="coinBalanceBig" class="font-display text-5xl font-extrabold leading-none text-gold">0</span>
                     <span class="mb-1 text-sm font-medium text-slate-400">coins</span>
                 </div>
-                <div class="mt-6">
-                    <div class="mb-2 flex items-center justify-between text-xs">
-                        <span class="font-medium text-slate-400">Goal: <span class="text-slate-200">1200 coins</span> = ₹10</span>
-                        <span id="progressLabel" class="font-semibold text-gold">0%</span>
-                    </div>
-                    <div class="h-2.5 w-full overflow-hidden rounded-full bg-surface-2">
-                        <div id="progressBar" class="h-full rounded-full bg-gradient-to-r from-gold-deep to-gold transition-all duration-500" style="width:0%"></div>
-                    </div>
-                </div>
             </section>
 
             <!-- Watch ad card -->
@@ -585,12 +576,9 @@
 
         function updateUI(animate) {
             let coins = parseInt(localStorage.getItem(`coins_${window.userId}`)) || 0;
-            const pct = Math.min(100, Math.round((coins / 1200) * 100));
             document.getElementById("coinBalance").innerText = coins;
             const big = document.getElementById("coinBalanceBig"); if (big) big.innerText = coins;
             const wallet = document.getElementById("coinBalanceWallet"); if (wallet) wallet.innerText = coins + " coins";
-            const bar = document.getElementById("progressBar"); if (bar) bar.style.width = pct + "%";
-            const label = document.getElementById("progressLabel"); if (label) label.innerText = pct + "%";
 
             let currentRefs = JSON.parse(localStorage.getItem(`referred_${window.userId}`)) || [];
             let currentRefCoins = parseInt(localStorage.getItem(`refcoins_${window.userId}`)) || 0;
@@ -692,69 +680,70 @@
             document.getElementById("gameModal").classList.add("hidden");
             document.getElementById("gameModal").classList.remove("flex");
         }
+
+        // Fix: Games se 1-10 coins milna aur popup close hona
         function rewardGame(key) {
             const earned = rand1to10();
             addCoins(earned);
             localStorage.setItem(`glast_${key}_${window.userId}`, String(now()));
             window.showToast(`You won +${earned} coins! 🎉`, "success");
             closeGame();
+            return earned;
         }
 
         function renderGame(key) {
             const body = document.getElementById("gameBody");
             if (key === "flip") {
-                body.innerHTML = `<div class="text-center"><div class="mx-auto mb-6 grid h-28 w-28 place-items-center rounded-full bg-surface-2 text-6xl ring-1 ring-line" id="flipCoin">🪙</div><p class="mb-4 text-sm text-slate-400">Pick your side</p><div class="grid grid-cols-2 gap-3"><button id="btnHead" class="rounded-2xl bg-gradient-to-b from-gold to-gold-deep py-3.5 font-display font-bold text-ink">Heads</button><button id="btnTail" class="rounded-2xl bg-surface-2 py-3.5 font-display font-bold text-slate-100 ring-1 ring-line">Tails</button></div></div>`;
-                setTimeout(() => {
-                    document.getElementById("btnHead").onclick = () => playFlip('H');
-                    document.getElementById("btnTail").onclick = () => playFlip('T');
-                }, 50);
+                body.innerHTML = `<div class="text-center"><div class="mx-auto mb-6 grid h-28 w-28 place-items-center rounded-full bg-surface-2 text-6xl ring-1 ring-line" id="flipCoin">🪙</div><p class="mb-4 text-sm text-slate-400">Pick your side</p><div class="grid grid-cols-2 gap-3"><button onclick="playFlip('H')" class="rounded-2xl bg-gradient-to-b from-gold to-gold-deep py-3.5 font-display font-bold text-ink">Heads</button><button onclick="playFlip('T')" class="rounded-2xl bg-surface-2 py-3.5 font-display font-bold text-slate-100 ring-1 ring-line">Tails</button></div></div>`;
             } else if (key === "spin") {
-                body.innerHTML = `<div class="text-center"><div class="relative mx-auto mb-6 h-40 w-40"><div class="absolute left-1/2 top-0 z-10 -translate-x-1/2 text-gold">▼</div><div id="wheel" class="spin grid h-40 w-40 place-items-center rounded-full text-4xl ring-4 ring-line" style="background: conic-gradient(#f5c344 0 60deg,#7c5cff 60deg 120deg,#e0a92b 120deg 180deg,#12182b 180deg 240deg,#f5c344 240deg 300deg,#7c5cff 300deg 360deg)">🎡</div></div><button id="spinBtn" class="w-full rounded-2xl bg-gradient-to-b from-gold to-gold-deep py-3.5 font-display font-bold text-ink">Spin Now</button></div>`;
-                setTimeout(() => { document.getElementById("spinBtn").onclick = playSpin; }, 50);
+                body.innerHTML = `<div class="text-center"><div class="relative mx-auto mb-6 h-40 w-40"><div class="absolute left-1/2 top-0 z-10 -translate-x-1/2 text-gold">▼</div><div id="wheel" class="spin grid h-40 w-40 place-items-center rounded-full text-4xl ring-4 ring-line" style="background: conic-gradient(#f5c344 0 60deg,#7c5cff 60deg 120deg,#e0a92b 120deg 180deg,#12182b 180deg 240deg,#f5c344 240deg 300deg,#7c5cff 300deg 360deg)">🎡</div></div><button onclick="playSpin()" id="spinBtn" class="w-full rounded-2xl bg-gradient-to-b from-gold to-gold-deep py-3.5 font-display font-bold text-ink">Spin Now</button></div>`;
             } else if (key === "box") {
-                body.innerHTML = `<div class="text-center"><p class="mb-5 text-sm text-slate-400">Choose one mystery box</p><div class="grid grid-cols-3 gap-3" id="boxContainer">${[0,1,2].map(i => `<button class="box-item grid aspect-square place-items-center rounded-2xl bg-surface-2 text-4xl ring-1 ring-line transition active:scale-95">🎁</button>`).join("")}</div></div>`;
-                setTimeout(() => {
-                    document.querySelectorAll(".box-item").forEach((b, i) => {
-                        b.onclick = () => playBox(i);
-                    });
-                }, 50);
+                body.innerHTML = `<div class="text-center"><p class="mb-5 text-sm text-slate-400">Choose one mystery box</p><div class="grid grid-cols-3 gap-3">${[0,1,2].map(i => `<button onclick="playBox(${i})" class="box-item grid aspect-square place-items-center rounded-2xl bg-surface-2 text-4xl ring-1 ring-line transition active:scale-95">🎁</button>`).join("")}</div></div>`;
             } else if (key === "dice") {
-                body.innerHTML = `<div class="text-center"><div id="dice" class="mx-auto mb-6 grid h-28 w-28 place-items-center rounded-3xl bg-surface-2 text-6xl ring-1 ring-line">🎲</div><button id="diceBtn" class="w-full rounded-2xl bg-gradient-to-b from-gold to-gold-deep py-3.5 font-display font-bold text-ink">Roll Dice</button></div>`;
-                setTimeout(() => { document.getElementById("diceBtn").onclick = playDice; }, 50);
+                body.innerHTML = `<div class="text-center"><div id="dice" class="mx-auto mb-6 grid h-28 w-28 place-items-center rounded-3xl bg-surface-2 text-6xl ring-1 ring-line">🎲</div><button onclick="playDice()" id="diceBtn" class="w-full rounded-2xl bg-gradient-to-b from-gold to-gold-deep py-3.5 font-display font-bold text-ink">Roll Dice</button></div>`;
             }
         }
 
         window.playFlip = function(choice) {
             const coin = document.getElementById("flipCoin");
             const result = Math.random() < 0.5 ? "H" : "T";
-            if(coin) {
+            if (coin) {
                 coin.style.transition = "transform 0.8s ease";
                 coin.style.transform = "rotateY(1080deg)";
             }
             setTimeout(() => {
-                if(coin) coin.innerText = result === "H" ? "😎" : "🎯";
-                if (result === choice) rewardGame("flip");
-                else window.showToast("Not this time, try again!", "error");
-                setTimeout(() => renderGame("flip"), 900);
+                if (coin) coin.innerText = result === "H" ? "😎" : "🎯";
+                if (result === choice) {
+                    rewardGame("flip");
+                } else {
+                    window.showToast("Not this time, try again!", "error");
+                    setTimeout(() => renderGame("flip"), 900);
+                }
             }, 850);
         }
 
         window.playSpin = function() {
             const wheel = document.getElementById("wheel");
-            if(wheel) wheel.style.transform = `rotate(1440deg)`;
-            setTimeout(() => { rewardGame("spin"); }, 2500);
+            if (wheel) wheel.style.transform = `rotate(1440deg)`;
+            setTimeout(() => { 
+                rewardGame("spin"); 
+            }, 2500);
         }
 
         window.playBox = function(i) {
             const boxes = document.querySelectorAll(".box-item");
-            if(boxes[i]) boxes[i].innerText = "🪙";
-            setTimeout(() => { rewardGame("box"); }, 600);
+            if (boxes[i]) boxes[i].innerText = "🪙";
+            setTimeout(() => { 
+                rewardGame("box"); 
+            }, 600);
         }
 
         window.playDice = function() {
             const dice = document.getElementById("dice");
-            if(dice) dice.innerText = Math.floor(Math.random() * 6) + 1;
-            setTimeout(() => { rewardGame("dice"); }, 800);
+            if (dice) dice.innerText = Math.floor(Math.random() * 6) + 1;
+            setTimeout(() => { 
+                rewardGame("dice"); 
+            }, 800);
         }
 
         const methodConfig = {
