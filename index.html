@@ -1,642 +1,428 @@
 <!DOCTYPE html>
-<html lang="en" class="bg-[#0a0e1a]">
+<html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#0a0e1a" />
-    <title>Earn &amp; Play</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ZyloBet Mini App</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              ink: "#0a0e1a",
-              surface: "#12182b",
-              "surface-2": "#1b2136",
-              line: "#2a3350",
-              gold: "#f5c344",
-              "gold-deep": "#e0a92b",
-              violet: "#7c5cff",
-            },
-            fontFamily: {
-              sans: ['Inter', 'system-ui', 'sans-serif'],
-              display: ['Sora', 'system-ui', 'sans-serif'],
-            },
-          },
-        },
-      };
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        darkBg: '#090D16',
+                        cardBg: '#131C31',
+                        accentBlue: '#0066FF',
+                        accentOrange: '#FF6B00',
+                    }
+                }
+            }
+        }
     </script>
-
     <style>
-      body { -webkit-tap-highlight-color: transparent; }
-      .glow-gold { box-shadow: 0 10px 40px -12px rgba(245,195,68,0.55); }
-      .coin-pop { animation: coinPop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
-      @keyframes coinPop {
-        0% { transform: scale(1); }
-        40% { transform: scale(1.25); color: #f5c344; }
-        100% { transform: scale(1); }
-      }
-      .toast-in { animation: toastIn 0.35s ease forwards; }
-      @keyframes toastIn {
-        from { opacity: 0; transform: translate(-50%, 20px); }
-        to { opacity: 1; transform: translate(-50%, 0); }
-      }
-      .shimmer::after {
-        content: "";
-        position: absolute; inset: 0;
-        background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,0.28) 50%, transparent 65%);
-        transform: translateX(-100%);
-        animation: shimmer 2.6s infinite;
-      }
-      @keyframes shimmer { to { transform: translateX(100%); } }
-      .nav-active { color: #f5c344; }
-      .nav-active .nav-dot { opacity: 1; }
+        body {
+            background-color: #090D16;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .glass-card {
+            background: rgba(19, 28, 49, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #00B4DB 0%, #FF6B00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gradient-btn {
+            background: linear-gradient(135deg, #0066FF 0%, #FF6B00 100%);
+        }
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; filter: drop-shadow(0 0 25px rgba(0, 102, 255, 0.6)); }
+        }
+        .animate-glow {
+            animation: pulseGlow 2.5s infinite ease-in-out;
+        }
+        @keyframes floatLogo {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-float {
+            animation: floatLogo 3s infinite ease-in-out;
+        }
+        ::-webkit-scrollbar { display: none; }
     </style>
 </head>
+<body class="bg-darkBg text-white antialiased flex justify-center items-center min-h-screen">
 
-<body class="bg-ink text-slate-100 font-sans flex flex-col min-h-screen antialiased selection:bg-gold/30">
+    <!-- Premium Animated Intro Splash Screen -->
+    <div id="splash-screen" class="fixed inset-0 z-50 bg-[#090D16] flex flex-col items-center justify-center transition-opacity duration-700">
+        <div class="relative flex flex-col items-center text-center px-6">
+            <div class="w-28 h-28 rounded-3xl gradient-btn flex items-center justify-center shadow-2xl mb-6 animate-glow animate-float">
+                <i class="fa-solid fa-bolt-lightning text-white text-5xl"></i>
+            </div>
+            <h1 class="text-4xl font-extrabold tracking-tight mb-2">
+                Zylo<span class="text-accentOrange">Bet</span>
+            </h1>
+            <p class="text-xs uppercase tracking-widest text-blue-400 font-semibold mb-8">Mini App</p>
+            
+            <div class="w-48 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                <div id="splash-progress" class="h-full bg-gradient-to-r from-blue-500 to-orange-500 w-0 transition-all duration-300"></div>
+            </div>
+            <p class="text-xs text-gray-400 mt-3 animate-pulse">Launching ZyloBet securely...</p>
+        </div>
+    </div>
 
-    <!-- Header -->
-    <header class="sticky top-0 z-30 border-b border-line/70 bg-ink/80 backdrop-blur-md">
-        <div class="mx-auto flex w-full max-w-md items-center justify-between px-4 py-3">
-            <div class="flex items-center gap-3">
-                <div id="userAvatar" class="grid h-11 w-11 place-items-center overflow-hidden rounded-xl bg-surface-2 text-xl ring-1 ring-line">🪙</div>
-                <div class="leading-tight">
-                    <p id="userName" class="text-[11px] font-medium uppercase tracking-wider text-slate-500">Balance</p>
-                    <div class="flex items-baseline gap-1">
-                        <h2 id="coinBalance" class="font-display text-xl font-bold text-gold">0</h2>
-                        <span class="text-xs font-medium text-slate-500">coins</span>
+    <!-- Main App Container -->
+    <div id="main-app" class="w-full max-w-md min-h-screen flex flex-col justify-between opacity-0 transition-opacity duration-500 pb-20">
+        
+        <header class="px-5 pt-6 pb-4 flex items-center justify-between glass-card sticky top-0 z-30 border-b border-gray-800/60">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl gradient-btn flex items-center justify-center shadow-md">
+                    <i class="fa-solid fa-bolt-lightning text-white text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="font-bold text-lg leading-tight">ZyloBet</h2>
+                    <span class="text-xs text-emerald-400 font-medium flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Online & Verified
+                    </span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 bg-gray-900/80 px-3 py-1.5 rounded-full border border-gray-700/60 shadow-inner">
+                <i class="fa-solid fa-coins text-amber-400"></i>
+                <span id="header-balance" class="font-bold text-sm tracking-wide">1,250</span>
+            </div>
+        </header>
+
+        <main class="flex-1 px-4 py-4 overflow-y-auto">
+            
+            <!-- HOME PAGE -->
+            <div id="page-home" class="space-y-5">
+                <div class="rounded-2xl p-5 gradient-btn shadow-lg relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 opacity-20 text-white text-8xl">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <span class="bg-white/20 text-xs px-2.5 py-1 rounded-full font-semibold uppercase tracking-wider">⚡ Instant Rewards</span>
+                    <h3 class="text-2xl font-extrabold mt-3 mb-1">Play & Win Daily</h3>
+                    <p class="text-white/80 text-xs mb-4">Spin the wheel or participate in exciting prediction matches to grow your balance.</p>
+                    <button onclick="switchTab('games')" class="bg-white text-gray-900 text-xs font-bold px-4 py-2.5 rounded-xl shadow hover:bg-gray-100 transition">
+                        Explore Games <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="glass-card p-4 rounded-2xl flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-wallet"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400">Total Balance</p>
+                            <h4 id="stat-balance" class="text-lg font-bold">1,250 Coins</h4>
+                        </div>
+                    </div>
+                    <div class="glass-card p-4 rounded-2xl flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-gamepad"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400">Active Bets</p>
+                            <h4 class="text-lg font-bold">2 Matches</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-bold text-sm tracking-wide text-gray-200">Live Prediction Matches</h4>
+                        <button onclick="switchTab('games')" class="text-xs text-blue-400 font-semibold">View All</button>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="glass-card p-4 rounded-2xl border border-gray-800">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-bold">LIVE MATCH</span>
+                                <span class="text-xs text-gray-400">Ends in 04:12m</span>
+                            </div>
+                            <div class="flex justify-between items-center my-3">
+                                <div class="text-center flex-1">
+                                    <span class="font-bold text-sm">INDIA</span>
+                                    <p class="text-[10px] text-gray-400">Odds: 1.85x</p>
+                                </div>
+                                <span class="text-xs font-extrabold text-orange-400 px-3">VS</span>
+                                <div class="text-center flex-1">
+                                    <span class="font-bold text-sm">AUSTRALIA</span>
+                                    <p class="text-[10px] text-gray-400">Odds: 2.10x</p>
+                                </div>
+                            </div>
+                            <button onclick="switchTab('games')" class="w-full py-2 bg-blue-600/30 hover:bg-blue-600/50 text-blue-400 border border-blue-500/30 rounded-xl text-xs font-semibold transition">
+                                Place Prediction
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-            <button onclick="openTab('wallet')" class="rounded-xl bg-surface-2 px-4 py-2.5 text-sm font-semibold text-gold ring-1 ring-line transition active:scale-95">
-                Withdraw
-            </button>
-        </div>
-    </header>
 
-    <main class="mx-auto w-full max-w-md flex-1 px-4 pb-28 pt-5">
-
-        <!-- HOME -->
-        <div id="tab-home" class="tab-content space-y-5">
-            <section class="relative overflow-hidden rounded-3xl border border-line bg-surface p-6">
-                <div class="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gold/10 blur-2xl"></div>
-                <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-500">Your Balance</p>
-                <div class="mt-1 flex items-end gap-2">
-                    <span id="coinBalanceBig" class="font-display text-5xl font-extrabold leading-none text-gold">0</span>
-                    <span class="mb-1 text-sm font-medium text-slate-400">coins</span>
-                </div>
-            </section>
-
-            <!-- Watch ad card -->
-            <section class="relative overflow-hidden rounded-3xl border border-violet/40 bg-gradient-to-br from-violet/25 via-surface to-surface p-6">
-                <div class="flex items-start justify-between">
-                    <div>
-                        <h2 class="font-display text-lg font-bold">Watch &amp; Earn</h2>
-                        <p class="mt-1 text-sm text-slate-400">Get <span class="font-semibold text-gold">+1 to +10 coins</span> per ad.</p>
-                    </div>
-                    <span class="text-3xl">📺</span>
-                </div>
-                <button id="watchAdBtn" onclick="watchAd()" class="shimmer relative mt-6 w-full overflow-hidden rounded-2xl bg-gradient-to-b from-gold to-gold-deep py-4 font-display font-bold text-ink transition active:scale-[0.98] glow-gold disabled:opacity-60">
-                    Watch Ad
-                </button>
-            </section>
-
-            <!-- PROMO CODE SECTION -->
-            <section class="rounded-3xl border border-line bg-surface p-6 text-center space-y-4">
-                <div class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-surface-2 text-2xl ring-1 ring-line">🎁</div>
-                <div>
-                    <h2 class="font-display text-md font-bold">Have a Promo Code?</h2>
-                    <p class="mt-0.5 text-xs text-slate-400">Get free coins instantly from our channel.</p>
-                </div>
-
-                <a href="https://t.me/+2vDL5Gmbee0zNDFl" target="_blank" class="inline-flex items-center gap-2 rounded-full bg-violet/20 px-4 py-2 text-xs font-bold text-violet-400 border border-violet/30 active:scale-95 transition">
-                    <span>📢</span> Join Telegram for Codes
-                </a>
-
-                <div class="rounded-2xl bg-surface-2 p-3 ring-1 ring-line text-left space-y-2">
-                    <label class="block text-[11px] font-medium uppercase tracking-wider text-slate-500">Enter Promo Code</label>
-                    <div class="flex items-center gap-2">
-                        <input type="text" id="promoCodeInput" placeholder="e.g. BONUS50" class="w-full rounded-xl border border-line bg-ink px-3 py-2.5 text-xs text-slate-200 uppercase outline-none focus:border-gold/60" />
-                        <button onclick="redeemPromoCode()" class="rounded-xl bg-gradient-to-b from-gold to-gold-deep px-4 py-2.5 text-xs font-bold text-ink active:scale-95">Claim</button>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <!-- REFER & EARN -->
-        <div id="tab-refer" class="tab-content hidden space-y-5">
-            <section class="rounded-3xl border border-line bg-surface p-6 text-center">
-                <div class="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-surface-2 text-3xl ring-1 ring-line">🎟️</div>
-                <h2 class="font-display text-lg font-bold">Refer &amp; Earn 300 Coins</h2>
-                <p class="mt-1 text-sm text-slate-400">Apna unique code dosto ko share karein. Code enter karne par dono ko <span class="font-semibold text-gold">300 coins</span> milenge!</p>
-
-                <div class="mt-6 rounded-2xl bg-surface-2 p-4 ring-1 ring-line text-left space-y-2">
-                    <label class="block text-xs font-medium uppercase tracking-wider text-slate-500">Aapka Unique Referral Code</label>
-                    <div class="flex items-center gap-2">
-                        <input type="text" id="myReferralCode" readonly class="w-full rounded-xl border border-line bg-ink px-3 py-3 text-sm font-bold text-gold tracking-widest text-center outline-none" />
-                        <button onclick="copyMyCode()" class="rounded-xl bg-gradient-to-b from-gold to-gold-deep px-4 py-3 text-xs font-bold text-ink active:scale-95">Copy Code</button>
-                    </div>
-                </div>
-
-                <div id="redeemSection" class="mt-4 rounded-2xl bg-surface-2 p-4 ring-1 ring-line text-left space-y-2">
-                    <label class="block text-xs font-medium uppercase tracking-wider text-slate-500">Friends Code Enter Karein</label>
-                    <div class="flex items-center gap-2">
-                        <input type="text" id="friendCodeInput" placeholder="Enter code here..." class="w-full rounded-xl border border-line bg-ink px-3 py-3 text-xs text-slate-200 uppercase outline-none focus:border-gold/60" />
-                        <button onclick="redeemFriendCode()" class="rounded-xl bg-gradient-to-b from-emerald-500 to-emerald-600 px-4 py-3 text-xs font-bold text-white active:scale-95">Claim 300</button>
-                    </div>
-                </div>
-
-                <div class="mt-5 grid grid-cols-2 gap-3">
-                    <div class="rounded-2xl bg-surface-2 p-4 ring-1 ring-line text-center">
-                        <p class="text-[11px] text-slate-400 uppercase">Total Referrals</p>
-                        <p id="totalReferralsCount" class="font-display text-xl font-bold text-gold mt-1">0</p>
-                    </div>
-                    <div class="rounded-2xl bg-surface-2 p-4 ring-1 ring-line text-center">
-                        <p class="text-[11px] text-slate-400 uppercase">Earned from Refer</p>
-                        <p id="totalReferralCoins" class="font-display text-xl font-bold text-gold mt-1">0</p>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <!-- WALLET -->
-        <div id="tab-wallet" class="tab-content hidden space-y-5">
-            <section class="rounded-3xl border border-line bg-surface p-6 space-y-4">
-                <h2 class="font-display text-lg font-bold">Withdraw Coins</h2>
+            <!-- GAMES PAGE (Ads removed cleanly) -->
+            <div id="page-games" class="space-y-4 hidden">
+                <h3 class="font-extrabold text-lg">Interactive Games</h3>
                 
-                <div class="rounded-2xl bg-surface-2 p-4 ring-1 ring-line">
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-slate-400">Available Balance</span>
-                        <span id="coinBalanceWallet" class="font-display font-bold text-gold">0 coins</span>
+                <div class="glass-card p-5 rounded-2xl border border-gray-800 text-center relative overflow-hidden">
+                    <div class="w-14 h-14 mx-auto rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-2xl mb-3 shadow-inner">
+                        <i class="fa-solid fa-dharmachakra animate-spin" style="animation-duration: 8s;"></i>
+                    </div>
+                    <h4 class="font-bold text-base mb-1">Daily Lucky Spin</h4>
+                    <p class="text-xs text-gray-400 mb-4">Spin the wheel once every day to win free coins instantly!</p>
+                    <button onclick="spinWheel()" id="spin-btn" class="w-full py-3 gradient-btn text-white font-bold rounded-xl shadow-lg hover:opacity-95 transition text-sm">
+                        Spin & Win Coins
+                    </button>
+                    <div id="spin-result" class="mt-3 text-xs font-bold text-amber-400 h-5"></div>
+                </div>
+
+                <div class="glass-card p-5 rounded-2xl border border-gray-800">
+                    <h4 class="font-bold text-sm mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-bolt text-orange-400"></i> Quick Odd Predictor
+                    </h4>
+                    <p class="text-xs text-gray-400 mb-4">Predict High or Low correctly to double your staked coins.</p>
+                    <div class="flex gap-3">
+                        <button onclick="playPredictor('LOW')" class="flex-1 py-3 bg-blue-600/20 border border-blue-500/40 text-blue-400 font-bold rounded-xl text-xs hover:bg-blue-600/30 transition">
+                            LOW (1-5) 2x
+                        </button>
+                        <button onclick="playPredictor('HIGH')" class="flex-1 py-3 bg-orange-600/20 border border-orange-500/40 text-orange-400 font-bold rounded-xl text-xs hover:bg-orange-600/30 transition">
+                            HIGH (6-10) 2x
+                        </button>
+                    </div>
+                    <div id="predictor-result" class="mt-3 text-center text-xs font-semibold text-gray-300"></div>
+                </div>
+            </div>
+
+            <!-- WALLET PAGE -->
+            <div id="page-wallet" class="space-y-4 hidden">
+                <h3 class="font-extrabold text-lg">My Wallet</h3>
+                
+                <div class="glass-card p-6 rounded-2xl bg-gradient-to-br from-gray-900 to-[#131C31] border border-gray-800 text-center">
+                    <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Available Coins</p>
+                    <h2 id="wallet-balance" class="text-4xl font-extrabold text-amber-400 mb-4">1,250</h2>
+                    <div class="flex justify-center gap-3">
+                        <button onclick="showModal('Deposit')" class="px-5 py-2.5 gradient-btn text-white text-xs font-bold rounded-xl shadow">
+                            <i class="fa-solid fa-plus mr-1"></i> Add Coins
+                        </button>
+                        <button onclick="showModal('Withdraw')" class="px-5 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-bold rounded-xl border border-gray-700">
+                            <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i> Withdraw
+                        </button>
                     </div>
                 </div>
 
-                <label class="block text-xs font-medium uppercase tracking-wider text-slate-500">Select Payout Method</label>
-                <div class="grid grid-cols-3 gap-2">
-                    <button type="button" data-method="upi" onclick="selectMethod('upi')" class="method-btn rounded-2xl border border-line bg-surface-2 px-2 py-3 text-center transition">
-                        <div class="text-xl">🏦</div>
-                        <p class="mt-1 text-[11px] font-semibold text-slate-300">UPI</p>
-                    </button>
-                    <button type="button" data-method="amazon" onclick="selectMethod('amazon')" class="method-btn rounded-2xl border border-line bg-surface-2 px-2 py-3 text-center transition">
-                        <div class="text-xl">📦</div>
-                        <p class="mt-1 text-[11px] font-semibold text-slate-300">Amazon</p>
-                    </button>
-                    <button type="button" data-method="playstore" onclick="selectMethod('playstore')" class="method-btn rounded-2xl border border-line bg-surface-2 px-2 py-3 text-center transition">
-                        <div class="text-xl">▶️</div>
-                        <p class="mt-1 text-[11px] font-semibold text-slate-300">Play Store</p>
-                    </button>
-                </div>
-
-                <!-- Plans Selection -->
-                <label class="block text-xs font-medium uppercase tracking-wider text-slate-500 pt-2">Select Amount Plan</label>
-                
-                <!-- ₹2 UPI Plan -->
-                <div id="upiPlanBox">
-                    <button type="button" onclick="selectPlan(300, '₹2')" id="planBtn_300" class="plan-btn w-full rounded-2xl border border-gold/40 bg-surface-2 p-3.5 text-left transition flex justify-between items-center ring-2 ring-gold/30">
-                        <div>
-                            <p class="font-bold text-gold text-sm">₹2 via UPI <span class="text-[10px] bg-gold/20 text-gold px-2 py-0.5 rounded-full ml-1">Limit: 5 Times</span></p>
-                            <p class="text-xs text-slate-400">Cost: 300 coins</p>
-                        </div>
-                        <span class="text-xs font-bold text-gold">Selected ✓</span>
-                    </button>
-                </div>
-
-                <!-- Other Plans Grid -->
-                <div class="grid grid-cols-2 gap-2.5 pt-1">
-                    <button type="button" onclick="selectPlan(1200, '₹10')" id="planBtn_1200" class="plan-btn rounded-2xl border border-line bg-surface-2 p-3 text-center transition active:scale-95">
-                        <p class="font-bold text-sm">₹10</p>
-                        <p class="text-[11px] text-slate-400">1200 coins</p>
-                    </button>
-                    <button type="button" onclick="selectPlan(3550, '₹30')" id="planBtn_3550" class="plan-btn rounded-2xl border border-line bg-surface-2 p-3 text-center transition active:scale-95">
-                        <p class="font-bold text-sm">₹30</p>
-                        <p class="text-[11px] text-slate-400">3550 coins</p>
-                    </button>
-                    <button type="button" onclick="selectPlan(5900, '₹50')" id="planBtn_5900" class="plan-btn rounded-2xl border border-line bg-surface-2 p-3 text-center transition active:scale-95">
-                        <p class="font-bold text-sm">₹50</p>
-                        <p class="text-[11px] text-slate-400">5900 coins</p>
-                    </button>
-                    <button type="button" onclick="selectPlan(11500, '₹100')" id="planBtn_11500" class="plan-btn rounded-2xl border border-line bg-surface-2 p-3 text-center transition active:scale-95">
-                        <p class="font-bold text-sm">₹100</p>
-                        <p class="text-[11px] text-slate-400">11500 coins</p>
-                    </button>
-                </div>
-
-                <label id="payoutLabel" class="block text-xs font-medium uppercase tracking-wider text-slate-500 pt-2">UPI ID</label>
-                <input type="text" id="payoutDetails" placeholder="yourname@upi"
-                    class="w-full rounded-2xl border border-line bg-surface-2 p-4 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-gold/60 focus:ring-2 focus:ring-gold/20" />
-
-                <button onclick="requestWithdrawal()" class="w-full rounded-2xl bg-gradient-to-b from-emerald-500 to-emerald-600 py-4 font-display font-bold text-white transition active:scale-[0.98]">
-                    Redeem Now
-                </button>
-                <p class="text-center text-xs text-slate-500">Requests are processed within 24–48 hours.</p>
-            </section>
-
-            <!-- Withdrawal History Section -->
-            <section class="rounded-3xl border border-line bg-surface p-6 space-y-3">
-                <h3 class="font-display text-md font-bold">Withdrawal History</h3>
-                <div id="historyList" class="space-y-2 text-xs text-slate-400">
-                    <p>No withdrawal requests yet.</p>
-                </div>
-            </section>
-        </div>
-    </main>
-
-    <!-- Bottom Navigation -->
-    <nav class="fixed inset-x-0 bottom-0 z-30 border-t border-line/70 bg-ink/90 backdrop-blur-md">
-        <div class="mx-auto flex w-full max-w-md items-center justify-around px-4 py-3" style="padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));">
-            <button id="nav-home" onclick="openTab('home')" class="nav-active flex flex-col items-center gap-1 text-slate-500 transition">
-                <span class="text-lg">🏠</span><span class="text-[11px] font-semibold">Home</span>
-                <span class="nav-dot h-1 w-1 rounded-full bg-gold opacity-0 transition"></span>
-            </button>
-            <button id="nav-refer" onclick="openTab('refer')" class="flex flex-col items-center gap-1 text-slate-500 transition">
-                <span class="text-lg">👥</span><span class="text-[11px] font-semibold">Refer</span>
-                <span class="nav-dot h-1 w-1 rounded-full bg-gold opacity-0 transition"></span>
-            </button>
-            <button id="nav-wallet" onclick="openTab('wallet')" class="flex flex-col items-center gap-1 text-slate-500 transition">
-                <span class="text-lg">👛</span><span class="text-[11px] font-semibold">Wallet</span>
-                <span class="nav-dot h-1 w-1 rounded-full bg-gold opacity-0 transition"></span>
-            </button>
-        </div>
-    </nav>
-
-    <div id="toast" class="pointer-events-none fixed bottom-24 left-1/2 z-[110] hidden -translate-x-1/2"></div>
-
-    <!-- Firebase SDK & App Scripts -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, where, getDocs, onSnapshot, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-          apiKey: "AIzaSyB3Jnitvrvot8iyJQdv-b71PDeSR3OGXhg",
-          authDomain: "watch-and-earn-16b69.firebaseapp.com",
-          projectId: "watch-and-earn-16b69",
-          storageBucket: "watch-and-earn-16b69.firebasestorage.app",
-          messagingSenderId: "979991411346",
-          appId: "1:979991411346:web:45136b6e8624099964c44b",
-          measurementId: "G-CRFRSJJZSY"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-        let tgUser = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null;
-        window.userId = tgUser && tgUser.id ? String(tgUser.id) : ("TG_" + Math.floor(100000 + Math.random() * 900000));
-        window.userNameVal = tgUser && tgUser.first_name ? tgUser.first_name : "User";
-
-        let coins = 0;
-        let selectedMethod = "upi";
-        let selectedCoinsRequired = 300;
-        let selectedPlanTitle = "₹2";
-
-        window.initUserData = function() {
-            coins = parseInt(localStorage.getItem(`coins_${window.userId}`)) || 0;
-            document.getElementById("myReferralCode").value = window.userId;
-            updateUI(false);
-            listenToUserWithdrawals();
-        };
-
-        function save() { localStorage.setItem(`coins_${window.userId}`, coins); }
-        function addCoins(n) { coins += n; save(); updateUI(true); }
-
-        window.showToast = function(message, type = "info") {
-            const host = document.getElementById("toast");
-            const bg = type === "success" ? "from-emerald-500 to-emerald-600"
-                     : type === "error"   ? "from-rose-500 to-rose-600"
-                     : "from-surface-2 to-surface-2";
-            const ring = type === "info" ? "ring-1 ring-line" : "";
-            host.innerHTML = `<div class="toast-in flex items-center gap-2 rounded-2xl bg-gradient-to-b ${bg} ${ring} px-5 py-3 text-sm font-semibold text-white shadow-xl">${message}</div>`;
-            host.classList.remove("hidden");
-            clearTimeout(host._t);
-            host._t = setTimeout(() => host.classList.add("hidden"), 2600);
-        }
-
-        window.applyProfile = function() {
-            const nameEl = document.getElementById("userName");
-            if (nameEl) {
-                nameEl.classList.remove("uppercase", "tracking-wider", "text-slate-500");
-                nameEl.classList.add("text-slate-300");
-                nameEl.innerText = "Hi, " + window.userNameVal;
-            }
-            const avatar = document.getElementById("userAvatar");
-            if (avatar && tgUser && tgUser.photo_url) {
-                avatar.innerHTML = `<img src="${tgUser.photo_url}" alt="User" class="h-full w-full object-cover" />`;
-            }
-        }
-
-        window.selectPlan = function(coinsNeeded, title) {
-            selectedCoinsRequired = coinsNeeded;
-            selectedPlanTitle = title;
-            
-            document.querySelectorAll(".plan-btn").forEach(btn => {
-                btn.classList.remove("border-gold/40", "ring-2", "ring-gold/30");
-                btn.classList.add("border-line");
-                let span = btn.querySelector("span");
-                if(span) span.remove();
-            });
-
-            let activeBtn = document.getElementById(`planBtn_${coinsNeeded}`);
-            if(activeBtn) {
-                activeBtn.classList.remove("border-line");
-                activeBtn.classList.add("border-gold/40", "ring-2", "ring-gold/30");
-                if(!activeBtn.querySelector("span")) {
-                    activeBtn.insertAdjacentHTML('beforeend', `<span class="text-xs font-bold text-gold">Selected ✓</span>`);
-                }
-            }
-        };
-
-        window.redeemPromoCode = async function() {
-            const codeInput = document.getElementById("promoCodeInput");
-            const code = codeInput.value.trim().toUpperCase();
-            if (!code) return window.showToast("Please enter a promo code", "error");
-
-            try {
-                const promoRef = doc(db, "promocodes", code);
-                const promoSnap = await getDoc(promoRef);
-
-                if (!promoSnap.exists()) {
-                    return window.showToast("Invalid promo code!", "error");
-                }
-
-                let promoData = promoSnap.data();
-                let usedByList = promoData.usedBy || [];
-
-                if (usedByList.includes(window.userId)) {
-                    return window.showToast("You have already used this promo code!", "error");
-                }
-
-                let rewardCoins = promoData.coins || 50;
-                usedByList.push(window.userId);
-
-                await updateDoc(promoRef, { usedBy: usedByList });
-
-                addCoins(rewardCoins);
-                codeInput.value = "";
-                window.showToast(`Success! +${rewardCoins} coins added! 🎉`, "success");
-            } catch (e) {
-                console.error(e);
-                window.showToast("Error claiming promo code", "error");
-            }
-        }
-
-        window.requestWithdrawal = async function() {
-            if (selectedCoinsRequired === 300) {
-                if (selectedMethod !== 'upi') {
-                    return window.showToast("₹2 plan is only available for UPI method!", "error");
-                }
-                let used2rs = parseInt(localStorage.getItem(`used2rs_${window.userId}`)) || 0;
-                if (used2rs >= 5) {
-                    return window.showToast("Limit reached! You can only use the ₹2 plan 5 times.", "error");
-                }
-                localStorage.setItem(`used2rs_${window.userId}`, used2rs + 1);
-            }
-
-            if (coins < selectedCoinsRequired) {
-                return window.showToast(`Need ${selectedCoinsRequired - coins} more coins for this plan`, "error");
-            }
-            const details = document.getElementById("payoutDetails").value.trim();
-            if (!details) return window.showToast("Please enter your payout details", "error");
-
-            try {
-                coins -= selectedCoinsRequired; 
-                save(); 
-                updateUI(true);
-                document.getElementById("payoutDetails").value = "";
-
-                await addDoc(collection(db, "withdrawals"), {
-                    userId: window.userId,
-                    userName: window.userNameVal,
-                    method: selectedMethod,
-                    details: details,
-                    amount: selectedPlanTitle,
-                    status: "Pending",
-                    timestamp: new Date()
-                });
-
-                window.showToast("Request sent! Your money will be sent within 24 hours.", "success");
-            } catch (e) {
-                console.error(e);
-                window.showToast("Error submitting request. Try again.", "error");
-            }
-        }
-
-        function listenToUserWithdrawals() {
-            const historyContainer = document.getElementById("historyList");
-            const q = query(collection(db, "withdrawals"), where("userId", "==", window.userId));
-            onSnapshot(q, (snapshot) => {
-                if (snapshot.empty) {
-                    historyContainer.innerHTML = `<p>No withdrawal requests yet.</p>`;
-                    return;
-                }
-                let html = "";
-                snapshot.forEach((docSnap) => {
-                    let data = docSnap.data();
-                    let badgeColor = data.status === "Success" ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/30" 
-                                   : data.status === "Rejected" ? "text-rose-400 bg-rose-500/10 border-rose-500/30" 
-                                   : "text-gold bg-gold/10 border-gold/30";
-                    
-                    html += `
-                        <div class="rounded-2xl bg-surface-2 p-3 ring-1 ring-line flex items-center justify-between">
-                            <div>
-                                <p class="font-semibold text-slate-200">${data.amount} via ${data.method.toUpperCase()}</p>
-                                <p class="text-[10px] text-slate-500">${data.details}</p>
+                <div class="glass-card p-4 rounded-2xl border border-gray-800">
+                    <h4 class="font-bold text-xs text-gray-400 uppercase tracking-wider mb-3">Recent Activity</h4>
+                    <div class="space-y-2.5 text-xs">
+                        <div class="flex justify-between items-center py-2 border-b border-gray-800/60">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                                    <i class="fa-solid fa-arrow-down"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold">Welcome Bonus</p>
+                                    <span class="text-[10px] text-gray-400">Today, 03:00 PM</span>
+                                </div>
                             </div>
-                            <span class="px-2.5 py-1 rounded-lg border text-[11px] font-bold ${badgeColor}">${data.status === 'Success' ? '✓ Success' : data.status}</span>
+                            <span class="font-bold text-emerald-400">+1,000 Coins</span>
                         </div>
-                    `;
-                });
-                historyContainer.innerHTML = html;
-            });
-        }
+                    </div>
+                </div>
+            </div>
 
-        window.onload = () => {
-            window.applyProfile();
-            window.initUserData();
-            selectMethod("upi");
-        };
-    </script>
+            <!-- PROFILE PAGE -->
+            <div id="page-profile" class="space-y-4 hidden">
+                <h3 class="font-extrabold text-lg">My Profile</h3>
+                
+                <div class="glass-card p-5 rounded-2xl border border-gray-800 flex items-center space-x-4">
+                    <div class="w-14 h-14 rounded-2xl gradient-btn flex items-center justify-center text-white text-2xl font-bold shadow">
+                        ZB
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-base">ZyloPlayer</h4>
+                        <p class="text-xs text-gray-400">ID: #ZB-849201</p>
+                        <span class="inline-block mt-1 text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full font-semibold">VIP Level 1</span>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl border border-gray-800 overflow-hidden divide-y divide-gray-800/60 text-xs">
+                    <a href="#" onclick="showModal('Support')" class="flex items-center justify-between p-4 hover:bg-gray-800/40 transition">
+                        <span class="flex items-center gap-3 font-semibold"><i class="fa-solid fa-headset text-blue-400 text-sm"></i> Customer Support</span>
+                        <i class="fa-solid fa-chevron-right text-gray-500"></i>
+                    </a>
+                    <a href="#" onclick="showModal('Terms')" class="flex items-center justify-between p-4 hover:bg-gray-800/40 transition">
+                        <span class="flex items-center gap-3 font-semibold"><i class="fa-solid fa-shield-halved text-emerald-400 text-sm"></i> Terms & Guidelines</span>
+                        <i class="fa-solid fa-chevron-right text-gray-500"></i>
+                    </a>
+                </div>
+            </div>
+
+        </main>
+
+        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto glass-card border-t border-gray-800/80 px-6 py-2.5 flex justify-around items-center z-40 bg-[#090D16]/95">
+            <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center text-blue-500 transition">
+                <i class="fa-solid fa-house text-lg mb-1"></i>
+                <span class="text-[10px] font-bold">Home</span>
+            </button>
+            <button onclick="switchTab('games')" id="nav-games" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
+                <i class="fa-solid fa-gamepad text-lg mb-1"></i>
+                <span class="text-[10px] font-bold">Games</span>
+            </button>
+            <button onclick="switchTab('wallet')" id="nav-wallet" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
+                <i class="fa-solid fa-wallet text-lg mb-1"></i>
+                <span class="text-[10px] font-bold">Wallet</span>
+            </button>
+            <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
+                <i class="fa-solid fa-user text-lg mb-1"></i>
+                <span class="text-[10px] font-bold">Profile</span>
+            </button>
+        </nav>
+
+        <!-- Custom Modal Popup -->
+        <div id="custom-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+            <div class="glass-card max-w-xs w-full p-6 rounded-2xl border border-gray-700 text-center space-y-4 shadow-2xl animate-float">
+                <div id="modal-icon" class="w-12 h-12 rounded-full mx-auto bg-blue-500/20 text-blue-400 flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+                <h4 id="modal-title" class="font-extrabold text-base">Notice</h4>
+                <p id="modal-desc" class="text-xs text-gray-300">Message content here.</p>
+                <button onclick="closeModal()" class="w-full py-2.5 gradient-btn text-white font-bold rounded-xl text-xs shadow">
+                    Okay
+                </button>
+            </div>
+        </div>
+
+    </div>
 
     <script>
-        const rand1to10 = () => Math.floor(Math.random() * 10) + 1;
+        let userBalance = 1250;
 
-        function redeemFriendCode() {
-            const inputField = document.getElementById("friendCodeInput");
-            const code = inputField.value.trim().toUpperCase();
-            if (!code) return window.showToast("Please enter a referral code", "error");
-            if (code === window.userId) return window.showToast("You cannot use your own referral code!", "error");
+        // Intro Splash Screen Sequence
+        window.addEventListener('DOMContentLoaded', () => {
+            const progressBar = document.getElementById('splash-progress');
+            const splashScreen = document.getElementById('splash-screen');
+            const mainApp = document.getElementById('main-app');
 
-            let hasRedeemed = localStorage.getItem(`redeemed_code_${window.userId}`);
-            if (hasRedeemed) return window.showToast("You have already used a referral code!", "error");
-
-            localStorage.setItem(`redeemed_code_${window.userId}`, code);
-            addCoins(300);
-
-            let refList = JSON.parse(localStorage.getItem(`referred_${code}`)) || [];
-            if (!refList.includes(window.userId)) {
-                refList.push(window.userId);
-                localStorage.setItem(`referred_${code}`, JSON.stringify(refList));
-                let refCoinsTotal = parseInt(localStorage.getItem(`refcoins_${code}`)) || 0;
-                refCoinsTotal += 300;
-                localStorage.setItem(`refcoins_${code}`, refCoinsTotal);
-                let currentRefCoinsEarned = parseInt(localStorage.getItem(`coins_${code}`)) || 0;
-                localStorage.setItem(`coins_${code}`, currentRefCoinsEarned + 300);
-            }
-
-            inputField.value = "";
-            document.getElementById("redeemSection").innerHTML = `<div class="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-3 text-center text-xs text-emerald-400 font-bold">Code Redeemed Successfully! +300 Coins Added 🎉</div>`;
-            window.showToast("Successfully claimed 300 coins! 🎉", "success");
-        }
-
-        function updateUI(animate) {
-            let coins = parseInt(localStorage.getItem(`coins_${window.userId}`)) || 0;
-            document.getElementById("coinBalance").innerText = coins;
-            const big = document.getElementById("coinBalanceBig"); if (big) big.innerText = coins;
-            const wallet = document.getElementById("coinBalanceWallet"); if (wallet) wallet.innerText = coins + " coins";
-
-            let currentRefs = JSON.parse(localStorage.getItem(`referred_${window.userId}`)) || [];
-            let currentRefCoins = parseInt(localStorage.getItem(`refcoins_${window.userId}`)) || 0;
-            document.getElementById("totalReferralsCount").innerText = currentRefs.length;
-            document.getElementById("totalReferralCoins").innerText = currentRefCoins;
-
-            if (localStorage.getItem(`redeemed_code_${window.userId}`)) {
-                const redeemSec = document.getElementById("redeemSection");
-                if (redeemSec && !redeemSec.innerHTML.includes("Successfully")) {
-                    redeemSec.innerHTML = `<div class="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-3 text-center text-xs text-emerald-400 font-bold">Referral Code Already Redeemed ✓</div>`;
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 25;
+                if(progressBar) progressBar.style.width = progress + '%';
+                if(progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        if(splashScreen) {
+                            splashScreen.style.opacity = '0';
+                            setTimeout(() => splashScreen.remove(), 700);
+                        }
+                        if(mainApp) {
+                            mainApp.style.opacity = '1';
+                        }
+                    }, 400);
                 }
-            }
+            }, 180);
+        });
 
-            if (animate) {
-                [document.getElementById("coinBalance"), big].forEach((el) => {
-                    if (!el) return; el.classList.remove("coin-pop"); void el.offsetWidth; el.classList.add("coin-pop");
-                });
-            }
-        }
-
-        function copyMyCode() {
-            const input = document.getElementById("myReferralCode");
-            input.select();
-            navigator.clipboard.writeText(input.value);
-            window.showToast("Referral code copied!", "success");
-        }
-
-        // ==========================================
-        // DYNAMIC ADSGRAM SCRIPT LOADER (BYPASSES WEBVIEW BLOCK)
-        // ==========================================
-        let adCoolingDown = false;
-        
-        function watchAd() {
-            const btn = document.getElementById("watchAdBtn");
-            if (adCoolingDown) return window.showToast("Please wait for cooldown", "error");
-            
-            window.showToast("Loading ad...", "info");
-
-            // Dynamically inject Adsgram script on click to bypass WebView restrictions
-            let script = document.getElementById("adsgramScript");
-            if (!script) {
-                script = document.createElement("script");
-                script.id = "adsgramScript";
-                script.src = "https://sad.adsgram.ai/js/adsgram.js";
-                script.async = true;
-                document.head.appendChild(script);
-            }
-
-            script.onload = function() {
-                try {
-                    const AdController = window.Adsgram.init({ blockId: "43622" });
-                    AdController.show()
-                        .then(() => {
-                            const earned = rand1to10();
-                            addCoins(earned);
-                            window.showToast(`You have seen an ad! +${earned} coins earned!`, "success");
-                            startAdCooldown(btn);
-                        })
-                        .catch((err) => {
-                            console.error("Ad display error:", err);
-                            window.showToast("Ad closed or failed to load", "error");
-                        });
-                } catch(e) {
-                    console.error("Adsgram init error:", e);
-                    window.showToast("Failed to initialize ad.", "error");
+        function switchTab(tabName) {
+            const pages = ['home', 'games', 'wallet', 'profile'];
+            pages.forEach(p => {
+                const el = document.getElementById(`page-${p}`);
+                const nav = document.getElementById(`nav-${p}`);
+                if (el) el.classList.add('hidden');
+                if (nav) {
+                    nav.classList.remove('text-blue-500');
+                    nav.classList.add('text-gray-400');
                 }
-            };
+            });
 
-            script.onerror = function() {
-                window.showToast("Ad network is blocked or unavailable.", "error");
-            };
-
-            // If script is already loaded previously
-            if (window.Adsgram) {
-                script.onload();
+            const activePage = document.getElementById(`page-${tabName}`);
+            const activeNav = document.getElementById(`nav-${tabName}`);
+            if (activePage) activePage.classList.remove('hidden');
+            if (activeNav) {
+                activeNav.classList.remove('text-gray-400');
+                activeNav.classList.add('text-blue-500');
             }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function startAdCooldown(btn) {
-            adCoolingDown = true;
-            let remaining = 5;
+        function updateBalanceUI() {
+            const hb = document.getElementById('header-balance');
+            const sb = document.getElementById('stat-balance');
+            const wb = document.getElementById('wallet-balance');
+            if(hb) hb.innerText = userBalance.toLocaleString();
+            if(sb) sb.innerText = userBalance.toLocaleString() + ' Coins';
+            if(wb) wb.innerText = userBalance.toLocaleString();
+        }
+
+        function spinWheel() {
+            const btn = document.getElementById('spin-btn');
+            const res = document.getElementById('spin-result');
             btn.disabled = true;
-            btn.innerText = `Wait ${remaining}s`;
-            const iv = setInterval(() => {
-                remaining--;
-                if (remaining <= 0) {
-                    clearInterval(iv);
-                    adCoolingDown = false;
-                    btn.disabled = false;
-                    btn.innerText = "Watch Ad";
-                } else {
-                    btn.innerText = `Wait ${remaining}s`;
-                }
-            }, 1000);
+            btn.innerText = "Spinning...";
+            res.innerText = "";
+
+            setTimeout(() => {
+                const rewards = [50, 100, 200, 500, 1000];
+                const won = rewards[Math.floor(Math.random() * rewards.length)];
+                userBalance += won;
+                updateBalanceUI();
+                res.innerText = `🎉 You won +${won} Coins!`;
+                btn.disabled = false;
+                btn.innerText = "Spin Again Tomorrow";
+            }, 1200);
         }
 
-        function openTab(t) {
-            document.querySelectorAll(".tab-content").forEach((el) => el.classList.add("hidden"));
-            document.getElementById("tab-" + t).classList.remove("hidden");
-            ["home", "refer", "wallet"].forEach((name) => {
-                const el = document.getElementById("nav-" + name);
-                if (el) el.classList.toggle("nav-active", name === t);
-            });
-            updateUI(false);
-        }
+        function playPredictor(choice) {
+            const res = document.getElementById('predictor-result');
+            const luckyNum = Math.floor(Math.random() * 10) + 1;
+            const isHigh = luckyNum >= 6;
+            const userGuessedHigh = choice === 'HIGH';
 
-        const methodConfig = {
-            upi: { label: "UPI ID", placeholder: "yourname@upi" },
-            amazon: { label: "Amazon account email", placeholder: "email for Amazon gift card" },
-            playstore: { label: "Google Play email", placeholder: "email for Play Store gift card" },
-        };
-        
-        window.selectMethod = function(m) {
-            selectedMethod = m;
-            document.querySelectorAll(".method-btn").forEach((btn) => {
-                const active = btn.dataset.method === m;
-                btn.classList.toggle("border-gold", active);
-                btn.classList.toggle("ring-2", active);
-                btn.classList.toggle("ring-gold/40", active);
-                btn.classList.toggle("border-line", !active);
-            });
-            
-            const upiBox = document.getElementById("upiPlanBox");
-            if (m === 'upi') {
-                upiBox.style.display = "block";
+            if(isHigh === userGuessedHigh) {
+                const prize = 100;
+                userBalance += prize;
+                updateBalanceUI();
+                res.innerHTML = `<span class="text-emerald-400">✅ Lucky Number was ${luckyNum}. You won +${prize} Coins!</span>`;
             } else {
-                upiBox.style.display = "none";
-                if(selectedCoinsRequired === 300) {
-                    selectPlan(1200, '₹10');
-                }
+                res.innerHTML = `<span class="text-red-400">❌ Lucky Number was ${luckyNum}. Better luck next time!</span>`;
             }
+        }
 
-            document.getElementById("payoutLabel").innerText = methodConfig[m].label;
-            document.getElementById("payoutDetails").placeholder = methodConfig[m].placeholder;
-            document.getElementById("payoutDetails").value = "";
+        function showModal(type) {
+            const modal = document.getElementById('custom-modal');
+            const title = document.getElementById('modal-title');
+            const desc = document.getElementById('modal-desc');
+            
+            if(type === 'Deposit') {
+                title.innerText = "Add Coins";
+                desc.innerText = "Free simulated coins credited successfully!";
+                userBalance += 500;
+                updateBalanceUI();
+            } else if(type === 'Withdraw') {
+                title.innerText = "Withdrawal Request";
+                desc.innerText = "Withdrawal requests are processed securely within 24 hours.";
+            } else if(type === 'Support') {
+                title.innerText = "Customer Support";
+                desc.innerText = "Need assistance? Contact our 24/7 Telegram support bot.";
+            } else {
+                title.innerText = "Terms & Guidelines";
+                desc.innerText = "ZyloBet Mini App is designed for smooth entertainment and skill prediction.";
+            }
+            if(modal) modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('custom-modal');
+            if(modal) modal.classList.add('hidden');
         }
     </script>
 </body>
