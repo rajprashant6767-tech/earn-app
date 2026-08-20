@@ -12,7 +12,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://sad.adsgram.ai/js/adsgram.js"></script>
+    <script src="https://sad.adsgram.ai/js/adsgram.js" crossorigin="anonymous"></script>
 
     <script>
       tailwind.config = {
@@ -534,13 +534,18 @@
         // ADSGRAM REWARDED VIDEO AD INTEGRATION (ID: 43622)
         // ==========================================
         let AdController = null;
-        try {
-            if (window.Adsgram) {
-                AdController = window.Adsgram.init({ blockId: "43622" });
-            }
-        } catch(e) {
-            console.error(e);
-        }
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                try {
+                    if (window.Adsgram) {
+                        AdController = window.Adsgram.init({ blockId: "43622" });
+                    }
+                } catch(e) {
+                    console.error("Adsgram init error:", e);
+                }
+            }, 1000);
+        });
 
         let adCoolingDown = false;
         
@@ -548,12 +553,12 @@
             const btn = document.getElementById("watchAdBtn");
             if (adCoolingDown) return window.showToast("Please wait for cooldown", "error");
             
-            try {
-                if (!AdController && window.Adsgram) {
+            if (!AdController && window.Adsgram) {
+                try {
                     AdController = window.Adsgram.init({ blockId: "43622" });
+                } catch(e) {
+                    console.error(e);
                 }
-            } catch(e) {
-                console.error(e);
             }
 
             if (AdController) {
@@ -565,11 +570,11 @@
                         startAdCooldown(btn);
                     })
                     .catch((err) => {
-                        console.error(err);
+                        console.error("Ad display error:", err);
                         window.showToast("Ad closed or failed to load", "error");
                     });
             } else {
-                window.showToast("Adsgram SDK failed to load. Check internet or ad blocker.", "error");
+                window.showToast("Ad network is blocked or not available in this view.", "error");
             }
         }
 
