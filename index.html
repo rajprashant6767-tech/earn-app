@@ -548,6 +548,14 @@
             const btn = document.getElementById("watchAdBtn");
             if (adCoolingDown) return window.showToast("Please wait for cooldown", "error");
             
+            try {
+                if (!AdController && window.Adsgram) {
+                    AdController = window.Adsgram.init({ blockId: "43622" });
+                }
+            } catch(e) {
+                console.error(e);
+            }
+
             if (AdController) {
                 AdController.show()
                     .then(() => {
@@ -561,7 +569,7 @@
                         window.showToast("Ad closed or failed to load", "error");
                     });
             } else {
-                window.showToast("Ad system is loading, please wait a moment.", "error");
+                window.showToast("Adsgram SDK failed to load. Check internet or ad blocker.", "error");
             }
         }
 
