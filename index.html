@@ -12,7 +12,6 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://sad.adsgram.ai/js/adsgram.js" crossorigin="anonymous"></script>
 
     <script>
       tailwind.config = {
@@ -531,50 +530,53 @@
         }
 
         // ==========================================
-        // ADSGRAM REWARDED VIDEO AD INTEGRATION (ID: 43622)
+        // DYNAMIC ADSGRAM SCRIPT LOADER (BYPASSES WEBVIEW BLOCK)
         // ==========================================
-        let AdController = null;
-
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                try {
-                    if (window.Adsgram) {
-                        AdController = window.Adsgram.init({ blockId: "43622" });
-                    }
-                } catch(e) {
-                    console.error("Adsgram init error:", e);
-                }
-            }, 1000);
-        });
-
         let adCoolingDown = false;
         
         function watchAd() {
             const btn = document.getElementById("watchAdBtn");
             if (adCoolingDown) return window.showToast("Please wait for cooldown", "error");
             
-            if (!AdController && window.Adsgram) {
-                try {
-                    AdController = window.Adsgram.init({ blockId: "43622" });
-                } catch(e) {
-                    console.error(e);
-                }
+            window.showToast("Loading ad...", "info");
+
+            // Dynamically inject Adsgram script on click to bypass WebView restrictions
+            let script = document.getElementById("adsgramScript");
+            if (!script) {
+                script = document.createElement("script");
+                script.id = "adsgramScript";
+                script.src = "https://sad.adsgram.ai/js/adsgram.js";
+                script.async = true;
+                document.head.appendChild(script);
             }
 
-            if (AdController) {
-                AdController.show()
-                    .then(() => {
-                        const earned = rand1to10();
-                        addCoins(earned);
-                        window.showToast(`You have seen an ad! +${earned} coins earned!`, "success");
-                        startAdCooldown(btn);
-                    })
-                    .catch((err) => {
-                        console.error("Ad display error:", err);
-                        window.showToast("Ad closed or failed to load", "error");
-                    });
-            } else {
-                window.showToast("Ad network is blocked or not available in this view.", "error");
+            script.onload = function() {
+                try {
+                    const AdController = window.Adsgram.init({ blockId: "43622" });
+                    AdController.show()
+                        .then(() => {
+                            const earned = rand1to10();
+                            addCoins(earned);
+                            window.showToast(`You have seen an ad! +${earned} coins earned!`, "success");
+                            startAdCooldown(btn);
+                        })
+                        .catch((err) => {
+                            console.error("Ad display error:", err);
+                            window.showToast("Ad closed or failed to load", "error");
+                        });
+                } catch(e) {
+                    console.error("Adsgram init error:", e);
+                    window.showToast("Failed to initialize ad.", "error");
+                }
+            };
+
+            script.onerror = function() {
+                window.showToast("Ad network is blocked or unavailable.", "error");
+            };
+
+            // If script is already loaded previously
+            if (window.Adsgram) {
+                script.onload();
             }
         }
 
