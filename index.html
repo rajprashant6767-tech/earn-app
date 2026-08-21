@@ -236,7 +236,7 @@
                 </div>`;
         }
 
-        // Step 2: Validate Amount & Proceed to UPI/Proof Upload with SEND button right below Choose File
+        // Step 2: Validate Amount & Proceed with Photo Validation Check
         function proceedToPayment() {
             const amountInput = document.getElementById('deposit-amount-input');
             const errField = document.getElementById('deposit-err');
@@ -257,10 +257,11 @@
                     <div class='bg-gray-900 border border-gray-800 p-3 rounded-xl font-mono text-orange-400 font-bold select-all'>raj-prashant@fam</div>
                     
                     <p class='text-gray-400 text-[10px] text-left'>Payment karne ke baad apna screenshot/proof yahan upload karein:</p>
-                    <input type='file' id='payment-proof-file' class='w-full bg-gray-900 border border-gray-800 p-2 text-xs rounded-xl'>
+                    <input type='file' id='payment-proof-file' accept='image/*' class='w-full bg-gray-900 border border-gray-800 p-2 text-xs rounded-xl'>
+                    <p id='proof-err' class='text-red-400 text-[10px] h-3 font-medium text-left'></p>
                     
-                    <!-- SEND Button right below Choose File -->
-                    <button onclick="alert('Deposit request for ${amt} Diamonds submitted successfully!'); closeModal();" class='w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl font-bold text-xs'>SEND</button>
+                    <!-- SEND PROOF Button with Validation Check -->
+                    <button onclick="submitDepositProof(${amt})" class='w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl font-bold text-xs'>SEND PROOF</button>
                     
                     <!-- Notes and Warning Section in Hinglish -->
                     <div class='bg-blue-500/10 border border-blue-500/30 p-3 rounded-xl text-left space-y-2 mt-2'>
@@ -280,6 +281,20 @@
                         </p>
                     </div>
                 </div>`;
+        }
+
+        // Validate that photo is selected before sending proof
+        function submitDepositProof(amt) {
+            const fileInput = document.getElementById('payment-proof-file');
+            const proofErr = document.getElementById('proof-err');
+
+            if(fileInput.files.length === 0) {
+                proofErr.innerText = "❌ Please select a payment proof screenshot first!";
+                return;
+            }
+
+            alert(`Deposit request for ${amt} Diamonds submitted successfully with proof!`);
+            closeModal();
         }
 
         function openModal(type) {
