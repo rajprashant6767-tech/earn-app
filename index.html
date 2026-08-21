@@ -61,14 +61,46 @@
         .animate-float {
             animation: floatLogo 3s infinite ease-in-out;
         }
+        @keyframes flyRocket {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(-3deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+        .animate-rocket {
+            animation: flyRocket 2s infinite ease-in-out;
+        }
         ::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="bg-darkBg text-white antialiased flex justify-center items-center min-h-screen">
 
-    <!-- STREAMING_CHUNK:Rendering splash screen... -->
+    <!-- STREAMING_CHUNK:Rendering Telegram Login Modal... -->
+    <!-- Telegram Login Modal (Shows on App Start) -->
+    <div id="telegram-login-modal" class="fixed inset-0 z-50 bg-[#090D16] flex flex-col items-center justify-center p-6 transition-opacity duration-700">
+        <div class="glass-card max-w-sm w-full p-8 rounded-3xl border border-gray-700 text-center space-y-6 shadow-2xl animate-float">
+            <div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-blue-500 to-cyan-400 mx-auto flex items-center justify-center text-white text-3xl shadow-lg">
+                <i class="fa-brands fa-telegram"></i>
+            </div>
+            <div>
+                <h2 class="text-2xl font-extrabold tracking-tight mb-1">Telegram Login</h2>
+                <p class="text-xs text-gray-400">Enter your Telegram name to sync your profile with ZyloBet Aviator.</p>
+            </div>
+            <div class="space-y-3 text-left">
+                <label class="text-[11px] font-semibold text-gray-300 uppercase tracking-wider">Your Telegram Name / Tag</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-blue-400 font-bold">@</span>
+                    <input type="text" id="tg-username-input" placeholder="e.g. Peaceful Dragon" class="w-full bg-gray-900 border border-gray-700 rounded-xl pl-8 pr-4 py-3 text-sm font-bold text-white focus:outline-none focus:border-blue-500">
+                </div>
+            </div>
+            <button onclick="handleTelegramLogin()" class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-cyan-500 hover:opacity-95 text-white font-bold rounded-xl text-sm shadow-lg transition">
+                <i class="fa-solid fa-arrow-right-to-bracket mr-2"></i> Login with Telegram
+            </button>
+        </div>
+    </div>
+
+    <!-- STREAMING_CHUNK:Rendering Splash Screen... -->
     <!-- Premium Animated Intro Splash Screen -->
-    <div id="splash-screen" class="fixed inset-0 z-50 bg-[#090D16] flex flex-col items-center justify-center transition-opacity duration-700">
+    <div id="splash-screen" class="fixed inset-0 z-50 bg-[#090D16] flex flex-col items-center justify-center transition-opacity duration-700 hidden">
         <div class="relative flex flex-col items-center text-center px-6">
             <div class="w-28 h-28 rounded-3xl gradient-btn flex items-center justify-center shadow-2xl mb-6 animate-glow animate-float">
                 <i class="fa-solid fa-bolt-lightning text-white text-5xl"></i>
@@ -85,7 +117,7 @@
         </div>
     </div>
 
-    <!-- STREAMING_CHUNK:Initializing main app structure... -->
+    <!-- STREAMING_CHUNK:Initializing Main App Container... -->
     <!-- Main App Container -->
     <div id="main-app" class="w-full max-w-md min-h-screen flex flex-col justify-between opacity-0 transition-opacity duration-500 pb-20">
         
@@ -96,8 +128,8 @@
                 </div>
                 <div>
                     <h2 class="font-bold text-lg leading-tight">ZyloBet</h2>
-                    <span class="text-xs text-emerald-400 font-medium flex items-center gap-1">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Online & Verified
+                    <span id="header-tg-status" class="text-xs text-blue-400 font-medium flex items-center gap-1">
+                        <i class="fa-brands fa-telegram"></i> @Peaceful Dragon
                     </span>
                 </div>
             </div>
@@ -108,7 +140,7 @@
                     <span id="header-balance" class="font-bold text-xs tracking-wide">1,250</span>
                 </div>
                 <div class="w-[1px] h-3 bg-gray-700"></div>
-                <div class="flex items-center space-x-1" title="Diamonds (1 Diamond = 100 Coins)">
+                <div class="flex items-center space-x-1" title="Diamonds">
                     <i class="fa-solid fa-gem text-cyan-400 text-xs animate-pulse"></i>
                     <span id="header-diamonds" class="font-bold text-xs tracking-wide text-cyan-300">12</span>
                 </div>
@@ -117,7 +149,7 @@
 
         <main class="flex-1 px-4 py-4 overflow-y-auto">
             
-            <!-- STREAMING_CHUNK:Rendering home page with Aviator game... -->
+            <!-- STREAMING_CHUNK:Rendering Home Page... -->
             <!-- HOME PAGE -->
             <div id="page-home" class="space-y-5">
                 <div class="grid grid-cols-2 gap-3">
@@ -141,48 +173,85 @@
                     </div>
                 </div>
 
-                <!-- Aviator Game Container -->
-                <div class="glass-card rounded-2xl border border-gray-800 overflow-hidden shadow-xl">
-                    <!-- Game Screen Header -->
-                    <div class="bg-gray-900/90 px-4 py-3 flex justify-between items-center border-b border-gray-800">
-                        <div class="flex items-center space-x-2">
-                            <i class="fa-solid fa-plane-departure text-orange-500 animate-bounce"></i>
-                            <span class="font-bold text-xs uppercase tracking-wider text-orange-400">Aviator Flight</span>
+                <!-- Attractive Aviator Game Banner Card -->
+                <div onclick="openAviatorGame()" class="relative rounded-3xl p-6 bg-gradient-to-br from-indigo-900 via-purple-900 to-darkBg border border-purple-500/40 shadow-2xl overflow-hidden cursor-pointer group hover:border-orange-500/80 transition duration-300">
+                    <div class="absolute -right-6 -bottom-6 opacity-20 text-orange-400 text-9xl group-hover:scale-110 transition duration-500">
+                        <i class="fa-solid fa-rocket"></i>
+                    </div>
+                    <div class="relative z-10 flex items-center justify-between">
+                        <div class="space-y-2">
+                            <span class="bg-orange-500/20 text-orange-400 border border-orange-500/30 text-[10px] px-3 py-1 rounded-full font-extrabold uppercase tracking-widest inline-block">
+                                <i class="fa-solid fa-fire mr-1"></i> Featured Game
+                            </span>
+                            <h3 class="text-3xl font-black tracking-tight text-white flex items-center gap-2">
+                                Aviator <span class="text-xs bg-cyan-500/20 text-cyan-300 px-2.5 py-0.5 rounded-lg border border-cyan-500/30 font-semibold">Duck Edition</span>
+                            </h3>
+                            <p class="text-xs text-gray-300 max-w-[200px]">Place your bets, watch the duck rocket fly, and cash out before it flies away!</p>
+                            <button class="mt-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:opacity-95 text-white text-xs font-extrabold rounded-xl shadow-lg flex items-center gap-2">
+                                Play Now <i class="fa-solid fa-arrow-right"></i>
+                            </button>
                         </div>
-                        <span id="aviator-status" class="text-[10px] bg-blue-500/20 text-blue-400 px-2.5 py-1 rounded-full font-bold">READY TO FLY</span>
+                        <div class="w-28 h-28 flex items-center justify-center animate-rocket">
+                            <div class="w-24 h-24 rounded-full bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-5xl shadow-[0_0_30px_rgba(255,107,0,0.3)]">
+                                🐥🚀
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STREAMING_CHUNK:Rendering Full Aviator Game Page... -->
+            <!-- AVIATOR GAME PAGE (Hidden by default, opened from banner) -->
+            <div id="page-aviator" class="space-y-4 hidden">
+                <div class="flex items-center justify-between">
+                    <button onclick="closeAviatorGame()" class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-xl text-xs font-bold border border-gray-700 flex items-center gap-1.5">
+                        <i class="fa-solid fa-arrow-left"></i> Exit Game
+                    </button>
+                    <span class="text-xs font-extrabold text-orange-400 tracking-wider">Game #552608</span>
+                </div>
+
+                <!-- Aviator Immersive UI Card -->
+                <div class="glass-card rounded-3xl border border-gray-800 overflow-hidden shadow-2xl bg-[#0b1329]">
+                    
+                    <!-- Top Multiplier History Bar -->
+                    <div class="bg-gray-900/90 px-4 py-2.5 flex items-center space-x-2 overflow-x-auto border-b border-gray-800">
+                        <span class="px-3 py-1 bg-gray-800 rounded-full text-xs font-bold text-amber-400 shrink-0">x78.29</span>
+                        <span class="px-3 py-1 bg-gray-800/60 rounded-full text-xs font-semibold text-gray-300 shrink-0">x1.12</span>
+                        <span class="px-3 py-1 bg-gray-800/60 rounded-full text-xs font-semibold text-gray-300 shrink-0">x1.31</span>
+                        <span class="px-3 py-1 bg-gray-800/60 rounded-full text-xs font-semibold text-gray-300 shrink-0">x2.45</span>
                     </div>
 
-                    <!-- Flight Radar Visual Area -->
-                    <div class="relative h-48 bg-gradient-to-b from-[#0b1329] to-[#131c31] flex flex-col items-center justify-center p-4 overflow-hidden border-b border-gray-800">
+                    <!-- Flight Visual Screen with Duck Rocket -->
+                    <div class="relative h-56 bg-gradient-to-b from-[#0e1736] to-[#131c31] flex flex-col items-center justify-center p-4 overflow-hidden border-b border-gray-800">
                         <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#0066FF_1px,transparent_1px)] [background-size:16px_16px]"></div>
                         
-                        <!-- Multiplier Display -->
-                        <div id="aviator-multiplier" class="text-4xl font-black text-white tracking-widest drop-shadow-[0_0_15px_rgba(255,107,0,0.6)]">
+                        <!-- Multiplier Large Display -->
+                        <div id="aviator-multiplier" class="text-5xl font-black text-white tracking-widest drop-shadow-[0_0_20px_rgba(255,107,0,0.8)] z-10">
                             1.00x
                         </div>
-                        <p id="aviator-subtext" class="text-[11px] text-gray-400 mt-1">Place min 100 coins bet to takeoff</p>
+                        <p id="aviator-subtext" class="text-[11px] text-gray-400 mt-1 z-10">Waiting for next flight takeoff...</p>
 
-                        <!-- Plane Icon Animating -->
-                        <div id="aviator-plane" class="absolute bottom-4 left-6 text-orange-500 text-3xl transition-all duration-300 opacity-80">
-                            <i class="fa-solid fa-plane"></i>
+                        <!-- Duck Rocket Avatar -->
+                        <div id="aviator-duck-rocket" class="absolute bottom-6 left-8 text-4xl transition-all duration-300 z-20">
+                            🐥🚀
                         </div>
                     </div>
 
-                    <!-- Betting Controls Panel -->
+                    <!-- Betting Panel -->
                     <div class="p-4 space-y-3 bg-[#131C31]">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs text-gray-300 font-semibold">Bet Amount (Min 100)</span>
+                            <span class="text-xs text-gray-300 font-semibold">Bet Amount (Min 100 Coins)</span>
                             <div class="flex space-x-1">
-                                <button onclick="setBet(100)" class="px-2 py-0.5 bg-gray-800 hover:bg-gray-700 text-xs rounded text-gray-300 font-bold">100</button>
-                                <button onclick="setBet(500)" class="px-2 py-0.5 bg-gray-800 hover:bg-gray-700 text-xs rounded text-gray-300 font-bold">500</button>
-                                <button onclick="setBet(1000)" class="px-2 py-0.5 bg-gray-800 hover:bg-gray-700 text-xs rounded text-gray-300 font-bold">1000</button>
+                                <button onclick="setAviatorBet(100)" class="px-2 py-0.5 bg-gray-800 hover:bg-gray-700 text-xs rounded text-gray-300 font-bold">100</button>
+                                <button onclick="setAviatorBet(500)" class="px-2 py-0.5 bg-gray-800 hover:bg-gray-700 text-xs rounded text-gray-300 font-bold">500</button>
+                                <button onclick="setAviatorBet(1000)" class="px-2 py-0.5 bg-gray-800 hover:bg-gray-700 text-xs rounded text-gray-300 font-bold">1000</button>
                             </div>
                         </div>
 
                         <div class="flex items-center space-x-2">
-                            <input type="number" id="bet-input" value="100" min="100" class="w-2/5 bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm font-bold text-amber-400 focus:outline-none focus:border-orange-500">
+                            <input type="number" id="aviator-bet-input" value="100" min="100" class="w-2/5 bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm font-bold text-amber-400 focus:outline-none focus:border-orange-500">
                             <div class="w-3/5">
-                                <button id="aviator-action-btn" onclick="toggleAviatorBet()" class="w-full py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold rounded-xl text-xs shadow-lg transition">
+                                <button id="aviator-action-btn" onclick="toggleAviatorPlay()" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold rounded-xl text-xs shadow-lg transition">
                                     PLACE BET (100)
                                 </button>
                             </div>
@@ -190,10 +259,34 @@
 
                         <div id="aviator-result-msg" class="text-center text-xs font-semibold h-4 text-gray-400"></div>
                     </div>
+
+                    <!-- Live Participant Players List (Showing Logged-In User Name) -->
+                    <div class="p-4 bg-gray-900/90 border-t border-gray-800 space-y-3">
+                        <div class="flex justify-between items-center text-xs text-gray-400 font-bold">
+                            <span>1 player active</span>
+                            <span>Crash rules</span>
+                        </div>
+                        <div id="live-players-container" class="bg-gray-800/50 p-3 rounded-2xl border border-gray-700/60 flex items-center justify-between text-xs">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-sm">
+                                    <i class="fa-solid fa-user"></i>
+                                </div>
+                                <div>
+                                    <h5 id="participant-username" class="font-bold text-white">Peaceful Dragon</h5>
+                                    <span class="text-[10px] text-gray-400">Telegram Verified</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span id="participant-bet-status" class="font-bold text-amber-400">100 Coins</span>
+                                <span id="participant-mult-status" class="block text-[10px] text-emerald-400">Ready</span>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
-            <!-- STREAMING_CHUNK:Rendering wallet page... -->
+            <!-- STREAMING_CHUNK:Rendering Wallet Page... -->
             <!-- WALLET PAGE -->
             <div id="page-wallet" class="space-y-4 hidden">
                 <h3 class="font-extrabold text-lg">My Wallet</h3>
@@ -254,7 +347,7 @@
                 </div>
             </div>
 
-            <!-- STREAMING_CHUNK:Rendering profile page... -->
+            <!-- STREAMING_CHUNK:Rendering Profile Page... -->
             <!-- PROFILE PAGE -->
             <div id="page-profile" class="space-y-4 hidden">
                 <h3 class="font-extrabold text-lg">My Profile</h3>
@@ -264,8 +357,8 @@
                         ZB
                     </div>
                     <div>
-                        <h4 class="font-bold text-base">ZyloPlayer</h4>
-                        <p class="text-xs text-gray-400">ID: #ZB-849201</p>
+                        <h4 id="profile-username" class="font-bold text-base">Peaceful Dragon</h4>
+                        <p class="text-xs text-gray-400">Telegram ID: #ZB-849201</p>
                         <span class="inline-block mt-1 text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full font-semibold">VIP Level 1</span>
                     </div>
                 </div>
@@ -284,8 +377,8 @@
 
         </main>
 
-        <!-- STREAMING_CHUNK:Rendering navigation bar... -->
-        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto glass-card border-t border-gray-800/80 px-6 py-2.5 flex justify-around items-center z-40 bg-[#090D16]/95">
+        <!-- STREAMING_CHUNK:Rendering Navigation Bar... -->
+        <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 max-w-md mx-auto glass-card border-t border-gray-800/80 px-6 py-2.5 flex justify-around items-center z-40 bg-[#090D16]/95">
             <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center text-blue-500 transition">
                 <i class="fa-solid fa-house text-lg mb-1"></i>
                 <span class="text-[10px] font-bold">Home</span>
@@ -316,23 +409,45 @@
 
     </div>
 
-    <!-- STREAMING_CHUNK:Initializing application logic... -->
+    <!-- STREAMING_CHUNK:Initializing Application Script Logic... -->
     <script>
         let userBalance = 1250;     // Coins
         let userDiamonds = 12;      // Diamonds (1 Diamond = 100 Coins)
+        let telegramUsername = "Peaceful Dragon";
 
-        // Aviator Game Variables
+        // Aviator Game State Variables
         let aviatorState = 'IDLE'; // IDLE, RUNNING, CASHED_OUT, CRASHED
         let currentMultiplier = 1.00;
         let aviatorInterval = null;
         let activeBetAmount = 0;
         let crashAt = 1.00;
 
+        // Telegram Login Handler
+        function handleTelegramLogin() {
+            const input = document.getElementById('tg-username-input').value.trim();
+            if(input) {
+                telegramUsername = input;
+            }
+            // Update UI with Telegram Name
+            document.getElementById('header-tg-status').innerHTML = `<i class="fa-brands fa-telegram"></i> @${telegramUsername}`;
+            document.getElementById('participant-username').innerText = telegramUsername;
+            document.getElementById('profile-username').innerText = telegramUsername;
+
+            // Hide Login Modal & Trigger Splash Screen
+            document.getElementById('telegram-login-modal').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('telegram-login-modal').remove();
+                startSplashScreen();
+            }, 600);
+        }
+
         // Intro Splash Screen Sequence
-        window.addEventListener('DOMContentLoaded', () => {
-            const progressBar = document.getElementById('splash-progress');
+        function startSplashScreen() {
             const splashScreen = document.getElementById('splash-screen');
             const mainApp = document.getElementById('main-app');
+            const progressBar = document.getElementById('splash-progress');
+
+            splashScreen.classList.remove('hidden');
 
             let progress = 0;
             const interval = setInterval(() => {
@@ -341,17 +456,13 @@
                 if(progress >= 100) {
                     clearInterval(interval);
                     setTimeout(() => {
-                        if(splashScreen) {
-                            splashScreen.style.opacity = '0';
-                            setTimeout(() => splashScreen.remove(), 700);
-                        }
-                        if(mainApp) {
-                            mainApp.style.opacity = '1';
-                        }
+                        splashScreen.style.opacity = '0';
+                        setTimeout(() => splashScreen.remove(), 700);
+                        mainApp.style.opacity = '1';
                     }, 400);
                 }
             }, 180);
-        });
+        }
 
         function switchTab(tabName) {
             const pages = ['home', 'wallet', 'profile'];
@@ -375,6 +486,20 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        function openAviatorGame() {
+            document.getElementById('page-home').classList.add('hidden');
+            document.getElementById('page-aviator').classList.remove('hidden');
+            document.getElementById('bottom-nav').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function closeAviatorGame() {
+            document.getElementById('page-aviator').classList.add('hidden');
+            document.getElementById('page-home').classList.remove('hidden');
+            document.getElementById('bottom-nav').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         function updateBalanceUI() {
             const hb = document.getElementById('header-balance');
             const hd = document.getElementById('header-diamonds');
@@ -391,19 +516,20 @@
             if(wd) wd.innerText = userDiamonds.toLocaleString();
         }
 
-        function setBet(amount) {
-            document.getElementById('bet-input').value = amount;
+        function setAviatorBet(amount) {
+            document.getElementById('aviator-bet-input').value = amount;
         }
 
-        // Aviator Game Logic
-        function toggleAviatorBet() {
-            const betInput = document.getElementById('bet-input');
+        // Aviator Duck Edition Game Logic
+        function toggleAviatorPlay() {
+            const betInput = document.getElementById('aviator-bet-input');
             const actionBtn = document.getElementById('aviator-action-btn');
-            const statusBadge = document.getElementById('aviator-status');
             const multDisplay = document.getElementById('aviator-multiplier');
             const subText = document.getElementById('aviator-subtext');
-            const plane = document.getElementById('aviator-plane');
+            const duckRocket = document.getElementById('aviator-duck-rocket');
             const resMsg = document.getElementById('aviator-result-msg');
+            const participantBetStatus = document.getElementById('participant-bet-status');
+            const participantMultStatus = document.getElementById('participant-mult-status');
 
             const betVal = parseInt(betInput.value);
 
@@ -424,44 +550,45 @@
 
                 aviatorState = 'RUNNING';
                 currentMultiplier = 1.00;
-                // Random crash point between 1.20x and 10.00x
-                crashAt = parseFloat((Math.random() * 8.8 + 1.2).toFixed(2));
+                crashAt = parseFloat((Math.random() * 8.5 + 1.2).toFixed(2));
 
                 actionBtn.innerText = "CASH OUT";
-                actionBtn.className = "w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold rounded-xl text-xs shadow-lg transition animate-pulse";
-                statusBadge.innerText = "FLYING...";
-                statusBadge.className = "text-[10px] bg-orange-500/20 text-orange-400 px-2.5 py-1 rounded-full font-bold";
+                actionBtn.className = "w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold rounded-xl text-xs shadow-lg transition animate-pulse";
                 resMsg.innerText = "";
                 betInput.disabled = true;
 
-                let posX = 6;
-                let posY = 16;
+                participantBetStatus.innerText = activeBetAmount + " Coins";
+                participantMultStatus.className = "block text-[10px] text-orange-400 font-bold animate-pulse";
+                participantMultStatus.innerText = "Flying...";
+
+                let posX = 8;
+                let posY = 15;
 
                 aviatorInterval = setInterval(() => {
                     currentMultiplier += 0.04;
                     multDisplay.innerText = currentMultiplier.toFixed(2) + 'x';
-                    subText.innerText = `Active Bet: ${activeBetAmount} Coins`;
+                    subText.innerText = `Active Flight for @${telegramUsername}`;
 
-                    // Move plane dynamically
                     posX = Math.min(posX + 1.2, 75);
                     posY = Math.min(posY + 1.5, 75);
-                    plane.style.left = posX + '%';
-                    plane.style.bottom = posY + '%';
+                    duckRocket.style.left = posX + '%';
+                    duckRocket.style.bottom = posY + '%';
 
                     if(currentMultiplier >= crashAt) {
                         // CRASHED
                         clearInterval(aviatorInterval);
                         aviatorState = 'CRASHED';
-                        statusBadge.innerText = "FLEW AWAY!";
-                        statusBadge.className = "text-[10px] bg-red-500/20 text-red-400 px-2.5 py-1 rounded-full font-bold";
                         multDisplay.innerText = crashAt.toFixed(2) + 'x (CRASHED)';
-                        resMsg.innerHTML = `<span class="text-red-400">💥 Plane flew away at ${crashAt.toFixed(2)}x. You lost ${activeBetAmount} coins!</span>`;
+                        resMsg.innerHTML = `<span class="text-red-400">💥 Duck Rocket flew away at ${crashAt.toFixed(2)}x. You lost ${activeBetAmount} coins!</span>`;
                         
+                        participantMultStatus.className = "block text-[10px] text-red-400 font-bold";
+                        participantMultStatus.innerText = "Flew away 💥";
+
                         actionBtn.innerText = "PLACE BET (" + betVal + ")";
-                        actionBtn.className = "w-full py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold rounded-xl text-xs shadow-lg transition";
+                        actionBtn.className = "w-full py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold rounded-xl text-xs shadow-lg transition";
                         betInput.disabled = false;
-                        plane.style.left = '6%';
-                        plane.style.bottom = '16%';
+                        duckRocket.style.left = '8%';
+                        duckRocket.style.bottom = '15%';
                     }
                 }, 100);
 
@@ -474,19 +601,19 @@
                 userBalance += winnings;
                 updateBalanceUI();
 
-                statusBadge.innerText = "CASHED OUT";
-                statusBadge.className = "text-[10px] bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-full font-bold";
                 resMsg.innerHTML = `<span class="text-emerald-400">🎉 Successfully cashed out at ${currentMultiplier.toFixed(2)}x! Won +${winnings} Coins!</span>`;
 
+                participantMultStatus.className = "block text-[10px] text-emerald-400 font-bold";
+                participantMultStatus.innerText = `${currentMultiplier.toFixed(2)}x (+${winnings})`;
+
                 actionBtn.innerText = "PLACE BET (" + betVal + ")";
-                actionBtn.className = "w-full py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold rounded-xl text-xs shadow-lg transition";
+                actionBtn.className = "w-full py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold rounded-xl text-xs shadow-lg transition";
                 betInput.disabled = false;
-                plane.style.left = '6%';
-                plane.style.bottom = '16%';
+                duckRocket.style.left = '8%';
+                duckRocket.style.bottom = '15%';
             }
         }
 
-        // Convert Diamonds to Coins (1 Diamond = 100 Coins)
         function convertDiamonds() {
             if(userDiamonds <= 0) {
                 showModal('Custom', 'Not Enough', 'You do not have any diamonds to convert!');
