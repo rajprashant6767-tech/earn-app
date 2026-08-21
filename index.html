@@ -1,103 +1,218 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZyloBet Mini App</title>
-    <!-- Telegram SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { background-color: #05070a; color: white; font-family: sans-serif; }
-        .glass { background: rgba(20, 25, 35, 0.9); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
-    </style>
-</head>
-<body class="flex items-center justify-center min-h-screen">
+'use client'
 
-    <!-- Loading State -->
-    <div id="loader" class="text-center">
-        <i class="fa-solid fa-spinner animate-spin text-4xl text-orange-500"></i>
-        <p class="mt-4 text-sm font-bold">Authenticating Telegram...</p>
-    </div>
+import { useState } from 'react'
+import {
+  ArrowLeft,
+  Check,
+  Clock3,
+  Diamond,
+  ExternalLink,
+  ShieldCheck,
+  X,
+} from 'lucide-react'
 
-    <!-- Main Content (Hidden until Login) -->
-    <div id="main-app" class="hidden w-full max-w-md min-h-screen flex flex-col">
-        <!-- Header -->
-        <header class="p-4 flex justify-between items-center glass border-b border-gray-800">
+const depositRequests = [
+  {
+    user: '@arjun_22',
+    request: '500 diamonds',
+    proof: 'UPI screenshot',
+    time: '12 min ago',
+  },
+  {
+    user: '@neha_play',
+    request: '100 diamonds',
+    proof: 'UPI screenshot',
+    time: '38 min ago',
+  },
+]
+
+const withdrawalRequests = [
+  {
+    user: '@rahul_11',
+    request: '10,000 coins · ₹100',
+    proof: 'UPI',
+    time: '18 min ago',
+  },
+  {
+    user: '@sneha_fx',
+    request: '5,000 coins · ₹50',
+    proof: 'Amazon gift card',
+    time: '1 hr ago',
+  },
+]
+
+type Tab = 'deposits' | 'withdrawals'
+
+export default function AdminPage() {
+  const [tab, setTab] = useState<Tab>('deposits')
+  const [handled, setHandled] = useState<string[]>([])
+
+  const rows =
+    tab === 'deposits' ? depositRequests : withdrawalRequests
+
+  const pending = rows.filter(
+    (row) => !handled.includes(row.user),
+  )
+
+  function handleRequest(
+    user: string,
+    action: 'approved' | 'rejected',
+  ) {
+    setHandled((current) => [...current, user])
+
+    window.alert(
+      `${user} request ${action}. Demo action only.`,
+    )
+  }
+
+  return (
+    <main className="min-h-screen bg-background text-foreground">
+      <div className="mx-auto min-h-screen max-w-5xl">
+        <header className="flex items-center justify-between border-b border-border px-4 py-4 md:px-8">
+          <div className="flex items-center gap-3">
+            <a
+              href="/"
+              aria-label="Back to ZyloBet"
+              className="rounded-xl border border-border p-2 text-muted-foreground hover:bg-muted"
+            >
+              <ArrowLeft className="size-4" />
+            </a>
+
+            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/15 text-primary">
+              <Diamond className="size-5" />
+            </div>
+
             <div>
-                <h1 class="font-bold">ZyloBet</h1>
-                <p id="tg-username" class="text-[10px] text-blue-400 font-bold"></p>
+              <p className="font-heading text-xl font-black">
+                Zylo<span className="text-primary">Bet</span>
+              </p>
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                Admin console
+              </p>
             </div>
-            <div class="text-[10px] bg-black px-3 py-1 rounded-full border border-gray-800">
-                <span class="text-amber-400 mr-2"><i class="fa-solid fa-coins"></i> 1,150</span>
-                <span class="text-cyan-400"><i class="fa-solid fa-gem"></i> 12</span>
-            </div>
-        </header>
+          </div>
 
-        <!-- Aviator Banner -->
-        <main class="flex-1 p-4">
-            <div onclick="showGame()" class="p-8 rounded-3xl bg-gradient-to-br from-indigo-900 to-black border border-indigo-500 text-center cursor-pointer hover:opacity-90">
-                <i class="fa-solid fa-rocket text-5xl text-orange-500 animate-pulse"></i>
-                <h2 class="mt-4 text-xl font-black">AVIATOR FLIGHT</h2>
-            </div>
-        </main>
+          <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-xs font-bold">
+            <span className="size-2 rounded-full bg-primary" />
+            
+              Deposit requests
+              <span className="ml-1 rounded-full bg-background/30 px-1.5 text-xs">
+                {depositRequests.length}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setTab('withdrawals')}
+              className={`flex-1 rounded-lg px-3 py-3 text-sm font-bold ${
+                tab === 'withdrawals'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground'
+              }`}
+            >
+              Withdrawals
+              <span className="ml-1 rounded-full bg-background/30 px-1.5 text-xs">
+                {withdrawalRequests.length}
+              </span>
+            </button>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            {pending.length === 0 ? (
+              <div className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+                All requests handled in this demo session.
+              </div>
+            ) : (
+              pending.map((row) => (
+                <article
+                  key={row.user}
+                  className="rounded-2xl border border-border bg-card p-4 md:p-5"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-bold">{row.user}</p>
+                      <p className="mt-1 text-sm text-primary">
+                        {row.request}
+                      </p>
+                    </div>
+
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Clock3 className="size-3" />
+                      {row.time}
+                    </span>
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-between rounded-xl bg-muted px-3 py-3">
+                    <span className="text-xs text-muted-foreground">
+                      Proof submitted
+                    </span>
+
+                    <button
+                      onClick={() =>
+                        window.alert(
+                          `${row.proof} preview · Demo only`,
+                        )
+                      }
+                      className="flex items-center gap-1 text-xs font-bold text-primary"
+                    >
+                      {row.proof}
+                      <ExternalLink className="size-3" />
+                    </button>
+                  </div>
+
+                  <div className="mt-4 grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() =>
+                        handleRequest(row.user, 'approved')
+                      }
+                      className="flex items-center justify-center gap-2 rounded-xl bg-primary px-3 py-3 text-sm font-bold text-primary-foreground"
+                    >
+                      <Check className="size-4" />
+                      Approve
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        handleRequest(row.user, 'rejected')
+                      }
+                      className="flex items-center justify-center gap-2 rounded-xl border border-border px-3 py-3 text-sm font-bold hover:bg-muted"
+                    >
+                      <X className="size-4" />
+                      Reject
+                    </button>
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
+
+          <div className="rounded-2xl border border-accent/30 bg-accent/10 p-4 text-sm text-accent">
+            <p className="font-bold">Trial prototype notice</p>
+
+            <p className="mt-1 text-xs leading-5">
+              This separate admin route uses demo data. Telegram ID checks,
+              proof uploads, UPI payments and wallet updates are not connected
+              yet.
+            </p>
+          </div>
+        </section>
+      </div>
+    </main>
+  )
+}
+
+function Stat({
+  label,
+  value,
+}: {
+  label: string
+  value: string
+}) {
+  return (
+    <div className="rounded-2xl border border-border bg-card p-4">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="mt-2 font-heading text-2xl font-black">
+        {value}
+      </p>
     </div>
-
-    <!-- Game Interface -->
-    <div id="game-ui" class="hidden fixed inset-0 z-50 bg-[#05070a] p-4">
-        <button onclick="hideGame()" class="text-gray-400 mb-4"><i class="fa-solid fa-arrow-left"></i> Exit</button>
-        <div class="glass h-[80%] rounded-3xl flex flex-col items-center justify-center border border-gray-700">
-            <div id="mult" class="text-6xl font-black mb-10 text-orange-500">1.00x</div>
-            <button id="bet-btn" onclick="playGame()" class="w-[80%] py-4 bg-green-600 rounded-2xl font-bold">PLACE BET (100)</button>
-            <div class="mt-10 flex items-center gap-3 bg-gray-900 p-3 rounded-2xl w-[80%]">
-                <div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center font-bold" id="user-initial"></div>
-                <p id="player-tag" class="text-sm font-bold"></p>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Init Telegram
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        
-        // Telegram Data Fetching
-        window.onload = () => {
-            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                const user = tg.initDataUnsafe.user;
-                document.getElementById('tg-username').innerText = "@" + (user.username || user.first_name);
-                document.getElementById('player-tag').innerText = user.first_name;
-                document.getElementById('user-initial').innerText = user.first_name.charAt(0);
-                document.getElementById('loader').classList.add('hidden');
-                document.getElementById('main-app').classList.remove('hidden');
-            } else {
-                // Fallback for non-telegram browser
-                document.getElementById('tg-username').innerText = "@GuestUser";
-                document.getElementById('loader').classList.add('hidden');
-                document.getElementById('main-app').classList.remove('hidden');
-            }
-        };
-
-        function showGame() { document.getElementById('game-ui').classList.remove('hidden'); }
-        function hideGame() { document.getElementById('game-ui').classList.add('hidden'); }
-
-        function playGame() {
-            const btn = document.getElementById('bet-btn');
-            const mult = document.getElementById('mult');
-            btn.disabled = true;
-            let m = 1.00;
-            let interval = setInterval(() => {
-                m += 0.25;
-                mult.innerText = m.toFixed(2) + "x";
-                if(m > 5) {
-                    clearInterval(interval);
-                    alert("Crashed!");
-                    btn.disabled = false;
-                    mult.innerText = "1.00x";
-                }
-            }, 300);
-        }
-    </script>
-</body>
-</html>
+  )
+}
