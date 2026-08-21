@@ -3,117 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZyloBet - Professional Aviator</title>
-    <!-- Telegram WebApp SDK -->
+    <title>ZyloBet Mini App</title>
+    <!-- Telegram SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #05070a; color: white; font-family: 'Inter', sans-serif; }
-        .glass-card { background: rgba(20, 25, 35, 0.8); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .rocket-glow { filter: drop-shadow(0 0 20px rgba(249, 115, 22, 0.8)); }
-        ::-webkit-scrollbar { display: none; }
+        body { background-color: #05070a; color: white; font-family: sans-serif; }
+        .glass { background: rgba(20, 25, 35, 0.9); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
     </style>
 </head>
-<body>
+<body class="flex items-center justify-center min-h-screen">
 
-    <!-- Main App -->
-    <div id="main-app" class="w-full max-w-md min-h-screen mx-auto flex flex-col">
-        
+    <!-- Loading State -->
+    <div id="loader" class="text-center">
+        <i class="fa-solid fa-spinner animate-spin text-4xl text-orange-500"></i>
+        <p class="mt-4 text-sm font-bold">Authenticating Telegram...</p>
+    </div>
+
+    <!-- Main Content (Hidden until Login) -->
+    <div id="main-app" class="hidden w-full max-w-md min-h-screen flex flex-col">
         <!-- Header -->
-        <header class="px-5 pt-6 pb-4 flex items-center justify-between glass-card border-b border-gray-800">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-orange-600 flex items-center justify-center shadow-lg"><i class="fa-solid fa-bolt text-white"></i></div>
-                <div>
-                    <h2 class="font-bold text-lg">ZyloBet</h2>
-                    <p id="tg-user-display" class="text-[10px] text-blue-400 font-bold flex items-center gap-1">
-                        <i class="fa-brands fa-telegram"></i> Connecting...
-                    </p>
-                </div>
+        <header class="p-4 flex justify-between items-center glass border-b border-gray-800">
+            <div>
+                <h1 class="font-bold">ZyloBet</h1>
+                <p id="tg-username" class="text-[10px] text-blue-400 font-bold"></p>
             </div>
-            <div class="flex items-center space-x-2 bg-black px-3 py-1.5 rounded-full border border-gray-800">
-                <span class="text-[10px] font-bold text-amber-400"><i class="fa-solid fa-coins"></i> 1,150</span>
-                <span class="text-[10px] font-bold text-cyan-400"><i class="fa-solid fa-gem"></i> 12</span>
+            <div class="text-[10px] bg-black px-3 py-1 rounded-full border border-gray-800">
+                <span class="text-amber-400 mr-2"><i class="fa-solid fa-coins"></i> 1,150</span>
+                <span class="text-cyan-400"><i class="fa-solid fa-gem"></i> 12</span>
             </div>
         </header>
 
-        <!-- Banner -->
-        <main class="flex-1 px-4 py-6">
-            <div onclick="openAviatorGame()" class="rounded-3xl p-8 bg-gradient-to-br from-indigo-900 to-black border border-indigo-500 shadow-2xl cursor-pointer hover:scale-[1.02] transition">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h3 class="text-2xl font-black text-white">Aviator <span class="text-orange-500">Flight</span></h3>
-                        <p class="text-[10px] text-gray-300 mt-1">Ready for takeoff?</p>
-                    </div>
-                    <i class="fa-solid fa-rocket text-4xl text-orange-500 animate-pulse"></i>
-                </div>
+        <!-- Aviator Banner -->
+        <main class="flex-1 p-4">
+            <div onclick="showGame()" class="p-8 rounded-3xl bg-gradient-to-br from-indigo-900 to-black border border-indigo-500 text-center cursor-pointer hover:opacity-90">
+                <i class="fa-solid fa-rocket text-5xl text-orange-500 animate-pulse"></i>
+                <h2 class="mt-4 text-xl font-black">AVIATOR FLIGHT</h2>
             </div>
         </main>
     </div>
 
-    <!-- Full Screen Aviator Game -->
-    <div id="aviator-game-page" class="hidden fixed inset-0 z-50 bg-[#05070a] p-4 flex flex-col">
-        <div class="flex justify-between items-center mb-4">
-            <button onclick="closeAviatorGame()" class="text-gray-400 text-xl"><i class="fa-solid fa-xmark"></i></button>
-            <span class="text-[10px] font-bold text-orange-500 bg-gray-900 px-3 py-1 rounded-full border border-gray-800">GAME #552608</span>
-        </div>
-        
-        <div class="flex-1 glass-card rounded-3xl p-6 text-center border border-gray-800 flex flex-col justify-center">
-            <div id="mult-display" class="text-6xl font-black mb-6 text-white rocket-glow">1.00x</div>
-            
-            <!-- Modern Rocket Icon -->
-            <div class="my-8 text-7xl animate-bounce">
-                <i class="fa-solid fa-rocket text-orange-500 transform -rotate-45"></i>
-            </div>
-
-            <button id="bet-btn" onclick="startBet()" class="w-full py-4 bg-green-600 rounded-2xl font-bold text-lg shadow-lg shadow-green-900/50">PLACE BET (100)</button>
-
-            <div class="mt-8 glass-card p-4 rounded-2xl text-left border-gray-700">
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-blue-900 flex items-center justify-center font-bold">P</div>
-                        <div>
-                            <p id="player-name-display" class="text-xs font-bold">Loading...</p>
-                            <p class="text-[9px] text-green-500">Telegram Verified ✅</p>
-                        </div>
-                    </div>
-                    <span class="text-xs font-bold text-amber-400">100 Coins</span>
-                </div>
+    <!-- Game Interface -->
+    <div id="game-ui" class="hidden fixed inset-0 z-50 bg-[#05070a] p-4">
+        <button onclick="hideGame()" class="text-gray-400 mb-4"><i class="fa-solid fa-arrow-left"></i> Exit</button>
+        <div class="glass h-[80%] rounded-3xl flex flex-col items-center justify-center border border-gray-700">
+            <div id="mult" class="text-6xl font-black mb-10 text-orange-500">1.00x</div>
+            <button id="bet-btn" onclick="playGame()" class="w-[80%] py-4 bg-green-600 rounded-2xl font-bold">PLACE BET (100)</button>
+            <div class="mt-10 flex items-center gap-3 bg-gray-900 p-3 rounded-2xl w-[80%]">
+                <div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center font-bold" id="user-initial"></div>
+                <p id="player-tag" class="text-sm font-bold"></p>
             </div>
         </div>
     </div>
 
     <script>
-        // Telegram Initialization
+        // Init Telegram
         const tg = window.Telegram.WebApp;
         tg.ready();
-        tg.expand();
+        
+        // Telegram Data Fetching
+        window.onload = () => {
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                const user = tg.initDataUnsafe.user;
+                document.getElementById('tg-username').innerText = "@" + (user.username || user.first_name);
+                document.getElementById('player-tag').innerText = user.first_name;
+                document.getElementById('user-initial').innerText = user.first_name.charAt(0);
+                document.getElementById('loader').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+            } else {
+                // Fallback for non-telegram browser
+                document.getElementById('tg-username').innerText = "@GuestUser";
+                document.getElementById('loader').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+            }
+        };
 
-        // Sync Name
-        const userName = tg.initDataUnsafe?.user?.first_name || "User";
-        document.getElementById('tg-user-display').innerText = "@" + userName;
-        document.getElementById('player-name-display').innerText = userName;
+        function showGame() { document.getElementById('game-ui').classList.remove('hidden'); }
+        function hideGame() { document.getElementById('game-ui').classList.add('hidden'); }
 
-        function openAviatorGame() { document.getElementById('aviator-game-page').classList.remove('hidden'); }
-        function closeAviatorGame() { document.getElementById('aviator-game-page').classList.add('hidden'); }
-
-        function startBet() {
-            let mult = 1.00;
+        function playGame() {
             const btn = document.getElementById('bet-btn');
-            const multDisplay = document.getElementById('mult-display');
+            const mult = document.getElementById('mult');
             btn.disabled = true;
-            btn.innerText = "FLYING...";
-            
+            let m = 1.00;
             let interval = setInterval(() => {
-                mult += 0.18;
-                multDisplay.innerText = mult.toFixed(2) + "x";
-                if(mult > 7.5) {
+                m += 0.25;
+                mult.innerText = m.toFixed(2) + "x";
+                if(m > 5) {
                     clearInterval(interval);
-                    alert("Crash! You lost 100 coins.");
-                    multDisplay.innerText = "CRASHED";
+                    alert("Crashed!");
                     btn.disabled = false;
-                    btn.innerText = "PLACE BET (100)";
+                    mult.innerText = "1.00x";
                 }
             }, 300);
         }
