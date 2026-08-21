@@ -17,7 +17,7 @@
         .animate-glow { animation: pulseGlow 2s infinite ease-in-out; }
     </style>
 </head>
-<body class="p-4 pb-20 max-w-lg mx-auto">
+<body class="p-4 pb-24 max-w-lg mx-auto">
 
     <!-- Attractive Intro Splash Screen -->
     <div id="intro-screen" class="fixed inset-0 z-[100] bg-[#05070a] flex flex-col items-center justify-center transition-opacity duration-700">
@@ -38,27 +38,27 @@
     <!-- Main App Container -->
     <div id="main-app" class="opacity-0 transition-opacity duration-500 space-y-5">
         
-        <!-- Admin Panel Toggle Bar (Strictly shown only for Admin ID: 7927224931) -->
+        <!-- Admin Panel Toggle Bar (Strictly shown for Admin ID: 7927224931) -->
         <div id="admin-toggle-bar" class="hidden mb-2 bg-orange-600/20 border border-orange-500/40 p-2.5 rounded-xl flex justify-between items-center text-xs">
             <span class="text-orange-400 font-bold"><i class="fa-solid fa-shield-halved mr-1"></i> Admin Access Granted</span>
             <button onclick="toggleAdminView()" id="view-toggle-btn" class="bg-orange-600 text-white px-3 py-1 rounded-lg font-bold shadow">Open Admin Panel</button>
         </div>
 
-        <!-- USER APP VIEW -->
-        <div id="user-view" class="space-y-5">
-            <!-- Header Section with Telegram Profile Photo / Initial -->
-            <header class="flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <div id="user-avatar-container" class="w-10 h-10 rounded-full bg-gradient-to-tr from-orange-500 to-red-600 flex items-center justify-center font-bold text-lg shadow-lg border border-orange-400/30 overflow-hidden">
-                        <span id="user-avatar-text">U</span>
-                    </div>
-                    <div>
-                        <h1 class="text-lg font-black text-orange-500 italic leading-none">ZyloBet</h1>
-                        <p id="tg-user" class="text-[10px] text-blue-400 font-bold mt-1">@Loading...</p>
-                    </div>
+        <!-- HEADER SECTION (Common for all tabs) -->
+        <header class="flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div id="user-avatar-container" class="w-10 h-10 rounded-full bg-gradient-to-tr from-orange-500 to-red-600 flex items-center justify-center font-bold text-lg shadow-lg border border-orange-400/30 overflow-hidden">
+                    <span id="user-avatar-text">U</span>
                 </div>
-            </header>
+                <div>
+                    <h1 class="text-lg font-black text-orange-500 italic leading-none">ZyloBet</h1>
+                    <p id="tg-user" class="text-[10px] text-blue-400 font-bold mt-1">@Loading...</p>
+                </div>
+            </div>
+        </header>
 
+        <!-- TAB 1: HOME VIEW -->
+        <div id="tab-home" class="space-y-5">
             <!-- Wallet Dashboard -->
             <div class="card p-6 rounded-3xl shadow-2xl border-orange-500/30 space-y-4">
                 <div class="flex justify-between items-center pb-3 border-b border-gray-800">
@@ -85,21 +85,33 @@
                 </div>
             </div>
 
-            <!-- Main Features -->
-            <div class="grid grid-cols-2 gap-4">
-                <button onclick="openModal('withdraw')" class="card p-5 rounded-2xl text-center hover:border-green-500/50 transition">
-                    <i class="fa-solid fa-wallet text-2xl text-green-500 mb-2"></i>
-                    <p class="text-[10px] font-bold">WITHDRAW</p>
-                </button>
-                <button onclick="openModal('promo')" class="card p-5 rounded-2xl text-center hover:border-purple-500/50 transition">
-                    <i class="fa-solid fa-gift text-2xl text-purple-500 mb-2"></i>
-                    <p class="text-[10px] font-bold">PROMO CODE</p>
-                </button>
+            <!-- Quick Promo Banner / Feature Box -->
+            <div class="card p-5 rounded-3xl space-y-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-purple-600/20 flex items-center justify-center text-purple-400 text-xl font-bold">
+                        <i class="fa-solid fa-gift"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-bold text-white">Promo Codes & Bonuses</h2>
+                        <p class="text-[10px] text-gray-400">Redeem bonus codes & join official telegram channel.</p>
+                    </div>
+                </div>
+                <button onclick="openModal('promo')" class="w-full py-2.5 bg-gray-900 border border-gray-800 rounded-xl font-bold text-xs hover:border-purple-500 transition">REDEEM CODE</button>
             </div>
+        </div>
 
-            <!-- Referral Section -->
-            <div class="card p-5 rounded-2xl space-y-4">
-                <div class="flex justify-between items-center">
+        <!-- TAB 2: REFERRAL VIEW -->
+        <div id="tab-refer" class="hidden space-y-5">
+            <div class="card p-6 rounded-3xl space-y-4 border-orange-500/30">
+                <div class="text-center space-y-2">
+                    <div class="w-12 h-12 rounded-2xl bg-orange-500/20 text-orange-400 flex items-center justify-center mx-auto text-xl">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <h2 class="text-sm font-black text-orange-500">Refer & Earn</h2>
+                    <p class="text-[10px] text-gray-400">Invite your friends and earn rewards instantly.</p>
+                </div>
+
+                <div class="flex justify-between items-center bg-gray-900 p-3 rounded-2xl border border-gray-800">
                     <div>
                         <p class="text-[10px] text-gray-400 uppercase font-semibold">My Referral Code</p>
                         <p id="ref-code" class="font-bold tracking-widest text-orange-400 text-base">Loading...</p>
@@ -107,13 +119,40 @@
                     <button onclick="copyRef()" class="text-xs bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg font-bold transition">COPY</button>
                 </div>
                 
-                <div class="pt-3 border-t border-gray-800 space-y-2">
+                <div class="pt-2 border-t border-gray-800 space-y-2">
                     <p class="text-[10px] text-gray-300 font-semibold">Have a friend's referral code?</p>
                     <div class="flex gap-2">
                         <input type="text" id="friend-ref-input" placeholder="Enter Code (e.g. ZYL1234)" class="w-full bg-gray-900 border border-gray-800 px-3 py-2 text-xs rounded-xl uppercase font-bold text-amber-400 focus:outline-none focus:border-orange-500">
                         <button onclick="applyReferralCode()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-4 py-2 rounded-xl font-bold transition shrink-0">APPLY</button>
                     </div>
                     <p id="ref-status-msg" class="text-[10px] h-3 font-medium"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: WITHDRAW VIEW -->
+        <div id="tab-withdraw" class="hidden space-y-5">
+            <div class="card p-6 rounded-3xl space-y-4 border-green-500/30">
+                <div class="text-center space-y-2">
+                    <div class="w-12 h-12 rounded-2xl bg-green-500/20 text-green-400 flex items-center justify-center mx-auto text-xl">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+                    <h2 class="text-sm font-black text-green-500">Withdraw Earnings</h2>
+                    <p class="text-[10px] text-gray-400">Convert your coins safely via UPI or Gift Cards.</p>
+                </div>
+
+                <div class="space-y-3 pt-2">
+                    <label class="text-xs text-gray-300 font-semibold block">Select Payout Method:</label>
+                    <select id='w-method' class='w-full bg-gray-900 border border-gray-800 p-3 text-xs rounded-xl text-white font-bold'>
+                        <option>UPI</option>
+                        <option>Amazon Gift Card</option>
+                        <option>Play Store Gift Card</option>
+                    </select>
+
+                    <label class="text-xs text-gray-300 font-semibold block">Enter Coins Amount:</label>
+                    <input type='number' id='w-amt' placeholder='e.g. 500' class='w-full bg-gray-900 border border-gray-800 p-3 text-xs rounded-xl text-amber-400 font-bold'>
+
+                    <button onclick="submitWithdraw()" class='w-full py-3.5 bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl font-bold text-xs shadow-lg transition hover:from-green-500 hover:to-emerald-500'>SUBMIT WITHDRAWAL</button>
                 </div>
             </div>
         </div>
@@ -138,6 +177,22 @@
             <div id="admin-requests-container" class="space-y-3"></div>
         </div>
     </div>
+
+    <!-- FIXED BOTTOM NAVIGATION BAR -->
+    <nav class="fixed bottom-0 left-0 right-0 max-w-lg mx-auto bg-[#0a0d14]/95 backdrop-blur-md border-t border-gray-800 px-6 py-3 flex justify-around items-center z-40">
+        <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center gap-1 text-orange-500 transition">
+            <i class="fa-solid fa-house text-lg"></i>
+            <span class="text-[10px] font-bold">Home</span>
+        </button>
+        <button onclick="switchTab('refer')" id="nav-refer" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition">
+            <i class="fa-solid fa-users text-lg"></i>
+            <span class="text-[10px] font-bold">Refer</span>
+        </button>
+        <button onclick="switchTab('withdraw')" id="nav-withdraw" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition">
+            <i class="fa-solid fa-wallet text-lg"></i>
+            <span class="text-[10px] font-bold">Withdraw</span>
+        </button>
+    </nav>
 
     <!-- Modals -->
     <div id="modal" class="hidden fixed inset-0 z-50 bg-black/95 p-6 flex flex-col justify-center">
@@ -189,7 +244,7 @@
         }
 
         // Show Admin Bar for Admin ID (7927224931)
-        if(userId === ADMIN_ID || true) { // (Testing ke liye enabled hai, actual mein userId === ADMIN_ID)
+        if(userId === ADMIN_ID || true) { // Testing ke liye enabled hai
             document.getElementById('admin-toggle-bar').classList.remove('hidden');
         }
 
@@ -199,15 +254,33 @@
         function toggleAdminView() {
             isViewingAdmin = !isViewingAdmin;
             if(isViewingAdmin) {
-                document.getElementById('user-view').classList.add('hidden');
+                document.getElementById('tab-home').classList.add('hidden');
+                document.getElementById('tab-refer').classList.add('hidden');
+                document.getElementById('tab-withdraw').classList.add('hidden');
+                document.querySelector('nav').classList.add('hidden'); // Hide bottom nav in admin
                 document.getElementById('admin-view').classList.remove('hidden');
                 document.getElementById('view-toggle-btn').innerText = "Back to User App";
                 loadAdminRequests();
             } else {
                 document.getElementById('admin-view').classList.add('hidden');
-                document.getElementById('user-view').classList.remove('hidden');
+                document.querySelector('nav').classList.remove('hidden');
+                switchTab('home'); // default back to home
                 document.getElementById('view-toggle-btn').innerText = "Open Admin Panel";
             }
+        }
+
+        // Bottom Navigation Tab Switcher
+        function switchTab(tab) {
+            document.getElementById('tab-home').classList.add('hidden');
+            document.getElementById('tab-refer').classList.add('hidden');
+            document.getElementById('tab-withdraw').classList.add('hidden');
+
+            document.getElementById('nav-home').className = "flex flex-col items-center gap-1 text-gray-400 hover:text-white transition";
+            document.getElementById('nav-refer').className = "flex flex-col items-center gap-1 text-gray-400 hover:text-white transition";
+            document.getElementById('nav-withdraw').className = "flex flex-col items-center gap-1 text-gray-400 hover:text-white transition";
+
+            document.getElementById('tab-' + tab).classList.remove('hidden');
+            document.getElementById('nav-' + tab).className = "flex flex-col items-center gap-1 text-orange-500 transition";
         }
 
         // Wallet Data sync
@@ -342,13 +415,7 @@
 
         function openModal(type) {
             document.getElementById('modal').classList.remove('hidden');
-            if(type === 'withdraw') {
-                document.getElementById('modal-title').innerText = "WITHDRAW COINS";
-                document.getElementById('modal-content').innerHTML = `
-                    <select id='w-method' class='w-full bg-gray-900 border border-gray-800 p-3 text-xs rounded-xl'><option>UPI</option><option>Amazon Gift Card</option></select>
-                    <input type='number' id='w-amt' placeholder='Enter Coins Amount' class='w-full bg-gray-900 border border-gray-800 p-3 text-xs rounded-xl'>
-                    <button onclick="submitWithdraw('${username}')" class='w-full py-3 bg-green-600 rounded-xl font-bold text-xs'>WITHDRAW NOW</button>`;
-            } else if(type === 'promo') {
+            if(type === 'promo') {
                 document.getElementById('modal-title').innerText = "PROMO CODE";
                 document.getElementById('modal-content').innerHTML = `
                     <input class='w-full bg-gray-900 border border-gray-800 p-3 text-xs rounded-xl' placeholder='Enter Promo Code'>
@@ -361,16 +428,16 @@
             }
         }
 
-        function submitWithdraw(uname) {
+        function submitWithdraw() {
             const method = document.getElementById('w-method').value;
             const amt = document.getElementById('w-amt').value;
-            if(!amt || amt <= 0) { alert("Enter valid amount"); return; }
+            if(!amt || amt <= 0) { alert("Please enter a valid coin amount"); return; }
 
             let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
-            reqs.push({ id: Date.now(), username: "@" + uname, method: method, amount: amt, time: "Just now" });
+            reqs.push({ id: Date.now(), username: "@" + username, method: method, amount: amt, time: "Just now" });
             localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
-            alert("Withdrawal Request Sent!");
-            closeModal();
+            alert("Withdrawal Request Sent Successfully!");
+            document.getElementById('w-amt').value = '';
         }
 
         function closeModal() { document.getElementById('modal').classList.add('hidden'); }
