@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZyloBet Mini App</title>
+    <title>ZyloBet Mini App - Aviator</title>
     <!-- STREAMING_CHUNK:Loading CSS and fonts... -->
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -117,7 +117,7 @@
 
         <main class="flex-1 px-4 py-4 overflow-y-auto">
             
-            <!-- STREAMING_CHUNK:Rendering home page... -->
+            <!-- STREAMING_CHUNK:Rendering home page with Aviator game... -->
             <!-- HOME PAGE -->
             <div id="page-home" class="space-y-5">
                 <div class="grid grid-cols-2 gap-3">
@@ -141,15 +141,55 @@
                     </div>
                 </div>
 
-                <div class="glass-card p-6 rounded-2xl border border-gray-800 text-center space-y-3">
-                    <div class="w-12 h-12 mx-auto rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-wallet"></i>
+                <!-- Aviator Game Container -->
+                <div class="glass-card rounded-2xl border border-gray-800 overflow-hidden shadow-xl">
+                    <!-- Game Screen Header -->
+                    <div class="bg-gray-900/90 px-4 py-3 flex justify-between items-center border-b border-gray-800">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-plane-departure text-orange-500 animate-bounce"></i>
+                            <span class="font-bold text-xs uppercase tracking-wider text-orange-400">Aviator Flight</span>
+                        </div>
+                        <span id="aviator-status" class="text-[10px] bg-blue-500/20 text-blue-400 px-2.5 py-1 rounded-full font-bold">READY TO FLY</span>
                     </div>
-                    <h4 class="font-bold text-base">Welcome to ZyloBet</h4>
-                    <p class="text-xs text-gray-400">Manage your earnings, convert diamonds to coins, and check your balances seamlessly from your wallet.</p>
-                    <button onclick="switchTab('wallet')" class="px-5 py-2.5 gradient-btn text-white text-xs font-bold rounded-xl shadow inline-block">
-                        Open Wallet
-                    </button>
+
+                    <!-- Flight Radar Visual Area -->
+                    <div class="relative h-48 bg-gradient-to-b from-[#0b1329] to-[#131c31] flex flex-col items-center justify-center p-4 overflow-hidden border-b border-gray-800">
+                        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#0066FF_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                        
+                        <!-- Multiplier Display -->
+                        <div id="aviator-multiplier" class="text-4xl font-black text-white tracking-widest drop-shadow-[0_0_15px_rgba(255,107,0,0.6)]">
+                            1.00x
+                        </div>
+                        <p id="aviator-subtext" class="text-[11px] text-gray-400 mt-1">Place min 100 coins bet to takeoff</p>
+
+                        <!-- Plane Icon Animating -->
+                        <div id="aviator-plane" class="absolute bottom-4 left-6 text-orange-500 text-3xl transition-all duration-300 opacity-80">
+                            <i class="fa-solid fa-plane"></i>
+                        </div>
+                    </div>
+
+                    <!-- Betting Controls Panel -->
+                    <div class="p-4 space-y-3 bg-[#131C31]">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-300 font-semibold">Bet Amount (Min 100)</span>
+                            <div class="flex space-x-1">
+                                <button onclick="setBet(100)" class="px-2 py-0.5 bg-gray-800 hover:bg-gray-700 text-xs rounded text-gray-300 font-bold">100</button>
+                                <button onclick="setBet(500)" class="px-2 py-0.5 bg-gray-800 hover:bg-gray-700 text-xs rounded text-gray-300 font-bold">500</button>
+                                <button onclick="setBet(1000)" class="px-2 py-0.5 bg-gray-800 hover:bg-gray-700 text-xs rounded text-gray-300 font-bold">1000</button>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-2">
+                            <input type="number" id="bet-input" value="100" min="100" class="w-2/5 bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-sm font-bold text-amber-400 focus:outline-none focus:border-orange-500">
+                            <div class="w-3/5">
+                                <button id="aviator-action-btn" onclick="toggleAviatorBet()" class="w-full py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold rounded-xl text-xs shadow-lg transition">
+                                    PLACE BET (100)
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="aviator-result-msg" class="text-center text-xs font-semibold h-4 text-gray-400"></div>
+                    </div>
                 </div>
             </div>
 
@@ -281,6 +321,13 @@
         let userBalance = 1250;     // Coins
         let userDiamonds = 12;      // Diamonds (1 Diamond = 100 Coins)
 
+        // Aviator Game Variables
+        let aviatorState = 'IDLE'; // IDLE, RUNNING, CASHED_OUT, CRASHED
+        let currentMultiplier = 1.00;
+        let aviatorInterval = null;
+        let activeBetAmount = 0;
+        let crashAt = 1.00;
+
         // Intro Splash Screen Sequence
         window.addEventListener('DOMContentLoaded', () => {
             const progressBar = document.getElementById('splash-progress');
@@ -342,6 +389,101 @@
             if(sd) sd.innerHTML = `${userDiamonds.toLocaleString()} <span class="text-[10px] text-gray-400 font-normal">(=${(userDiamonds*100).toLocaleString()})</span>`;
             if(wb) wb.innerText = userBalance.toLocaleString();
             if(wd) wd.innerText = userDiamonds.toLocaleString();
+        }
+
+        function setBet(amount) {
+            document.getElementById('bet-input').value = amount;
+        }
+
+        // Aviator Game Logic
+        function toggleAviatorBet() {
+            const betInput = document.getElementById('bet-input');
+            const actionBtn = document.getElementById('aviator-action-btn');
+            const statusBadge = document.getElementById('aviator-status');
+            const multDisplay = document.getElementById('aviator-multiplier');
+            const subText = document.getElementById('aviator-subtext');
+            const plane = document.getElementById('aviator-plane');
+            const resMsg = document.getElementById('aviator-result-msg');
+
+            const betVal = parseInt(betInput.value);
+
+            if(aviatorState === 'IDLE' || aviatorState === 'CRASHED' || aviatorState === 'CASHED_OUT') {
+                if(isNaN(betVal) || betVal < 100) {
+                    showModal('Custom', 'Invalid Bet', 'Minimum bet amount for Aviator is 100 coins.');
+                    return;
+                }
+                if(userBalance < betVal) {
+                    showModal('Custom', 'Insufficient Balance', 'You do not have enough coins to place this bet!');
+                    return;
+                }
+
+                // Deduct Bet & Start Flight
+                userBalance -= betVal;
+                activeBetAmount = betVal;
+                updateBalanceUI();
+
+                aviatorState = 'RUNNING';
+                currentMultiplier = 1.00;
+                // Random crash point between 1.20x and 10.00x
+                crashAt = parseFloat((Math.random() * 8.8 + 1.2).toFixed(2));
+
+                actionBtn.innerText = "CASH OUT";
+                actionBtn.className = "w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold rounded-xl text-xs shadow-lg transition animate-pulse";
+                statusBadge.innerText = "FLYING...";
+                statusBadge.className = "text-[10px] bg-orange-500/20 text-orange-400 px-2.5 py-1 rounded-full font-bold";
+                resMsg.innerText = "";
+                betInput.disabled = true;
+
+                let posX = 6;
+                let posY = 16;
+
+                aviatorInterval = setInterval(() => {
+                    currentMultiplier += 0.04;
+                    multDisplay.innerText = currentMultiplier.toFixed(2) + 'x';
+                    subText.innerText = `Active Bet: ${activeBetAmount} Coins`;
+
+                    // Move plane dynamically
+                    posX = Math.min(posX + 1.2, 75);
+                    posY = Math.min(posY + 1.5, 75);
+                    plane.style.left = posX + '%';
+                    plane.style.bottom = posY + '%';
+
+                    if(currentMultiplier >= crashAt) {
+                        // CRASHED
+                        clearInterval(aviatorInterval);
+                        aviatorState = 'CRASHED';
+                        statusBadge.innerText = "FLEW AWAY!";
+                        statusBadge.className = "text-[10px] bg-red-500/20 text-red-400 px-2.5 py-1 rounded-full font-bold";
+                        multDisplay.innerText = crashAt.toFixed(2) + 'x (CRASHED)';
+                        resMsg.innerHTML = `<span class="text-red-400">💥 Plane flew away at ${crashAt.toFixed(2)}x. You lost ${activeBetAmount} coins!</span>`;
+                        
+                        actionBtn.innerText = "PLACE BET (" + betVal + ")";
+                        actionBtn.className = "w-full py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold rounded-xl text-xs shadow-lg transition";
+                        betInput.disabled = false;
+                        plane.style.left = '6%';
+                        plane.style.bottom = '16%';
+                    }
+                }, 100);
+
+            } else if(aviatorState === 'RUNNING') {
+                // CASH OUT CLICKED
+                clearInterval(aviatorInterval);
+                aviatorState = 'CASHED_OUT';
+
+                const winnings = Math.floor(activeBetAmount * currentMultiplier);
+                userBalance += winnings;
+                updateBalanceUI();
+
+                statusBadge.innerText = "CASHED OUT";
+                statusBadge.className = "text-[10px] bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-full font-bold";
+                resMsg.innerHTML = `<span class="text-emerald-400">🎉 Successfully cashed out at ${currentMultiplier.toFixed(2)}x! Won +${winnings} Coins!</span>`;
+
+                actionBtn.innerText = "PLACE BET (" + betVal + ")";
+                actionBtn.className = "w-full py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold rounded-xl text-xs shadow-lg transition";
+                betInput.disabled = false;
+                plane.style.left = '6%';
+                plane.style.bottom = '16%';
+            }
         }
 
         // Convert Diamonds to Coins (1 Diamond = 100 Coins)
