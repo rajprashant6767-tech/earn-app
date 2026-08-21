@@ -3,70 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZyloBet Mini App</title>
+    <title>ZyloBet Pro - Aviator</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background: #05070a; color: white; font-family: sans-serif; }
-        .glass { background: rgba(20, 25, 35, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .tab-btn.active { border-bottom: 2px solid #f97316; color: #f97316; }
+        .glass { background: rgba(20, 25, 35, 0.95); border: 1px solid #333; }
+        .glow { filter: drop-shadow(0 0 10px #f97316); }
     </style>
 </head>
-<body class="p-4">
+<body class="p-4 pb-20">
 
     <!-- Dashboard -->
-    <div id="dashboard" class="space-y-6">
-        <header class="flex justify-between items-center">
+    <div id="main-ui">
+        <header class="flex justify-between items-center mb-6">
             <div>
                 <h1 class="text-xl font-black">ZyloBet</h1>
-                <p id="tg-user" class="text-[10px] text-blue-400 font-bold">@Loading...</p>
+                <p id="tg-user" class="text-[10px] text-blue-400 font-bold">@Connecting...</p>
             </div>
-            <a href="https://t.me/+2vDL5Gmbee0zNDFl" class="text-2xl text-blue-500"><i class="fa-brands fa-telegram"></i></a>
+            <a href="https://t.me/+2vDL5Gmbee0zNDFl" target="_blank" class="text-2xl text-blue-500"><i class="fa-brands fa-telegram"></i></a>
         </header>
 
         <!-- Wallet Card -->
-        <div class="glass p-5 rounded-3xl border border-gray-800">
+        <div class="glass p-5 rounded-3xl mb-6 border-orange-500/20">
             <div class="flex justify-between mb-4">
-                <p class="text-gray-400 text-xs">Wallet Balance</p>
-                <button onclick="showModal('deposit')" class="text-orange-500 text-xs font-bold underline">Deposit Diamond</button>
+                <p class="text-gray-400 text-xs">Wallet</p>
+                <button onclick="showModal('deposit')" class="text-orange-500 text-xs font-bold underline">Deposit (UPI)</button>
             </div>
-            <div class="flex gap-6">
+            <div class="flex gap-8">
                 <div><p class="text-2xl font-black text-amber-400" id="coins">1,250</p><p class="text-[9px]">COINS</p></div>
                 <div><p class="text-2xl font-black text-cyan-400" id="gems">12</p><p class="text-[9px]">DIAMONDS</p></div>
             </div>
         </div>
 
-        <!-- Game Section -->
+        <!-- Games -->
         <div class="grid grid-cols-2 gap-4">
-            <div onclick="openGame('aviator')" class="glass p-6 rounded-3xl text-center border border-gray-800 cursor-pointer">
-                <i class="fa-solid fa-rocket text-3xl text-orange-500 mb-2"></i>
-                <p class="text-xs font-bold">AVIATOR</p>
-            </div>
-            <div onclick="openGame('flip')" class="glass p-6 rounded-3xl text-center border border-gray-800 cursor-pointer">
-                <i class="fa-solid fa-circle-half-stroke text-3xl text-purple-500 mb-2"></i>
+            <button onclick="openGame('aviator')" class="glass p-6 rounded-3xl text-center border-orange-500/20 hover:border-orange-500">
+                <i class="fa-solid fa-rocket text-4xl text-orange-500 mb-2"></i>
+                <p class="text-xs font-bold">AVIATOR PRO</p>
+            </button>
+            <button onclick="alert('Coming Soon')" class="glass p-6 rounded-3xl text-center border-gray-800">
+                <i class="fa-solid fa-circle-half-stroke text-4xl text-purple-500 mb-2"></i>
                 <p class="text-xs font-bold">COIN FLIP</p>
-            </div>
+            </button>
         </div>
     </div>
 
-    <!-- Game Screen (Hidden) -->
-    <div id="game-screen" class="hidden fixed inset-0 bg-[#05070a] z-50 p-4">
-        <button onclick="closeGame()" class="text-gray-400 mb-6"><i class="fa-solid fa-arrow-left"></i> Back</button>
-        <div class="glass h-[70vh] rounded-3xl flex flex-col items-center justify-center p-6 text-center">
-            <div id="mult" class="text-6xl font-black mb-8 text-orange-500">1.00x</div>
-            <button onclick="startGame()" id="bet-btn" class="w-full py-4 bg-green-600 rounded-2xl font-bold">BET 100 COINS</button>
+    <!-- Aviator Pro UI -->
+    <div id="aviator-ui" class="hidden fixed inset-0 z-50 bg-black p-4 flex flex-col">
+        <button onclick="closeGame()" class="text-gray-400 mb-4"><i class="fa-solid fa-xmark text-xl"></i></button>
+        <div class="flex-1 flex flex-col items-center justify-center glass rounded-3xl p-6">
+            <div id="mult" class="text-7xl font-black text-white glow mb-10">1.00x</div>
+            <div id="rocket" class="text-6xl text-orange-500 mb-10"><i class="fa-solid fa-rocket transform -rotate-45"></i></div>
+            <button id="bet-btn" onclick="startAviator()" class="w-full py-4 bg-gradient-to-r from-orange-600 to-red-600 rounded-2xl font-black text-lg">PLACE BET</button>
         </div>
     </div>
 
-    <!-- Modal for Deposit/Withdraw -->
-    <div id="modal" class="hidden fixed inset-0 bg-black/90 z-50 p-6 flex flex-col justify-center">
+    <!-- Modal System -->
+    <div id="modal" class="hidden fixed inset-0 bg-black/90 z-[60] p-6 flex flex-col justify-center">
         <div class="glass p-6 rounded-3xl">
-            <h2 id="modal-title" class="font-bold mb-4">Deposit Request</h2>
-            <p class="text-xs text-gray-400 mb-4">UPI: raj-prashant@fam</p>
-            <input type="file" class="w-full mb-4 text-xs">
-            <button onclick="submitRequest()" class="w-full py-3 bg-orange-600 rounded-xl font-bold text-sm">SEND PROOF</button>
-            <button onclick="closeModal()" class="w-full mt-2 text-gray-500 text-xs">Cancel</button>
+            <h2 id="modal-title" class="font-bold mb-4 text-center">Deposit via UPI</h2>
+            <p class="text-[10px] text-gray-400 mb-2">UPI: raj-prashant@fam</p>
+            <input type="file" class="w-full mb-4 text-xs bg-gray-800 p-2 rounded">
+            <button onclick="alert('Proof Sent to Admin!')" class="w-full py-3 bg-blue-600 rounded-xl font-bold">SEND PROOF</button>
+            <button onclick="document.getElementById('modal').classList.add('hidden')" class="w-full mt-2 text-gray-500 text-xs">Close</button>
         </div>
     </div>
 
@@ -74,36 +75,27 @@
         const tg = window.Telegram.WebApp;
         tg.ready();
         
-        // Telegram Data
-        const user = tg.initDataUnsafe?.user;
-        if(user) {
-            document.getElementById('tg-user').innerText = "@" + (user.username || user.first_name);
-        }
+        // Load User
+        const name = tg.initDataUnsafe?.user?.first_name || "Player";
+        document.getElementById('tg-user').innerText = "@" + name;
 
-        function openGame(g) { document.getElementById('dashboard').classList.add('hidden'); document.getElementById('game-screen').classList.remove('hidden'); }
-        function closeGame() { document.getElementById('dashboard').classList.remove('hidden'); document.getElementById('game-screen').classList.add('hidden'); }
-        
-        function showModal(type) {
-            document.getElementById('modal').classList.remove('hidden');
-            document.getElementById('modal-title').innerText = type.toUpperCase() + " REQUEST";
-        }
-        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
-        
-        function submitRequest() {
-            alert("Request sent to Admin! Wait for approval.");
-            closeModal();
-        }
+        function openGame(g) { document.getElementById('main-ui').classList.add('hidden'); document.getElementById('aviator-ui').classList.remove('hidden'); }
+        function closeGame() { document.getElementById('main-ui').classList.remove('hidden'); document.getElementById('aviator-ui').classList.add('hidden'); }
+        function showModal(t) { document.getElementById('modal').classList.remove('hidden'); }
 
-        function startGame() {
+        // Game Logic
+        function startAviator() {
             let m = 1.00;
             const btn = document.getElementById('bet-btn');
             btn.disabled = true;
+            btn.innerText = "FLYING...";
             let interval = setInterval(() => {
-                m += 0.15;
+                m += 0.25;
                 document.getElementById('mult').innerText = m.toFixed(2) + "x";
-                if(m > 5) {
+                if(m > 6.0) {
                     clearInterval(interval);
                     btn.disabled = false;
+                    btn.innerText = "PLACE BET";
                     alert("Crashed!");
                 }
             }, 300);
