@@ -236,7 +236,7 @@
                 </div>`;
         }
 
-        // Step 2: Validate Amount & Proceed to UPI/Proof Upload with Hinglish Notes & Warnings
+        // Step 2: Validate Amount & Proceed to UPI/Proof Upload with SEND button right below Choose File
         function proceedToPayment() {
             const amountInput = document.getElementById('deposit-amount-input');
             const errField = document.getElementById('deposit-err');
@@ -256,8 +256,11 @@
                     <p class='text-gray-300'>Send payment to UPI ID:</p>
                     <div class='bg-gray-900 border border-gray-800 p-3 rounded-xl font-mono text-orange-400 font-bold select-all'>raj-prashant@fam</div>
                     
-                    <p class='text-gray-400 text-[10px]'>Payment karne ke baad apna screenshot/proof yahan upload karein:</p>
+                    <p class='text-gray-400 text-[10px] text-left'>Payment karne ke baad apna screenshot/proof yahan upload karein:</p>
                     <input type='file' id='payment-proof-file' class='w-full bg-gray-900 border border-gray-800 p-2 text-xs rounded-xl'>
+                    
+                    <!-- SEND Button right below Choose File -->
+                    <button onclick="alert('Deposit request for ${amt} Diamonds submitted successfully!'); closeModal();" class='w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl font-bold text-xs'>SEND</button>
                     
                     <!-- Notes and Warning Section in Hinglish -->
                     <div class='bg-blue-500/10 border border-blue-500/30 p-3 rounded-xl text-left space-y-2 mt-2'>
@@ -276,8 +279,6 @@
                             <i class='fa-solid fa-triangle-exclamation mr-1'></i> <b>Warning:</b> Agar koi user galat payment karega matlab deposit ka amount jitna hai usse kam karega, toh uska request reject kar diya jayega!
                         </p>
                     </div>
-
-                    <button onclick="alert('Deposit request for ${amt} Diamonds submitted successfully!'); closeModal();" class='w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl font-bold text-xs mt-2'>SUBMIT PROOF</button>
                 </div>`;
         }
 
