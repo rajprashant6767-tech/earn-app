@@ -141,67 +141,15 @@
                     </div>
                 </div>
 
-                <div>
-                    <div class="flex justify-between items-center mb-3">
-                        <h4 class="font-bold text-sm tracking-wide text-gray-200">Live Prediction Matches</h4>
-                        <button onclick="switchTab('games')" class="text-xs text-blue-400 font-semibold">View All</button>
+                <div class="glass-card p-6 rounded-2xl border border-gray-800 text-center space-y-3">
+                    <div class="w-12 h-12 mx-auto rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-wallet"></i>
                     </div>
-                    <div class="space-y-3">
-                        <div class="glass-card p-4 rounded-2xl border border-gray-800">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-bold">LIVE MATCH</span>
-                                <span class="text-xs text-gray-400">Ends in 04:12m</span>
-                            </div>
-                            <div class="flex justify-between items-center my-3">
-                                <div class="text-center flex-1">
-                                    <span class="font-bold text-sm">INDIA</span>
-                                    <p class="text-[10px] text-gray-400">Odds: 1.85x</p>
-                                </div>
-                                <span class="text-xs font-extrabold text-orange-400 px-3">VS</span>
-                                <div class="text-center flex-1">
-                                    <span class="font-bold text-sm">AUSTRALIA</span>
-                                    <p class="text-[10px] text-gray-400">Odds: 2.10x</p>
-                                </div>
-                            </div>
-                            <button onclick="switchTab('games')" class="w-full py-2 bg-blue-600/30 hover:bg-blue-600/50 text-blue-400 border border-blue-500/30 rounded-xl text-xs font-semibold transition">
-                                Place Prediction
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- STREAMING_CHUNK:Rendering games page... -->
-            <!-- GAMES PAGE -->
-            <div id="page-games" class="space-y-4 hidden">
-                <h3 class="font-extrabold text-lg">Interactive Games</h3>
-                
-                <div class="glass-card p-5 rounded-2xl border border-gray-800 text-center relative overflow-hidden">
-                    <div class="w-14 h-14 mx-auto rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-2xl mb-3 shadow-inner">
-                        <i class="fa-solid fa-dharmachakra animate-spin" style="animation-duration: 8s;"></i>
-                    </div>
-                    <h4 class="font-bold text-base mb-1">Daily Lucky Spin</h4>
-                    <p class="text-xs text-gray-400 mb-4">Spin the wheel once every day to win free coins instantly!</p>
-                    <button onclick="spinWheel()" id="spin-btn" class="w-full py-3 gradient-btn text-white font-bold rounded-xl shadow-lg hover:opacity-95 transition text-sm">
-                        Spin & Win Coins
+                    <h4 class="font-bold text-base">Welcome to ZyloBet</h4>
+                    <p class="text-xs text-gray-400">Manage your earnings, convert diamonds to coins, and check your balances seamlessly from your wallet.</p>
+                    <button onclick="switchTab('wallet')" class="px-5 py-2.5 gradient-btn text-white text-xs font-bold rounded-xl shadow inline-block">
+                        Open Wallet
                     </button>
-                    <div id="spin-result" class="mt-3 text-xs font-bold text-amber-400 h-5"></div>
-                </div>
-
-                <div class="glass-card p-5 rounded-2xl border border-gray-800">
-                    <h4 class="font-bold text-sm mb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-bolt text-orange-400"></i> Quick Odd Predictor
-                    </h4>
-                    <p class="text-xs text-gray-400 mb-4">Predict High or Low correctly to double your staked coins.</p>
-                    <div class="flex gap-3">
-                        <button onclick="playPredictor('LOW')" class="flex-1 py-3 bg-blue-600/20 border border-blue-500/40 text-blue-400 font-bold rounded-xl text-xs hover:bg-blue-600/30 transition">
-                            LOW (1-5) 2x
-                        </button>
-                        <button onclick="playPredictor('HIGH')" class="flex-1 py-3 bg-orange-600/20 border border-orange-500/40 text-orange-400 font-bold rounded-xl text-xs hover:bg-orange-600/30 transition">
-                            HIGH (6-10) 2x
-                        </button>
-                    </div>
-                    <div id="predictor-result" class="mt-3 text-center text-xs font-semibold text-gray-300"></div>
                 </div>
             </div>
 
@@ -302,10 +250,6 @@
                 <i class="fa-solid fa-house text-lg mb-1"></i>
                 <span class="text-[10px] font-bold">Home</span>
             </button>
-            <button onclick="switchTab('games')" id="nav-games" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
-                <i class="fa-solid fa-gamepad text-lg mb-1"></i>
-                <span class="text-[10px] font-bold">Games</span>
-            </button>
             <button onclick="switchTab('wallet')" id="nav-wallet" class="flex flex-col items-center text-gray-400 hover:text-gray-200 transition">
                 <i class="fa-solid fa-wallet text-lg mb-1"></i>
                 <span class="text-[10px] font-bold">Wallet</span>
@@ -363,7 +307,7 @@
         });
 
         function switchTab(tabName) {
-            const pages = ['home', 'games', 'wallet', 'profile'];
+            const pages = ['home', 'wallet', 'profile'];
             pages.forEach(p => {
                 const el = document.getElementById(`page-${p}`);
                 const nav = document.getElementById(`nav-${p}`);
@@ -414,40 +358,6 @@
             showModal('Custom', 'Conversion Successful!', `Successfully converted ${convertCount} Diamonds into +${coinsEarned} Coins!`);
         }
 
-        function spinWheel() {
-            const btn = document.getElementById('spin-btn');
-            const res = document.getElementById('spin-result');
-            btn.disabled = true;
-            btn.innerText = "Spinning...";
-            res.innerText = "";
-
-            setTimeout(() => {
-                const rewards = [50, 100, 200, 500, 1000];
-                const won = rewards[Math.floor(Math.random() * rewards.length)];
-                userBalance += won;
-                updateBalanceUI();
-                res.innerText = `🎉 You won +${won} Coins!`;
-                btn.disabled = false;
-                btn.innerText = "Spin Again Tomorrow";
-            }, 1200);
-        }
-
-        function playPredictor(choice) {
-            const res = document.getElementById('predictor-result');
-            const luckyNum = Math.floor(Math.random() * 10) + 1;
-            const isHigh = luckyNum >= 6;
-            const userGuessedHigh = choice === 'HIGH';
-
-            if(isHigh === userGuessedHigh) {
-                const prize = 100;
-                userBalance += prize;
-                updateBalanceUI();
-                res.innerHTML = `<span class="text-emerald-400">✅ Lucky Number was ${luckyNum}. You won +${prize} Coins!</span>`;
-            } else {
-                res.innerHTML = `<span class="text-red-400">❌ Lucky Number was ${luckyNum}. Better luck next time!</span>`;
-            }
-        }
-
         function showModal(type, customTitle = '', customDesc = '') {
             const modal = document.getElementById('custom-modal');
             const title = document.getElementById('modal-title');
@@ -466,7 +376,7 @@
                 desc.innerText = "Need assistance? Contact our 24/7 Telegram support bot.";
             } else if(type === 'Terms') {
                 title.innerText = "Terms & Guidelines";
-                desc.innerText = "ZyloBet Mini App is designed for smooth entertainment and skill prediction.";
+                desc.innerText = "ZyloBet Mini App is designed for smooth entertainment and wallet management.";
             } else if(type === 'Custom') {
                 title.innerText = customTitle;
                 desc.innerText = customDesc;
