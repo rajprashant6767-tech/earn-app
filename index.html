@@ -15,7 +15,7 @@
 <body class="p-4 pb-20">
 
     <!-- Header Section with Telegram Profile Photo / Initial -->
-    <header class="flex justify-between items-center mb-6">
+    <header class="flex justify-between items-center mb-5">
         <div class="flex items-center gap-3">
             <div id="user-avatar-container" class="w-10 h-10 rounded-full bg-gradient-to-tr from-orange-500 to-red-600 flex items-center justify-center font-bold text-lg shadow-lg border border-orange-400/30 overflow-hidden">
                 <span id="user-avatar-text">U</span>
@@ -25,15 +25,12 @@
                 <p id="tg-user" class="text-[10px] text-blue-400 font-bold mt-1">@Loading...</p>
             </div>
         </div>
-        <div class="text-xs bg-gray-900 border border-gray-800 px-3 py-1.5 rounded-full text-amber-400 font-bold">
-            <i class="fa-solid fa-coins mr-1"></i> <span id="coin-count">1,250</span>
-        </div>
     </header>
 
-    <!-- Wallet Dashboard (Deposit Box on Top) -->
-    <div class="card p-6 rounded-3xl mb-6 shadow-2xl border-orange-500/30">
+    <!-- Wallet Dashboard (Deposit & Balances on Top) -->
+    <div class="card p-6 rounded-3xl mb-5 shadow-2xl border-orange-500/30 space-y-4">
         <!-- Deposit Box Top -->
-        <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-800">
+        <div class="flex justify-between items-center pb-3 border-b border-gray-800">
             <div>
                 <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Quick Deposit</p>
                 <p class="text-xs text-orange-400 font-semibold">UPI: raj-prashant@fam</p>
@@ -41,14 +38,25 @@
             <button onclick="openModal('deposit')" class="bg-gradient-to-r from-orange-500 to-red-600 text-white text-xs px-4 py-2 rounded-xl font-bold shadow-lg">DEPOSIT</button>
         </div>
 
-        <div class="flex justify-between items-center pt-1">
-            <div><p class="text-2xl font-black text-amber-400" id="coins">1,250</p><p class="text-[9px] text-gray-500">COINS</p></div>
-            <div><p class="text-2xl font-black text-cyan-400" id="gems">12</p><p class="text-[9px] text-gray-500">DIAMONDS</p></div>
+        <!-- Clickable Balance Boxes for History -->
+        <div class="grid grid-cols-2 gap-4 pt-1">
+            <div onclick="openHistory('coins')" class="bg-gray-900/60 p-3 rounded-2xl border border-gray-800 cursor-pointer hover:border-amber-400/50 transition">
+                <p class="text-2xl font-black text-amber-400" id="coins">1,250</p>
+                <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-1">
+                    <span>COINS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-amber-400"></i>
+                </p>
+            </div>
+            <div onclick="openHistory('gems')" class="bg-gray-900/60 p-3 rounded-2xl border border-gray-800 cursor-pointer hover:border-cyan-400/50 transition">
+                <p class="text-2xl font-black text-cyan-400" id="gems">12</p>
+                <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-1">
+                    <span>DIAMONDS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-cyan-400"></i>
+                </p>
+            </div>
         </div>
     </div>
 
     <!-- Main Features -->
-    <div class="grid grid-cols-2 gap-4 mb-6">
+    <div class="grid grid-cols-2 gap-4 mb-5">
         <button onclick="openModal('withdraw')" class="card p-5 rounded-2xl text-center hover:border-green-500/50 transition">
             <i class="fa-solid fa-wallet text-2xl text-green-500 mb-2"></i>
             <p class="text-[10px] font-bold">WITHDRAW</p>
@@ -60,7 +68,7 @@
     </div>
 
     <!-- Referral Section with Input Box & Secure Logic -->
-    <div class="card p-5 rounded-2xl mb-6 space-y-4">
+    <div class="card p-5 rounded-2xl mb-5 space-y-4">
         <div class="flex justify-between items-center">
             <div>
                 <p class="text-[10px] text-gray-400 uppercase font-semibold">My Referral Code</p>
@@ -115,7 +123,6 @@
             const statusMsg = document.getElementById('ref-status-msg');
             const enteredCode = inputField.value.trim().toUpperCase();
 
-            // Check if already used
             const hasUsedReferral = localStorage.getItem('zylobet_ref_used');
             if(hasUsedReferral === 'true') {
                 statusMsg.className = "text-[10px] h-3 font-medium text-red-400";
@@ -129,18 +136,47 @@
                 return;
             }
 
-            // Prevent self-referral check
             if(enteredCode === myReferralCode) {
                 statusMsg.className = "text-[10px] h-3 font-medium text-red-400";
                 statusMsg.innerText = "❌ You cannot use your own referral code!";
                 return;
             }
 
-            // Success & Lock to prevent bypass
             localStorage.setItem('zylobet_ref_used', 'true');
             statusMsg.className = "text-[10px] h-3 font-medium text-green-400";
             statusMsg.innerText = "🎉 Referral code applied successfully! Bonus added.";
             inputField.disabled = true;
+        }
+
+        // Transaction History Viewer
+        function openHistory(type) {
+            document.getElementById('modal').classList.remove('hidden');
+            const title = document.getElementById('modal-title');
+            const content = document.getElementById('modal-content');
+
+            if(type === 'coins') {
+                title.innerText = "COINS TRANSACTION HISTORY";
+                content.innerHTML = `
+                    <div class='space-y-2 max-h-60 overflow-y-auto text-xs'>
+                        <div class='flex justify-between bg-gray-900 p-2.5 rounded-xl border border-gray-800'>
+                            <div><p class='font-bold text-emerald-400'>+1,000 Coins</p><p class='text-[9px] text-gray-400'>Welcome Bonus</p></div>
+                            <span class='text-[10px] text-gray-500'>Today</span>
+                        </div>
+                        <div class='flex justify-between bg-gray-900 p-2.5 rounded-xl border border-gray-800'>
+                            <div><p class='font-bold text-emerald-400'>+250 Coins</p><p class='text-[9px] text-gray-400'>Referral Reward</p></div>
+                            <span class='text-[10px] text-gray-500'>Yesterday</span>
+                        </div>
+                    </div>`;
+            } else if(type === 'gems') {
+                title.innerText = "DIAMONDS TRANSACTION HISTORY";
+                content.innerHTML = `
+                    <div class='space-y-2 max-h-60 overflow-y-auto text-xs'>
+                        <div class='flex justify-between bg-gray-900 p-2.5 rounded-xl border border-gray-800'>
+                            <div><p class='font-bold text-cyan-400'>+12 Diamonds</p><p class='text-[9px] text-gray-400'>Deposit Approved</p></div>
+                            <span class='text-[10px] text-gray-500'>Today</span>
+                        </div>
+                    </div>`;
+            }
         }
 
         function openModal(type) {
