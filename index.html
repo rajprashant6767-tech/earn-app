@@ -217,7 +217,7 @@
             }
         }
 
-        // Step 1: Open Deposit Amount Entry Box (Min 1, Max 1000)
+        // Step 1: Open Deposit Amount Entry Box (Min 1, Max 1000) with 1 Diamond = 1 Rs info
         function openDepositModal() {
             document.getElementById('modal').classList.remove('hidden');
             const title = document.getElementById('modal-title');
@@ -226,6 +226,9 @@
             title.innerText = "DEPOSIT DIAMONDS";
             content.innerHTML = `
                 <div class='space-y-3 text-xs'>
+                    <div class='bg-cyan-500/10 border border-cyan-500/30 p-2.5 rounded-xl text-cyan-300 font-semibold text-center'>
+                        💎 1 Diamond = ₹1 Rs
+                    </div>
                     <label class='text-gray-300 font-semibold block'>Enter Diamond Amount (1 - 1000):</label>
                     <input type='number' id='deposit-amount-input' min='1' max='1000' placeholder='e.g. 100' class='w-full bg-gray-900 border border-gray-800 p-3 rounded-xl font-bold text-cyan-400'>
                     <p id='deposit-err' class='text-red-400 text-[10px] h-3 font-medium'></p>
@@ -233,7 +236,7 @@
                 </div>`;
         }
 
-        // Step 2: Validate Amount & Proceed to UPI/Proof Upload with Notes & Warnings
+        // Step 2: Validate Amount & Proceed to UPI/Proof Upload with Hinglish Notes & Warnings
         function proceedToPayment() {
             const amountInput = document.getElementById('deposit-amount-input');
             const errField = document.getElementById('deposit-err');
@@ -253,13 +256,13 @@
                     <p class='text-gray-300'>Send payment to UPI ID:</p>
                     <div class='bg-gray-900 border border-gray-800 p-3 rounded-xl font-mono text-orange-400 font-bold select-all'>raj-prashant@fam</div>
                     
-                    <p class='text-gray-400 text-[10px]'>After payment, upload your payment screenshot/proof below:</p>
+                    <p class='text-gray-400 text-[10px]'>Payment karne ke baad apna screenshot/proof yahan upload karein:</p>
                     <input type='file' id='payment-proof-file' class='w-full bg-gray-900 border border-gray-800 p-2 text-xs rounded-xl'>
                     
-                    <!-- Notes and Warning Section -->
+                    <!-- Notes and Warning Section in Hinglish -->
                     <div class='bg-blue-500/10 border border-blue-500/30 p-3 rounded-xl text-left space-y-2 mt-2'>
                         <p class='text-blue-300 text-[10px] font-semibold leading-relaxed'>
-                            <i class='fa-solid fa-circle-info mr-1'></i> <b>Note:</b> Deposit amount will be credited within 24 hours. If you face any problem, you can contact us:
+                            <i class='fa-solid fa-circle-info mr-1'></i> <b>Note:</b> Deposit ka amount 24 hours ke andar add kar diya jayega. Agar kisi user ko koi problem ho, toh aap humse contact kar sakte hain:
                         </p>
                         <div class='text-center pt-1'>
                             <a href='https://t.me/Raj_Prashant' target='_blank' class='inline-flex items-center gap-1.5 text-xs text-blue-400 font-bold bg-blue-500/20 px-3 py-1.5 rounded-lg'>
