@@ -14,54 +14,66 @@
 </head>
 <body class="p-4">
 
-    <!-- Header Section -->
+    <!-- Header Section with User Photo / Initial -->
     <header class="flex justify-between items-center mb-6">
-        <div>
-            <h1 class="text-2xl font-black text-orange-500 italic">ZyloBet</h1>
-            <p id="tg-user" class="text-[10px] text-blue-400 font-bold">@Loading...</p>
+        <div class="flex items-center gap-3">
+            <div id="user-avatar" class="w-10 h-10 rounded-full bg-gradient-to-tr from-orange-500 to-red-600 flex items-center justify-center font-bold text-lg shadow-lg border border-orange-400/30">
+                U
+            </div>
+            <div>
+                <h1 class="text-lg font-black text-orange-500 italic leading-none">ZyloBet</h1>
+                <p id="tg-user" class="text-[10px] text-blue-400 font-bold mt-1">@Loading...</p>
+            </div>
         </div>
-        <a href="https://t.me/+2vDL5Gmbee0zNDFl" class="text-3xl text-blue-500"><i class="fa-brands fa-telegram"></i></a>
+        <div class="text-xs bg-gray-900 border border-gray-800 px-3 py-1.5 rounded-full text-amber-400 font-bold">
+            <i class="fa-solid fa-coins mr-1"></i> <span id="coin-count">1,250</span>
+        </div>
     </header>
 
-    <!-- Wallet Dashboard -->
-    <div class="card p-6 rounded-3xl mb-6 shadow-2xl">
-        <div class="flex justify-between mb-4">
-            <span class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">My Balance</span>
-            <span class="text-orange-500 text-[10px] font-bold underline cursor-pointer" onclick="openModal('deposit')">DEPOSIT</span>
+    <!-- Wallet Dashboard (Deposit Box on Top) -->
+    <div class="card p-6 rounded-3xl mb-6 shadow-2xl border-orange-500/30">
+        <!-- Deposit Box Top -->
+        <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-800">
+            <div>
+                <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Quick Deposit</p>
+                <p class="text-xs text-orange-400 font-semibold">UPI: raj-prashant@fam</p>
+            </div>
+            <button onclick="openModal('deposit')" class="bg-gradient-to-r from-orange-500 to-red-600 text-white text-xs px-4 py-2 rounded-xl font-bold shadow-lg">DEPOSIT</button>
         </div>
-        <div class="flex gap-10">
-            <div><p class="text-3xl font-black text-amber-400" id="coins">1,250</p><p class="text-[9px] text-gray-500">COINS</p></div>
-            <div><p class="text-3xl font-black text-cyan-400" id="gems">12</p><p class="text-[9px] text-gray-500">DIAMONDS</p></div>
+
+        <div class="flex justify-between items-center pt-1">
+            <div><p class="text-2xl font-black text-amber-400" id="coins">1,250</p><p class="text-[9px] text-gray-500">COINS</p></div>
+            <div><p class="text-2xl font-black text-cyan-400" id="gems">12</p><p class="text-[9px] text-gray-500">DIAMONDS</p></div>
         </div>
     </div>
 
     <!-- Main Features -->
     <div class="grid grid-cols-2 gap-4 mb-6">
-        <button onclick="openModal('withdraw')" class="card p-5 rounded-2xl text-center">
+        <button onclick="openModal('withdraw')" class="card p-5 rounded-2xl text-center hover:border-green-500/50 transition">
             <i class="fa-solid fa-wallet text-2xl text-green-500 mb-2"></i>
             <p class="text-[10px] font-bold">WITHDRAW</p>
         </button>
-        <button onclick="openModal('promo')" class="card p-5 rounded-2xl text-center">
+        <button onclick="openModal('promo')" class="card p-5 rounded-2xl text-center hover:border-purple-500/50 transition">
             <i class="fa-solid fa-gift text-2xl text-purple-500 mb-2"></i>
             <p class="text-[10px] font-bold">PROMO CODE</p>
         </button>
     </div>
 
     <!-- Referral Section -->
-    <div class="card p-4 rounded-2xl flex justify-between items-center">
+    <div class="card p-4 rounded-2xl flex justify-between items-center mb-6">
         <div>
             <p class="text-[10px] text-gray-400 uppercase">My Referral Code</p>
             <p id="ref-code" class="font-bold tracking-widest text-orange-400">Loading...</p>
         </div>
-        <button onclick="copyRef()" class="text-xs bg-gray-800 px-4 py-2 rounded-lg">COPY</button>
+        <button onclick="copyRef()" class="text-xs bg-gray-800 px-4 py-2 rounded-lg font-bold">COPY</button>
     </div>
 
-    <!-- Deposit/Withdraw Modal -->
+    <!-- Modal Box -->
     <div id="modal" class="hidden fixed inset-0 z-50 bg-black/95 p-6 flex flex-col justify-center">
-        <div class="card p-6 rounded-3xl">
-            <h2 id="modal-title" class="font-bold text-center mb-6">Request</h2>
+        <div class="card p-6 rounded-3xl border border-gray-700">
+            <h2 id="modal-title" class="font-bold text-center mb-6 text-sm tracking-wider">Request</h2>
             <div id="modal-content" class="space-y-4"></div>
-            <button onclick="closeModal()" class="w-full mt-4 text-gray-500 text-xs">CANCEL</button>
+            <button onclick="closeModal()" class="w-full mt-4 text-gray-400 text-xs font-semibold py-2">CANCEL</button>
         </div>
     </div>
 
@@ -69,11 +81,17 @@
         const tg = window.Telegram.WebApp;
         tg.ready();
         
-        // Telegram Data Fetch
+        // Telegram Data & Profile Photo / Initial Setup
         const user = tg.initDataUnsafe?.user;
         const username = user ? (user.username || user.first_name) : "Player";
         document.getElementById('tg-user').innerText = "@" + username;
         document.getElementById('ref-code').innerText = "ZYL" + (user?.id || "0000").toString().slice(-4);
+
+        // User Photo / Initial Avatar
+        if(user && user.first_name) {
+            const initial = user.first_name.charAt(0).toUpperCase();
+            document.getElementById('user-avatar').innerText = initial;
+        }
 
         function openModal(type) {
             document.getElementById('modal').classList.remove('hidden');
@@ -81,23 +99,28 @@
             const content = document.getElementById('modal-content');
             
             if(type === 'deposit') {
-                title.innerText = "DEPOSIT REQUEST";
-                content.innerHTML = `<p class='text-[10px]'>Send payment to UPI: <b>raj-prashant@fam</b></p>
-                                    <input type='file' class='w-full bg-gray-800 p-2 text-xs rounded'>
-                                    <button onclick="alert('Proof Sent!')" class='w-full py-3 bg-orange-600 rounded-xl font-bold'>UPLOAD PROOF</button>`;
+                title.innerText = "DEPOSIT DIAMONDS";
+                content.innerHTML = `<p class='text-[11px] text-gray-300'>Send payment to UPI: <b class='text-orange-400'>raj-prashant@fam</b></p>
+                                    <input type='file' class='w-full bg-gray-900 border border-gray-800 p-2 text-xs rounded-xl'>
+                                    <button onclick="alert('Proof Sent to Admin!'); closeModal();" class='w-full py-3 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl font-bold text-xs'>UPLOAD PROOF</button>`;
             } else if(type === 'withdraw') {
                 title.innerText = "WITHDRAW COINS";
-                content.innerHTML = `<select class='w-full bg-gray-800 p-3 text-xs rounded'><option>UPI</option><option>Amazon GC</option></select>
-                                    <input type='number' placeholder='Amount' class='w-full bg-gray-800 p-3 text-xs rounded'>
-                                    <button onclick="alert('Withdrawal Request Sent!')" class='w-full py-3 bg-green-600 rounded-xl font-bold'>WITHDRAW</button>`;
-            } else {
-                title.innerText = "PROMO CODE";
-                content.innerHTML = `<input class='w-full bg-gray-800 p-3 text-xs rounded' placeholder='Enter Code'>
-                                    <button onclick="alert('Applied!')" class='w-full py-3 bg-blue-600 rounded-xl font-bold'>APPLY</button>`;
+                content.innerHTML = `<select class='w-full bg-gray-900 border border-gray-800 p-3 text-xs rounded-xl'><option>UPI</option><option>Amazon Gift Card</option><option>Play Store Gift Card</option></select>
+                                    <input type='number' placeholder='Enter Amount' class='w-full bg-gray-900 border border-gray-800 p-3 text-xs rounded-xl'>
+                                    <button onclick="alert('Withdrawal Request Sent!'); closeModal();" class='w-full py-3 bg-green-600 rounded-xl font-bold text-xs'>WITHDRAW NOW</button>`;
+            } else if(type === 'promo') {
+                title.innerText = "PROMO CODE & CHANNEL";
+                content.innerHTML = `<input class='w-full bg-gray-900 border border-gray-800 p-3 text-xs rounded-xl' placeholder='Enter Promo Code'>
+                                    <button onclick="alert('Applied Successfully!'); closeModal();" class='w-full py-3 bg-blue-600 rounded-xl font-bold text-xs mb-3'>APPLY CODE</button>
+                                    <div class='text-center pt-2 border-t border-gray-800'>
+                                        <a href='https://t.me/+2vDL5Gmbee0zNDFl' target='_blank' class='inline-flex items-center gap-2 text-xs text-blue-400 font-bold bg-blue-500/10 border border-blue-500/20 px-4 py-2.5 rounded-xl w-full justify-center'>
+                                            <i class='fa-brands fa-telegram text-base'></i> Join Telegram Channel
+                                        </a>
+                                    </div>`;
             }
         }
         function closeModal() { document.getElementById('modal').classList.add('hidden'); }
-        function copyRef() { navigator.clipboard.writeText(document.getElementById('ref-code').innerText); alert("Copied!"); }
+        function copyRef() { navigator.clipboard.writeText(document.getElementById('ref-code').innerText); alert("Referral Code Copied!"); }
     </script>
 </body>
 </html>
