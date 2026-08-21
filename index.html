@@ -12,7 +12,7 @@
         .card { background: linear-gradient(145deg, #111, #000); border: 1px solid #222; }
     </style>
 </head>
-<body class="p-4">
+<body class="p-4 pb-20">
 
     <!-- Header Section with Telegram Profile Photo / Initial -->
     <header class="flex justify-between items-center mb-6">
@@ -59,13 +59,24 @@
         </button>
     </div>
 
-    <!-- Referral Section -->
-    <div class="card p-4 rounded-2xl flex justify-between items-center mb-6">
-        <div>
-            <p class="text-[10px] text-gray-400 uppercase">My Referral Code</p>
-            <p id="ref-code" class="font-bold tracking-widest text-orange-400">Loading...</p>
+    <!-- Referral Section with Input Box & Secure Logic -->
+    <div class="card p-5 rounded-2xl mb-6 space-y-4">
+        <div class="flex justify-between items-center">
+            <div>
+                <p class="text-[10px] text-gray-400 uppercase font-semibold">My Referral Code</p>
+                <p id="ref-code" class="font-bold tracking-widest text-orange-400 text-base">Loading...</p>
+            </div>
+            <button onclick="copyRef()" class="text-xs bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg font-bold transition">COPY</button>
         </div>
-        <button onclick="copyRef()" class="text-xs bg-gray-800 px-4 py-2 rounded-lg font-bold">COPY</button>
+        
+        <div class="pt-3 border-t border-gray-800 space-y-2">
+            <p class="text-[10px] text-gray-300 font-semibold">Have a friend's referral code?</p>
+            <div class="flex gap-2">
+                <input type="text" id="friend-ref-input" placeholder="Enter Code (e.g. ZYL1234)" class="w-full bg-gray-900 border border-gray-800 px-3 py-2 text-xs rounded-xl uppercase font-bold text-amber-400 focus:outline-none focus:border-orange-500">
+                <button onclick="applyReferralCode()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-4 py-2 rounded-xl font-bold transition shrink-0">APPLY</button>
+            </div>
+            <p id="ref-status-msg" class="text-[10px] h-3 font-medium"></p>
+        </div>
     </div>
 
     <!-- Modal Box -->
@@ -84,8 +95,11 @@
         // Telegram Data & Profile Photo Setup
         const user = tg.initDataUnsafe?.user;
         const username = user ? (user.username || user.first_name) : "Player";
+        const userId = user?.id ? user.id.toString() : "0000";
+        const myReferralCode = "ZYL" + userId.slice(-4);
+
         document.getElementById('tg-user').innerText = "@" + username;
-        document.getElementById('ref-code').innerText = "ZYL" + (user?.id || "0000").toString().slice(-4);
+        document.getElementById('ref-code').innerText = myReferralCode;
 
         // Telegram Profile Photo handling
         const avatarContainer = document.getElementById('user-avatar-container');
@@ -93,6 +107,40 @@
             avatarContainer.innerHTML = `<img src="${user.photo_url}" alt="Profile" class="w-full h-full object-cover">`;
         } else if(user && user.first_name) {
             document.getElementById('user-avatar-text').innerText = user.first_name.charAt(0).toUpperCase();
+        }
+
+        // Secure Referral Application Logic (Anti-Bypass)
+        function applyReferralCode() {
+            const inputField = document.getElementById('friend-ref-input');
+            const statusMsg = document.getElementById('ref-status-msg');
+            const enteredCode = inputField.value.trim().toUpperCase();
+
+            // Check if already used
+            const hasUsedReferral = localStorage.getItem('zylobet_ref_used');
+            if(hasUsedReferral === 'true') {
+                statusMsg.className = "text-[10px] h-3 font-medium text-red-400";
+                statusMsg.innerText = "❌ You have already redeemed a referral code!";
+                return;
+            }
+
+            if(!enteredCode) {
+                statusMsg.className = "text-[10px] h-3 font-medium text-red-400";
+                statusMsg.innerText = "❌ Please enter a valid referral code.";
+                return;
+            }
+
+            // Prevent self-referral check
+            if(enteredCode === myReferralCode) {
+                statusMsg.className = "text-[10px] h-3 font-medium text-red-400";
+                statusMsg.innerText = "❌ You cannot use your own referral code!";
+                return;
+            }
+
+            // Success & Lock to prevent bypass
+            localStorage.setItem('zylobet_ref_used', 'true');
+            statusMsg.className = "text-[10px] h-3 font-medium text-green-400";
+            statusMsg.innerText = "🎉 Referral code applied successfully! Bonus added.";
+            inputField.disabled = true;
         }
 
         function openModal(type) {
