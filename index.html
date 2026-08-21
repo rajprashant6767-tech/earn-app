@@ -233,7 +233,7 @@
                 </div>`;
         }
 
-        // Step 2: Validate Amount & Proceed to UPI/Proof Upload
+        // Step 2: Validate Amount & Proceed to UPI/Proof Upload with Notes & Warnings
         function proceedToPayment() {
             const amountInput = document.getElementById('deposit-amount-input');
             const errField = document.getElementById('deposit-err');
@@ -249,12 +249,32 @@
 
             title.innerText = `PAYMENT FOR ${amt} DIAMONDS`;
             content.innerHTML = `
-                <div class='space-y-3 text-xs text-center'>
+                <div class='space-y-3 text-xs text-center max-h-[70vh] overflow-y-auto px-1'>
                     <p class='text-gray-300'>Send payment to UPI ID:</p>
                     <div class='bg-gray-900 border border-gray-800 p-3 rounded-xl font-mono text-orange-400 font-bold select-all'>raj-prashant@fam</div>
+                    
                     <p class='text-gray-400 text-[10px]'>After payment, upload your payment screenshot/proof below:</p>
                     <input type='file' id='payment-proof-file' class='w-full bg-gray-900 border border-gray-800 p-2 text-xs rounded-xl'>
-                    <button onclick="alert('Deposit request for ${amt} Diamonds submitted successfully!'); closeModal();" class='w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl font-bold text-xs'>SUBMIT PROOF</button>
+                    
+                    <!-- Notes and Warning Section -->
+                    <div class='bg-blue-500/10 border border-blue-500/30 p-3 rounded-xl text-left space-y-2 mt-2'>
+                        <p class='text-blue-300 text-[10px] font-semibold leading-relaxed'>
+                            <i class='fa-solid fa-circle-info mr-1'></i> <b>Note:</b> Deposit amount will be credited within 24 hours. If you face any problem, you can contact us:
+                        </p>
+                        <div class='text-center pt-1'>
+                            <a href='https://t.me/Raj_Prashant' target='_blank' class='inline-flex items-center gap-1.5 text-xs text-blue-400 font-bold bg-blue-500/20 px-3 py-1.5 rounded-lg'>
+                                <i class='fa-brands fa-telegram text-base'></i> Contact: @Raj_Prashant
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class='bg-red-500/10 border border-red-500/30 p-3 rounded-xl text-left'>
+                        <p class='text-red-400 text-[10px] font-semibold leading-relaxed'>
+                            <i class='fa-solid fa-triangle-exclamation mr-1'></i> <b>Warning:</b> Agar koi user galat payment karega matlab deposit ka amount jitna hai usse kam karega, toh uska request reject kar diya jayega!
+                        </p>
+                    </div>
+
+                    <button onclick="alert('Deposit request for ${amt} Diamonds submitted successfully!'); closeModal();" class='w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl font-bold text-xs mt-2'>SUBMIT PROOF</button>
                 </div>`;
         }
 
