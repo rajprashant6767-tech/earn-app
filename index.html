@@ -8,82 +8,106 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #05070a; color: white; font-family: 'Inter', sans-serif; }
+        body { background: #05070a; color: white; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         .card { background: linear-gradient(145deg, #111, #000); border: 1px solid #222; }
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(249,115,22,0.4)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 30px rgba(249,115,22,0.8)); }
+        }
+        .animate-glow { animation: pulseGlow 2s infinite ease-in-out; }
     </style>
 </head>
 <body class="p-4 pb-20">
 
-    <!-- Header Section with Telegram Profile Photo / Initial -->
-    <header class="flex justify-between items-center mb-5">
-        <div class="flex items-center gap-3">
-            <div id="user-avatar-container" class="w-10 h-10 rounded-full bg-gradient-to-tr from-orange-500 to-red-600 flex items-center justify-center font-bold text-lg shadow-lg border border-orange-400/30 overflow-hidden">
-                <span id="user-avatar-text">U</span>
+    <!-- Attractive Intro Splash Screen -->
+    <div id="intro-screen" class="fixed inset-0 z-[100] bg-[#05070a] flex flex-col items-center justify-center transition-opacity duration-700">
+        <div class="text-center space-y-4">
+            <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-orange-500 to-red-600 mx-auto flex items-center justify-center text-white text-4xl shadow-2xl animate-glow">
+                <i class="fa-solid fa-bolt-lightning"></i>
             </div>
             <div>
-                <h1 class="text-lg font-black text-orange-500 italic leading-none">ZyloBet</h1>
-                <p id="tg-user" class="text-[10px] text-blue-400 font-bold mt-1">@Loading...</p>
+                <h1 class="text-3xl font-black tracking-wider text-orange-500 italic">ZyloBet</h1>
+                <p class="text-xs text-gray-400 mt-1 uppercase tracking-widest font-semibold">Official Mini App</p>
             </div>
-        </div>
-    </header>
-
-    <!-- Wallet Dashboard (Deposit & Balances on Top) -->
-    <div class="card p-6 rounded-3xl mb-5 shadow-2xl border-orange-500/30 space-y-4">
-        <!-- Deposit Box Top -->
-        <div class="flex justify-between items-center pb-3 border-b border-gray-800">
-            <div>
-                <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Quick Deposit</p>
-                <p class="text-xs text-orange-400 font-semibold">UPI: raj-prashant@fam</p>
-            </div>
-            <button onclick="openModal('deposit')" class="bg-gradient-to-r from-orange-500 to-red-600 text-white text-xs px-4 py-2 rounded-xl font-bold shadow-lg">DEPOSIT</button>
-        </div>
-
-        <!-- Clickable Balance Boxes for History -->
-        <div class="grid grid-cols-2 gap-4 pt-1">
-            <div onclick="openHistory('coins')" class="bg-gray-900/60 p-3 rounded-2xl border border-gray-800 cursor-pointer hover:border-amber-400/50 transition">
-                <p class="text-2xl font-black text-amber-400" id="coins">1,250</p>
-                <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-1">
-                    <span>COINS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-amber-400"></i>
-                </p>
-            </div>
-            <div onclick="openHistory('gems')" class="bg-gray-900/60 p-3 rounded-2xl border border-gray-800 cursor-pointer hover:border-cyan-400/50 transition">
-                <p class="text-2xl font-black text-cyan-400" id="gems">12</p>
-                <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-1">
-                    <span>DIAMONDS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-cyan-400"></i>
-                </p>
+            <div class="w-36 h-1 bg-gray-800 rounded-full mx-auto overflow-hidden mt-4">
+                <div id="intro-bar" class="h-full bg-gradient-to-r from-orange-500 to-amber-400 w-0 transition-all duration-500"></div>
             </div>
         </div>
     </div>
 
-    <!-- Main Features -->
-    <div class="grid grid-cols-2 gap-4 mb-5">
-        <button onclick="openModal('withdraw')" class="card p-5 rounded-2xl text-center hover:border-green-500/50 transition">
-            <i class="fa-solid fa-wallet text-2xl text-green-500 mb-2"></i>
-            <p class="text-[10px] font-bold">WITHDRAW</p>
-        </button>
-        <button onclick="openModal('promo')" class="card p-5 rounded-2xl text-center hover:border-purple-500/50 transition">
-            <i class="fa-solid fa-gift text-2xl text-purple-500 mb-2"></i>
-            <p class="text-[10px] font-bold">PROMO CODE</p>
-        </button>
-    </div>
+    <!-- Main App Container -->
+    <div id="main-app" class="opacity-0 transition-opacity duration-500">
+        <!-- Header Section with Telegram Profile Photo / Initial -->
+        <header class="flex justify-between items-center mb-5">
+            <div class="flex items-center gap-3">
+                <div id="user-avatar-container" class="w-10 h-10 rounded-full bg-gradient-to-tr from-orange-500 to-red-600 flex items-center justify-center font-bold text-lg shadow-lg border border-orange-400/30 overflow-hidden">
+                    <span id="user-avatar-text">U</span>
+                </div>
+                <div>
+                    <h1 class="text-lg font-black text-orange-500 italic leading-none">ZyloBet</h1>
+                    <p id="tg-user" class="text-[10px] text-blue-400 font-bold mt-1">@Loading...</p>
+                </div>
+            </div>
+        </header>
 
-    <!-- Referral Section with Input Box & Secure Logic -->
-    <div class="card p-5 rounded-2xl mb-5 space-y-4">
-        <div class="flex justify-between items-center">
-            <div>
-                <p class="text-[10px] text-gray-400 uppercase font-semibold">My Referral Code</p>
-                <p id="ref-code" class="font-bold tracking-widest text-orange-400 text-base">Loading...</p>
+        <!-- Wallet Dashboard (Deposit & Balances on Top) -->
+        <div class="card p-6 rounded-3xl mb-5 shadow-2xl border-orange-500/30 space-y-4">
+            <!-- Deposit Box Top (No UPI Text) -->
+            <div class="flex justify-between items-center pb-3 border-b border-gray-800">
+                <div>
+                    <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Quick Deposit</p>
+                    <p class="text-xs text-white font-semibold">Buy Diamonds via UPI</p>
+                </div>
+                <button onclick="openModal('deposit')" class="bg-gradient-to-r from-orange-500 to-red-600 text-white text-xs px-4 py-2 rounded-xl font-bold shadow-lg">DEPOSIT</button>
             </div>
-            <button onclick="copyRef()" class="text-xs bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg font-bold transition">COPY</button>
+
+            <!-- Clickable Balance Boxes for History -->
+            <div class="grid grid-cols-2 gap-4 pt-1">
+                <div onclick="openHistory('coins')" class="bg-gray-900/60 p-3 rounded-2xl border border-gray-800 cursor-pointer hover:border-amber-400/50 transition">
+                    <p class="text-2xl font-black text-amber-400" id="coins">1,250</p>
+                    <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-1">
+                        <span>COINS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-amber-400"></i>
+                    </p>
+                </div>
+                <div onclick="openHistory('gems')" class="bg-gray-900/60 p-3 rounded-2xl border border-gray-800 cursor-pointer hover:border-cyan-400/50 transition">
+                    <p class="text-2xl font-black text-cyan-400" id="gems">12</p>
+                    <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-1">
+                        <span>DIAMONDS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-cyan-400"></i>
+                    </p>
+                </div>
+            </div>
         </div>
-        
-        <div class="pt-3 border-t border-gray-800 space-y-2">
-            <p class="text-[10px] text-gray-300 font-semibold">Have a friend's referral code?</p>
-            <div class="flex gap-2">
-                <input type="text" id="friend-ref-input" placeholder="Enter Code (e.g. ZYL1234)" class="w-full bg-gray-900 border border-gray-800 px-3 py-2 text-xs rounded-xl uppercase font-bold text-amber-400 focus:outline-none focus:border-orange-500">
-                <button onclick="applyReferralCode()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-4 py-2 rounded-xl font-bold transition shrink-0">APPLY</button>
+
+        <!-- Main Features -->
+        <div class="grid grid-cols-2 gap-4 mb-5">
+            <button onclick="openModal('withdraw')" class="card p-5 rounded-2xl text-center hover:border-green-500/50 transition">
+                <i class="fa-solid fa-wallet text-2xl text-green-500 mb-2"></i>
+                <p class="text-[10px] font-bold">WITHDRAW</p>
+            </button>
+            <button onclick="openModal('promo')" class="card p-5 rounded-2xl text-center hover:border-purple-500/50 transition">
+                <i class="fa-solid fa-gift text-2xl text-purple-500 mb-2"></i>
+                <p class="text-[10px] font-bold">PROMO CODE</p>
+            </button>
+        </div>
+
+        <!-- Referral Section with Input Box & Secure Logic -->
+        <div class="card p-5 rounded-2xl mb-5 space-y-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-[10px] text-gray-400 uppercase font-semibold">My Referral Code</p>
+                    <p id="ref-code" class="font-bold tracking-widest text-orange-400 text-base">Loading...</p>
+                </div>
+                <button onclick="copyRef()" class="text-xs bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg font-bold transition">COPY</button>
             </div>
-            <p id="ref-status-msg" class="text-[10px] h-3 font-medium"></p>
+            
+            <div class="pt-3 border-t border-gray-800 space-y-2">
+                <p class="text-[10px] text-gray-300 font-semibold">Have a friend's referral code?</p>
+                <div class="flex gap-2">
+                    <input type="text" id="friend-ref-input" placeholder="Enter Code (e.g. ZYL1234)" class="w-full bg-gray-900 border border-gray-800 px-3 py-2 text-xs rounded-xl uppercase font-bold text-amber-400 focus:outline-none focus:border-orange-500">
+                    <button onclick="applyReferralCode()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-4 py-2 rounded-xl font-bold transition shrink-0">APPLY</button>
+                </div>
+                <p id="ref-status-msg" class="text-[10px] h-3 font-medium"></p>
+            </div>
         </div>
     </div>
 
@@ -97,6 +121,20 @@
     </div>
 
     <script>
+        // Intro Animation Sequence
+        window.addEventListener('DOMContentLoaded', () => {
+            const bar = document.getElementById('intro-bar');
+            setTimeout(() => { bar.style.width = '100%'; }, 200);
+            setTimeout(() => {
+                const intro = document.getElementById('intro-screen');
+                intro.style.opacity = '0';
+                setTimeout(() => {
+                    intro.remove();
+                    document.getElementById('main-app').style.opacity = '1';
+                }, 700);
+            }, 1500);
+        });
+
         const tg = window.Telegram.WebApp;
         tg.ready();
         
