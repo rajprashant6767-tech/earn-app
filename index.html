@@ -3,71 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZyloBet Pro - Aviator</title>
+    <title>ZyloBet | Official App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #05070a; color: white; font-family: sans-serif; }
-        .glass { background: rgba(20, 25, 35, 0.95); border: 1px solid #333; }
-        .glow { filter: drop-shadow(0 0 10px #f97316); }
+        body { background: #05070a; color: white; font-family: 'Inter', sans-serif; }
+        .card { background: linear-gradient(145deg, #111, #000); border: 1px solid #222; }
     </style>
 </head>
-<body class="p-4 pb-20">
+<body class="p-4">
 
-    <!-- Dashboard -->
-    <div id="main-ui">
-        <header class="flex justify-between items-center mb-6">
-            <div>
-                <h1 class="text-xl font-black">ZyloBet</h1>
-                <p id="tg-user" class="text-[10px] text-blue-400 font-bold">@Connecting...</p>
-            </div>
-            <a href="https://t.me/+2vDL5Gmbee0zNDFl" target="_blank" class="text-2xl text-blue-500"><i class="fa-brands fa-telegram"></i></a>
-        </header>
-
-        <!-- Wallet Card -->
-        <div class="glass p-5 rounded-3xl mb-6 border-orange-500/20">
-            <div class="flex justify-between mb-4">
-                <p class="text-gray-400 text-xs">Wallet</p>
-                <button onclick="showModal('deposit')" class="text-orange-500 text-xs font-bold underline">Deposit (UPI)</button>
-            </div>
-            <div class="flex gap-8">
-                <div><p class="text-2xl font-black text-amber-400" id="coins">1,250</p><p class="text-[9px]">COINS</p></div>
-                <div><p class="text-2xl font-black text-cyan-400" id="gems">12</p><p class="text-[9px]">DIAMONDS</p></div>
-            </div>
+    <!-- Header Section -->
+    <header class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-2xl font-black text-orange-500 italic">ZyloBet</h1>
+            <p id="tg-user" class="text-[10px] text-blue-400 font-bold">@Loading...</p>
         </div>
+        <a href="https://t.me/+2vDL5Gmbee0zNDFl" class="text-3xl text-blue-500"><i class="fa-brands fa-telegram"></i></a>
+    </header>
 
-        <!-- Games -->
-        <div class="grid grid-cols-2 gap-4">
-            <button onclick="openGame('aviator')" class="glass p-6 rounded-3xl text-center border-orange-500/20 hover:border-orange-500">
-                <i class="fa-solid fa-rocket text-4xl text-orange-500 mb-2"></i>
-                <p class="text-xs font-bold">AVIATOR PRO</p>
-            </button>
-            <button onclick="alert('Coming Soon')" class="glass p-6 rounded-3xl text-center border-gray-800">
-                <i class="fa-solid fa-circle-half-stroke text-4xl text-purple-500 mb-2"></i>
-                <p class="text-xs font-bold">COIN FLIP</p>
-            </button>
+    <!-- Wallet Dashboard -->
+    <div class="card p-6 rounded-3xl mb-6 shadow-2xl">
+        <div class="flex justify-between mb-4">
+            <span class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">My Balance</span>
+            <span class="text-orange-500 text-[10px] font-bold underline cursor-pointer" onclick="openModal('deposit')">DEPOSIT</span>
+        </div>
+        <div class="flex gap-10">
+            <div><p class="text-3xl font-black text-amber-400" id="coins">1,250</p><p class="text-[9px] text-gray-500">COINS</p></div>
+            <div><p class="text-3xl font-black text-cyan-400" id="gems">12</p><p class="text-[9px] text-gray-500">DIAMONDS</p></div>
         </div>
     </div>
 
-    <!-- Aviator Pro UI -->
-    <div id="aviator-ui" class="hidden fixed inset-0 z-50 bg-black p-4 flex flex-col">
-        <button onclick="closeGame()" class="text-gray-400 mb-4"><i class="fa-solid fa-xmark text-xl"></i></button>
-        <div class="flex-1 flex flex-col items-center justify-center glass rounded-3xl p-6">
-            <div id="mult" class="text-7xl font-black text-white glow mb-10">1.00x</div>
-            <div id="rocket" class="text-6xl text-orange-500 mb-10"><i class="fa-solid fa-rocket transform -rotate-45"></i></div>
-            <button id="bet-btn" onclick="startAviator()" class="w-full py-4 bg-gradient-to-r from-orange-600 to-red-600 rounded-2xl font-black text-lg">PLACE BET</button>
-        </div>
+    <!-- Main Features -->
+    <div class="grid grid-cols-2 gap-4 mb-6">
+        <button onclick="openModal('withdraw')" class="card p-5 rounded-2xl text-center">
+            <i class="fa-solid fa-wallet text-2xl text-green-500 mb-2"></i>
+            <p class="text-[10px] font-bold">WITHDRAW</p>
+        </button>
+        <button onclick="openModal('promo')" class="card p-5 rounded-2xl text-center">
+            <i class="fa-solid fa-gift text-2xl text-purple-500 mb-2"></i>
+            <p class="text-[10px] font-bold">PROMO CODE</p>
+        </button>
     </div>
 
-    <!-- Modal System -->
-    <div id="modal" class="hidden fixed inset-0 bg-black/90 z-[60] p-6 flex flex-col justify-center">
-        <div class="glass p-6 rounded-3xl">
-            <h2 id="modal-title" class="font-bold mb-4 text-center">Deposit via UPI</h2>
-            <p class="text-[10px] text-gray-400 mb-2">UPI: raj-prashant@fam</p>
-            <input type="file" class="w-full mb-4 text-xs bg-gray-800 p-2 rounded">
-            <button onclick="alert('Proof Sent to Admin!')" class="w-full py-3 bg-blue-600 rounded-xl font-bold">SEND PROOF</button>
-            <button onclick="document.getElementById('modal').classList.add('hidden')" class="w-full mt-2 text-gray-500 text-xs">Close</button>
+    <!-- Referral Section -->
+    <div class="card p-4 rounded-2xl flex justify-between items-center">
+        <div>
+            <p class="text-[10px] text-gray-400 uppercase">My Referral Code</p>
+            <p id="ref-code" class="font-bold tracking-widest text-orange-400">Loading...</p>
+        </div>
+        <button onclick="copyRef()" class="text-xs bg-gray-800 px-4 py-2 rounded-lg">COPY</button>
+    </div>
+
+    <!-- Deposit/Withdraw Modal -->
+    <div id="modal" class="hidden fixed inset-0 z-50 bg-black/95 p-6 flex flex-col justify-center">
+        <div class="card p-6 rounded-3xl">
+            <h2 id="modal-title" class="font-bold text-center mb-6">Request</h2>
+            <div id="modal-content" class="space-y-4"></div>
+            <button onclick="closeModal()" class="w-full mt-4 text-gray-500 text-xs">CANCEL</button>
         </div>
     </div>
 
@@ -75,31 +69,35 @@
         const tg = window.Telegram.WebApp;
         tg.ready();
         
-        // Load User
-        const name = tg.initDataUnsafe?.user?.first_name || "Player";
-        document.getElementById('tg-user').innerText = "@" + name;
+        // Telegram Data Fetch
+        const user = tg.initDataUnsafe?.user;
+        const username = user ? (user.username || user.first_name) : "Player";
+        document.getElementById('tg-user').innerText = "@" + username;
+        document.getElementById('ref-code').innerText = "ZYL" + (user?.id || "0000").toString().slice(-4);
 
-        function openGame(g) { document.getElementById('main-ui').classList.add('hidden'); document.getElementById('aviator-ui').classList.remove('hidden'); }
-        function closeGame() { document.getElementById('main-ui').classList.remove('hidden'); document.getElementById('aviator-ui').classList.add('hidden'); }
-        function showModal(t) { document.getElementById('modal').classList.remove('hidden'); }
-
-        // Game Logic
-        function startAviator() {
-            let m = 1.00;
-            const btn = document.getElementById('bet-btn');
-            btn.disabled = true;
-            btn.innerText = "FLYING...";
-            let interval = setInterval(() => {
-                m += 0.25;
-                document.getElementById('mult').innerText = m.toFixed(2) + "x";
-                if(m > 6.0) {
-                    clearInterval(interval);
-                    btn.disabled = false;
-                    btn.innerText = "PLACE BET";
-                    alert("Crashed!");
-                }
-            }, 300);
+        function openModal(type) {
+            document.getElementById('modal').classList.remove('hidden');
+            const title = document.getElementById('modal-title');
+            const content = document.getElementById('modal-content');
+            
+            if(type === 'deposit') {
+                title.innerText = "DEPOSIT REQUEST";
+                content.innerHTML = `<p class='text-[10px]'>Send payment to UPI: <b>raj-prashant@fam</b></p>
+                                    <input type='file' class='w-full bg-gray-800 p-2 text-xs rounded'>
+                                    <button onclick="alert('Proof Sent!')" class='w-full py-3 bg-orange-600 rounded-xl font-bold'>UPLOAD PROOF</button>`;
+            } else if(type === 'withdraw') {
+                title.innerText = "WITHDRAW COINS";
+                content.innerHTML = `<select class='w-full bg-gray-800 p-3 text-xs rounded'><option>UPI</option><option>Amazon GC</option></select>
+                                    <input type='number' placeholder='Amount' class='w-full bg-gray-800 p-3 text-xs rounded'>
+                                    <button onclick="alert('Withdrawal Request Sent!')" class='w-full py-3 bg-green-600 rounded-xl font-bold'>WITHDRAW</button>`;
+            } else {
+                title.innerText = "PROMO CODE";
+                content.innerHTML = `<input class='w-full bg-gray-800 p-3 text-xs rounded' placeholder='Enter Code'>
+                                    <button onclick="alert('Applied!')" class='w-full py-3 bg-blue-600 rounded-xl font-bold'>APPLY</button>`;
+            }
         }
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+        function copyRef() { navigator.clipboard.writeText(document.getElementById('ref-code').innerText); alert("Copied!"); }
     </script>
 </body>
 </html>
