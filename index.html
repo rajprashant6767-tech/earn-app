@@ -52,13 +52,13 @@
 
         <!-- Wallet Dashboard (Deposit & Balances on Top) -->
         <div class="card p-6 rounded-3xl mb-5 shadow-2xl border-orange-500/30 space-y-4">
-            <!-- Deposit Box Top (No UPI Text) -->
+            <!-- Deposit Box Top -->
             <div class="flex justify-between items-center pb-3 border-b border-gray-800">
                 <div>
                     <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Quick Deposit</p>
                     <p class="text-xs text-white font-semibold">Buy Diamonds via UPI</p>
                 </div>
-                <button onclick="openModal('deposit')" class="bg-gradient-to-r from-orange-500 to-red-600 text-white text-xs px-4 py-2 rounded-xl font-bold shadow-lg">DEPOSIT</button>
+                <button onclick="openDepositModal()" class="bg-gradient-to-r from-orange-500 to-red-600 text-white text-xs px-4 py-2 rounded-xl font-bold shadow-lg">DEPOSIT</button>
             </div>
 
             <!-- Clickable Balance Boxes for History -->
@@ -217,17 +217,53 @@
             }
         }
 
+        // Step 1: Open Deposit Amount Entry Box (Min 1, Max 1000)
+        function openDepositModal() {
+            document.getElementById('modal').classList.remove('hidden');
+            const title = document.getElementById('modal-title');
+            const content = document.getElementById('modal-content');
+
+            title.innerText = "DEPOSIT DIAMONDS";
+            content.innerHTML = `
+                <div class='space-y-3 text-xs'>
+                    <label class='text-gray-300 font-semibold block'>Enter Diamond Amount (1 - 1000):</label>
+                    <input type='number' id='deposit-amount-input' min='1' max='1000' placeholder='e.g. 100' class='w-full bg-gray-900 border border-gray-800 p-3 rounded-xl font-bold text-cyan-400'>
+                    <p id='deposit-err' class='text-red-400 text-[10px] h-3 font-medium'></p>
+                    <button onclick='proceedToPayment()' class='w-full py-3 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl font-bold text-xs'>NEXT</button>
+                </div>`;
+        }
+
+        // Step 2: Validate Amount & Proceed to UPI/Proof Upload
+        function proceedToPayment() {
+            const amountInput = document.getElementById('deposit-amount-input');
+            const errField = document.getElementById('deposit-err');
+            const amt = parseInt(amountInput.value);
+
+            if(isNaN(amt) || amt < 1 || amt > 1000) {
+                errField.innerText = "❌ Please enter a valid amount between 1 and 1000 diamonds.";
+                return;
+            }
+
+            const title = document.getElementById('modal-title');
+            const content = document.getElementById('modal-content');
+
+            title.innerText = `PAYMENT FOR ${amt} DIAMONDS`;
+            content.innerHTML = `
+                <div class='space-y-3 text-xs text-center'>
+                    <p class='text-gray-300'>Send payment to UPI ID:</p>
+                    <div class='bg-gray-900 border border-gray-800 p-3 rounded-xl font-mono text-orange-400 font-bold select-all'>raj-prashant@fam</div>
+                    <p class='text-gray-400 text-[10px]'>After payment, upload your payment screenshot/proof below:</p>
+                    <input type='file' id='payment-proof-file' class='w-full bg-gray-900 border border-gray-800 p-2 text-xs rounded-xl'>
+                    <button onclick="alert('Deposit request for ${amt} Diamonds submitted successfully!'); closeModal();" class='w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl font-bold text-xs'>SUBMIT PROOF</button>
+                </div>`;
+        }
+
         function openModal(type) {
             document.getElementById('modal').classList.remove('hidden');
             const title = document.getElementById('modal-title');
             const content = document.getElementById('modal-content');
             
-            if(type === 'deposit') {
-                title.innerText = "DEPOSIT DIAMONDS";
-                content.innerHTML = `<p class='text-[11px] text-gray-300'>Send payment to UPI: <b class='text-orange-400'>raj-prashant@fam</b></p>
-                                    <input type='file' class='w-full bg-gray-900 border border-gray-800 p-2 text-xs rounded-xl'>
-                                    <button onclick="alert('Proof Sent to Admin!'); closeModal();" class='w-full py-3 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl font-bold text-xs'>UPLOAD PROOF</button>`;
-            } else if(type === 'withdraw') {
+            if(type === 'withdraw') {
                 title.innerText = "WITHDRAW COINS";
                 content.innerHTML = `<select class='w-full bg-gray-900 border border-gray-800 p-3 text-xs rounded-xl'><option>UPI</option><option>Amazon Gift Card</option><option>Play Store Gift Card</option></select>
                                     <input type='number' placeholder='Enter Amount' class='w-full bg-gray-900 border border-gray-800 p-3 text-xs rounded-xl'>
