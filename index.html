@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ZyloBet Mini App</title>
+    <!-- STREAMING_CHUNK:Loading CSS and fonts... -->
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome for Icons -->
@@ -65,6 +66,7 @@
 </head>
 <body class="bg-darkBg text-white antialiased flex justify-center items-center min-h-screen">
 
+    <!-- STREAMING_CHUNK:Rendering splash screen... -->
     <!-- Premium Animated Intro Splash Screen -->
     <div id="splash-screen" class="fixed inset-0 z-50 bg-[#090D16] flex flex-col items-center justify-center transition-opacity duration-700">
         <div class="relative flex flex-col items-center text-center px-6">
@@ -83,6 +85,7 @@
         </div>
     </div>
 
+    <!-- STREAMING_CHUNK:Initializing main app structure... -->
     <!-- Main App Container -->
     <div id="main-app" class="w-full max-w-md min-h-screen flex flex-col justify-between opacity-0 transition-opacity duration-500 pb-20">
         
@@ -98,45 +101,42 @@
                     </span>
                 </div>
             </div>
-            <div class="flex items-center space-x-2 bg-gray-900/80 px-3 py-1.5 rounded-full border border-gray-700/60 shadow-inner">
-                <i class="fa-solid fa-coins text-amber-400"></i>
-                <span id="header-balance" class="font-bold text-sm tracking-wide">1,250</span>
+            <!-- Dual Currency Header View -->
+            <div class="flex items-center space-x-3 bg-gray-900/80 px-3 py-1.5 rounded-full border border-gray-700/60 shadow-inner">
+                <div class="flex items-center space-x-1" title="Coins">
+                    <i class="fa-solid fa-coins text-amber-400 text-xs"></i>
+                    <span id="header-balance" class="font-bold text-xs tracking-wide">1,250</span>
+                </div>
+                <div class="w-[1px] h-3 bg-gray-700"></div>
+                <div class="flex items-center space-x-1" title="Diamonds (1 Diamond = 100 Coins)">
+                    <i class="fa-solid fa-gem text-cyan-400 text-xs animate-pulse"></i>
+                    <span id="header-diamonds" class="font-bold text-xs tracking-wide text-cyan-300">12</span>
+                </div>
             </div>
         </header>
 
         <main class="flex-1 px-4 py-4 overflow-y-auto">
             
+            <!-- STREAMING_CHUNK:Rendering home page... -->
             <!-- HOME PAGE -->
             <div id="page-home" class="space-y-5">
-                <div class="rounded-2xl p-5 gradient-btn shadow-lg relative overflow-hidden">
-                    <div class="absolute -right-4 -bottom-4 opacity-20 text-white text-8xl">
-                        <i class="fa-solid fa-trophy"></i>
-                    </div>
-                    <span class="bg-white/20 text-xs px-2.5 py-1 rounded-full font-semibold uppercase tracking-wider">⚡ Instant Rewards</span>
-                    <h3 class="text-2xl font-extrabold mt-3 mb-1">Play & Win Daily</h3>
-                    <p class="text-white/80 text-xs mb-4">Spin the wheel or participate in exciting prediction matches to grow your balance.</p>
-                    <button onclick="switchTab('games')" class="bg-white text-gray-900 text-xs font-bold px-4 py-2.5 rounded-xl shadow hover:bg-gray-100 transition">
-                        Explore Games <i class="fa-solid fa-arrow-right ml-1"></i>
-                    </button>
-                </div>
-
                 <div class="grid grid-cols-2 gap-3">
                     <div class="glass-card p-4 rounded-2xl flex items-center space-x-3">
-                        <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-lg">
-                            <i class="fa-solid fa-wallet"></i>
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-coins"></i>
                         </div>
                         <div>
-                            <p class="text-xs text-gray-400">Total Balance</p>
-                            <h4 id="stat-balance" class="text-lg font-bold">1,250 Coins</h4>
+                            <p class="text-xs text-gray-400">Total Coins</p>
+                            <h4 id="stat-balance" class="text-base font-bold">1,250</h4>
                         </div>
                     </div>
                     <div class="glass-card p-4 rounded-2xl flex items-center space-x-3">
-                        <div class="w-10 h-10 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center text-lg">
-                            <i class="fa-solid fa-gamepad"></i>
+                        <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-gem"></i>
                         </div>
                         <div>
-                            <p class="text-xs text-gray-400">Active Bets</p>
-                            <h4 class="text-lg font-bold">2 Matches</h4>
+                            <p class="text-xs text-gray-400">Diamonds</p>
+                            <h4 id="stat-diamonds" class="text-base font-bold text-cyan-300">12 <span class="text-[10px] text-gray-400 font-normal">(=1.2k)</span></h4>
                         </div>
                     </div>
                 </div>
@@ -171,7 +171,8 @@
                 </div>
             </div>
 
-            <!-- GAMES PAGE (Ads removed cleanly) -->
+            <!-- STREAMING_CHUNK:Rendering games page... -->
+            <!-- GAMES PAGE -->
             <div id="page-games" class="space-y-4 hidden">
                 <h3 class="font-extrabold text-lg">Interactive Games</h3>
                 
@@ -204,14 +205,39 @@
                 </div>
             </div>
 
+            <!-- STREAMING_CHUNK:Rendering wallet page... -->
             <!-- WALLET PAGE -->
             <div id="page-wallet" class="space-y-4 hidden">
                 <h3 class="font-extrabold text-lg">My Wallet</h3>
                 
-                <div class="glass-card p-6 rounded-2xl bg-gradient-to-br from-gray-900 to-[#131C31] border border-gray-800 text-center">
-                    <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Available Coins</p>
-                    <h2 id="wallet-balance" class="text-4xl font-extrabold text-amber-400 mb-4">1,250</h2>
-                    <div class="flex justify-center gap-3">
+                <div class="glass-card p-6 rounded-2xl bg-gradient-to-br from-gray-900 to-[#131C31] border border-gray-800 text-center space-y-4">
+                    <div>
+                        <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Available Currencies</p>
+                        <div class="flex justify-center items-center gap-6 mt-3">
+                            <div>
+                                <span class="text-xs text-amber-400 block mb-1 font-semibold"><i class="fa-solid fa-coins"></i> Coins</span>
+                                <h2 id="wallet-balance" class="text-3xl font-extrabold text-amber-400">1,250</h2>
+                            </div>
+                            <div class="w-[1px] h-10 bg-gray-700"></div>
+                            <div>
+                                <span class="text-xs text-cyan-400 block mb-1 font-semibold"><i class="fa-solid fa-gem"></i> Diamonds</span>
+                                <h2 id="wallet-diamonds" class="text-3xl font-extrabold text-cyan-400">12</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Exchange Mechanism (1 Diamond = 100 Coins) -->
+                    <div class="bg-gray-800/60 p-3 rounded-xl border border-gray-700/60 flex items-center justify-between text-xs">
+                        <div class="text-left">
+                            <span class="font-bold text-gray-200 block">Convert Diamonds</span>
+                            <span class="text-[10px] text-gray-400">1 Diamond = 100 Coins</span>
+                        </div>
+                        <button onclick="convertDiamonds()" class="px-3 py-1.5 bg-cyan-600/30 border border-cyan-500/50 text-cyan-300 font-bold rounded-lg hover:bg-cyan-600/50 transition">
+                            Convert to Coins
+                        </button>
+                    </div>
+
+                    <div class="flex justify-center gap-3 pt-2">
                         <button onclick="showModal('Deposit')" class="px-5 py-2.5 gradient-btn text-white text-xs font-bold rounded-xl shadow">
                             <i class="fa-solid fa-plus mr-1"></i> Add Coins
                         </button>
@@ -240,6 +266,7 @@
                 </div>
             </div>
 
+            <!-- STREAMING_CHUNK:Rendering profile page... -->
             <!-- PROFILE PAGE -->
             <div id="page-profile" class="space-y-4 hidden">
                 <h3 class="font-extrabold text-lg">My Profile</h3>
@@ -269,6 +296,7 @@
 
         </main>
 
+        <!-- STREAMING_CHUNK:Rendering navigation bar... -->
         <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto glass-card border-t border-gray-800/80 px-6 py-2.5 flex justify-around items-center z-40 bg-[#090D16]/95">
             <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center text-blue-500 transition">
                 <i class="fa-solid fa-house text-lg mb-1"></i>
@@ -304,8 +332,10 @@
 
     </div>
 
+    <!-- STREAMING_CHUNK:Initializing application logic... -->
     <script>
-        let userBalance = 1250;
+        let userBalance = 1250;     // Coins
+        let userDiamonds = 12;      // Diamonds (1 Diamond = 100 Coins)
 
         // Intro Splash Screen Sequence
         window.addEventListener('DOMContentLoaded', () => {
@@ -356,11 +386,32 @@
 
         function updateBalanceUI() {
             const hb = document.getElementById('header-balance');
+            const hd = document.getElementById('header-diamonds');
             const sb = document.getElementById('stat-balance');
+            const sd = document.getElementById('stat-diamonds');
             const wb = document.getElementById('wallet-balance');
+            const wd = document.getElementById('wallet-diamonds');
+
             if(hb) hb.innerText = userBalance.toLocaleString();
-            if(sb) sb.innerText = userBalance.toLocaleString() + ' Coins';
+            if(hd) hd.innerText = userDiamonds.toLocaleString();
+            if(sb) sb.innerText = userBalance.toLocaleString();
+            if(sd) sd.innerHTML = `${userDiamonds.toLocaleString()} <span class="text-[10px] text-gray-400 font-normal">(=${(userDiamonds*100).toLocaleString()})</span>`;
             if(wb) wb.innerText = userBalance.toLocaleString();
+            if(wd) wd.innerText = userDiamonds.toLocaleString();
+        }
+
+        // Convert Diamonds to Coins (1 Diamond = 100 Coins)
+        function convertDiamonds() {
+            if(userDiamonds <= 0) {
+                showModal('Custom', 'Not Enough', 'You do not have any diamonds to convert!');
+                return;
+            }
+            const convertCount = userDiamonds;
+            const coinsEarned = convertCount * 100;
+            userBalance += coinsEarned;
+            userDiamonds = 0;
+            updateBalanceUI();
+            showModal('Custom', 'Conversion Successful!', `Successfully converted ${convertCount} Diamonds into +${coinsEarned} Coins!`);
         }
 
         function spinWheel() {
@@ -397,7 +448,7 @@
             }
         }
 
-        function showModal(type) {
+        function showModal(type, customTitle = '', customDesc = '') {
             const modal = document.getElementById('custom-modal');
             const title = document.getElementById('modal-title');
             const desc = document.getElementById('modal-desc');
@@ -413,9 +464,12 @@
             } else if(type === 'Support') {
                 title.innerText = "Customer Support";
                 desc.innerText = "Need assistance? Contact our 24/7 Telegram support bot.";
-            } else {
+            } else if(type === 'Terms') {
                 title.innerText = "Terms & Guidelines";
                 desc.innerText = "ZyloBet Mini App is designed for smooth entertainment and skill prediction.";
+            } else if(type === 'Custom') {
+                title.innerText = customTitle;
+                desc.innerText = customDesc;
             }
             if(modal) modal.classList.remove('hidden');
         }
@@ -427,3 +481,4 @@
     </script>
 </body>
 </html>
+```eof
