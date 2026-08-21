@@ -1,218 +1,113 @@
-'use client'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZyloBet Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #05070a; color: white; font-family: sans-serif; }
+        .glass { background: rgba(20, 25, 35, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .tab-btn.active { border-bottom: 2px solid #f97316; color: #f97316; }
+    </style>
+</head>
+<body class="p-4">
 
-import { useState } from 'react'
-import {
-  ArrowLeft,
-  Check,
-  Clock3,
-  Diamond,
-  ExternalLink,
-  ShieldCheck,
-  X,
-} from 'lucide-react'
-
-const depositRequests = [
-  {
-    user: '@arjun_22',
-    request: '500 diamonds',
-    proof: 'UPI screenshot',
-    time: '12 min ago',
-  },
-  {
-    user: '@neha_play',
-    request: '100 diamonds',
-    proof: 'UPI screenshot',
-    time: '38 min ago',
-  },
-]
-
-const withdrawalRequests = [
-  {
-    user: '@rahul_11',
-    request: '10,000 coins · ₹100',
-    proof: 'UPI',
-    time: '18 min ago',
-  },
-  {
-    user: '@sneha_fx',
-    request: '5,000 coins · ₹50',
-    proof: 'Amazon gift card',
-    time: '1 hr ago',
-  },
-]
-
-type Tab = 'deposits' | 'withdrawals'
-
-export default function AdminPage() {
-  const [tab, setTab] = useState<Tab>('deposits')
-  const [handled, setHandled] = useState<string[]>([])
-
-  const rows =
-    tab === 'deposits' ? depositRequests : withdrawalRequests
-
-  const pending = rows.filter(
-    (row) => !handled.includes(row.user),
-  )
-
-  function handleRequest(
-    user: string,
-    action: 'approved' | 'rejected',
-  ) {
-    setHandled((current) => [...current, user])
-
-    window.alert(
-      `${user} request ${action}. Demo action only.`,
-    )
-  }
-
-  return (
-    <main className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto min-h-screen max-w-5xl">
-        <header className="flex items-center justify-between border-b border-border px-4 py-4 md:px-8">
-          <div className="flex items-center gap-3">
-            <a
-              href="/"
-              aria-label="Back to ZyloBet"
-              className="rounded-xl border border-border p-2 text-muted-foreground hover:bg-muted"
-            >
-              <ArrowLeft className="size-4" />
-            </a>
-
-            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/15 text-primary">
-              <Diamond className="size-5" />
-            </div>
-
+    <!-- Dashboard -->
+    <div id="dashboard" class="space-y-6">
+        <header class="flex justify-between items-center">
             <div>
-              <p className="font-heading text-xl font-black">
-                Zylo<span className="text-primary">Bet</span>
-              </p>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                Admin console
-              </p>
+                <h1 class="text-xl font-black">ZyloBet</h1>
+                <p id="tg-user" class="text-[10px] text-blue-400 font-bold">@Loading...</p>
             </div>
-          </div>
+            <a href="https://t.me/+2vDL5Gmbee0zNDFl" class="text-2xl text-blue-500"><i class="fa-brands fa-telegram"></i></a>
+        </header>
 
-          <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-xs font-bold">
-            <span className="size-2 rounded-full bg-primary" />
-            
-              Deposit requests
-              <span className="ml-1 rounded-full bg-background/30 px-1.5 text-xs">
-                {depositRequests.length}
-              </span>
-            </button>
+        <!-- Wallet Card -->
+        <div class="glass p-5 rounded-3xl border border-gray-800">
+            <div class="flex justify-between mb-4">
+                <p class="text-gray-400 text-xs">Wallet Balance</p>
+                <button onclick="showModal('deposit')" class="text-orange-500 text-xs font-bold underline">Deposit Diamond</button>
+            </div>
+            <div class="flex gap-6">
+                <div><p class="text-2xl font-black text-amber-400" id="coins">1,250</p><p class="text-[9px]">COINS</p></div>
+                <div><p class="text-2xl font-black text-cyan-400" id="gems">12</p><p class="text-[9px]">DIAMONDS</p></div>
+            </div>
+        </div>
 
-            <button
-              onClick={() => setTab('withdrawals')}
-              className={`flex-1 rounded-lg px-3 py-3 text-sm font-bold ${
-                tab === 'withdrawals'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground'
-              }`}
-            >
-              Withdrawals
-              <span className="ml-1 rounded-full bg-background/30 px-1.5 text-xs">
-                {withdrawalRequests.length}
-              </span>
-            </button>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            {pending.length === 0 ? (
-              <div className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
-                All requests handled in this demo session.
-              </div>
-            ) : (
-              pending.map((row) => (
-                <article
-                  key={row.user}
-                  className="rounded-2xl border border-border bg-card p-4 md:p-5"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-bold">{row.user}</p>
-                      <p className="mt-1 text-sm text-primary">
-                        {row.request}
-                      </p>
-                    </div>
-
-                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Clock3 className="size-3" />
-                      {row.time}
-                    </span>
-                  </div>
-
-                  <div className="mt-4 flex items-center justify-between rounded-xl bg-muted px-3 py-3">
-                    <span className="text-xs text-muted-foreground">
-                      Proof submitted
-                    </span>
-
-                    <button
-                      onClick={() =>
-                        window.alert(
-                          `${row.proof} preview · Demo only`,
-                        )
-                      }
-                      className="flex items-center gap-1 text-xs font-bold text-primary"
-                    >
-                      {row.proof}
-                      <ExternalLink className="size-3" />
-                    </button>
-                  </div>
-
-                  <div className="mt-4 grid grid-cols-2 gap-2">
-                    <button
-                      onClick={() =>
-                        handleRequest(row.user, 'approved')
-                      }
-                      className="flex items-center justify-center gap-2 rounded-xl bg-primary px-3 py-3 text-sm font-bold text-primary-foreground"
-                    >
-                      <Check className="size-4" />
-                      Approve
-                    </button>
-
-                    <button
-                      onClick={() =>
-                        handleRequest(row.user, 'rejected')
-                      }
-                      className="flex items-center justify-center gap-2 rounded-xl border border-border px-3 py-3 text-sm font-bold hover:bg-muted"
-                    >
-                      <X className="size-4" />
-                      Reject
-                    </button>
-                  </div>
-                </article>
-              ))
-            )}
-          </div>
-
-          <div className="rounded-2xl border border-accent/30 bg-accent/10 p-4 text-sm text-accent">
-            <p className="font-bold">Trial prototype notice</p>
-
-            <p className="mt-1 text-xs leading-5">
-              This separate admin route uses demo data. Telegram ID checks,
-              proof uploads, UPI payments and wallet updates are not connected
-              yet.
-            </p>
-          </div>
-        </section>
-      </div>
-    </main>
-  )
-}
-
-function Stat({
-  label,
-  value,
-}: {
-  label: string
-  value: string
-}) {
-  return (
-    <div className="rounded-2xl border border-border bg-card p-4">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="mt-2 font-heading text-2xl font-black">
-        {value}
-      </p>
+        <!-- Game Section -->
+        <div class="grid grid-cols-2 gap-4">
+            <div onclick="openGame('aviator')" class="glass p-6 rounded-3xl text-center border border-gray-800 cursor-pointer">
+                <i class="fa-solid fa-rocket text-3xl text-orange-500 mb-2"></i>
+                <p class="text-xs font-bold">AVIATOR</p>
+            </div>
+            <div onclick="openGame('flip')" class="glass p-6 rounded-3xl text-center border border-gray-800 cursor-pointer">
+                <i class="fa-solid fa-circle-half-stroke text-3xl text-purple-500 mb-2"></i>
+                <p class="text-xs font-bold">COIN FLIP</p>
+            </div>
+        </div>
     </div>
-  )
-}
+
+    <!-- Game Screen (Hidden) -->
+    <div id="game-screen" class="hidden fixed inset-0 bg-[#05070a] z-50 p-4">
+        <button onclick="closeGame()" class="text-gray-400 mb-6"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        <div class="glass h-[70vh] rounded-3xl flex flex-col items-center justify-center p-6 text-center">
+            <div id="mult" class="text-6xl font-black mb-8 text-orange-500">1.00x</div>
+            <button onclick="startGame()" id="bet-btn" class="w-full py-4 bg-green-600 rounded-2xl font-bold">BET 100 COINS</button>
+        </div>
+    </div>
+
+    <!-- Modal for Deposit/Withdraw -->
+    <div id="modal" class="hidden fixed inset-0 bg-black/90 z-50 p-6 flex flex-col justify-center">
+        <div class="glass p-6 rounded-3xl">
+            <h2 id="modal-title" class="font-bold mb-4">Deposit Request</h2>
+            <p class="text-xs text-gray-400 mb-4">UPI: raj-prashant@fam</p>
+            <input type="file" class="w-full mb-4 text-xs">
+            <button onclick="submitRequest()" class="w-full py-3 bg-orange-600 rounded-xl font-bold text-sm">SEND PROOF</button>
+            <button onclick="closeModal()" class="w-full mt-2 text-gray-500 text-xs">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        
+        // Telegram Data
+        const user = tg.initDataUnsafe?.user;
+        if(user) {
+            document.getElementById('tg-user').innerText = "@" + (user.username || user.first_name);
+        }
+
+        function openGame(g) { document.getElementById('dashboard').classList.add('hidden'); document.getElementById('game-screen').classList.remove('hidden'); }
+        function closeGame() { document.getElementById('dashboard').classList.remove('hidden'); document.getElementById('game-screen').classList.add('hidden'); }
+        
+        function showModal(type) {
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('modal-title').innerText = type.toUpperCase() + " REQUEST";
+        }
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+        
+        function submitRequest() {
+            alert("Request sent to Admin! Wait for approval.");
+            closeModal();
+        }
+
+        function startGame() {
+            let m = 1.00;
+            const btn = document.getElementById('bet-btn');
+            btn.disabled = true;
+            let interval = setInterval(() => {
+                m += 0.15;
+                document.getElementById('mult').innerText = m.toFixed(2) + "x";
+                if(m > 5) {
+                    clearInterval(interval);
+                    btn.disabled = false;
+                    alert("Crashed!");
+                }
+            }, 300);
+        }
+    </script>
+</body>
+</html>
