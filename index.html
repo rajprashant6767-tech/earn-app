@@ -543,6 +543,7 @@
             inputField.disabled = true;
         }
 
+        // SECURE PROMO CODE REDEEM LOGIC (Strictly checks activation and single-use per user)
         function applyPromoCode() {
             const promoInput = document.getElementById('promo-input');
             const statusMsg = document.getElementById('promo-status-msg');
@@ -958,7 +959,7 @@
             loadAdminRequests();
         }
 
-        // ADMIN PROMO MANAGER (SECURE: If code exists and is active, prevents duplicates. If deactivated, allows fresh creation).
+        // ADMIN PROMO MANAGER
         function loadAdminPromoManager() {
             const container = document.getElementById('admin-requests-container');
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
@@ -1003,10 +1004,10 @@
                 </div>
 
                 <div class='space-y-3 pt-2'>
-                    <h3 class='text-xs font-black text-gray-300 uppercase tracking-wider'>Active Promo Codes</h3>`;
+                    <h3 class='text-xs font-black text-gray-300 uppercase tracking-wider'>Active / Inactive Codes</h3>`;
 
             if(promos.length === 0) {
-                html += `<div class='cyber-card p-5 text-center text-gray-500 text-xs rounded-2xl'>No promo codes available.</div>`;
+                html += `<div class='cyber-card p-5 text-center text-gray-500 text-xs rounded-2xl'>No promo codes found.</div>`;
             } else {
                 promos.forEach((p, idx) => {
                     let statusText = p.active ? '<span class="text-emerald-400 font-bold">ACTIVE</span>' : '<span class="text-rose-400 font-bold">DEACTIVATED</span>';
@@ -1055,8 +1056,8 @@
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
             let existingPromo = promos.find(p => p.code === codeVal);
 
-            if(existingPromo && existingPromo.active && Date.now() <= existingPromo.expiryTime) {
-                alert("❌ This promo code already exists and is active!");
+            if(existingPromo) {
+                alert("❌ This promo code name already exists! Please use a different name or reactivate it from the list.");
                 return;
             }
 
@@ -1068,28 +1069,18 @@
             }
             const expiryTime = Date.now() + durationMs;
 
-            if(existingPromo) {
-                existingPromo.rewardType = rewardType;
-                existingPromo.rewardAmount = rewardAmount;
-                existingPromo.expiryTime = expiryTime;
-                existingPromo.maxUsers = maxUsr;
-                existingPromo.usedCount = 0;
-                existingPromo.active = true;
-                alert(`Promo Code '${codeVal}' Reactivated Successfully!`);
-            } else {
-                promos.push({
-                    code: codeVal,
-                    rewardType: rewardType,
-                    rewardAmount: rewardAmount,
-                    expiryTime: expiryTime,
-                    maxUsers: maxUsr,
-                    usedCount: 0,
-                    active: true
-                });
-                alert(`Promo Code '${codeVal}' Created Successfully!`);
-            }
+            promos.push({
+                code: codeVal,
+                rewardType: rewardType,
+                rewardAmount: rewardAmount,
+                expiryTime: expiryTime,
+                maxUsers: maxUsr,
+                usedCount: 0,
+                active: true
+            });
 
             localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
+            alert(`Promo Code '${codeVal}' Created Successfully!`);
             loadAdminPromoManager();
         }
 
