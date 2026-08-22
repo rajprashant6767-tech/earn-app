@@ -72,7 +72,6 @@
             transform: rotate(-45deg);
         }
 
-        /* Ensure Inputs are 100% interactive */
         input, select, textarea {
             pointer-events: auto !important;
             user-select: text !important;
@@ -197,7 +196,7 @@
                         <i class="fa-solid fa-users"></i>
                     </div>
                     <h2 class="text-base font-black text-sky-400">Refer & Earn Rewards</h2>
-                    <p class="text-[11px] text-gray-400">Invite players & earn high commission bonuses.</p>
+                    <p class="text-[11px] text-gray-400">Invite your friend and both get +300 Coins instantly!</p>
                 </div>
 
                 <div class="flex justify-between items-center bg-black/30 p-4 rounded-2xl border border-white/5">
@@ -419,6 +418,7 @@
             ]));
         }
 
+        // REFERRAL CODE LOGIC (+300 Coins for user when applying a friend's code)
         function applyReferralCode() {
             const inputField = document.getElementById('friend-ref-input');
             const statusMsg = document.getElementById('ref-status-msg');
@@ -446,12 +446,13 @@
                 return;
             }
 
+            // Reward 300 Coins to the user
             userCoins += 300;
             localStorage.setItem('zylobet_coins', userCoins);
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
 
             let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-            coinHistory.unshift({ title: `Referral (${enteredCode})`, amount: "+300 Coins", type: "earn", time: "Just now" });
+            coinHistory.unshift({ title: `Referral Bonus (${enteredCode})`, amount: "+300 Coins", type: "earn", time: "Just now" });
             localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
 
             localStorage.setItem('zylobet_ref_used', 'true');
@@ -584,7 +585,7 @@
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs'>
                     <div class='bg-cyan-500/10 border border-cyan-500/30 p-3 rounded-2xl text-cyan-300 font-bold text-center tracking-wide flex items-center justify-center gap-2'>
-                        <span class='ff-diamond' style='width:22px;height:22px;font-size:9px;'><i class='fa-solid fa-gem'></i></span> 1 Diamond = ₹1 Rs
+                        <span class='ff-diamond' style='width:24px;height:24px;font-size:10px;'><i class='fa-solid fa-gem'></i></span> 1 Diamond = ₹1 Rs
                     </div>
                     <div>
                         <label class='text-gray-300 font-bold block mb-1.5 uppercase tracking-wider text-[11px]'>Enter Diamond Amount (1 - 1000)</label>
