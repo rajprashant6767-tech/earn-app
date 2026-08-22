@@ -288,7 +288,7 @@
 
     <div id="img-modal" class="hidden fixed inset-0 z-50 bg-black/95 backdrop-blur-xl p-5 flex flex-col items-center justify-center">
         <img id="modal-img" src="" alt="Proof" class="max-h-[75vh] max-w-full rounded-2xl border border-white/10 mb-5 object-contain shadow-2xl">
-        <button onclick="document.getElementById('img-modal').classList.add('hidden')" class="px-8 py-3 bg-white/10 hover:bg-white/20 rounded-2xl font-black text-xs text-white transition border border-white/10">CLOSE PROOF</button>
+        <button onclick="document.getElementById('img-modal'].classList.add('hidden')" class="px-8 py-3 bg-white/10 hover:bg-white/20 rounded-2xl font-black text-xs text-white transition border border-white/10">CLOSE PROOF</button>
     </div>
 
     <script>
@@ -360,7 +360,6 @@
             document.getElementById('nav-' + tab).className = "flex flex-col items-center gap-1 text-cyan-400 transition py-1 px-4 rounded-2xl bg-cyan-500/10";
         }
 
-        // Wallet & Storage Initialization
         let userCoins = parseInt(localStorage.getItem('zylobet_coins')) || 1250;
         let userGems = parseInt(localStorage.getItem('zylobet_gems')) || 12;
         
@@ -417,7 +416,7 @@
             inputField.disabled = true;
         }
 
-        // PROMO CODE REDEEM LOGIC (With Dynamic Admin Validation)
+        // PROMO CODE REDEEM LOGIC (Coins or Diamonds Support)
         function applyPromoCode() {
             const promoInput = document.getElementById('promo-input');
             const statusMsg = document.getElementById('promo-status-msg');
@@ -444,7 +443,6 @@
                 return;
             }
 
-            // Check timer validity
             const now = Date.now();
             if(now > foundPromo.expiryTime) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-red-400";
@@ -452,14 +450,12 @@
                 return;
             }
 
-            // Check user limit
             if(foundPromo.usedCount >= foundPromo.maxUsers) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-red-400";
                 statusMsg.innerText = "❌ Promo Code usage limit reached!";
                 return;
             }
 
-            // Check if this specific user already redeemed this code
             let userRedeemed = JSON.parse(localStorage.getItem('zylobet_user_redeemed_' + userId)) || [];
             if(userRedeemed.includes(promoVal)) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-red-400";
@@ -467,26 +463,33 @@
                 return;
             }
 
-            // Success: Apply bonus (e.g. 100 coins)
-            userCoins += 100;
-            localStorage.setItem('zylobet_coins', userCoins);
-            document.getElementById('user-coins').innerText = userCoins.toLocaleString();
+            // Grant reward based on admin setting (Coins or Diamonds)
+            if(foundPromo.rewardType === 'coins') {
+                userCoins += foundPromo.rewardAmount;
+                localStorage.setItem('zylobet_coins', userCoins);
+                document.getElementById('user-coins').innerText = userCoins.toLocaleString();
 
-            // Update used count
+                let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
+                coinHistory.unshift({ title: `Promo (${promoVal})`, amount: `+${foundPromo.rewardAmount} Coins`, type: "earn", time: "Just now" });
+                localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
+            } else {
+                userGems += foundPromo.rewardAmount;
+                localStorage.setItem('zylobet_gems', userGems);
+                document.getElementById('user-gems').innerText = userGems;
+
+                let gemHistory = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
+                gemHistory.unshift({ title: `Promo (${promoVal})`, amount: `+${foundPromo.rewardAmount} Diamonds`, type: "earn", time: "Just now" });
+                localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHistory));
+            }
+
             foundPromo.usedCount += 1;
             localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
 
-            // Mark redeemed for user
             userRedeemed.push(promoVal);
             localStorage.setItem('zylobet_user_redeemed_' + userId, JSON.stringify(userRedeemed));
 
-            // Add to history
-            let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-            coinHistory.unshift({ title: `Promo (${promoVal})`, amount: "+100 Coins", type: "earn", time: "Just now" });
-            localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
-
             statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
-            statusMsg.innerText = "🎉 Promo Code Applied Successfully! +100 Coins added.";
+            statusMsg.innerText = `🎉 Promo Code Applied Successfully! +${foundPromo.rewardAmount} ${foundPromo.rewardType.toUpperCase()} added.`;
             promoInput.value = '';
         }
 
@@ -650,7 +653,7 @@
         function closeModal() { document.getElementById('modal').classList.add('hidden'); }
         function copyRef() { navigator.clipboard.writeText(document.getElementById('ref-code').innerText); alert("Referral Code Copied!"); }
 
-        // ADMIN PANEL TAB SWITCHER & PROMO MANAGER
+        // ADMIN PANEL TAB SWITCHER
         function switchAdminTab(tab) {
             adminTab = tab;
             const dBtn = document.getElementById('adm-tab-dep');
@@ -714,19 +717,33 @@
             }
         }
 
-        // ADMIN PROMO CODE MANAGER INTERFACE
+        // ADMIN PROMO MANAGER WITH REWARD TYPE & AMOUNT SETTINGS
         function loadAdminPromoManager() {
             const container = document.getElementById('admin-requests-container');
-            
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
             
             let html = `
                 <div class='cyber-card p-4 rounded-3xl space-y-3 border border-pink-500/30'>
                     <h3 class='text-xs font-black text-pink-400 uppercase tracking-wider'>Create New Promo Code</h3>
                     <input type='text' id='adm-code-input' placeholder='Code Name (e.g. ZYLO100)' class='w-full bg-black/50 border border-white/10 p-3 text-xs rounded-xl text-pink-300 font-bold uppercase'>
+                    
                     <div class='grid grid-cols-2 gap-2'>
                         <div>
-                            <label class='text-[10px] text-gray-400 font-bold block mb-1'>Validity Time (Minutes)</label>
+                            <label class='text-[10px] text-gray-400 font-bold block mb-1'>Reward Type</label>
+                            <select id='adm-reward-type' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-xl text-white font-bold'>
+                                <option value='coins'>Coins 🪙</option>
+                                <option value='gems'>Diamonds 💎</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class='text-[10px] text-gray-400 font-bold block mb-1'>Reward Amount</label>
+                            <input type='number' id='adm-reward-amt' value='100' min='1' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-xl text-white font-bold'>
+                        </div>
+                    </div>
+
+                    <div class='grid grid-cols-2 gap-2'>
+                        <div>
+                            <label class='text-[10px] text-gray-400 font-bold block mb-1'>Validity (Minutes)</label>
                             <input type='number' id='adm-time-input' value='30' min='1' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-xl text-white font-bold'>
                         </div>
                         <div>
@@ -748,6 +765,7 @@
                     let statusText = p.active && !isExpired ? "<span class='text-emerald-400 font-bold'>ACTIVE</span>" : "<span class='text-red-400 font-bold'>DEACTIVATED / EXPIRED</span>";
                     let actionBtnText = p.active ? "DEACTIVATE" : "ACTIVATE";
                     let actionBtnClass = p.active ? "bg-red-600 hover:bg-red-500" : "bg-emerald-600 hover:bg-emerald-500";
+                    let symbol = p.rewardType === 'coins' ? '🪙 Coins' : '💎 Diamonds';
 
                     html += `
                         <div class='cyber-card p-3.5 rounded-2xl border border-white/10 space-y-2 text-xs'>
@@ -755,9 +773,9 @@
                                 <span class='text-pink-400 text-sm'>${p.code}</span>
                                 <span>${statusText}</span>
                             </div>
-                            <div class='flex justify-between text-[11px] text-gray-300'>
-                                <span>Limit: ${p.usedCount} / ${p.maxUsers} Users</span>
-                                <span>Bonus: +100 Coins</span>
+                            <div class='flex justify-between text-[11px] text-gray-300 font-semibold'>
+                                <span>Reward: +${p.rewardAmount} ${symbol}</span>
+                                <span>Limit: ${p.usedCount} / ${p.maxUsers}</span>
                             </div>
                             <button onclick='togglePromoStatus(${idx})' class='w-full py-2 ${actionBtnClass} text-white font-black rounded-xl transition'>${actionBtnText}</button>
                         </div>`;
@@ -769,10 +787,14 @@
 
         function createPromoCode() {
             const codeInput = document.getElementById('adm-code-input');
+            const typeInput = document.getElementById('adm-reward-type');
+            const amtInput = document.getElementById('adm-reward-amt');
             const timeInput = document.getElementById('adm-time-input');
             const limitInput = document.getElementById('adm-limit-input');
 
             const codeVal = codeInput.value.trim().toUpperCase();
+            const rewardType = typeInput.value;
+            const rewardAmount = parseInt(amtInput.value) || 100;
             const minutes = parseInt(timeInput.value) || 30;
             const maxUsr = parseInt(limitInput.value) || 50;
 
@@ -783,7 +805,6 @@
 
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
             
-            // Check if code already exists
             if(promos.some(p => p.code === codeVal)) {
                 alert("This promo code already exists!");
                 return;
@@ -793,6 +814,8 @@
 
             promos.push({
                 code: codeVal,
+                rewardType: rewardType,
+                rewardAmount: rewardAmount,
                 expiryTime: expiryTime,
                 maxUsers: maxUsr,
                 usedCount: 0,
@@ -800,7 +823,7 @@
             });
 
             localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
-            alert(`Promo Code '${codeVal}' Created & Activated Successfully!`);
+            alert(`Promo Code '${codeVal}' with +${rewardAmount} ${rewardType.toUpperCase()} Created Successfully!`);
             loadAdminPromoManager();
         }
 
