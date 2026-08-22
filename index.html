@@ -400,13 +400,6 @@
     </div>
 
     <script>
-        // AUTO-RESET STORAGE VERSION CHECK TO CLEAR STALE CACHE
-        const CURRENT_VERSION = "v3.2";
-        if (localStorage.getItem("zylobet_version") !== CURRENT_VERSION) {
-            localStorage.clear();
-            localStorage.setItem("zylobet_version", CURRENT_VERSION);
-        }
-
         window.addEventListener('DOMContentLoaded', () => {
             const bar = document.getElementById('intro-bar');
             setTimeout(() => { bar.style.width = '100%'; }, 200);
@@ -494,6 +487,9 @@
             localStorage.setItem('zylobet_gem_history', JSON.stringify([
                 { title: "Initial Diamonds", amount: `+${userGems} Diamonds`, type: "earn", time: "Active", status: "Success" }
             ]));
+        }
+        if(!localStorage.getItem('zylobet_used_promo_names')) {
+            localStorage.setItem('zylobet_used_promo_names', JSON.stringify([]));
         }
 
         let selectedWCoins = 0;
@@ -965,7 +961,7 @@
             loadAdminRequests();
         }
 
-        // ADMIN PROMO MANAGER
+        // ADMIN PROMO MANAGER (PERMANENT UNIQUE CODE RESTRICTION)
         function loadAdminPromoManager() {
             const container = document.getElementById('admin-requests-container');
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
@@ -1006,15 +1002,13 @@
                             <input type='number' id='adm-limit-input' value='50' min='1' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-xl text-white font-bold'>
                         </div>
                     </div>
-                    <button onclick='createPromoCode()' class='w-full py-3 bg-gradient-to-r from-rose-600 to-purple-600 rounded-xl font-black text-xs text-white shadow-lg transition'>CREATE & ACTIVATE CODE</button>
+                    <button onclick='createPromoCode()' class='w-full py-3 bg-gradient-to-r from-rose-600 to-purple-600 rounded-xl font-black text-xs text-white shadow-xl transition'>CREATE & ACTIVATE CODE</button>
                 </div>
 
                 <div class='space-y-3 pt-2'>
                     <h3 class='text-xs font-black text-gray-300 uppercase tracking-wider'>Active Promo Codes</h3>`;
 
-            let activePromos = promos.filter(p => p.active && Date.now() <= p.expiryTime);
-
-            if(activePromos.length === 0) {
+            if(promos.length === 0) {
                 html += `<div class='cyber-card p-5 text-center text-gray-500 text-xs rounded-2xl'>No active promo codes available.</div>`;
             } else {
                 promos.forEach((p, idx) => {
@@ -1058,12 +1052,13 @@
                 return;
             }
 
-            let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
-            if(promos.some(p => p.code === codeVal)) {
-                alert("❌ This promo code already exists!");
+            let usedCodes = JSON.parse(localStorage.getItem('zylobet_used_promo_names')) || [];
+            if(usedCodes.includes(codeVal)) {
+                alert("❌ This promo code name has already been used before and cannot be created again!");
                 return;
             }
 
+            let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
             let durationMs = timeValue * 60 * 1000;
             if(timeUnit === 'sec') {
                 durationMs = timeValue * 1000;
@@ -1082,6 +1077,8 @@
                 active: true
             });
 
+            usedCodes.push(codeVal);
+            localStorage.setItem('zylobet_used_promo_names', JSON.stringify(usedCodes));
             localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
             alert(`Promo Code '${codeVal}' Created Successfully!`);
             loadAdminPromoManager();
