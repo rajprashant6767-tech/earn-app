@@ -38,7 +38,6 @@
             background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.6), transparent);
         }
 
-        /* High-Quality Free Fire Style Gold Coin */
         .ff-gold-coin {
             display: inline-flex;
             align-items: center;
@@ -53,7 +52,6 @@
             font-size: 14px;
         }
 
-        /* High-Quality Free Fire Style Diamond */
         .ff-diamond {
             display: inline-flex;
             align-items: center;
@@ -254,7 +252,7 @@
 
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-[11px] text-gray-300 font-bold uppercase tracking-wider">Select Payout Method</span>
-                    <button onclick="openHistory('withdrawals')" class="text-[10px] bg-emerald-500/20 text-emerald-300 px-3.5 py-1.5 rounded-xl font-extrabold border border-emerald-500/40 transition active:scale-95">📜 History & Status</button>
+                    <button onclick="openHistory('withdrawals')" class="text-[10px] bg-emerald-500/20 text-emerald-300 px-4 py-2 rounded-xl font-extrabold border border-emerald-500/40 transition active:scale-95">📜 Withdrawal History</button>
                 </div>
 
                 <!-- Payout Section Tabs -->
@@ -387,12 +385,12 @@
         </button>
     </nav>
 
-    <!-- Modals -->
-    <div id="modal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md p-5 flex flex-col justify-center">
-        <div class="cyber-card p-6 rounded-3xl border border-white/10 shadow-2xl">
-            <h2 id="modal-title" class="font-black text-center mb-5 text-sm tracking-widest text-sky-400 uppercase">Request</h2>
-            <div id="modal-content" class="space-y-4"></div>
-            <button onclick="closeModal()" class="w-full mt-5 bg-white/5 hover:bg-white/10 text-gray-400 text-xs font-bold py-3 rounded-2xl transition border border-white/5">CANCEL</button>
+    <!-- Modals (Bigger, cleaner box for History) -->
+    <div id="modal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md p-4 flex flex-col justify-center">
+        <div class="cyber-card p-6 rounded-3xl border border-white/10 shadow-2xl max-w-md w-full mx-auto">
+            <h2 id="modal-title" class="font-black text-center mb-4 text-xs tracking-widest text-sky-400 uppercase">Request</h2>
+            <div id="modal-content" class="space-y-4 max-h-[70vh] overflow-y-auto pr-1"></div>
+            <button onclick="closeModal()" class="w-full mt-5 bg-white/5 hover:bg-white/10 text-gray-400 text-xs font-bold py-3 rounded-2xl transition border border-white/5">CLOSE</button>
         </div>
     </div>
 
@@ -478,9 +476,11 @@
 
         if(!localStorage.getItem('zylobet_coin_history')) {
             localStorage.setItem('zylobet_coin_history', JSON.stringify([
-                { title: "Welcome Bonus", amount: "+1,000 Coins", type: "earn", time: "Today", status: "Success" },
-                { title: "Active Balance", amount: "+250 Coins", type: "earn", time: "Today", status: "Success" }
+                { title: "Welcome Bonus", amount: "+1,000 Coins", type: "earn", time: "Today", status: "Success" }
             ]));
+        }
+        if(!localStorage.getItem('zylobet_withdraw_history')) {
+            localStorage.setItem('zylobet_withdraw_history', JSON.stringify([]));
         }
         if(!localStorage.getItem('zylobet_gem_history')) {
             localStorage.setItem('zylobet_gem_history', JSON.stringify([
@@ -520,16 +520,9 @@
                 return;
             }
 
-            if(!enteredCode) {
+            if(!enteredCode || enteredCode === myReferralCode) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ Please enter a valid referral code.";
-                setTimeout(() => { statusMsg.innerText = ""; }, 3000);
-                return;
-            }
-
-            if(enteredCode === myReferralCode) {
-                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ You cannot use your own referral code!";
+                statusMsg.innerText = "❌ Invalid Referral Code!";
                 setTimeout(() => { statusMsg.innerText = ""; }, 3000);
                 return;
             }
@@ -564,31 +557,9 @@
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
             let foundPromo = promos.find(p => p.code === promoVal);
 
-            if(!foundPromo) {
+            if(!foundPromo || !foundPromo.active || Date.now() > foundPromo.expiryTime || foundPromo.usedCount >= foundPromo.maxUsers) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ Invalid Promo Code!";
-                setTimeout(() => { statusMsg.innerText = ""; }, 3000);
-                return;
-            }
-
-            if(!foundPromo.active) {
-                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ This Promo Code is currently Deactivated!";
-                setTimeout(() => { statusMsg.innerText = ""; }, 3000);
-                return;
-            }
-
-            const now = Date.now();
-            if(now > foundPromo.expiryTime) {
-                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ This Promo Code has Expired!";
-                setTimeout(() => { statusMsg.innerText = ""; }, 3000);
-                return;
-            }
-
-            if(foundPromo.usedCount >= foundPromo.maxUsers) {
-                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ Promo Code usage limit reached!";
+                statusMsg.innerText = "❌ Invalid or Expired Promo Code!";
                 setTimeout(() => { statusMsg.innerText = ""; }, 3000);
                 return;
             }
@@ -605,7 +576,6 @@
                 userCoins += foundPromo.rewardAmount;
                 localStorage.setItem('zylobet_coins', userCoins);
                 document.getElementById('user-coins').innerText = userCoins.toLocaleString();
-
                 let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
                 coinHistory.unshift({ title: `Promo (${promoVal})`, amount: `+${foundPromo.rewardAmount} Coins`, type: "earn", time: "Just now", status: "Success" });
                 localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
@@ -613,7 +583,6 @@
                 userGems += foundPromo.rewardAmount;
                 localStorage.setItem('zylobet_gems', userGems);
                 document.getElementById('user-gems').innerText = userGems;
-
                 let gemHistory = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
                 gemHistory.unshift({ title: `Promo (${promoVal})`, amount: `+${foundPromo.rewardAmount} Diamonds`, type: "earn", time: "Just now", status: "Success" });
                 localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHistory));
@@ -621,12 +590,11 @@
 
             foundPromo.usedCount += 1;
             localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
-
             userRedeemed.push(promoVal);
             localStorage.setItem('zylobet_user_redeemed_' + userId, JSON.stringify(userRedeemed));
 
             statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
-            statusMsg.innerText = `🎉 Promo Code Applied Successfully! +${foundPromo.rewardAmount} ${foundPromo.rewardType.toUpperCase()} added.`;
+            statusMsg.innerText = `🎉 +${foundPromo.rewardAmount} Added Successfully!`;
             setTimeout(() => { statusMsg.innerText = ""; }, 3000);
             promoInput.value = '';
         }
@@ -636,24 +604,44 @@
             const title = document.getElementById('modal-title');
             const content = document.getElementById('modal-content');
 
-            if(type === 'coins' || type === 'withdrawals') {
-                title.innerText = "COINS & WITHDRAWAL HISTORY";
+            if(type === 'coins') {
+                title.innerText = "COINS TRANSACTION HISTORY";
                 let history = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-                let html = "<div class='space-y-2.5 max-h-60 overflow-y-auto text-xs pr-1'>";
+                let html = "<div class='space-y-3'>";
                 history.forEach(item => {
                     let colorClass = item.type === 'spend' ? 'text-rose-400' : 'text-amber-400';
-                    let statusColor = item.status === 'Pending' ? 'text-amber-400' : (item.status === 'Rejected' ? 'text-rose-400' : 'text-emerald-400');
-                    let redeemInfo = item.redeemCode ? `<p class='text-[10px] text-sky-300 font-bold mt-0.5 bg-sky-500/10 p-1.5 rounded-lg'>🔑 Redeem Code: <span class="font-mono text-white">${item.redeemCode}</span></p>` : '';
-                    
                     html += `
-                        <div class='cyber-card p-3.5 rounded-2xl border border-white/5 space-y-1.5'>
-                            <div class='flex justify-between items-center'>
+                        <div class='cyber-card p-4 rounded-2xl border border-white/5 flex justify-between items-center'>
+                            <div>
                                 <p class='font-black ${colorClass} text-sm flex items-center gap-1.5'>${item.amount} <span class='ff-gold-coin' style='width:20px;height:20px;font-size:9px;'><i class='fa-solid fa-coins'></i></span></p>
-                                <span class='text-[10px] font-extrabold ${statusColor} px-2 py-0.5 rounded-full bg-white/5 border border-white/10'>${item.status || 'Success'}</span>
+                                <p class='text-[10px] text-gray-300 font-bold mt-1'>Source: ${item.title}</p>
                             </div>
-                            <p class='text-[10px] text-gray-300 font-bold'>Source: ${item.title}</p>
-                            ${redeemInfo}
-                            <p class='text-[9px] text-gray-500 font-semibold text-right'>${item.time}</p>
+                            <span class='text-[10px] text-gray-400 font-bold'>${item.time}</span>
+                        </div>`;
+                });
+                html += "</div>";
+                content.innerHTML = html;
+            } else if(type === 'withdrawals') {
+                title.innerText = "WITHDRAWAL HISTORY & STATUS";
+                let withdraws = JSON.parse(localStorage.getItem('zylobet_withdraw_history')) || [];
+                if(withdraws.length === 0) {
+                    content.innerHTML = `<div class='text-center py-8 text-gray-500 text-xs'>No withdrawal history found.</div>`;
+                    return;
+                }
+                let html = "<div class='space-y-3'>";
+                withdraws.forEach(item => {
+                    let statusColor = item.status === 'Pending' ? 'text-amber-400 bg-amber-500/10 border-amber-500/30' : (item.status === 'Rejected' ? 'text-rose-400 bg-rose-500/10 border-rose-500/30' : 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30');
+                    let redeemCodeBox = item.redeemCode ? `<div class='mt-2.5 p-2.5 rounded-xl bg-sky-500/10 border border-sky-500/30 text-xs font-mono text-sky-300'>🔑 Redeem Code: <b class="text-white select-all">${item.redeemCode}</b></div>` : '';
+
+                    html += `
+                        <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2'>
+                            <div class='flex justify-between items-center'>
+                                <span class='text-xs font-black text-amber-400'>${item.amount} Coins (₹${item.rupees})</span>
+                                <span class='text-[10px] font-extrabold px-2.5 py-1 rounded-full border ${statusColor}'>${item.status}</span>
+                            </div>
+                            <p class='text-[11px] text-gray-300 font-bold'>Method: <span class="text-white">${item.method}</span> ${item.details || ''}</p>
+                            ${redeemCodeBox}
+                            <p class='text-[9px] text-gray-500 text-right'>${item.time}</p>
                         </div>`;
                 });
                 html += "</div>";
@@ -661,11 +649,14 @@
             } else if(type === 'gems') {
                 title.innerText = "DIAMONDS TRANSACTION HISTORY";
                 let history = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
-                let html = "<div class='space-y-2.5 max-h-60 overflow-y-auto text-xs pr-1'>";
+                let html = "<div class='space-y-3'>";
                 history.forEach(item => {
                     html += `
-                        <div class='cyber-card p-3 rounded-2xl border border-white/5 flex justify-between items-center'>
-                            <div><p class='font-black text-cyan-400 text-sm flex items-center gap-1.5'>${item.amount} <span class='ff-diamond' style='width:20px;height:20px;font-size:8px;'><i class='fa-solid fa-gem'></i></span></p><p class='text-[10px] text-gray-300 font-bold mt-0.5'>Source: ${item.title}</p></div>
+                        <div class='cyber-card p-4 rounded-2xl border border-white/5 flex justify-between items-center'>
+                            <div>
+                                <p class='font-black text-cyan-400 text-sm flex items-center gap-1.5'>${item.amount} <span class='ff-diamond' style='width:20px;height:20px;font-size:8px;'><i class='fa-solid fa-gem'></i></span></p>
+                                <p class='text-[10px] text-gray-300 font-bold mt-1'>Source: ${item.title}</p>
+                            </div>
                             <span class='text-[10px] text-emerald-400 font-bold'>Success</span>
                         </div>`;
                 });
@@ -699,9 +690,8 @@
             localStorage.setItem('zylobet_coins', userCoins);
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
 
-            let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
             let reqId = Date.now();
-            reqs.push({
+            let newReq = {
                 id: reqId,
                 username: "@" + username,
                 method: method,
@@ -710,19 +700,17 @@
                 details: extraDetails,
                 status: "Pending",
                 time: "Just now"
-            });
+            };
+
+            // Save to admin requests
+            let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
+            reqs.push(newReq);
             localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
 
-            let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-            coinHistory.unshift({
-                id: reqId,
-                title: `${method} Payout (₹${selectedWAmount}) ${extraDetails}`,
-                amount: `-${selectedWCoins} Coins`,
-                type: "spend",
-                status: "Pending",
-                time: "Just now"
-            });
-            localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
+            // Save to dedicated withdrawal history
+            let withdrawHistory = JSON.parse(localStorage.getItem('zylobet_withdraw_history')) || [];
+            withdrawHistory.unshift(newReq);
+            localStorage.setItem('zylobet_withdraw_history', JSON.stringify(withdrawHistory));
 
             alert(`🎉 ${method} Withdrawal Request Sent Successfully! Status: Pending.`);
             selectedWCoins = 0;
@@ -938,13 +926,14 @@
 
             localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
 
-            let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-            let historyItem = coinHistory.find(h => h.id === id);
+            // Update dedicated withdrawal history
+            let withdrawHistory = JSON.parse(localStorage.getItem('zylobet_withdraw_history')) || [];
+            let historyItem = withdrawHistory.find(h => h.id === id);
             if(historyItem) {
                 historyItem.status = req.status;
                 if(redeemCode) historyItem.redeemCode = redeemCode;
             }
-            localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
+            localStorage.setItem('zylobet_withdraw_history', JSON.stringify(withdrawHistory));
 
             loadAdminRequests();
         }
