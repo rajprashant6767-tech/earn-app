@@ -288,7 +288,7 @@
 
     <div id="img-modal" class="hidden fixed inset-0 z-50 bg-black/95 backdrop-blur-xl p-5 flex flex-col items-center justify-center">
         <img id="modal-img" src="" alt="Proof" class="max-h-[75vh] max-w-full rounded-2xl border border-white/10 mb-5 object-contain shadow-2xl">
-        <button onclick="document.getElementById('img-modal'].classList.add('hidden')" class="px-8 py-3 bg-white/10 hover:bg-white/20 rounded-2xl font-black text-xs text-white transition border border-white/10">CLOSE PROOF</button>
+        <button onclick="document.getElementById('img-modal').classList.add('hidden')" class="px-8 py-3 bg-white/10 hover:bg-white/20 rounded-2xl font-black text-xs text-white transition border border-white/10">CLOSE PROOF</button>
     </div>
 
     <script>
@@ -416,7 +416,7 @@
             inputField.disabled = true;
         }
 
-        // PROMO CODE REDEEM LOGIC (Coins or Diamonds Support)
+        // PROMO CODE REDEEM LOGIC
         function applyPromoCode() {
             const promoInput = document.getElementById('promo-input');
             const statusMsg = document.getElementById('promo-status-msg');
@@ -463,7 +463,6 @@
                 return;
             }
 
-            // Grant reward based on admin setting (Coins or Diamonds)
             if(foundPromo.rewardType === 'coins') {
                 userCoins += foundPromo.rewardAmount;
                 localStorage.setItem('zylobet_coins', userCoins);
@@ -717,7 +716,7 @@
             }
         }
 
-        // ADMIN PROMO MANAGER WITH REWARD TYPE & AMOUNT SETTINGS
+        // ADMIN PROMO MANAGER WITH SEC / MIN / HOUR SUPPORT
         function loadAdminPromoManager() {
             const container = document.getElementById('admin-requests-container');
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
@@ -743,8 +742,15 @@
 
                     <div class='grid grid-cols-2 gap-2'>
                         <div>
-                            <label class='text-[10px] text-gray-400 font-bold block mb-1'>Validity (Minutes)</label>
-                            <input type='number' id='adm-time-input' value='30' min='1' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-xl text-white font-bold'>
+                            <label class='text-[10px] text-gray-400 font-bold block mb-1'>Time Value & Unit</label>
+                            <div class='flex gap-1'>
+                                <input type='number' id='adm-time-value' value='30' min='1' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-xl text-white font-bold'>
+                                <select id='adm-time-unit' class='bg-black/50 border border-white/10 p-2 text-xs rounded-xl text-amber-400 font-bold'>
+                                    <option value='sec'>Sec</option>
+                                    <option value='min' selected>Min</option>
+                                    <option value='hour'>Hour</option>
+                                </select>
+                            </div>
                         </div>
                         <div>
                             <label class='text-[10px] text-gray-400 font-bold block mb-1'>Max Users Limit</label>
@@ -789,13 +795,15 @@
             const codeInput = document.getElementById('adm-code-input');
             const typeInput = document.getElementById('adm-reward-type');
             const amtInput = document.getElementById('adm-reward-amt');
-            const timeInput = document.getElementById('adm-time-input');
+            const timeValInput = document.getElementById('adm-time-value');
+            const timeUnitInput = document.getElementById('adm-time-unit');
             const limitInput = document.getElementById('adm-limit-input');
 
             const codeVal = codeInput.value.trim().toUpperCase();
             const rewardType = typeInput.value;
             const rewardAmount = parseInt(amtInput.value) || 100;
-            const minutes = parseInt(timeInput.value) || 30;
+            const timeValue = parseInt(timeValInput.value) || 30;
+            const timeUnit = timeUnitInput.value;
             const maxUsr = parseInt(limitInput.value) || 50;
 
             if(!codeVal) {
@@ -810,7 +818,14 @@
                 return;
             }
 
-            const expiryTime = Date.now() + (minutes * 60 * 1000);
+            let durationMs = timeValue * 60 * 1000; // default min
+            if(timeUnit === 'sec') {
+                durationMs = timeValue * 1000;
+            } else if(timeUnit === 'hour') {
+                durationMs = timeValue * 60 * 60 * 1000;
+            }
+
+            const expiryTime = Date.now() + durationMs;
 
             promos.push({
                 code: codeVal,
@@ -823,7 +838,7 @@
             });
 
             localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
-            alert(`Promo Code '${codeVal}' with +${rewardAmount} ${rewardType.toUpperCase()} Created Successfully!`);
+            alert(`Promo Code '${codeVal}' Created Successfully!`);
             loadAdminPromoManager();
         }
 
