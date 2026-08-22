@@ -192,6 +192,7 @@
                 <div class="space-y-3.5 pt-1">
                     <input type="text" id="promo-input" class='w-full bg-black/50 border border-white/10 p-4 text-xs rounded-2xl text-pink-300 font-black uppercase focus:outline-none focus:border-pink-500 transition tracking-wider' placeholder='ENTER PROMO CODE'>
                     <button onclick="applyPromoCode()" class='w-full py-4 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 rounded-2xl font-black text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>APPLY CODE</button>
+                    <p id="promo-status-msg" class="text-[11px] h-4 font-semibold text-center"></p>
                 </div>
 
                 <div class='text-center pt-3 border-t border-white/10 mt-2'>
@@ -238,16 +239,18 @@
             <div class="cyber-card p-4 rounded-3xl border border-cyan-500/30 flex justify-between items-center">
                 <div>
                     <h1 class="text-base font-black text-cyan-400 italic">ZyloBet Admin Panel</h1>
-                    <p class="text-[10px] text-gray-400">Live Requests & Secure Proofs</p>
+                    <p class="text-[10px] text-gray-400">Live Requests & Promo Manager</p>
                 </div>
                 <button onclick="loadAdminRequests()" class="bg-white/10 hover:bg-white/20 text-xs px-3.5 py-2 rounded-xl font-bold text-amber-400 transition active:scale-95">
                     <i class="fa-solid fa-rotate mr-1"></i> Refresh
                 </button>
             </div>
 
-            <div class="grid grid-cols-2 gap-2.5">
-                <button onclick="switchAdminTab('deposit')" id="adm-tab-dep" class="py-3 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-2xl font-black text-xs shadow-lg transition">Deposit Requests</button>
-                <button onclick="switchAdminTab('withdraw')" id="adm-tab-wit" class="py-3 bg-black/50 border border-white/10 text-gray-400 rounded-2xl font-black text-xs shadow transition">Withdrawal Requests</button>
+            <!-- Admin Tabs -->
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="switchAdminTab('deposit')" id="adm-tab-dep" class="py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-xl font-black text-[11px] shadow transition">Deposit</button>
+                <button onclick="switchAdminTab('withdraw')" id="adm-tab-wit" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[11px] shadow transition">Withdraw</button>
+                <button onclick="switchAdminTab('promo')" id="adm-tab-promo" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[11px] shadow transition">Promos</button>
             </div>
 
             <div id="admin-requests-container" class="space-y-3"></div>
@@ -357,6 +360,7 @@
             document.getElementById('nav-' + tab).className = "flex flex-col items-center gap-1 text-cyan-400 transition py-1 px-4 rounded-2xl bg-cyan-500/10";
         }
 
+        // Wallet & Storage Initialization
         let userCoins = parseInt(localStorage.getItem('zylobet_coins')) || 1250;
         let userGems = parseInt(localStorage.getItem('zylobet_gems')) || 12;
         
@@ -413,24 +417,76 @@
             inputField.disabled = true;
         }
 
+        // PROMO CODE REDEEM LOGIC (With Dynamic Admin Validation)
         function applyPromoCode() {
             const promoInput = document.getElementById('promo-input');
+            const statusMsg = document.getElementById('promo-status-msg');
             const promoVal = promoInput.value.trim().toUpperCase();
             
             if(!promoVal) {
-                alert("Please enter a promo code.");
+                statusMsg.className = "text-[11px] h-4 font-semibold text-red-400";
+                statusMsg.innerText = "❌ Please enter a promo code.";
                 return;
             }
 
+            let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
+            let foundPromo = promos.find(p => p.code === promoVal);
+
+            if(!foundPromo) {
+                statusMsg.className = "text-[11px] h-4 font-semibold text-red-400";
+                statusMsg.innerText = "❌ Invalid Promo Code!";
+                return;
+            }
+
+            if(!foundPromo.active) {
+                statusMsg.className = "text-[11px] h-4 font-semibold text-red-400";
+                statusMsg.innerText = "❌ This Promo Code is currently Deactivated!";
+                return;
+            }
+
+            // Check timer validity
+            const now = Date.now();
+            if(now > foundPromo.expiryTime) {
+                statusMsg.className = "text-[11px] h-4 font-semibold text-red-400";
+                statusMsg.innerText = "❌ This Promo Code has Expired!";
+                return;
+            }
+
+            // Check user limit
+            if(foundPromo.usedCount >= foundPromo.maxUsers) {
+                statusMsg.className = "text-[11px] h-4 font-semibold text-red-400";
+                statusMsg.innerText = "❌ Promo Code usage limit reached!";
+                return;
+            }
+
+            // Check if this specific user already redeemed this code
+            let userRedeemed = JSON.parse(localStorage.getItem('zylobet_user_redeemed_' + userId)) || [];
+            if(userRedeemed.includes(promoVal)) {
+                statusMsg.className = "text-[11px] h-4 font-semibold text-red-400";
+                statusMsg.innerText = "❌ You have already redeemed this promo code!";
+                return;
+            }
+
+            // Success: Apply bonus (e.g. 100 coins)
             userCoins += 100;
             localStorage.setItem('zylobet_coins', userCoins);
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
 
+            // Update used count
+            foundPromo.usedCount += 1;
+            localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
+
+            // Mark redeemed for user
+            userRedeemed.push(promoVal);
+            localStorage.setItem('zylobet_user_redeemed_' + userId, JSON.stringify(userRedeemed));
+
+            // Add to history
             let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-            coinHistory.unshift({ title: `Promo Code (${promoVal})`, amount: "+100 Coins", type: "earn", time: "Just now" });
+            coinHistory.unshift({ title: `Promo (${promoVal})`, amount: "+100 Coins", type: "earn", time: "Just now" });
             localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
 
-            alert(`Promo Code '${promoVal}' Applied Successfully! +100 Coins added.`);
+            statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
+            statusMsg.innerText = "🎉 Promo Code Applied Successfully! +100 Coins added.";
             promoInput.value = '';
         }
 
@@ -515,7 +571,6 @@
                     
                     <button onclick="submitDepositProof('${username}', ${amt})" class='w-full py-4 shiny-green-btn rounded-2xl font-black text-xs text-white shadow-xl transition active:scale-95 tracking-wide'>SEND PROOF</button>
                     
-                    <!-- Updated Note Section -->
                     <div class='bg-blue-500/10 border border-blue-500/30 p-3.5 rounded-2xl text-left space-y-2.5 mt-2'>
                         <p class='text-blue-300 text-[11px] font-semibold leading-relaxed'>
                             <i class='fa-solid fa-circle-info mr-1'></i> <b>Note:</b> Deposit ka amount 24 hours ke andar add kar diya jayega. Agar payment ho gaya ho aur amount add na hua ho to hame contact karen:
@@ -527,7 +582,6 @@
                         </div>
                     </div>
 
-                    <!-- Updated Warning Section -->
                     <div class='bg-red-500/10 border border-red-500/30 p-3.5 rounded-2xl text-left'>
                         <p class='text-red-400 text-[11px] font-semibold leading-relaxed'>
                             <i class='fa-solid fa-triangle-exclamation mr-1'></i> <b>Warning:</b> Agar koi user galat payment karega matlab deposit amount se kam karega, toh request reject kar di jayegi, payment manually check hoga!
@@ -596,18 +650,27 @@
         function closeModal() { document.getElementById('modal').classList.add('hidden'); }
         function copyRef() { navigator.clipboard.writeText(document.getElementById('ref-code').innerText); alert("Referral Code Copied!"); }
 
+        // ADMIN PANEL TAB SWITCHER & PROMO MANAGER
         function switchAdminTab(tab) {
             adminTab = tab;
             const dBtn = document.getElementById('adm-tab-dep');
             const wBtn = document.getElementById('adm-tab-wit');
+            const pBtn = document.getElementById('adm-tab-promo');
+            
+            dBtn.className = "py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[11px] shadow transition";
+            wBtn.className = "py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[11px] shadow transition";
+            pBtn.className = "py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[11px] shadow transition";
+
             if(tab === 'deposit') {
-                dBtn.className = "py-3 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-2xl font-black text-xs shadow-lg transition";
-                wBtn.className = "py-3 bg-black/50 border border-white/10 text-gray-400 rounded-2xl font-black text-xs shadow transition";
-            } else {
-                wBtn.className = "py-3 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-2xl font-black text-xs shadow-lg transition";
-                dBtn.className = "py-3 bg-black/50 border border-white/10 text-gray-400 rounded-2xl font-black text-xs shadow transition";
+                dBtn.className = "py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-xl font-black text-[11px] shadow transition";
+                loadAdminRequests();
+            } else if(tab === 'withdraw') {
+                wBtn.className = "py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-xl font-black text-[11px] shadow transition";
+                loadAdminRequests();
+            } else if(tab === 'promo') {
+                pBtn.className = "py-2.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl font-black text-[11px] shadow transition";
+                loadAdminPromoManager();
             }
-            loadAdminRequests();
         }
 
         function loadAdminRequests() {
@@ -631,7 +694,7 @@
                             </div>
                         </div>`;
                 });
-            } else {
+            } else if(adminTab === 'withdraw') {
                 let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
                 if(reqs.length === 0) {
                     container.innerHTML = `<div class='cyber-card p-6 text-center text-gray-500 text-xs rounded-2xl border border-white/5'>No pending withdrawal requests.</div>`;
@@ -648,6 +711,105 @@
                             </div>
                         </div>`;
                 });
+            }
+        }
+
+        // ADMIN PROMO CODE MANAGER INTERFACE
+        function loadAdminPromoManager() {
+            const container = document.getElementById('admin-requests-container');
+            
+            let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
+            
+            let html = `
+                <div class='cyber-card p-4 rounded-3xl space-y-3 border border-pink-500/30'>
+                    <h3 class='text-xs font-black text-pink-400 uppercase tracking-wider'>Create New Promo Code</h3>
+                    <input type='text' id='adm-code-input' placeholder='Code Name (e.g. ZYLO100)' class='w-full bg-black/50 border border-white/10 p-3 text-xs rounded-xl text-pink-300 font-bold uppercase'>
+                    <div class='grid grid-cols-2 gap-2'>
+                        <div>
+                            <label class='text-[10px] text-gray-400 font-bold block mb-1'>Validity Time (Minutes)</label>
+                            <input type='number' id='adm-time-input' value='30' min='1' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-xl text-white font-bold'>
+                        </div>
+                        <div>
+                            <label class='text-[10px] text-gray-400 font-bold block mb-1'>Max Users Limit</label>
+                            <input type='number' id='adm-limit-input' value='50' min='1' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-xl text-white font-bold'>
+                        </div>
+                    </div>
+                    <button onclick='createPromoCode()' class='w-full py-3 bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl font-black text-xs text-white shadow-lg transition'>CREATE & ACTIVATE CODE</button>
+                </div>
+
+                <div class='space-y-3 pt-2'>
+                    <h3 class='text-xs font-black text-gray-300 uppercase tracking-wider'>Active / Created Promo Codes</h3>`;
+
+            if(promos.length === 0) {
+                html += `<div class='cyber-card p-5 text-center text-gray-500 text-xs rounded-2xl'>No promo codes created yet.</div>`;
+            } else {
+                promos.forEach((p, idx) => {
+                    let isExpired = Date.now() > p.expiryTime;
+                    let statusText = p.active && !isExpired ? "<span class='text-emerald-400 font-bold'>ACTIVE</span>" : "<span class='text-red-400 font-bold'>DEACTIVATED / EXPIRED</span>";
+                    let actionBtnText = p.active ? "DEACTIVATE" : "ACTIVATE";
+                    let actionBtnClass = p.active ? "bg-red-600 hover:bg-red-500" : "bg-emerald-600 hover:bg-emerald-500";
+
+                    html += `
+                        <div class='cyber-card p-3.5 rounded-2xl border border-white/10 space-y-2 text-xs'>
+                            <div class='flex justify-between font-black'>
+                                <span class='text-pink-400 text-sm'>${p.code}</span>
+                                <span>${statusText}</span>
+                            </div>
+                            <div class='flex justify-between text-[11px] text-gray-300'>
+                                <span>Limit: ${p.usedCount} / ${p.maxUsers} Users</span>
+                                <span>Bonus: +100 Coins</span>
+                            </div>
+                            <button onclick='togglePromoStatus(${idx})' class='w-full py-2 ${actionBtnClass} text-white font-black rounded-xl transition'>${actionBtnText}</button>
+                        </div>`;
+                });
+            }
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function createPromoCode() {
+            const codeInput = document.getElementById('adm-code-input');
+            const timeInput = document.getElementById('adm-time-input');
+            const limitInput = document.getElementById('adm-limit-input');
+
+            const codeVal = codeInput.value.trim().toUpperCase();
+            const minutes = parseInt(timeInput.value) || 30;
+            const maxUsr = parseInt(limitInput.value) || 50;
+
+            if(!codeVal) {
+                alert("Please enter a promo code name!");
+                return;
+            }
+
+            let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
+            
+            // Check if code already exists
+            if(promos.some(p => p.code === codeVal)) {
+                alert("This promo code already exists!");
+                return;
+            }
+
+            const expiryTime = Date.now() + (minutes * 60 * 1000);
+
+            promos.push({
+                code: codeVal,
+                expiryTime: expiryTime,
+                maxUsers: maxUsr,
+                usedCount: 0,
+                active: true
+            });
+
+            localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
+            alert(`Promo Code '${codeVal}' Created & Activated Successfully!`);
+            loadAdminPromoManager();
+        }
+
+        function togglePromoStatus(index) {
+            let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
+            if(promos[index]) {
+                promos[index].active = !promos[index].active;
+                localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
+                loadAdminPromoManager();
             }
         }
 
