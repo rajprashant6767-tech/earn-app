@@ -455,12 +455,16 @@
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs text-center max-h-[70vh] overflow-y-auto px-1'>
                     <p class='text-gray-300 font-medium'>Send payment to UPI ID:</p>
-                    <div class='bg-black/60 border border-white/10 p-3 rounded-2xl font-mono text-cyan-400 font-black select-all text-xs tracking-wider'>raj-prashant@fam</div>
+                    <div class='bg-black/60 border border-white/10 p-3.5 rounded-2xl font-mono text-cyan-400 font-black select-all text-xs tracking-wider'>raj-prashant@fam</div>
                     
-                    <!-- QR Code Displayed Here -->
+                    <!-- QR Code Stable Fallback Box -->
                     <div class='flex justify-center my-2'>
-                        <div class='bg-white p-2 rounded-2xl shadow-lg border border-white/10 inline-block'>
-                            <img src='https://i.ibb.co/6z5XQ1v/qr-code.png' alt='Payment QR' class='w-36 h-36 object-contain rounded-xl'>
+                        <div class='bg-white p-3 rounded-2xl shadow-xl border border-white/20 inline-block'>
+                            <div class='w-36 h-36 bg-gray-100 rounded-xl flex flex-col items-center justify-center text-gray-800 border border-dashed border-gray-400'>
+                                <i class='fa-solid fa-qrcode text-4xl mb-1 text-gray-700'></i>
+                                <span class='text-[10px] font-bold text-gray-600'>Scan to Pay</span>
+                                <span class='text-[9px] text-cyan-600 font-bold'>₹${amt}</span>
+                            </div>
                         </div>
                     </div>
 
