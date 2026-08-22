@@ -418,7 +418,6 @@
             ]));
         }
 
-        // REFERRAL CODE LOGIC (+300 Coins for user when applying a friend's code)
         function applyReferralCode() {
             const inputField = document.getElementById('friend-ref-input');
             const statusMsg = document.getElementById('ref-status-msg');
@@ -446,7 +445,6 @@
                 return;
             }
 
-            // Reward 300 Coins to the user
             userCoins += 300;
             localStorage.setItem('zylobet_coins', userCoins);
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
@@ -609,12 +607,23 @@
             document.getElementById('modal-title').innerText = `PAYMENT FOR ${amt} DIAMONDS (₹${amt})`;
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs text-center max-h-[70vh] overflow-y-auto px-1'>
-                    <p class='text-gray-300 font-medium'>Send payment to UPI ID:</p>
-                    <div class='bg-black/60 border border-white/10 p-3.5 rounded-2xl font-mono text-sky-400 font-black select-all text-xs tracking-wider'>raj-prashant@fam</div>
+                    <div class='bg-black/60 border border-white/10 p-3.5 rounded-2xl space-y-1 text-left'>
+                        <p class='text-gray-400 text-[10px] uppercase font-bold tracking-wider'>Account Name</p>
+                        <p class='text-white font-black text-sm'>Prashant Raj</p>
+                        <div class='pt-2 flex justify-between items-center border-t border-white/10 mt-2'>
+                            <div>
+                                <p class='text-gray-400 text-[10px] uppercase font-bold tracking-wider'>UPI ID</p>
+                                <p id='upi-id-text' class='font-mono text-sky-400 font-black text-xs mt-0.5 tracking-wider'>raj-prashant@fam</p>
+                            </div>
+                            <button onclick='copyUpiId()' class='bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 px-3 py-1.5 rounded-xl font-extrabold text-[11px] transition active:scale-95 border border-sky-500/30'>
+                                <i class='fa-regular fa-copy mr-1'></i> COPY
+                            </button>
+                        </div>
+                    </div>
                     
                     <div class='flex justify-center my-2'>
                         <div class='bg-white p-3 rounded-2xl shadow-xl border border-white/25 inline-block'>
-                            <img src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=raj-prashant@fam&pn=ZyloBet&am=${amt}&cu=INR' alt='UPI QR Code' class='w-36 h-36 object-contain rounded-xl'>
+                            <img src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}&cu=INR' alt='UPI QR Code' class='w-36 h-36 object-contain rounded-xl'>
                         </div>
                     </div>
                     <p class='text-[10px] text-gray-400'>Scan & Pay ₹${amt} via GPay / PhonePe / Paytm</p>
@@ -642,6 +651,12 @@
                         </p>
                     </div>
                 </div>`;
+        }
+
+        function copyUpiId() {
+            const upiText = document.getElementById('upi-id-text').innerText;
+            navigator.clipboard.writeText(upiText);
+            alert("UPI ID Copied Successfully!");
         }
 
         function submitDepositProof(uname, amt) {
