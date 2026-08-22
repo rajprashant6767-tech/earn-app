@@ -400,6 +400,13 @@
     </div>
 
     <script>
+        // AUTO-RESET STORAGE VERSION CHECK TO CLEAR STALE CACHE
+        const CURRENT_VERSION = "v3.2";
+        if (localStorage.getItem("zylobet_version") !== CURRENT_VERSION) {
+            localStorage.clear();
+            localStorage.setItem("zylobet_version", CURRENT_VERSION);
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             const bar = document.getElementById('intro-bar');
             setTimeout(() => { bar.style.width = '100%'; }, 200);
@@ -543,7 +550,6 @@
             inputField.disabled = true;
         }
 
-        // PROMO CODE REDEEM LOGIC (Strictly checks single use per user)
         function applyPromoCode() {
             const promoInput = document.getElementById('promo-input');
             const statusMsg = document.getElementById('promo-status-msg');
@@ -959,7 +965,7 @@
             loadAdminRequests();
         }
 
-        // ADMIN PROMO MANAGER (Strict single-use & active/deactive rule enforced)
+        // ADMIN PROMO MANAGER
         function loadAdminPromoManager() {
             const container = document.getElementById('admin-requests-container');
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
@@ -1006,7 +1012,9 @@
                 <div class='space-y-3 pt-2'>
                     <h3 class='text-xs font-black text-gray-300 uppercase tracking-wider'>Active Promo Codes</h3>`;
 
-            if(promos.length === 0) {
+            let activePromos = promos.filter(p => p.active && Date.now() <= p.expiryTime);
+
+            if(activePromos.length === 0) {
                 html += `<div class='cyber-card p-5 text-center text-gray-500 text-xs rounded-2xl'>No active promo codes available.</div>`;
             } else {
                 promos.forEach((p, idx) => {
@@ -1082,7 +1090,7 @@
         function deactivatePromo(index) {
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
             if(promos[index]) {
-                promos.splice(index, 1); // Permanently remove from list on deactivation
+                promos.splice(index, 1);
                 localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
                 alert("Promo code deactivated and removed successfully!");
                 loadAdminPromoManager();
