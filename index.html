@@ -11,13 +11,17 @@
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
         
         body { 
-            background: #07090f; 
+            background: #05070f; 
+            /* Outer background par blue & orange subtle lighting/glow effect jaisa aapne mark kiya */
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(249, 115, 22, 0.12) 0%, transparent 40%);
+            background-attachment: fixed;
             color: #f1f5f9; 
             font-family: 'Outfit', sans-serif; 
             overflow-x: hidden; 
         }
 
-        /* Unique Cyber-Glass Card Style */
         .cyber-card { 
             background: linear-gradient(135deg, rgba(20, 27, 45, 0.75) 0%, rgba(10, 14, 23, 0.9) 100%);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -34,9 +38,15 @@
             background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.5), transparent);
         }
 
-        /* Neon Glow Accents */
-        .neon-glow-orange {
-            box-shadow: 0 0 30px rgba(249, 115, 22, 0.2);
+        /* Shiny Green Glow for Deposit & Admin Buttons */
+        .shiny-green-btn {
+            background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+        .shiny-green-btn:hover {
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            filter: brightness(1.1);
         }
 
         @keyframes cyberPulse {
@@ -45,16 +55,15 @@
         }
         .animate-cyber { animation: cyberPulse 3s infinite ease-in-out; }
 
-        /* Smooth Custom Scrollbar */
         ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #07090f; }
+        ::-webkit-scrollbar-track { background: #05070f; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
     </style>
 </head>
 <body class="p-4 pb-28 max-w-lg mx-auto">
 
     <!-- Unique Futuristic Intro Screen -->
-    <div id="intro-screen" class="fixed inset-0 z-[100] bg-[#07090f] flex flex-col items-center justify-center transition-opacity duration-700">
+    <div id="intro-screen" class="fixed inset-0 z-[100] bg-[#05070f] flex flex-col items-center justify-center transition-opacity duration-700">
         <div class="text-center space-y-5">
             <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-orange-600 via-amber-500 to-indigo-600 mx-auto flex items-center justify-center text-white text-4xl shadow-2xl animate-cyber border border-orange-400/40">
                 <i class="fa-solid fa-gamepad"></i>
@@ -72,13 +81,13 @@
     <!-- Main App Container -->
     <div id="main-app" class="opacity-0 transition-opacity duration-500 space-y-5">
         
-        <!-- Admin Panel Toggle Bar (Strictly shown for Admin ID: 7927224931) -->
-        <div id="admin-toggle-bar" class="hidden mb-2 bg-gradient-to-r from-orange-950/50 to-amber-950/50 border border-orange-500/40 p-3 rounded-2xl flex justify-between items-center text-xs shadow-xl backdrop-blur-md">
-            <span class="text-orange-400 font-extrabold flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-sm"></i> Admin Mode Active</span>
-            <button onclick="toggleAdminView()" id="view-toggle-btn" class="bg-gradient-to-r from-orange-500 to-amber-600 text-white px-4 py-1.5 rounded-xl font-bold shadow-lg transition active:scale-95">Open Admin Panel</button>
+        <!-- Admin Panel Toggle Bar with Shiny Green Button -->
+        <div id="admin-toggle-bar" class="hidden mb-2 cyber-card p-3 rounded-2xl flex justify-between items-center text-xs shadow-xl backdrop-blur-md border-emerald-500/40">
+            <span class="text-emerald-400 font-extrabold flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-sm"></i> Admin Mode Active</span>
+            <button onclick="toggleAdminView()" id="view-toggle-btn" class="shiny-green-btn text-white px-4 py-2 rounded-xl font-black shadow-lg transition active:scale-95">Open Admin Panel</button>
         </div>
 
-        <!-- HEADER SECTION (Unique Cyber Profile) -->
+        <!-- HEADER SECTION -->
         <header class="cyber-card p-4 rounded-3xl flex justify-between items-center">
             <div class="flex items-center gap-3.5">
                 <div id="user-avatar-container" class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-500 to-indigo-600 flex items-center justify-center font-black text-xl shadow-lg border border-orange-400/30 overflow-hidden text-white">
@@ -97,13 +106,14 @@
         <!-- TAB 1: HOME VIEW -->
         <div id="tab-home" class="space-y-5">
             <!-- Cyber Wallet Dashboard -->
-            <div class="cyber-card p-6 rounded-3xl space-y-5 neon-glow-orange">
+            <div class="cyber-card p-6 rounded-3xl space-y-5">
                 <div class="flex justify-between items-center pb-4 border-b border-white/10">
                     <div>
                         <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Quick Deposit</p>
                         <p class="text-xs text-white font-semibold mt-0.5">Instant UPI Diamond Top-up</p>
                     </div>
-                    <button onclick="openDepositModal()" class="bg-gradient-to-r from-orange-500 via-amber-500 to-red-600 text-white text-xs px-5 py-2.5 rounded-2xl font-black shadow-lg transition hover:scale-105 active:scale-95 tracking-wide">
+                    <!-- Shiny Green Deposit Button -->
+                    <button onclick="openDepositModal()" class="shiny-green-btn text-white text-xs px-5 py-2.5 rounded-2xl font-black shadow-lg transition active:scale-95 tracking-wide">
                         <i class="fa-solid fa-plus mr-1"></i> DEPOSIT
                     </button>
                 </div>
@@ -124,7 +134,7 @@
                 </div>
             </div>
 
-            <!-- Unique Feature Banner -->
+            <!-- Feature Banner -->
             <div class="cyber-card p-5 rounded-3xl flex items-center justify-between">
                 <div class="flex items-center gap-3.5">
                     <div class="w-12 h-12 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 text-xl font-bold">
@@ -245,7 +255,7 @@
     </div>
 
     <!-- FIXED CYBER BOTTOM NAVIGATION BAR -->
-    <nav class="fixed bottom-3 left-4 right-4 max-w-lg mx-auto bg-[#0c101c]/90 backdrop-blur-xl border border-white/10 px-3 py-2.5 flex justify-around items-center z-40 rounded-3xl shadow-2xl">
+    <nav class="fixed bottom-3 left-4 right-4 max-w-lg mx-auto bg-[#0a0f1d]/90 backdrop-blur-xl border border-white/10 px-3 py-2.5 flex justify-around items-center z-40 rounded-3xl shadow-2xl">
         <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center gap-1 text-orange-400 transition py-1 px-4 rounded-2xl bg-orange-500/10">
             <i class="fa-solid fa-house text-base"></i>
             <span class="text-[10px] font-extrabold tracking-wide">Home</span>
@@ -279,7 +289,6 @@
     </div>
 
     <script>
-        // Intro Animation Sequence
         window.addEventListener('DOMContentLoaded', () => {
             const bar = document.getElementById('intro-bar');
             setTimeout(() => { bar.style.width = '100%'; }, 200);
@@ -305,7 +314,6 @@
         document.getElementById('tg-user').innerText = "@" + username;
         document.getElementById('ref-code').innerText = myReferralCode;
 
-        // Telegram Profile Photo handling
         const avatarContainer = document.getElementById('user-avatar-container');
         if(user && user.photo_url) {
             avatarContainer.innerHTML = `<img src="${user.photo_url}" alt="Profile" class="w-full h-full object-cover">`;
@@ -313,7 +321,6 @@
             document.getElementById('user-avatar-text').innerText = user.first_name.charAt(0).toUpperCase();
         }
 
-        // Show Admin Bar for Admin ID (7927224931)
         if(userId === ADMIN_ID || true) { 
             document.getElementById('admin-toggle-bar').classList.remove('hidden');
         }
@@ -340,7 +347,6 @@
             }
         }
 
-        // Bottom Navigation Tab Switcher
         function switchTab(tab) {
             ['home', 'refer', 'promo', 'withdraw'].forEach(t => {
                 document.getElementById('tab-' + t).classList.add('hidden');
@@ -351,13 +357,11 @@
             document.getElementById('nav-' + tab).className = "flex flex-col items-center gap-1 text-orange-400 transition py-1 px-4 rounded-2xl bg-orange-500/10";
         }
 
-        // Wallet Data sync
         let userCoins = parseInt(localStorage.getItem('zylobet_coins')) || 1250;
         let userGems = parseInt(localStorage.getItem('zylobet_gems')) || 12;
         document.getElementById('user-coins').innerText = userCoins.toLocaleString();
         document.getElementById('user-gems').innerText = userGems;
 
-        // Secure Referral Application Logic
         function applyReferralCode() {
             const inputField = document.getElementById('friend-ref-input');
             const statusMsg = document.getElementById('ref-status-msg');
@@ -437,7 +441,7 @@
                         <input type='number' id='deposit-amount-input' min='1' max='1000' placeholder='e.g. 100' class='w-full bg-black/50 border border-white/10 p-3.5 rounded-2xl font-black text-cyan-400 focus:outline-none focus:border-orange-500 transition'>
                     </div>
                     <p id='deposit-err' class='text-red-400 text-[11px] h-4 font-semibold'></p>
-                    <button onclick='proceedToPayment()' class='w-full py-4 bg-gradient-to-r from-orange-500 via-amber-500 to-red-600 rounded-2xl font-black text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>NEXT</button>
+                    <button onclick='proceedToPayment()' class='w-full py-4 shiny-green-btn rounded-2xl font-black text-xs text-white shadow-xl transition active:scale-95 tracking-wide'>NEXT</button>
                 </div>`;
         }
 
@@ -461,7 +465,7 @@
                     <input type='file' id='payment-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300'>
                     <p id='proof-err' class='text-red-400 text-[11px] h-4 font-semibold text-left'></p>
                     
-                    <button onclick="submitDepositProof('${username}', ${amt})" class='w-full py-4 bg-gradient-to-r from-emerald-600 to-green-600 rounded-2xl font-black text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>SEND PROOF</button>
+                    <button onclick="submitDepositProof('${username}', ${amt})" class='w-full py-4 shiny-green-btn rounded-2xl font-black text-xs text-white shadow-xl transition active:scale-95 tracking-wide'>SEND PROOF</button>
                     
                     <div class='bg-blue-500/10 border border-blue-500/30 p-3.5 rounded-2xl text-left space-y-2.5 mt-2'>
                         <p class='text-blue-300 text-[11px] font-semibold leading-relaxed'>
@@ -524,7 +528,6 @@
         function closeModal() { document.getElementById('modal').classList.add('hidden'); }
         function copyRef() { navigator.clipboard.writeText(document.getElementById('ref-code').innerText); alert("Referral Code Copied!"); }
 
-        // ADMIN PANEL FUNCTIONS
         function switchAdminTab(tab) {
             adminTab = tab;
             const dBtn = document.getElementById('adm-tab-dep');
@@ -555,8 +558,8 @@
                             <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-cyan-400 text-sm'>${r.amount} Diamonds</span></div>
                             <button onclick="document.getElementById('modal-img').src='${r.proof}'; document.getElementById('img-modal').classList.remove('hidden');" class='w-full bg-white/5 hover:bg-white/10 py-2.5 rounded-xl font-black text-[11px] transition border border-white/5 text-gray-200'>View Proof Screenshot</button>
                             <div class='grid grid-cols-2 gap-2 pt-1'>
-                                <button onclick="handleAdmDep(${r.id}, 'approve', ${r.amount})" class='bg-emerald-600 hover:bg-emerald-500 py-3 rounded-xl font-black transition shadow-md'>APPROVE</button>
-                                <button onclick="handleAdmDep(${r.id}, 'reject', 0)" class='bg-red-600 hover:bg-red-500 py-3 rounded-xl font-black transition shadow-md'>REJECT</button>
+                                <button onclick="handleAdmDep(${r.id}, 'approve', ${r.amount})" class='shiny-green-btn py-3 rounded-xl font-black text-white transition shadow-md'>APPROVE</button>
+                                <button onclick="handleAdmDep(${r.id}, 'reject', 0)" class='bg-red-600 hover:bg-red-500 py-3 rounded-xl font-black text-white transition shadow-md'>REJECT</button>
                             </div>
                         </div>`;
                 });
@@ -572,8 +575,8 @@
                             <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-amber-400 text-sm'>${r.amount} Coins</span></div>
                             <p class='text-gray-400 font-bold'>Method: <span class="text-white">${r.method}</span></p>
                             <div class='grid grid-cols-2 gap-2 pt-1'>
-                                <button onclick="handleAdmWit(${r.id}, 'approve')" class='bg-emerald-600 hover:bg-emerald-500 py-3 rounded-xl font-black transition shadow-md'>APPROVE</button>
-                                <button onclick="handleAdmWit(${r.id}, 'reject')" class='bg-red-600 hover:bg-red-500 py-3 rounded-xl font-black transition shadow-md'>REJECT</button>
+                                <button onclick="handleAdmWit(${r.id}, 'approve')" class='shiny-green-btn py-3 rounded-xl font-black text-white transition shadow-md'>APPROVE</button>
+                                <button onclick="handleAdmWit(${r.id}, 'reject')" class='bg-red-600 hover:bg-red-500 py-3 rounded-xl font-black text-white transition shadow-md'>REJECT</button>
                             </div>
                         </div>`;
                 });
