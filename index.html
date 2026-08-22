@@ -11,7 +11,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
         
         body { 
-            /* Reference image ke jaisa left mein Cyan/Blue aur right mein Pink/Magenta gradient background */
             background: #090d16;
             background-image: 
                 radial-gradient(circle at 0% 20%, rgba(0, 180, 255, 0.35) 0%, transparent 55%),
@@ -39,7 +38,6 @@
             background: linear-gradient(90deg, transparent, rgba(0, 180, 255, 0.5), transparent);
         }
 
-        /* Shiny Green Glow for Deposit & Admin Buttons */
         .shiny-green-btn {
             background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
             box-shadow: 0 0 20px rgba(16, 185, 129, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
@@ -106,14 +104,12 @@
 
         <!-- TAB 1: HOME VIEW -->
         <div id="tab-home" class="space-y-5">
-            <!-- Cyber Wallet Dashboard -->
             <div class="cyber-card p-6 rounded-3xl space-y-5">
                 <div class="flex justify-between items-center pb-4 border-b border-white/10">
                     <div>
                         <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Quick Deposit</p>
                         <p class="text-xs text-white font-semibold mt-0.5">Instant UPI Diamond Top-up</p>
                     </div>
-                    <!-- Shiny Green Deposit Button -->
                     <button onclick="openDepositModal()" class="shiny-green-btn text-white text-xs px-5 py-2.5 rounded-2xl font-black shadow-lg transition active:scale-95 tracking-wide">
                         <i class="fa-solid fa-plus mr-1"></i> DEPOSIT
                     </button>
@@ -135,7 +131,6 @@
                 </div>
             </div>
 
-            <!-- Feature Banner -->
             <div class="cyber-card p-5 rounded-3xl flex items-center justify-between">
                 <div class="flex items-center gap-3.5">
                     <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 text-xl font-bold">
@@ -456,12 +451,19 @@
                 return;
             }
 
-            document.getElementById('modal-title').innerText = `PAYMENT FOR ${amt} DIAMONDS`;
+            document.getElementById('modal-title').innerText = `PAYMENT FOR ${amt} DIAMONDS (₹${amt})`;
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs text-center max-h-[70vh] overflow-y-auto px-1'>
                     <p class='text-gray-300 font-medium'>Send payment to UPI ID:</p>
-                    <div class='bg-black/60 border border-white/10 p-3.5 rounded-2xl font-mono text-cyan-400 font-black select-all text-sm tracking-wider'>raj-prashant@fam</div>
+                    <div class='bg-black/60 border border-white/10 p-3 rounded-2xl font-mono text-cyan-400 font-black select-all text-xs tracking-wider'>raj-prashant@fam</div>
                     
+                    <!-- QR Code Displayed Here -->
+                    <div class='flex justify-center my-2'>
+                        <div class='bg-white p-2 rounded-2xl shadow-lg border border-white/10 inline-block'>
+                            <img src='https://i.ibb.co/6z5XQ1v/qr-code.png' alt='Payment QR' class='w-36 h-36 object-contain rounded-xl'>
+                        </div>
+                    </div>
+
                     <p class='text-gray-400 text-[11px] text-left font-semibold'>Payment screenshot upload karein:</p>
                     <input type='file' id='payment-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300'>
                     <p id='proof-err' class='text-red-400 text-[11px] h-4 font-semibold text-left'></p>
