@@ -38,37 +38,45 @@
             background: linear-gradient(90deg, transparent, rgba(0, 180, 255, 0.5), transparent);
         }
 
-        /* 3D Realistic Glossy Icons Styling */
+        /* Pro-Level 3D Realistic Glossy Icons Styling */
         .icon-3d-coin {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 32px;
-            height: 32px;
-            background: radial-gradient(circle at 30% 30%, #fde047 0%, #eab308 50%, #ca8a04 100%);
+            width: 34px;
+            height: 34px;
+            background: radial-gradient(circle at 30% 30%, #fffb96 0%, #facc15 40%, #ca8a04 80%, #713f12 100%);
             border-radius: 50%;
-            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.8), inset 0 -3px 6px rgba(0, 0, 0, 0.5), 0 4px 10px rgba(234, 179, 8, 0.4);
-            color: #713f12;
-            font-size: 14px;
+            box-shadow: inset 0 3px 6px rgba(255, 255, 255, 0.9), inset 0 -4px 8px rgba(0, 0, 0, 0.6), 0 5px 15px rgba(250, 204, 21, 0.5);
+            color: #422006;
+            font-size: 15px;
             font-weight: 900;
-            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
+            border: 1px solid #fef08a;
         }
 
         .icon-3d-gem {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 32px;
-            height: 32px;
-            background: radial-gradient(circle at 30% 30%, #67e8f9 0%, #06b6d4 50%, #0e7490 100%);
-            border-radius: 10px;
+            width: 34px;
+            height: 34px;
+            background: radial-gradient(circle at 30% 30%, #cffafe 0%, #22d3ee 40%, #0891b2 80%, #164e63 100%);
+            border-radius: 12px;
             transform: rotate(45deg);
-            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.8), inset 0 -3px 6px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(6, 182, 212, 0.5);
+            box-shadow: inset 0 3px 6px rgba(255, 255, 255, 0.9), inset 0 -4px 8px rgba(0, 0, 0, 0.6), 0 5px 15px rgba(34, 211, 238, 0.6);
             color: #ecfeff;
-            font-size: 13px;
+            font-size: 14px;
+            border: 1px solid #a5f3fc;
         }
         .icon-3d-gem i {
             transform: rotate(-45deg);
+        }
+
+        /* Ensure Inputs are 100% interactive and easy to type */
+        input, select, textarea {
+            pointer-events: auto !important;
+            user-select: text !important;
+            -webkit-user-select: text !important;
         }
 
         .shiny-green-btn {
@@ -150,7 +158,7 @@
 
                 <div class="grid grid-cols-2 gap-4">
                     <div onclick="openHistory('coins')" class="bg-black/40 p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-amber-400/40 transition group">
-                        <p class="text-2xl font-black text-amber-400 group-hover:scale-105 transition origin-left flex items-center gap-2">
+                        <p class="text-2xl font-black text-amber-400 group-hover:scale-105 transition origin-left flex items-center gap-2.5">
                             <span class="icon-3d-coin"><i class="fa-solid fa-c"></i></span> <span id="user-coins">1,250</span>
                         </p>
                         <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-2 tracking-wider">
@@ -158,7 +166,7 @@
                         </p>
                     </div>
                     <div onclick="openHistory('gems')" class="bg-black/40 p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-cyan-400/40 transition group">
-                        <p class="text-2xl font-black text-cyan-400 group-hover:scale-105 transition origin-left flex items-center gap-2.5">
+                        <p class="text-2xl font-black text-cyan-400 group-hover:scale-105 transition origin-left flex items-center gap-3">
                             <span class="icon-3d-gem"><i class="fa-solid fa-gem"></i></span> <span id="user-gems">12</span>
                         </p>
                         <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-2 tracking-wider">
@@ -548,7 +556,7 @@
                     let colorClass = item.type === 'spend' ? 'text-red-400' : 'text-amber-400';
                     html += `
                         <div class='flex justify-between bg-black/40 p-3 rounded-2xl border border-white/5 items-center'>
-                            <div><p class='font-black ${colorClass} text-sm'>${item.amount} <span class='icon-3d-coin' style='width:18px;height:18px;font-size:9px;'><i class='fa-solid fa-c'></i></span></p><p class='text-[10px] text-gray-300 font-bold mt-0.5'>Source: ${item.title}</p></div>
+                            <div><p class='font-black ${colorClass} text-sm flex items-center gap-1.5'>${item.amount} <span class='icon-3d-coin' style='width:20px;height:20px;font-size:9px;'><i class='fa-solid fa-c'></i></span></p><p class='text-[10px] text-gray-300 font-bold mt-0.5'>Source: ${item.title}</p></div>
                             <span class='text-[10px] text-gray-400 font-bold'>${item.time}</span>
                         </div>`;
                 });
@@ -561,7 +569,7 @@
                 history.forEach(item => {
                     html += `
                         <div class='flex justify-between bg-black/40 p-3 rounded-2xl border border-white/5 items-center'>
-                            <div><p class='font-black text-cyan-400 text-sm'>${item.amount} <span class='icon-3d-gem' style='width:18px;height:18px;font-size:8px;'><i class='fa-solid fa-gem'></i></span></p><p class='text-[10px] text-gray-300 font-bold mt-0.5'>Source: ${item.title}</p></div>
+                            <div><p class='font-black text-cyan-400 text-sm flex items-center gap-1.5'>${item.amount} <span class='icon-3d-gem' style='width:20px;height:20px;font-size:8px;'><i class='fa-solid fa-gem'></i></span></p><p class='text-[10px] text-gray-300 font-bold mt-0.5'>Source: ${item.title}</p></div>
                             <span class='text-[10px] text-gray-400 font-bold'>${item.time}</span>
                         </div>`;
                 });
@@ -576,7 +584,7 @@
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs'>
                     <div class='bg-cyan-500/10 border border-cyan-500/30 p-3 rounded-2xl text-cyan-300 font-bold text-center tracking-wide flex items-center justify-center gap-1.5'>
-                        <span class='icon-3d-gem' style='width:20px;height:20px;font-size:9px;'><i class='fa-solid fa-gem'></i></span> 1 Diamond = ₹1 Rs
+                        <span class='icon-3d-gem' style='width:22px;height:22px;font-size:9px;'><i class='fa-solid fa-gem'></i></span> 1 Diamond = ₹1 Rs
                     </div>
                     <div>
                         <label class='text-gray-300 font-bold block mb-1.5 uppercase tracking-wider text-[11px]'>Enter Diamond Amount (1 - 1000)</label>
@@ -731,7 +739,7 @@
                 reqs.forEach(r => {
                     container.innerHTML += `
                         <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-3 text-xs shadow-lg'>
-                            <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-cyan-400 text-sm flex items-center gap-1'>${r.amount} Diamonds <span class='icon-3d-gem' style='width:18px;height:18px;font-size:8px;'><i class='fa-solid fa-gem'></i></span></span></div>
+                            <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-cyan-400 text-sm flex items-center gap-1.5'>${r.amount} Diamonds <span class='icon-3d-gem' style='width:20px;height:20px;font-size:8px;'><i class='fa-solid fa-gem'></i></span></span></div>
                             <button onclick="document.getElementById('modal-img').src='${r.proof}'; document.getElementById('img-modal').classList.remove('hidden');" class='w-full bg-white/5 hover:bg-white/10 py-2.5 rounded-xl font-black text-[11px] transition border border-white/5 text-gray-200'>View Proof Screenshot</button>
                             <div class='grid grid-cols-2 gap-2 pt-1'>
                                 <button onclick="handleAdmDep(${r.id}, 'approve', ${r.amount})" class='shiny-green-btn py-3 rounded-xl font-black text-white transition shadow-md'>APPROVE</button>
@@ -748,7 +756,7 @@
                 reqs.forEach(r => {
                     container.innerHTML += `
                         <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-3 text-xs shadow-lg'>
-                            <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-amber-400 text-sm flex items-center gap-1'>${r.amount} Coins <span class='icon-3d-coin' style='width:18px;height:18px;font-size:9px;'><i class='fa-solid fa-c'></i></span></span></div>
+                            <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-amber-400 text-sm flex items-center gap-1.5'>${r.amount} Coins <span class='icon-3d-coin' style='width:20px;height:20px;font-size:9px;'><i class='fa-solid fa-c'></i></span></span></div>
                             <p class='text-gray-400 font-bold'>Method: <span class="text-white">${r.method}</span></p>
                             <div class='grid grid-cols-2 gap-2 pt-1'>
                                 <button onclick="handleAdmWit(${r.id}, 'approve')" class='shiny-green-btn py-3 rounded-xl font-black text-white transition shadow-md'>APPROVE</button>
@@ -815,7 +823,7 @@
                     let isExpired = Date.now() > p.expiryTime;
                     if (!p.active || isExpired) return;
 
-                    let symbol = p.rewardType === 'coins' ? '<span class="icon-3d-coin" style="width:14px;height:14px;font-size:7px;"><i class="fa-solid fa-c"></i></span> Coins' : '<span class="icon-3d-gem" style="width:14px;height:14px;font-size:6px;"><i class="fa-solid fa-gem"></i></span> Diamonds';
+                    let symbol = p.rewardType === 'coins' ? '<span class="icon-3d-coin" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-c"></i></span> Coins' : '<span class="icon-3d-gem" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span> Diamonds';
 
                     html += `
                         <div class='cyber-card p-3.5 rounded-2xl border border-white/10 space-y-2 text-xs'>
