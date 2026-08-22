@@ -357,7 +357,6 @@
             document.getElementById('nav-' + tab).className = "flex flex-col items-center gap-1 text-cyan-400 transition py-1 px-4 rounded-2xl bg-cyan-500/10";
         }
 
-        // Wallet & History Initialization
         let userCoins = parseInt(localStorage.getItem('zylobet_coins')) || 1250;
         let userGems = parseInt(localStorage.getItem('zylobet_gems')) || 12;
         
@@ -516,9 +515,10 @@
                     
                     <button onclick="submitDepositProof('${username}', ${amt})" class='w-full py-4 shiny-green-btn rounded-2xl font-black text-xs text-white shadow-xl transition active:scale-95 tracking-wide'>SEND PROOF</button>
                     
+                    <!-- Updated Note Section -->
                     <div class='bg-blue-500/10 border border-blue-500/30 p-3.5 rounded-2xl text-left space-y-2.5 mt-2'>
                         <p class='text-blue-300 text-[11px] font-semibold leading-relaxed'>
-                            <i class='fa-solid fa-circle-info mr-1'></i> <b>Note:</b> Deposit ka amount 24 hours ke andar add kar diya jayega. Contact:
+                            <i class='fa-solid fa-circle-info mr-1'></i> <b>Note:</b> Deposit ka amount 24 hours ke andar add kar diya jayega. Agar payment ho gaya ho aur amount add na hua ho to hame contact karen:
                         </p>
                         <div class='text-center pt-1'>
                             <a href='https://t.me/Raj_Prashant' target='_blank' class='inline-flex items-center gap-1.5 text-xs text-blue-400 font-black bg-blue-500/20 px-4 py-2 rounded-xl transition hover:bg-blue-500/30'>
@@ -527,9 +527,10 @@
                         </div>
                     </div>
 
+                    <!-- Updated Warning Section -->
                     <div class='bg-red-500/10 border border-red-500/30 p-3.5 rounded-2xl text-left'>
                         <p class='text-red-400 text-[11px] font-semibold leading-relaxed'>
-                            <i class='fa-solid fa-triangle-exclamation mr-1'></i> <b>Warning:</b> Agar koi user galat payment karega matlab deposit amount se kam karega, toh request reject kar di jayegi!
+                            <i class='fa-solid fa-triangle-exclamation mr-1'></i> <b>Warning:</b> Agar koi user galat payment karega matlab deposit amount se kam karega, toh request reject kar di jayegi, payment manually check hoga!
                         </p>
                     </div>
                 </div>`;
@@ -576,17 +577,14 @@
                 return;
             }
 
-            // Deduct coins from balance
             userCoins -= amt;
             localStorage.setItem('zylobet_coins', userCoins);
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
 
-            // Add withdrawal request to admin panel
             let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
             reqs.push({ id: Date.now(), username: "@" + username, method: method, amount: amt, time: "Just now" });
             localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
 
-            // Add to coin history with minus sign
             let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
             coinHistory.unshift({ title: `Withdrawal (${method})`, amount: `-${amt} Coins`, type: "spend", time: "Just now" });
             localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
