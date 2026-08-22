@@ -170,6 +170,18 @@
                     </div>
                 </div>
             </div>
+
+            <div class="cyber-card p-5 rounded-3xl flex items-center justify-between">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-12 h-12 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 text-xl font-bold">
+                        <i class="fa-solid fa-bolt-lightning"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xs font-black text-white uppercase tracking-wider">Elite VIP Status</h2>
+                        <p class="text-[10px] text-gray-400 mt-0.5">Fast automated deposits & secure payouts.</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- TAB 2: REFERRAL VIEW -->
@@ -218,10 +230,16 @@
                     <button onclick="applyPromoCode()" class='w-full py-4 bg-gradient-to-r from-rose-600 via-purple-600 to-blue-600 rounded-2xl font-black text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>APPLY CODE</button>
                     <p id="promo-status-msg" class="text-[11px] h-4 font-semibold text-center"></p>
                 </div>
+
+                <div class='text-center pt-3 border-t border-white/10 mt-2'>
+                    <a href='https://t.me/+2vDL5Gmbee0zNDFl' target='_blank' class='inline-flex items-center gap-2 text-xs text-sky-400 font-bold bg-sky-500/10 border border-sky-500/20 px-5 py-3 rounded-2xl w-full justify-center transition hover:bg-sky-500/20 active:scale-95'>
+                        <i class='fa-brands fa-telegram text-base'></i> Join Official Telegram Channel
+                    </a>
+                </div>
             </div>
         </div>
 
-        <!-- TAB 4: WITHDRAW VIEW (UPDATED WITH 3 SEPARATE SECTIONS & PACKAGES) -->
+        <!-- TAB 4: WITHDRAW VIEW -->
         <div id="tab-withdraw" class="hidden space-y-5">
             <div class="cyber-card p-6 rounded-3xl space-y-5 border border-emerald-500/30">
                 <div class="text-center space-y-2">
@@ -234,7 +252,7 @@
 
                 <!-- Payout Section Tabs -->
                 <div class="grid grid-cols-3 gap-2 bg-black/40 p-1.5 rounded-2xl border border-white/10">
-                    <button onclick="switchWithdrawSection('upi')" id="w-tab-upi" class="py-2.5 rounded-xl font-black text-[11px] text-emerald-400 bg-emerald-500/20 transition flex items-center justify-center gap-1.5"><i class="fa-solid fa-building-columns"></i> UPI</button>
+                    <button onclick="switchWithdrawSection('upi')" id="w-tab-upi" class="py-2.5 rounded-xl font-black text-[11px] text-emerald-400 bg-emerald-500/25 transition flex items-center justify-center gap-1.5"><i class="fa-solid fa-building-columns"></i> UPI</button>
                     <button onclick="switchWithdrawSection('amazon')" id="w-tab-amazon" class="py-2.5 rounded-xl font-black text-[11px] text-gray-400 transition flex items-center justify-center gap-1.5"><i class="fa-brands fa-amazon"></i> Amazon</button>
                     <button onclick="switchWithdrawSection('playstore')" id="w-tab-playstore" class="py-2.5 rounded-xl font-black text-[11px] text-gray-400 transition flex items-center justify-center gap-1.5"><i class="fa-brands fa-google-play"></i> PlayStore</button>
                 </div>
@@ -463,7 +481,6 @@
             ]));
         }
 
-        // Selected withdrawal package tracking
         let selectedWCoins = 0;
         let selectedWAmount = 0;
 
@@ -671,12 +688,10 @@
                 extraDetails = ` (UPI: ${upiId})`;
             }
 
-            // Deduct coins
             userCoins -= selectedWCoins;
             localStorage.setItem('zylobet_coins', userCoins);
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
 
-            // Save to withdrawal requests for admin
             let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
             let reqId = Date.now();
             reqs.push({
@@ -691,7 +706,6 @@
             });
             localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
 
-            // Save to user coin history
             let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
             coinHistory.unshift({
                 id: reqId,
@@ -766,6 +780,23 @@
                     <p id='proof-err' class='text-rose-400 text-[11px] h-4 font-semibold text-left'></p>
                     
                     <button onclick="submitDepositProof('${username}', ${amt})" class='w-full py-4 shiny-green-btn rounded-2xl font-black text-xs text-white shadow-xl transition active:scale-95 tracking-wide'>SEND PROOF</button>
+                    
+                    <div class='bg-blue-500/10 border border-blue-500/30 p-3.5 rounded-2xl text-left space-y-2.5 mt-2'>
+                        <p class='text-blue-300 text-[11px] font-semibold leading-relaxed'>
+                            <i class='fa-solid fa-circle-info mr-1'></i> <b>Note:</b> Deposit ka amount 24 hours ke andar add kar diya jayega. Agar payment ho gaya ho aur amount add na hua ho to hame contact karen:
+                        </p>
+                        <div class='text-center pt-1'>
+                            <a href='https://t.me/Raj_Prashant' target='_blank' class='inline-flex items-center gap-1.5 text-xs text-blue-400 font-black bg-blue-500/20 px-4 py-2 rounded-xl transition hover:bg-blue-500/30'>
+                                <i class='fa-brands fa-telegram text-base'></i> @Raj_Prashant
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class='bg-rose-500/10 border border-rose-500/30 p-3.5 rounded-2xl text-left'>
+                        <p class='text-rose-400 text-[11px] font-semibold leading-relaxed'>
+                            <i class='fa-solid fa-triangle-exclamation mr-1'></i> <b>Warning:</b> Agar koi user galat payment karega matlab deposit amount se kam karega, toh request reject kar di jayegi, payment manually check hoga!
+                        </p>
+                    </div>
                 </div>`;
         }
 
@@ -898,7 +929,6 @@
                 alert("Withdrawal Approved & Redeem Code Sent!");
             } else {
                 req.status = "Rejected";
-                // Refund coins on rejection
                 userCoins += req.amount;
                 localStorage.setItem('zylobet_coins', userCoins);
                 document.getElementById('user-coins').innerText = userCoins.toLocaleString();
@@ -907,7 +937,6 @@
 
             localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
 
-            // Update user coin history status
             let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
             let historyItem = coinHistory.find(h => h.id === id);
             if(historyItem) {
@@ -961,29 +990,98 @@
                         </div>
                     </div>
                     <button onclick='createPromoCode()' class='w-full py-3 bg-gradient-to-r from-rose-600 to-purple-600 rounded-xl font-black text-xs text-white shadow-lg transition'>CREATE & ACTIVATE CODE</button>
-                </div>`;
+                </div>
+
+                <div class='space-y-3 pt-2'>
+                    <h3 class='text-xs font-black text-gray-300 uppercase tracking-wider'>Active Promo Codes</h3>`;
+
+            let activePromos = promos.filter(p => p.active && Date.now() <= p.expiryTime);
+
+            if(activePromos.length === 0) {
+                html += `<div class='cyber-card p-5 text-center text-gray-500 text-xs rounded-2xl'>No active promo codes available.</div>`;
+            } else {
+                promos.forEach((p, idx) => {
+                    let isExpired = Date.now() > p.expiryTime;
+                    if (!p.active || isExpired) return;
+
+                    let symbol = p.rewardType === 'coins' ? '<span class="ff-gold-coin" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> Coins' : '<span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span> Diamonds';
+
+                    html += `
+                        <div class='cyber-card p-3.5 rounded-2xl border border-white/10 space-y-2 text-xs'>
+                            <div class='flex justify-between font-black'>
+                                <span class='text-rose-400 text-sm'>${p.code}</span>
+                                <span class='text-emerald-400 font-bold'>ACTIVE</span>
+                            </div>
+                            <div class='flex justify-between text-[11px] text-gray-300 font-semibold items-center'>
+                                <span>Reward: +${p.rewardAmount} ${symbol}</span>
+                                <span>Limit: ${p.usedCount} / ${p.maxUsers}</span>
+                            </div>
+                            <button onclick='togglePromoStatus(${idx})' class='w-full py-2 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-xl transition'>DEACTIVATE</button>
+                        </div>`;
+                });
+            }
+            html += `</div>`;
             container.innerHTML = html;
         }
 
         function createPromoCode() {
-            const codeVal = document.getElementById('adm-code-input').value.trim().toUpperCase();
-            const rewardType = document.getElementById('adm-reward-type').value;
-            const rewardAmount = parseInt(document.getElementById('adm-reward-amt').value) || 100;
-            const timeVal = parseInt(document.getElementById('adm-time-value').value) || 30;
-            const timeUnit = document.getElementById('adm-time-unit').value;
-            const maxUsr = parseInt(document.getElementById('adm-limit-input').value) || 50;
+            const codeInput = document.getElementById('adm-code-input');
+            const typeInput = document.getElementById('adm-reward-type');
+            const amtInput = document.getElementById('adm-reward-amt');
+            const timeValInput = document.getElementById('adm-time-value');
+            const timeUnitInput = document.getElementById('adm-time-unit');
+            const limitInput = document.getElementById('adm-limit-input');
 
-            if(!codeVal) { alert("Enter promo code!"); return; }
+            const codeVal = codeInput.value.trim().toUpperCase();
+            const rewardType = typeInput.value;
+            const rewardAmount = parseInt(amtInput.value) || 100;
+            const timeValue = parseInt(timeValInput.value) || 30;
+            const timeUnit = timeUnitInput.value;
+            const maxUsr = parseInt(limitInput.value) || 50;
+
+            if(!codeVal) {
+                alert("Please enter a promo code name!");
+                return;
+            }
 
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
-            let durationMs = timeVal * 60 * 1000;
-            if(timeUnit === 'sec') durationMs = timeVal * 1000;
-            if(timeUnit === 'hour') durationMs = timeVal * 3600 * 1000;
+            
+            if(promos.some(p => p.code === codeVal)) {
+                alert("This promo code already exists!");
+                return;
+            }
 
-            promos.push({ code: codeVal, rewardType, rewardAmount, expiryTime: Date.now() + durationMs, maxUsers: maxUsr, usedCount: 0, active: true });
+            let durationMs = timeValue * 60 * 1000;
+            if(timeUnit === 'sec') {
+                durationMs = timeValue * 1000;
+            } else if(timeUnit === 'hour') {
+                durationMs = timeValue * 60 * 60 * 1000;
+            }
+
+            const expiryTime = Date.now() + durationMs;
+
+            promos.push({
+                code: codeVal,
+                rewardType: rewardType,
+                rewardAmount: rewardAmount,
+                expiryTime: expiryTime,
+                maxUsers: maxUsr,
+                usedCount: 0,
+                active: true
+            });
+
             localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
-            alert("Promo Code Created!");
+            alert(`Promo Code '${codeVal}' Created Successfully!`);
             loadAdminPromoManager();
+        }
+
+        function togglePromoStatus(index) {
+            let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
+            if(promos[index]) {
+                promos[index].active = !promos[index].active;
+                localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
+                loadAdminPromoManager();
+            }
         }
     </script>
 </body>
