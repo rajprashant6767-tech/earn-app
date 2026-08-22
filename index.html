@@ -3,61 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZyloBet | Pro Gaming App</title>
+    <title>ZyloBet | Elite Gaming</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
         
         body { 
-            background: #030508; 
-            color: #f8fafc; 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: #07090f; 
+            color: #f1f5f9; 
+            font-family: 'Outfit', sans-serif; 
             overflow-x: hidden; 
         }
 
-        /* Pro Glassmorphism Card */
-        .pro-card { 
-            background: linear-gradient(145deg, rgba(18, 24, 38, 0.7), rgba(8, 11, 18, 0.8)); 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
-            backdrop-filter: blur(16px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        /* Unique Cyber-Glass Card Style */
+        .cyber-card { 
+            background: linear-gradient(135deg, rgba(20, 27, 45, 0.75) 0%, rgba(10, 14, 23, 0.9) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
         }
 
-        /* Neon Glow Effects */
+        .cyber-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.5), transparent);
+        }
+
+        /* Neon Glow Accents */
         .neon-glow-orange {
-            box-shadow: 0 0 25px rgba(249, 115, 22, 0.25);
-        }
-        .neon-glow-green {
-            box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
+            box-shadow: 0 0 30px rgba(249, 115, 22, 0.2);
         }
 
-        @keyframes pulseGlow {
-            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(249,115,22,0.6)); }
-            50% { transform: scale(1.04); filter: drop-shadow(0 0 35px rgba(249,115,22,0.9)); }
+        @keyframes cyberPulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(249,115,22,0.5)); }
+            50% { transform: scale(1.06); filter: drop-shadow(0 0 30px rgba(249,115,22,0.9)); }
         }
-        .animate-glow { animation: pulseGlow 2.5s infinite ease-in-out; }
+        .animate-cyber { animation: cyberPulse 3s infinite ease-in-out; }
 
-        /* Custom Scrollbar */
+        /* Smooth Custom Scrollbar */
         ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #030508; }
+        ::-webkit-scrollbar-track { background: #07090f; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
     </style>
 </head>
 <body class="p-4 pb-28 max-w-lg mx-auto">
 
-    <!-- Pro Intro Splash Screen -->
-    <div id="intro-screen" class="fixed inset-0 z-[100] bg-[#030508] flex flex-col items-center justify-center transition-opacity duration-700">
+    <!-- Unique Futuristic Intro Screen -->
+    <div id="intro-screen" class="fixed inset-0 z-[100] bg-[#07090f] flex flex-col items-center justify-center transition-opacity duration-700">
         <div class="text-center space-y-5">
-            <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-orange-500 via-amber-500 to-red-600 mx-auto flex items-center justify-center text-white text-4xl shadow-2xl animate-glow border border-orange-400/40">
-                <i class="fa-solid fa-bolt-lightning"></i>
+            <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-orange-600 via-amber-500 to-indigo-600 mx-auto flex items-center justify-center text-white text-4xl shadow-2xl animate-cyber border border-orange-400/40">
+                <i class="fa-solid fa-gamepad"></i>
             </div>
             <div>
-                <h1 class="text-3xl font-extrabold tracking-wider bg-gradient-to-r from-orange-400 to-amber-200 bg-clip-text text-transparent italic">ZyloBet</h1>
-                <p class="text-[11px] text-gray-400 mt-1 uppercase tracking-widest font-semibold">Next-Gen Gaming Experience</p>
+                <h1 class="text-3xl font-black tracking-wider bg-gradient-to-r from-orange-400 via-amber-200 to-indigo-400 bg-clip-text text-transparent italic">ZYLOBET</h1>
+                <p class="text-[10px] text-gray-400 mt-1 uppercase tracking-[0.25em] font-bold">Next-Gen Web3 Gaming</p>
             </div>
-            <div class="w-40 h-1 bg-gray-900 rounded-full mx-auto overflow-hidden mt-4 border border-gray-800">
+            <div class="w-40 h-1.5 bg-gray-900 rounded-full mx-auto overflow-hidden mt-4 border border-gray-800">
                 <div id="intro-bar" class="h-full bg-gradient-to-r from-orange-500 to-amber-400 w-0 transition-all duration-500"></div>
             </div>
         </div>
@@ -67,50 +73,50 @@
     <div id="main-app" class="opacity-0 transition-opacity duration-500 space-y-5">
         
         <!-- Admin Panel Toggle Bar (Strictly shown for Admin ID: 7927224931) -->
-        <div id="admin-toggle-bar" class="hidden mb-2 bg-gradient-to-r from-orange-950/60 to-red-950/60 border border-orange-500/40 p-3 rounded-2xl flex justify-between items-center text-xs shadow-xl backdrop-blur-md">
-            <span class="text-orange-400 font-bold flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-sm"></i> Admin Mode Active</span>
-            <button onclick="toggleAdminView()" id="view-toggle-btn" class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-3.5 py-1.5 rounded-xl font-bold shadow-lg transition hover:brightness-110 active:scale-95">Open Admin Panel</button>
+        <div id="admin-toggle-bar" class="hidden mb-2 bg-gradient-to-r from-orange-950/50 to-amber-950/50 border border-orange-500/40 p-3 rounded-2xl flex justify-between items-center text-xs shadow-xl backdrop-blur-md">
+            <span class="text-orange-400 font-extrabold flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-sm"></i> Admin Mode Active</span>
+            <button onclick="toggleAdminView()" id="view-toggle-btn" class="bg-gradient-to-r from-orange-500 to-amber-600 text-white px-4 py-1.5 rounded-xl font-bold shadow-lg transition active:scale-95">Open Admin Panel</button>
         </div>
 
-        <!-- HEADER SECTION (Pro Profile Card) -->
-        <header class="pro-card p-4 rounded-3xl flex justify-between items-center border border-white/10 shadow-lg">
+        <!-- HEADER SECTION (Unique Cyber Profile) -->
+        <header class="cyber-card p-4 rounded-3xl flex justify-between items-center">
             <div class="flex items-center gap-3.5">
-                <div id="user-avatar-container" class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-500 to-red-600 flex items-center justify-center font-extrabold text-xl shadow-lg border border-orange-400/40 overflow-hidden text-white">
+                <div id="user-avatar-container" class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-500 to-indigo-600 flex items-center justify-center font-black text-xl shadow-lg border border-orange-400/30 overflow-hidden text-white">
                     <span id="user-avatar-text">U</span>
                 </div>
                 <div>
-                    <h1 class="text-base font-extrabold tracking-wide text-orange-400 italic leading-none">ZyloBet</h1>
+                    <h1 class="text-base font-black tracking-wide text-orange-400 italic leading-none">ZyloBet</h1>
                     <p id="tg-user" class="text-xs text-blue-400 font-bold mt-1 tracking-wide">@Loading...</p>
                 </div>
             </div>
-            <div class="bg-white/5 border border-white/10 px-3 py-1.5 rounded-2xl flex items-center gap-1.5 text-[11px] font-semibold text-gray-300">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Online
+            <div class="bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-2xl flex items-center gap-1.5 text-[11px] font-bold text-gray-300">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Live
             </div>
         </header>
 
         <!-- TAB 1: HOME VIEW -->
         <div id="tab-home" class="space-y-5">
-            <!-- Pro Wallet Dashboard -->
-            <div class="pro-card p-6 rounded-3xl shadow-2xl border border-orange-500/30 space-y-5 neon-glow-orange">
+            <!-- Cyber Wallet Dashboard -->
+            <div class="cyber-card p-6 rounded-3xl space-y-5 neon-glow-orange">
                 <div class="flex justify-between items-center pb-4 border-b border-white/10">
                     <div>
                         <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Quick Deposit</p>
                         <p class="text-xs text-white font-semibold mt-0.5">Instant UPI Diamond Top-up</p>
                     </div>
-                    <button onclick="openDepositModal()" class="bg-gradient-to-r from-orange-500 via-amber-500 to-red-600 text-white text-xs px-5 py-2.5 rounded-2xl font-extrabold shadow-lg transition hover:scale-105 active:scale-95 tracking-wide">
+                    <button onclick="openDepositModal()" class="bg-gradient-to-r from-orange-500 via-amber-500 to-red-600 text-white text-xs px-5 py-2.5 rounded-2xl font-black shadow-lg transition hover:scale-105 active:scale-95 tracking-wide">
                         <i class="fa-solid fa-plus mr-1"></i> DEPOSIT
                     </button>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div onclick="openHistory('coins')" class="bg-black/40 p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-amber-400/40 transition group">
-                        <p class="text-2xl font-extrabold text-amber-400 group-hover:scale-105 transition origin-left" id="user-coins">1,250</p>
+                        <p class="text-2xl font-black text-amber-400 group-hover:scale-105 transition origin-left" id="user-coins">1,250</p>
                         <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-2 tracking-wider">
                             <span>COINS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-amber-400/80"></i>
                         </p>
                     </div>
                     <div onclick="openHistory('gems')" class="bg-black/40 p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-cyan-400/40 transition group">
-                        <p class="text-2xl font-extrabold text-cyan-400 group-hover:scale-105 transition origin-left" id="user-gems">12</p>
+                        <p class="text-2xl font-black text-cyan-400 group-hover:scale-105 transition origin-left" id="user-gems">12</p>
                         <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-2 tracking-wider">
                             <span>DIAMONDS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-cyan-400/80"></i>
                         </p>
@@ -118,15 +124,15 @@
                 </div>
             </div>
 
-            <!-- Pro Quick Access Banner -->
-            <div class="pro-card p-5 rounded-3xl border border-white/10 flex items-center justify-between">
+            <!-- Unique Feature Banner -->
+            <div class="cyber-card p-5 rounded-3xl flex items-center justify-between">
                 <div class="flex items-center gap-3.5">
-                    <div class="w-12 h-12 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 text-lg font-bold">
-                        <i class="fa-solid fa-shield-cat"></i>
+                    <div class="w-12 h-12 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 text-xl font-bold">
+                        <i class="fa-solid fa-bolt-lightning"></i>
                     </div>
                     <div>
-                        <h2 class="text-xs font-extrabold text-white">Secure Escrow System</h2>
-                        <p class="text-[10px] text-gray-400 mt-0.5">100% safe deposits & fast automated withdrawals.</p>
+                        <h2 class="text-xs font-black text-white uppercase tracking-wider">Elite VIP Status</h2>
+                        <p class="text-[10px] text-gray-400 mt-0.5">Fast automated deposits & secure payouts.</p>
                     </div>
                 </div>
             </div>
@@ -134,21 +140,21 @@
 
         <!-- TAB 2: REFERRAL VIEW -->
         <div id="tab-refer" class="hidden space-y-5">
-            <div class="pro-card p-6 rounded-3xl space-y-5 border border-orange-500/20">
+            <div class="cyber-card p-6 rounded-3xl space-y-5 border border-orange-500/20">
                 <div class="text-center space-y-2">
                     <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-orange-500/20 to-amber-500/10 border border-orange-500/30 text-orange-400 flex items-center justify-center mx-auto text-xl shadow-lg">
                         <i class="fa-solid fa-users"></i>
                     </div>
-                    <h2 class="text-base font-extrabold text-orange-400">Refer & Earn Rewards</h2>
+                    <h2 class="text-base font-black text-orange-400">Refer & Earn Rewards</h2>
                     <p class="text-[11px] text-gray-400">Invite players & earn high commission bonuses.</p>
                 </div>
 
                 <div class="flex justify-between items-center bg-black/40 p-4 rounded-2xl border border-white/5">
                     <div>
                         <p class="text-[10px] text-gray-400 uppercase font-semibold tracking-wider">My Referral Code</p>
-                        <p id="ref-code" class="font-extrabold tracking-widest text-orange-400 text-lg mt-0.5">Loading...</p>
+                        <p id="ref-code" class="font-black tracking-widest text-orange-400 text-lg mt-0.5">Loading...</p>
                     </div>
-                    <button onclick="copyRef()" class="text-xs bg-white/10 hover:bg-white/20 px-4 py-2.5 rounded-xl font-extrabold transition active:scale-95 text-white">COPY</button>
+                    <button onclick="copyRef()" class="text-xs bg-white/10 hover:bg-white/20 px-4 py-2.5 rounded-xl font-bold transition active:scale-95 text-white">COPY</button>
                 </div>
                 
                 <div class="pt-3 border-t border-white/10 space-y-2.5">
@@ -164,18 +170,18 @@
 
         <!-- TAB 3: PROMO CODE VIEW -->
         <div id="tab-promo" class="hidden space-y-5">
-            <div class="pro-card p-6 rounded-3xl space-y-5 border border-purple-500/20">
+            <div class="cyber-card p-6 rounded-3xl space-y-5 border border-purple-500/20">
                 <div class="text-center space-y-2">
                     <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-500/20 to-indigo-500/10 border border-purple-500/30 text-purple-400 flex items-center justify-center mx-auto text-xl shadow-lg">
                         <i class="fa-solid fa-gift"></i>
                     </div>
-                    <h2 class="text-base font-extrabold text-purple-400">Promo Code & Bonuses</h2>
-                    <p class="text-[11px] text-gray-400">Redeem bonus vouchers instantly into your account.</p>
+                    <h2 class="text-base font-black text-purple-400">Promo Code & Bonuses</h2>
+                    <p class="text-[11px] text-gray-400">Redeem exclusive bonus codes instantly.</p>
                 </div>
 
                 <div class="space-y-3.5 pt-1">
-                    <input type="text" id="promo-input" class='w-full bg-black/50 border border-white/10 p-4 text-xs rounded-2xl text-purple-300 font-extrabold uppercase focus:outline-none focus:border-purple-500 transition tracking-wider' placeholder='ENTER PROMO CODE'>
-                    <button onclick="applyPromoCode()" class='w-full py-4 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 rounded-2xl font-extrabold text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>APPLY CODE</button>
+                    <input type="text" id="promo-input" class='w-full bg-black/50 border border-white/10 p-4 text-xs rounded-2xl text-purple-300 font-black uppercase focus:outline-none focus:border-purple-500 transition tracking-wider' placeholder='ENTER PROMO CODE'>
+                    <button onclick="applyPromoCode()" class='w-full py-4 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 rounded-2xl font-black text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>APPLY CODE</button>
                 </div>
 
                 <div class='text-center pt-3 border-t border-white/10 mt-2'>
@@ -188,12 +194,12 @@
 
         <!-- TAB 4: WITHDRAW VIEW -->
         <div id="tab-withdraw" class="hidden space-y-5">
-            <div class="pro-card p-6 rounded-3xl space-y-5 border border-emerald-500/30 neon-glow-green">
+            <div class="cyber-card p-6 rounded-3xl space-y-5 border border-emerald-500/30">
                 <div class="text-center space-y-2">
                     <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500/20 to-green-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto text-xl shadow-lg">
                         <i class="fa-solid fa-wallet"></i>
                     </div>
-                    <h2 class="text-base font-extrabold text-emerald-400">Withdraw Earnings</h2>
+                    <h2 class="text-base font-black text-emerald-400">Withdraw Earnings</h2>
                     <p class="text-[11px] text-gray-400">Convert your gaming coins safely & securely.</p>
                 </div>
 
@@ -209,37 +215,37 @@
 
                     <div>
                         <label class="text-[11px] text-gray-300 font-bold block mb-1.5 uppercase tracking-wider">Enter Coins Amount</label>
-                        <input type='number' id='w-amt' placeholder='e.g. 500' class='w-full bg-black/50 border border-white/10 p-3.5 text-xs rounded-2xl text-amber-400 font-extrabold focus:outline-none focus:border-emerald-500 transition'>
+                        <input type='number' id='w-amt' placeholder='e.g. 500' class='w-full bg-black/50 border border-white/10 p-3.5 text-xs rounded-2xl text-amber-400 font-black focus:outline-none focus:border-emerald-500 transition'>
                     </div>
 
-                    <button onclick="submitWithdraw()" class='w-full py-4 bg-gradient-to-r from-emerald-600 to-green-600 rounded-2xl font-extrabold text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>SUBMIT WITHDRAWAL</button>
+                    <button onclick="submitWithdraw()" class='w-full py-4 bg-gradient-to-r from-emerald-600 to-green-600 rounded-2xl font-black text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>SUBMIT WITHDRAWAL</button>
                 </div>
             </div>
         </div>
 
         <!-- ADMIN PANEL VIEW -->
         <div id="admin-view" class="hidden space-y-4">
-            <div class="pro-card p-4 rounded-3xl border border-orange-500/30 flex justify-between items-center">
+            <div class="cyber-card p-4 rounded-3xl border border-orange-500/30 flex justify-between items-center">
                 <div>
-                    <h1 class="text-base font-extrabold text-orange-400 italic">ZyloBet Admin Panel</h1>
+                    <h1 class="text-base font-black text-orange-400 italic">ZyloBet Admin Panel</h1>
                     <p class="text-[10px] text-gray-400">Live Requests & Secure Proofs</p>
                 </div>
-                <button onclick="loadAdminRequests()" class="bg-white/10 hover:bg-white/20 text-xs px-3.5 py-2 rounded-xl font-extrabold text-amber-400 transition active:scale-95">
+                <button onclick="loadAdminRequests()" class="bg-white/10 hover:bg-white/20 text-xs px-3.5 py-2 rounded-xl font-bold text-amber-400 transition active:scale-95">
                     <i class="fa-solid fa-rotate mr-1"></i> Refresh
                 </button>
             </div>
 
             <div class="grid grid-cols-2 gap-2.5">
-                <button onclick="switchAdminTab('deposit')" id="adm-tab-dep" class="py-3 bg-gradient-to-r from-orange-600 to-amber-600 rounded-2xl font-extrabold text-xs shadow-lg transition">Deposit Requests</button>
-                <button onclick="switchAdminTab('withdraw')" id="adm-tab-wit" class="py-3 bg-black/50 border border-white/10 text-gray-400 rounded-2xl font-extrabold text-xs shadow transition">Withdrawal Requests</button>
+                <button onclick="switchAdminTab('deposit')" id="adm-tab-dep" class="py-3 bg-gradient-to-r from-orange-600 to-amber-600 rounded-2xl font-black text-xs shadow-lg transition">Deposit Requests</button>
+                <button onclick="switchAdminTab('withdraw')" id="adm-tab-wit" class="py-3 bg-black/50 border border-white/10 text-gray-400 rounded-2xl font-black text-xs shadow transition">Withdrawal Requests</button>
             </div>
 
             <div id="admin-requests-container" class="space-y-3"></div>
         </div>
     </div>
 
-    <!-- FIXED PRO BOTTOM NAVIGATION BAR -->
-    <nav class="fixed bottom-3 left-4 right-4 max-w-lg mx-auto bg-[#0a0d14]/90 backdrop-blur-xl border border-white/10 px-3 py-2.5 flex justify-around items-center z-40 rounded-3xl shadow-2xl">
+    <!-- FIXED CYBER BOTTOM NAVIGATION BAR -->
+    <nav class="fixed bottom-3 left-4 right-4 max-w-lg mx-auto bg-[#0c101c]/90 backdrop-blur-xl border border-white/10 px-3 py-2.5 flex justify-around items-center z-40 rounded-3xl shadow-2xl">
         <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center gap-1 text-orange-400 transition py-1 px-4 rounded-2xl bg-orange-500/10">
             <i class="fa-solid fa-house text-base"></i>
             <span class="text-[10px] font-extrabold tracking-wide">Home</span>
@@ -260,8 +266,8 @@
 
     <!-- Modals -->
     <div id="modal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md p-5 flex flex-col justify-center">
-        <div class="pro-card p-6 rounded-3xl border border-white/10 shadow-2xl">
-            <h2 id="modal-title" class="font-extrabold text-center mb-5 text-sm tracking-widest text-orange-400 uppercase">Request</h2>
+        <div class="cyber-card p-6 rounded-3xl border border-white/10 shadow-2xl">
+            <h2 id="modal-title" class="font-black text-center mb-5 text-sm tracking-widest text-orange-400 uppercase">Request</h2>
             <div id="modal-content" class="space-y-4"></div>
             <button onclick="closeModal()" class="w-full mt-5 bg-white/5 hover:bg-white/10 text-gray-400 text-xs font-bold py-3 rounded-2xl transition border border-white/5">CANCEL</button>
         </div>
@@ -269,7 +275,7 @@
 
     <div id="img-modal" class="hidden fixed inset-0 z-50 bg-black/95 backdrop-blur-xl p-5 flex flex-col items-center justify-center">
         <img id="modal-img" src="" alt="Proof" class="max-h-[75vh] max-w-full rounded-2xl border border-white/10 mb-5 object-contain shadow-2xl">
-        <button onclick="document.getElementById('img-modal').classList.add('hidden')" class="px-8 py-3 bg-white/10 hover:bg-white/20 rounded-2xl font-extrabold text-xs text-white transition border border-white/10">CLOSE PROOF</button>
+        <button onclick="document.getElementById('img-modal').classList.add('hidden')" class="px-8 py-3 bg-white/10 hover:bg-white/20 rounded-2xl font-black text-xs text-white transition border border-white/10">CLOSE PROOF</button>
     </div>
 
     <script>
@@ -334,7 +340,7 @@
             }
         }
 
-        // Bottom Navigation Tab Switcher with Pro Active Glow
+        // Bottom Navigation Tab Switcher
         function switchTab(tab) {
             ['home', 'refer', 'promo', 'withdraw'].forEach(t => {
                 document.getElementById('tab-' + t).classList.add('hidden');
@@ -382,7 +388,6 @@
             inputField.disabled = true;
         }
 
-        // Apply Promo Code Function
         function applyPromoCode() {
             const promoVal = document.getElementById('promo-input').value.trim();
             if(!promoVal) {
@@ -393,7 +398,6 @@
             document.getElementById('promo-input').value = '';
         }
 
-        // Transaction History Viewer
         function openHistory(type) {
             document.getElementById('modal').classList.remove('hidden');
             const title = document.getElementById('modal-title');
@@ -403,18 +407,18 @@
                 title.innerText = "COINS TRANSACTION HISTORY";
                 content.innerHTML = `
                     <div class='space-y-2 max-h-60 overflow-y-auto text-xs'>
-                        <div class='flex justify-between bg-black/40 p-3 rounded-2xl border border-white/5 items-center'>
-                            <div><p class='font-extrabold text-emerald-400 text-sm'>+1,000 Coins</p><p class='text-[10px] text-gray-400 mt-0.5'>Welcome Bonus</p></div>
-                            <span class='text-[10px] text-gray-500 font-semibold'>Today</span>
+                        <div class='flex justify-between bg-black/40 p-3.5 rounded-2xl border border-white/5 items-center'>
+                            <div><p class='font-black text-emerald-400 text-sm'>+1,000 Coins</p><p class='text-[10px] text-gray-400 mt-0.5'>Welcome Bonus</p></div>
+                            <span class='text-[10px] text-gray-500 font-bold'>Today</span>
                         </div>
                     </div>`;
             } else if(type === 'gems') {
                 title.innerText = "DIAMONDS TRANSACTION HISTORY";
                 content.innerHTML = `
                     <div class='space-y-2 max-h-60 overflow-y-auto text-xs'>
-                        <div class='flex justify-between bg-black/40 p-3 rounded-2xl border border-white/5 items-center'>
-                            <div><p class='font-extrabold text-cyan-400 text-sm'>+${userGems} Diamonds</p><p class='text-[10px] text-gray-400 mt-0.5'>Current Balance</p></div>
-                            <span class='text-[10px] text-gray-500 font-semibold'>Active</span>
+                        <div class='flex justify-between bg-black/40 p-3.5 rounded-2xl border border-white/5 items-center'>
+                            <div><p class='font-black text-cyan-400 text-sm'>+${userGems} Diamonds</p><p class='text-[10px] text-gray-400 mt-0.5'>Current Balance</p></div>
+                            <span class='text-[10px] text-gray-500 font-bold'>Active</span>
                         </div>
                     </div>`;
             }
@@ -430,10 +434,10 @@
                     </div>
                     <div>
                         <label class='text-gray-300 font-bold block mb-1.5 uppercase tracking-wider text-[11px]'>Enter Diamond Amount (1 - 1000)</label>
-                        <input type='number' id='deposit-amount-input' min='1' max='1000' placeholder='e.g. 100' class='w-full bg-black/50 border border-white/10 p-3.5 rounded-2xl font-extrabold text-cyan-400 focus:outline-none focus:border-orange-500 transition'>
+                        <input type='number' id='deposit-amount-input' min='1' max='1000' placeholder='e.g. 100' class='w-full bg-black/50 border border-white/10 p-3.5 rounded-2xl font-black text-cyan-400 focus:outline-none focus:border-orange-500 transition'>
                     </div>
                     <p id='deposit-err' class='text-red-400 text-[11px] h-4 font-semibold'></p>
-                    <button onclick='proceedToPayment()' class='w-full py-4 bg-gradient-to-r from-orange-500 via-amber-500 to-red-600 rounded-2xl font-extrabold text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>NEXT</button>
+                    <button onclick='proceedToPayment()' class='w-full py-4 bg-gradient-to-r from-orange-500 via-amber-500 to-red-600 rounded-2xl font-black text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>NEXT</button>
                 </div>`;
         }
 
@@ -451,21 +455,20 @@
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs text-center max-h-[70vh] overflow-y-auto px-1'>
                     <p class='text-gray-300 font-medium'>Send payment to UPI ID:</p>
-                    <div class='bg-black/60 border border-white/10 p-3.5 rounded-2xl font-mono text-orange-400 font-extrabold select-all text-sm tracking-wider'>raj-prashant@fam</div>
+                    <div class='bg-black/60 border border-white/10 p-3.5 rounded-2xl font-mono text-orange-400 font-black select-all text-sm tracking-wider'>raj-prashant@fam</div>
                     
                     <p class='text-gray-400 text-[11px] text-left font-semibold'>Payment screenshot upload karein:</p>
                     <input type='file' id='payment-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300'>
                     <p id='proof-err' class='text-red-400 text-[11px] h-4 font-semibold text-left'></p>
                     
-                    <button onclick="submitDepositProof('${username}', ${amt})" class='w-full py-4 bg-gradient-to-r from-emerald-600 to-green-600 rounded-2xl font-extrabold text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>SEND PROOF</button>
+                    <button onclick="submitDepositProof('${username}', ${amt})" class='w-full py-4 bg-gradient-to-r from-emerald-600 to-green-600 rounded-2xl font-black text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>SEND PROOF</button>
                     
-                    <!-- Note & Warning Section -->
                     <div class='bg-blue-500/10 border border-blue-500/30 p-3.5 rounded-2xl text-left space-y-2.5 mt-2'>
                         <p class='text-blue-300 text-[11px] font-semibold leading-relaxed'>
                             <i class='fa-solid fa-circle-info mr-1'></i> <b>Note:</b> Deposit ka amount 24 hours ke andar add kar diya jayega. Contact:
                         </p>
                         <div class='text-center pt-1'>
-                            <a href='https://t.me/Raj_Prashant' target='_blank' class='inline-flex items-center gap-1.5 text-xs text-blue-400 font-extrabold bg-blue-500/20 px-4 py-2 rounded-xl transition hover:bg-blue-500/30'>
+                            <a href='https://t.me/Raj_Prashant' target='_blank' class='inline-flex items-center gap-1.5 text-xs text-blue-400 font-black bg-blue-500/20 px-4 py-2 rounded-xl transition hover:bg-blue-500/30'>
                                 <i class='fa-brands fa-telegram text-base'></i> @Raj_Prashant
                             </a>
                         </div>
@@ -527,11 +530,11 @@
             const dBtn = document.getElementById('adm-tab-dep');
             const wBtn = document.getElementById('adm-tab-wit');
             if(tab === 'deposit') {
-                dBtn.className = "py-3 bg-gradient-to-r from-orange-600 to-amber-600 rounded-2xl font-extrabold text-xs shadow-lg transition";
-                wBtn.className = "py-3 bg-black/50 border border-white/10 text-gray-400 rounded-2xl font-extrabold text-xs shadow transition";
+                dBtn.className = "py-3 bg-gradient-to-r from-orange-600 to-amber-600 rounded-2xl font-black text-xs shadow-lg transition";
+                wBtn.className = "py-3 bg-black/50 border border-white/10 text-gray-400 rounded-2xl font-black text-xs shadow transition";
             } else {
-                wBtn.className = "py-3 bg-gradient-to-r from-orange-600 to-amber-600 rounded-2xl font-extrabold text-xs shadow-lg transition";
-                dBtn.className = "py-3 bg-black/50 border border-white/10 text-gray-400 rounded-2xl font-extrabold text-xs shadow transition";
+                wBtn.className = "py-3 bg-gradient-to-r from-orange-600 to-amber-600 rounded-2xl font-black text-xs shadow-lg transition";
+                dBtn.className = "py-3 bg-black/50 border border-white/10 text-gray-400 rounded-2xl font-black text-xs shadow transition";
             }
             loadAdminRequests();
         }
@@ -543,34 +546,34 @@
             if(adminTab === 'deposit') {
                 let reqs = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
                 if(reqs.length === 0) {
-                    container.innerHTML = `<div class='pro-card p-6 text-center text-gray-500 text-xs rounded-2xl border border-white/5'>No pending deposit requests.</div>`;
+                    container.innerHTML = `<div class='cyber-card p-6 text-center text-gray-500 text-xs rounded-2xl border border-white/5'>No pending deposit requests.</div>`;
                     return;
                 }
                 reqs.forEach(r => {
                     container.innerHTML += `
-                        <div class='pro-card p-4 rounded-2xl border border-white/10 space-y-3 text-xs shadow-lg'>
-                            <div class='flex justify-between font-extrabold'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-cyan-400 text-sm'>${r.amount} Diamonds</span></div>
-                            <button onclick="document.getElementById('modal-img').src='${r.proof}'; document.getElementById('img-modal').classList.remove('hidden');" class='w-full bg-white/5 hover:bg-white/10 py-2.5 rounded-xl font-extrabold text-[11px] transition border border-white/5 text-gray-200'>View Proof Screenshot</button>
+                        <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-3 text-xs shadow-lg'>
+                            <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-cyan-400 text-sm'>${r.amount} Diamonds</span></div>
+                            <button onclick="document.getElementById('modal-img').src='${r.proof}'; document.getElementById('img-modal').classList.remove('hidden');" class='w-full bg-white/5 hover:bg-white/10 py-2.5 rounded-xl font-black text-[11px] transition border border-white/5 text-gray-200'>View Proof Screenshot</button>
                             <div class='grid grid-cols-2 gap-2 pt-1'>
-                                <button onclick="handleAdmDep(${r.id}, 'approve', ${r.amount})" class='bg-emerald-600 hover:bg-emerald-500 py-3 rounded-xl font-extrabold transition shadow-md'>APPROVE</button>
-                                <button onclick="handleAdmDep(${r.id}, 'reject', 0)" class='bg-red-600 hover:bg-red-500 py-3 rounded-xl font-extrabold transition shadow-md'>REJECT</button>
+                                <button onclick="handleAdmDep(${r.id}, 'approve', ${r.amount})" class='bg-emerald-600 hover:bg-emerald-500 py-3 rounded-xl font-black transition shadow-md'>APPROVE</button>
+                                <button onclick="handleAdmDep(${r.id}, 'reject', 0)" class='bg-red-600 hover:bg-red-500 py-3 rounded-xl font-black transition shadow-md'>REJECT</button>
                             </div>
                         </div>`;
                 });
             } else {
                 let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
                 if(reqs.length === 0) {
-                    container.innerHTML = `<div class='pro-card p-6 text-center text-gray-500 text-xs rounded-2xl border border-white/5'>No pending withdrawal requests.</div>`;
+                    container.innerHTML = `<div class='cyber-card p-6 text-center text-gray-500 text-xs rounded-2xl border border-white/5'>No pending withdrawal requests.</div>`;
                     return;
                 }
                 reqs.forEach(r => {
                     container.innerHTML += `
-                        <div class='pro-card p-4 rounded-2xl border border-white/10 space-y-3 text-xs shadow-lg'>
-                            <div class='flex justify-between font-extrabold'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-amber-400 text-sm'>${r.amount} Coins</span></div>
-                            <p class='text-gray-400 font-semibold'>Method: <span class="text-white">${r.method}</span></p>
+                        <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-3 text-xs shadow-lg'>
+                            <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-amber-400 text-sm'>${r.amount} Coins</span></div>
+                            <p class='text-gray-400 font-bold'>Method: <span class="text-white">${r.method}</span></p>
                             <div class='grid grid-cols-2 gap-2 pt-1'>
-                                <button onclick="handleAdmWit(${r.id}, 'approve')" class='bg-emerald-600 hover:bg-emerald-500 py-3 rounded-xl font-extrabold transition shadow-md'>APPROVE</button>
-                                <button onclick="handleAdmWit(${r.id}, 'reject')" class='bg-red-600 hover:bg-red-500 py-3 rounded-xl font-extrabold transition shadow-md'>REJECT</button>
+                                <button onclick="handleAdmWit(${r.id}, 'approve')" class='bg-emerald-600 hover:bg-emerald-500 py-3 rounded-xl font-black transition shadow-md'>APPROVE</button>
+                                <button onclick="handleAdmWit(${r.id}, 'reject')" class='bg-red-600 hover:bg-red-500 py-3 rounded-xl font-black transition shadow-md'>REJECT</button>
                             </div>
                         </div>`;
                 });
