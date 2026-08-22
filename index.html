@@ -84,19 +84,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Welcome / Banner Box -->
-            <div class="card p-5 rounded-3xl space-y-3">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-2xl bg-orange-600/20 flex items-center justify-center text-orange-400 text-xl font-bold">
-                        <i class="fa-solid fa-bolt-lightning"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-sm font-bold text-white">Welcome to ZyloBet</h2>
-                        <p class="text-[10px] text-gray-400">Play, deposit, refer, and win big rewards daily.</p>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- TAB 2: REFERRAL VIEW -->
@@ -129,7 +116,31 @@
             </div>
         </div>
 
-        <!-- TAB 3: WITHDRAW VIEW -->
+        <!-- TAB 3: PROMO CODE VIEW -->
+        <div id="tab-promo" class="hidden space-y-5">
+            <div class="card p-6 rounded-3xl space-y-4 border-purple-500/30">
+                <div class="text-center space-y-2">
+                    <div class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center mx-auto text-xl">
+                        <i class="fa-solid fa-gift"></i>
+                    </div>
+                    <h2 class="text-sm font-black text-purple-500">Promo Code & Bonuses</h2>
+                    <p class="text-[10px] text-gray-400">Redeem exclusive bonus codes & join our community.</p>
+                </div>
+
+                <div class="space-y-3 pt-2">
+                    <input type="text" id="promo-input" class='w-full bg-gray-900 border border-gray-800 p-3 text-xs rounded-xl text-purple-300 font-bold uppercase' placeholder='ENTER PROMO CODE'>
+                    <button onclick="applyPromoCode()" class='w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl font-bold text-xs shadow-lg transition hover:from-purple-500 hover:to-indigo-500'>APPLY CODE</button>
+                </div>
+
+                <div class='text-center pt-2 border-t border-gray-800 mt-3'>
+                    <a href='https://t.me/+2vDL5Gmbee0zNDFl' target='_blank' class='inline-flex items-center gap-2 text-xs text-blue-400 font-bold bg-blue-500/10 border border-blue-500/20 px-4 py-2.5 rounded-xl w-full justify-center'>
+                        <i class='fa-brands fa-telegram text-base'></i> Join Telegram Channel
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: WITHDRAW VIEW -->
         <div id="tab-withdraw" class="hidden space-y-5">
             <div class="card p-6 rounded-3xl space-y-4 border-green-500/30">
                 <div class="text-center space-y-2">
@@ -156,30 +167,6 @@
             </div>
         </div>
 
-        <!-- TAB 4: PROMO CODE VIEW -->
-        <div id="tab-promo" class="hidden space-y-5">
-            <div class="card p-6 rounded-3xl space-y-4 border-purple-500/30">
-                <div class="text-center space-y-2">
-                    <div class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center mx-auto text-xl">
-                        <i class="fa-solid fa-gift"></i>
-                    </div>
-                    <h2 class="text-sm font-black text-purple-500">Promo Code & Bonuses</h2>
-                    <p class="text-[10px] text-gray-400">Redeem exclusive bonus codes & join our community.</p>
-                </div>
-
-                <div class="space-y-3 pt-2">
-                    <input type="text" id="promo-input" class='w-full bg-gray-900 border border-gray-800 p-3 text-xs rounded-xl text-purple-300 font-bold uppercase' placeholder='ENTER PROMO CODE'>
-                    <button onclick="applyPromoCode()" class='w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl font-bold text-xs shadow-lg transition hover:from-purple-500 hover:to-indigo-500'>APPLY CODE</button>
-                </div>
-
-                <div class='text-center pt-2 border-t border-gray-800 mt-3'>
-                    <a href='https://t.me/+2vDL5Gmbee0zNDFl' target='_blank' class='inline-flex items-center gap-2 text-xs text-blue-400 font-bold bg-blue-500/10 border border-blue-500/20 px-4 py-2.5 rounded-xl w-full justify-center'>
-                        <i class='fa-brands fa-telegram text-base'></i> Join Telegram Channel
-                    </a>
-                </div>
-            </div>
-        </div>
-
         <!-- ADMIN PANEL VIEW -->
         <div id="admin-view" class="hidden space-y-4">
             <div class="card p-4 rounded-2xl border-orange-500/30 flex justify-between items-center">
@@ -201,7 +188,7 @@
         </div>
     </div>
 
-    <!-- FIXED BOTTOM NAVIGATION BAR WITH 4 TABS -->
+    <!-- FIXED BOTTOM NAVIGATION BAR -->
     <nav class="fixed bottom-0 left-0 right-0 max-w-lg mx-auto bg-[#0a0d14]/95 backdrop-blur-md border-t border-gray-800 px-4 py-3 flex justify-around items-center z-40">
         <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center gap-1 text-orange-500 transition">
             <i class="fa-solid fa-house text-lg"></i>
@@ -211,13 +198,13 @@
             <i class="fa-solid fa-users text-lg"></i>
             <span class="text-[10px] font-bold">Refer</span>
         </button>
-        <button onclick="switchTab('withdraw')" id="nav-withdraw" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition">
-            <i class="fa-solid fa-wallet text-lg"></i>
-            <span class="text-[10px] font-bold">Withdraw</span>
-        </button>
         <button onclick="switchTab('promo')" id="nav-promo" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition">
             <i class="fa-solid fa-gift text-lg"></i>
             <span class="text-[10px] font-bold">Promo</span>
+        </button>
+        <button onclick="switchTab('withdraw')" id="nav-withdraw" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition">
+            <i class="fa-solid fa-wallet text-lg"></i>
+            <span class="text-[10px] font-bold">Withdraw</span>
         </button>
     </nav>
 
@@ -283,8 +270,8 @@
             if(isViewingAdmin) {
                 document.getElementById('tab-home').classList.add('hidden');
                 document.getElementById('tab-refer').classList.add('hidden');
-                document.getElementById('tab-withdraw').classList.add('hidden');
                 document.getElementById('tab-promo').classList.add('hidden');
+                document.getElementById('tab-withdraw').classList.add('hidden');
                 document.querySelector('nav').classList.add('hidden');
                 document.getElementById('admin-view').classList.remove('hidden');
                 document.getElementById('view-toggle-btn').innerText = "Back to User App";
@@ -297,9 +284,9 @@
             }
         }
 
-        // Bottom Navigation Tab Switcher (4 Tabs)
+        // Bottom Navigation Tab Switcher
         function switchTab(tab) {
-            ['home', 'refer', 'withdraw', 'promo'].forEach(t => {
+            ['home', 'refer', 'promo', 'withdraw'].forEach(t => {
                 document.getElementById('tab-' + t).classList.add('hidden');
                 document.getElementById('nav-' + t).className = "flex flex-col items-center gap-1 text-gray-400 hover:text-white transition";
             });
