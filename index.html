@@ -11,11 +11,11 @@
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
         
         body { 
-            background: #090d16;
+            background: #05080f;
             background-image: 
                 radial-gradient(circle at 0% 20%, rgba(0, 180, 255, 0.35) 0%, transparent 55%),
                 radial-gradient(circle at 100% 20%, rgba(244, 63, 94, 0.35) 0%, transparent 55%),
-                linear-gradient(180deg, #070a14 0%, #120c1f 100%);
+                linear-gradient(180deg, #03050a 0%, #0d0817 100%);
             background-attachment: fixed;
             color: #f1f5f9; 
             font-family: 'Outfit', sans-serif; 
@@ -23,9 +23,9 @@
         }
 
         .cyber-card { 
-            background: linear-gradient(135deg, rgba(20, 27, 45, 0.75) 0%, rgba(10, 14, 23, 0.9) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            background: linear-gradient(135deg, rgba(20, 27, 45, 0.8) 0%, rgba(10, 14, 23, 0.95) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(20px);
             position: relative;
             overflow: hidden;
@@ -35,44 +35,56 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(0, 180, 255, 0.5), transparent);
+            background: linear-gradient(90deg, transparent, rgba(0, 180, 255, 0.6), transparent);
         }
 
-        /* Pro-Level 3D Realistic Glossy Icons Styling */
+        /* ULTRA PRO-LEVEL 3D GLOSSY COIN */
         .icon-3d-coin {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 34px;
-            height: 34px;
-            background: radial-gradient(circle at 30% 30%, #fffb96 0%, #facc15 40%, #ca8a04 80%, #713f12 100%);
+            width: 36px;
+            height: 36px;
+            background: radial-gradient(circle at 35% 35%, #fffb8f 0%, #facc15 35%, #ca8a04 70%, #451a03 100%);
             border-radius: 50%;
-            box-shadow: inset 0 3px 6px rgba(255, 255, 255, 0.9), inset 0 -4px 8px rgba(0, 0, 0, 0.6), 0 5px 15px rgba(250, 204, 21, 0.5);
-            color: #422006;
-            font-size: 15px;
+            box-shadow: 
+                inset 0 4px 6px rgba(255, 255, 255, 0.95), 
+                inset 0 -5px 8px rgba(0, 0, 0, 0.7), 
+                0 6px 16px rgba(250, 204, 21, 0.6),
+                0 0 12px rgba(234, 179, 8, 0.4);
+            color: #451a03;
+            font-size: 16px;
             font-weight: 900;
-            border: 1px solid #fef08a;
+            border: 2px solid #fef08a;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
         }
 
+        /* ULTRA PRO-LEVEL 3D GLOSSY DIAMOND */
         .icon-3d-gem {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 34px;
-            height: 34px;
-            background: radial-gradient(circle at 30% 30%, #cffafe 0%, #22d3ee 40%, #0891b2 80%, #164e63 100%);
+            width: 36px;
+            height: 36px;
+            background: radial-gradient(circle at 30% 30%, #ecfeff 0%, #22d3ee 35%, #0891b2 75%, #164e63 100%);
             border-radius: 12px;
             transform: rotate(45deg);
-            box-shadow: inset 0 3px 6px rgba(255, 255, 255, 0.9), inset 0 -4px 8px rgba(0, 0, 0, 0.6), 0 5px 15px rgba(34, 211, 238, 0.6);
-            color: #ecfeff;
-            font-size: 14px;
-            border: 1px solid #a5f3fc;
+            box-shadow: 
+                inset 0 4px 6px rgba(255, 255, 255, 0.95), 
+                inset 0 -5px 8px rgba(0, 0, 0, 0.7), 
+                0 6px 18px rgba(6, 182, 212, 0.7),
+                0 0 12px rgba(34, 211, 238, 0.5);
+            color: #ffffff;
+            font-size: 15px;
+            border: 2px solid #a5f3fc;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
         }
         .icon-3d-gem i {
             transform: rotate(-45deg);
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6));
         }
 
-        /* Ensure Inputs are 100% interactive and easy to type */
+        /* Ensure Inputs are 100% interactive */
         input, select, textarea {
             pointer-events: auto !important;
             user-select: text !important;
@@ -96,14 +108,14 @@
         .animate-cyber { animation: cyberPulse 3s infinite ease-in-out; }
 
         ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #070a14; }
+        ::-webkit-scrollbar-track { background: #05080f; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
     </style>
 </head>
 <body class="p-4 pb-28 max-w-lg mx-auto">
 
     <!-- Unique Futuristic Intro Screen -->
-    <div id="intro-screen" class="fixed inset-0 z-[100] bg-[#070a14] flex flex-col items-center justify-center transition-opacity duration-700">
+    <div id="intro-screen" class="fixed inset-0 z-[100] bg-[#05080f] flex flex-col items-center justify-center transition-opacity duration-700">
         <div class="text-center space-y-5">
             <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-cyan-500 via-indigo-600 to-pink-500 mx-auto flex items-center justify-center text-white text-4xl shadow-2xl animate-cyber border border-cyan-400/40">
                 <i class="fa-solid fa-gamepad"></i>
@@ -556,7 +568,7 @@
                     let colorClass = item.type === 'spend' ? 'text-red-400' : 'text-amber-400';
                     html += `
                         <div class='flex justify-between bg-black/40 p-3 rounded-2xl border border-white/5 items-center'>
-                            <div><p class='font-black ${colorClass} text-sm flex items-center gap-1.5'>${item.amount} <span class='icon-3d-coin' style='width:20px;height:20px;font-size:9px;'><i class='fa-solid fa-c'></i></span></p><p class='text-[10px] text-gray-300 font-bold mt-0.5'>Source: ${item.title}</p></div>
+                            <div><p class='font-black ${colorClass} text-sm flex items-center gap-1.5'>${item.amount} <span class='icon-3d-coin' style='width:22px;height:22px;font-size:10px;'><i class='fa-solid fa-c'></i></span></p><p class='text-[10px] text-gray-300 font-bold mt-0.5'>Source: ${item.title}</p></div>
                             <span class='text-[10px] text-gray-400 font-bold'>${item.time}</span>
                         </div>`;
                 });
@@ -569,7 +581,7 @@
                 history.forEach(item => {
                     html += `
                         <div class='flex justify-between bg-black/40 p-3 rounded-2xl border border-white/5 items-center'>
-                            <div><p class='font-black text-cyan-400 text-sm flex items-center gap-1.5'>${item.amount} <span class='icon-3d-gem' style='width:20px;height:20px;font-size:8px;'><i class='fa-solid fa-gem'></i></span></p><p class='text-[10px] text-gray-300 font-bold mt-0.5'>Source: ${item.title}</p></div>
+                            <div><p class='font-black text-cyan-400 text-sm flex items-center gap-1.5'>${item.amount} <span class='icon-3d-gem' style='width:22px;height:22px;font-size:9px;'><i class='fa-solid fa-gem'></i></span></p><p class='text-[10px] text-gray-300 font-bold mt-0.5'>Source: ${item.title}</p></div>
                             <span class='text-[10px] text-gray-400 font-bold'>${item.time}</span>
                         </div>`;
                 });
@@ -583,8 +595,8 @@
             document.getElementById('modal-title').innerText = "DEPOSIT DIAMONDS";
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs'>
-                    <div class='bg-cyan-500/10 border border-cyan-500/30 p-3 rounded-2xl text-cyan-300 font-bold text-center tracking-wide flex items-center justify-center gap-1.5'>
-                        <span class='icon-3d-gem' style='width:22px;height:22px;font-size:9px;'><i class='fa-solid fa-gem'></i></span> 1 Diamond = ₹1 Rs
+                    <div class='bg-cyan-500/10 border border-cyan-500/30 p-3 rounded-2xl text-cyan-300 font-bold text-center tracking-wide flex items-center justify-center gap-2'>
+                        <span class='icon-3d-gem' style='width:24px;height:24px;font-size:10px;'><i class='fa-solid fa-gem'></i></span> 1 Diamond = ₹1 Rs
                     </div>
                     <div>
                         <label class='text-gray-300 font-bold block mb-1.5 uppercase tracking-wider text-[11px]'>Enter Diamond Amount (1 - 1000)</label>
