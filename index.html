@@ -11,11 +11,12 @@
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
         
         body { 
-            background: #05070f; 
-            /* Outer background par blue & orange subtle lighting/glow effect jaisa aapne mark kiya */
+            /* Reference image ke jaisa left mein Cyan/Blue aur right mein Pink/Magenta gradient background */
+            background: #090d16;
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.12) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(249, 115, 22, 0.12) 0%, transparent 40%);
+                radial-gradient(circle at 0% 20%, rgba(0, 180, 255, 0.35) 0%, transparent 55%),
+                radial-gradient(circle at 100% 20%, rgba(244, 63, 94, 0.35) 0%, transparent 55%),
+                linear-gradient(180deg, #070a14 0%, #120c1f 100%);
             background-attachment: fixed;
             color: #f1f5f9; 
             font-family: 'Outfit', sans-serif; 
@@ -24,7 +25,7 @@
 
         .cyber-card { 
             background: linear-gradient(135deg, rgba(20, 27, 45, 0.75) 0%, rgba(10, 14, 23, 0.9) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(20px);
             position: relative;
@@ -35,7 +36,7 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.5), transparent);
+            background: linear-gradient(90deg, transparent, rgba(0, 180, 255, 0.5), transparent);
         }
 
         /* Shiny Green Glow for Deposit & Admin Buttons */
@@ -50,30 +51,30 @@
         }
 
         @keyframes cyberPulse {
-            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(249,115,22,0.5)); }
-            50% { transform: scale(1.06); filter: drop-shadow(0 0 30px rgba(249,115,22,0.9)); }
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(0, 180, 255, 0.5)); }
+            50% { transform: scale(1.06); filter: drop-shadow(0 0 30px rgba(244, 63, 94, 0.8)); }
         }
         .animate-cyber { animation: cyberPulse 3s infinite ease-in-out; }
 
         ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #05070f; }
+        ::-webkit-scrollbar-track { background: #070a14; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
     </style>
 </head>
 <body class="p-4 pb-28 max-w-lg mx-auto">
 
     <!-- Unique Futuristic Intro Screen -->
-    <div id="intro-screen" class="fixed inset-0 z-[100] bg-[#05070f] flex flex-col items-center justify-center transition-opacity duration-700">
+    <div id="intro-screen" class="fixed inset-0 z-[100] bg-[#070a14] flex flex-col items-center justify-center transition-opacity duration-700">
         <div class="text-center space-y-5">
-            <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-orange-600 via-amber-500 to-indigo-600 mx-auto flex items-center justify-center text-white text-4xl shadow-2xl animate-cyber border border-orange-400/40">
+            <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-cyan-500 via-indigo-600 to-pink-500 mx-auto flex items-center justify-center text-white text-4xl shadow-2xl animate-cyber border border-cyan-400/40">
                 <i class="fa-solid fa-gamepad"></i>
             </div>
             <div>
-                <h1 class="text-3xl font-black tracking-wider bg-gradient-to-r from-orange-400 via-amber-200 to-indigo-400 bg-clip-text text-transparent italic">ZYLOBET</h1>
+                <h1 class="text-3xl font-black tracking-wider bg-gradient-to-r from-cyan-400 via-white to-pink-500 bg-clip-text text-transparent italic">ZYLOBET</h1>
                 <p class="text-[10px] text-gray-400 mt-1 uppercase tracking-[0.25em] font-bold">Next-Gen Web3 Gaming</p>
             </div>
             <div class="w-40 h-1.5 bg-gray-900 rounded-full mx-auto overflow-hidden mt-4 border border-gray-800">
-                <div id="intro-bar" class="h-full bg-gradient-to-r from-orange-500 to-amber-400 w-0 transition-all duration-500"></div>
+                <div id="intro-bar" class="h-full bg-gradient-to-r from-cyan-400 to-pink-500 w-0 transition-all duration-500"></div>
             </div>
         </div>
     </div>
@@ -90,12 +91,12 @@
         <!-- HEADER SECTION -->
         <header class="cyber-card p-4 rounded-3xl flex justify-between items-center">
             <div class="flex items-center gap-3.5">
-                <div id="user-avatar-container" class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-orange-500 to-indigo-600 flex items-center justify-center font-black text-xl shadow-lg border border-orange-400/30 overflow-hidden text-white">
+                <div id="user-avatar-container" class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 to-pink-500 flex items-center justify-center font-black text-xl shadow-lg border border-cyan-400/30 overflow-hidden text-white">
                     <span id="user-avatar-text">U</span>
                 </div>
                 <div>
-                    <h1 class="text-base font-black tracking-wide text-orange-400 italic leading-none">ZyloBet</h1>
-                    <p id="tg-user" class="text-xs text-blue-400 font-bold mt-1 tracking-wide">@Loading...</p>
+                    <h1 class="text-base font-black tracking-wide text-cyan-400 italic leading-none">ZyloBet</h1>
+                    <p id="tg-user" class="text-xs text-pink-400 font-bold mt-1 tracking-wide">@Loading...</p>
                 </div>
             </div>
             <div class="bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-2xl flex items-center gap-1.5 text-[11px] font-bold text-gray-300">
@@ -137,7 +138,7 @@
             <!-- Feature Banner -->
             <div class="cyber-card p-5 rounded-3xl flex items-center justify-between">
                 <div class="flex items-center gap-3.5">
-                    <div class="w-12 h-12 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 text-xl font-bold">
+                    <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 text-xl font-bold">
                         <i class="fa-solid fa-bolt-lightning"></i>
                     </div>
                     <div>
@@ -150,19 +151,19 @@
 
         <!-- TAB 2: REFERRAL VIEW -->
         <div id="tab-refer" class="hidden space-y-5">
-            <div class="cyber-card p-6 rounded-3xl space-y-5 border border-orange-500/20">
+            <div class="cyber-card p-6 rounded-3xl space-y-5 border border-cyan-500/20">
                 <div class="text-center space-y-2">
-                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-orange-500/20 to-amber-500/10 border border-orange-500/30 text-orange-400 flex items-center justify-center mx-auto text-xl shadow-lg">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-cyan-500/20 to-blue-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center mx-auto text-xl shadow-lg">
                         <i class="fa-solid fa-users"></i>
                     </div>
-                    <h2 class="text-base font-black text-orange-400">Refer & Earn Rewards</h2>
+                    <h2 class="text-base font-black text-cyan-400">Refer & Earn Rewards</h2>
                     <p class="text-[11px] text-gray-400">Invite players & earn high commission bonuses.</p>
                 </div>
 
                 <div class="flex justify-between items-center bg-black/40 p-4 rounded-2xl border border-white/5">
                     <div>
                         <p class="text-[10px] text-gray-400 uppercase font-semibold tracking-wider">My Referral Code</p>
-                        <p id="ref-code" class="font-black tracking-widest text-orange-400 text-lg mt-0.5">Loading...</p>
+                        <p id="ref-code" class="font-black tracking-widest text-cyan-400 text-lg mt-0.5">Loading...</p>
                     </div>
                     <button onclick="copyRef()" class="text-xs bg-white/10 hover:bg-white/20 px-4 py-2.5 rounded-xl font-bold transition active:scale-95 text-white">COPY</button>
                 </div>
@@ -170,7 +171,7 @@
                 <div class="pt-3 border-t border-white/10 space-y-2.5">
                     <p class="text-[11px] text-gray-300 font-semibold">Have a friend's referral code?</p>
                     <div class="flex gap-2">
-                        <input type="text" id="friend-ref-input" placeholder="Enter Code (e.g. ZYL1234)" class="w-full bg-black/50 border border-white/10 px-4 py-3 text-xs rounded-2xl uppercase font-extrabold text-amber-400 focus:outline-none focus:border-orange-500 transition">
+                        <input type="text" id="friend-ref-input" placeholder="Enter Code (e.g. ZYL1234)" class="w-full bg-black/50 border border-white/10 px-4 py-3 text-xs rounded-2xl uppercase font-extrabold text-amber-400 focus:outline-none focus:border-cyan-500 transition">
                         <button onclick="applyReferralCode()" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white text-xs px-5 py-3 rounded-2xl font-extrabold transition shrink-0 active:scale-95 shadow-md">APPLY</button>
                     </div>
                     <p id="ref-status-msg" class="text-[11px] h-4 font-semibold"></p>
@@ -180,22 +181,22 @@
 
         <!-- TAB 3: PROMO CODE VIEW -->
         <div id="tab-promo" class="hidden space-y-5">
-            <div class="cyber-card p-6 rounded-3xl space-y-5 border border-purple-500/20">
+            <div class="cyber-card p-6 rounded-3xl space-y-5 border border-pink-500/20">
                 <div class="text-center space-y-2">
-                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-500/20 to-indigo-500/10 border border-purple-500/30 text-purple-400 flex items-center justify-center mx-auto text-xl shadow-lg">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-pink-500/20 to-purple-500/10 border border-pink-500/30 text-pink-400 flex items-center justify-center mx-auto text-xl shadow-lg">
                         <i class="fa-solid fa-gift"></i>
                     </div>
-                    <h2 class="text-base font-black text-purple-400">Promo Code & Bonuses</h2>
+                    <h2 class="text-base font-black text-pink-400">Promo Code & Bonuses</h2>
                     <p class="text-[11px] text-gray-400">Redeem exclusive bonus codes instantly.</p>
                 </div>
 
                 <div class="space-y-3.5 pt-1">
-                    <input type="text" id="promo-input" class='w-full bg-black/50 border border-white/10 p-4 text-xs rounded-2xl text-purple-300 font-black uppercase focus:outline-none focus:border-purple-500 transition tracking-wider' placeholder='ENTER PROMO CODE'>
-                    <button onclick="applyPromoCode()" class='w-full py-4 bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 rounded-2xl font-black text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>APPLY CODE</button>
+                    <input type="text" id="promo-input" class='w-full bg-black/50 border border-white/10 p-4 text-xs rounded-2xl text-pink-300 font-black uppercase focus:outline-none focus:border-pink-500 transition tracking-wider' placeholder='ENTER PROMO CODE'>
+                    <button onclick="applyPromoCode()" class='w-full py-4 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 rounded-2xl font-black text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>APPLY CODE</button>
                 </div>
 
                 <div class='text-center pt-3 border-t border-white/10 mt-2'>
-                    <a href='https://t.me/+2vDL5Gmbee0zNDFl' target='_blank' class='inline-flex items-center gap-2 text-xs text-blue-400 font-bold bg-blue-500/10 border border-blue-500/20 px-5 py-3 rounded-2xl w-full justify-center transition hover:bg-blue-500/20 active:scale-95'>
+                    <a href='https://t.me/+2vDL5Gmbee0zNDFl' target='_blank' class='inline-flex items-center gap-2 text-xs text-cyan-400 font-bold bg-cyan-500/10 border border-cyan-500/20 px-5 py-3 rounded-2xl w-full justify-center transition hover:bg-cyan-500/20 active:scale-95'>
                         <i class='fa-brands fa-telegram text-base'></i> Join Official Telegram Channel
                     </a>
                 </div>
@@ -235,9 +236,9 @@
 
         <!-- ADMIN PANEL VIEW -->
         <div id="admin-view" class="hidden space-y-4">
-            <div class="cyber-card p-4 rounded-3xl border border-orange-500/30 flex justify-between items-center">
+            <div class="cyber-card p-4 rounded-3xl border border-cyan-500/30 flex justify-between items-center">
                 <div>
-                    <h1 class="text-base font-black text-orange-400 italic">ZyloBet Admin Panel</h1>
+                    <h1 class="text-base font-black text-cyan-400 italic">ZyloBet Admin Panel</h1>
                     <p class="text-[10px] text-gray-400">Live Requests & Secure Proofs</p>
                 </div>
                 <button onclick="loadAdminRequests()" class="bg-white/10 hover:bg-white/20 text-xs px-3.5 py-2 rounded-xl font-bold text-amber-400 transition active:scale-95">
@@ -246,7 +247,7 @@
             </div>
 
             <div class="grid grid-cols-2 gap-2.5">
-                <button onclick="switchAdminTab('deposit')" id="adm-tab-dep" class="py-3 bg-gradient-to-r from-orange-600 to-amber-600 rounded-2xl font-black text-xs shadow-lg transition">Deposit Requests</button>
+                <button onclick="switchAdminTab('deposit')" id="adm-tab-dep" class="py-3 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-2xl font-black text-xs shadow-lg transition">Deposit Requests</button>
                 <button onclick="switchAdminTab('withdraw')" id="adm-tab-wit" class="py-3 bg-black/50 border border-white/10 text-gray-400 rounded-2xl font-black text-xs shadow transition">Withdrawal Requests</button>
             </div>
 
@@ -255,8 +256,8 @@
     </div>
 
     <!-- FIXED CYBER BOTTOM NAVIGATION BAR -->
-    <nav class="fixed bottom-3 left-4 right-4 max-w-lg mx-auto bg-[#0a0f1d]/90 backdrop-blur-xl border border-white/10 px-3 py-2.5 flex justify-around items-center z-40 rounded-3xl shadow-2xl">
-        <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center gap-1 text-orange-400 transition py-1 px-4 rounded-2xl bg-orange-500/10">
+    <nav class="fixed bottom-3 left-4 right-4 max-w-lg mx-auto bg-[#070a14]/90 backdrop-blur-xl border border-white/10 px-3 py-2.5 flex justify-around items-center z-40 rounded-3xl shadow-2xl">
+        <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center gap-1 text-cyan-400 transition py-1 px-4 rounded-2xl bg-cyan-500/10">
             <i class="fa-solid fa-house text-base"></i>
             <span class="text-[10px] font-extrabold tracking-wide">Home</span>
         </button>
@@ -277,7 +278,7 @@
     <!-- Modals -->
     <div id="modal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md p-5 flex flex-col justify-center">
         <div class="cyber-card p-6 rounded-3xl border border-white/10 shadow-2xl">
-            <h2 id="modal-title" class="font-black text-center mb-5 text-sm tracking-widest text-orange-400 uppercase">Request</h2>
+            <h2 id="modal-title" class="font-black text-center mb-5 text-sm tracking-widest text-cyan-400 uppercase">Request</h2>
             <div id="modal-content" class="space-y-4"></div>
             <button onclick="closeModal()" class="w-full mt-5 bg-white/5 hover:bg-white/10 text-gray-400 text-xs font-bold py-3 rounded-2xl transition border border-white/5">CANCEL</button>
         </div>
@@ -354,7 +355,7 @@
             });
 
             document.getElementById('tab-' + tab).classList.remove('hidden');
-            document.getElementById('nav-' + tab).className = "flex flex-col items-center gap-1 text-orange-400 transition py-1 px-4 rounded-2xl bg-orange-500/10";
+            document.getElementById('nav-' + tab).className = "flex flex-col items-center gap-1 text-cyan-400 transition py-1 px-4 rounded-2xl bg-cyan-500/10";
         }
 
         let userCoins = parseInt(localStorage.getItem('zylobet_coins')) || 1250;
@@ -438,7 +439,7 @@
                     </div>
                     <div>
                         <label class='text-gray-300 font-bold block mb-1.5 uppercase tracking-wider text-[11px]'>Enter Diamond Amount (1 - 1000)</label>
-                        <input type='number' id='deposit-amount-input' min='1' max='1000' placeholder='e.g. 100' class='w-full bg-black/50 border border-white/10 p-3.5 rounded-2xl font-black text-cyan-400 focus:outline-none focus:border-orange-500 transition'>
+                        <input type='number' id='deposit-amount-input' min='1' max='1000' placeholder='e.g. 100' class='w-full bg-black/50 border border-white/10 p-3.5 rounded-2xl font-black text-cyan-400 focus:outline-none focus:border-cyan-500 transition'>
                     </div>
                     <p id='deposit-err' class='text-red-400 text-[11px] h-4 font-semibold'></p>
                     <button onclick='proceedToPayment()' class='w-full py-4 shiny-green-btn rounded-2xl font-black text-xs text-white shadow-xl transition active:scale-95 tracking-wide'>NEXT</button>
@@ -459,7 +460,7 @@
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs text-center max-h-[70vh] overflow-y-auto px-1'>
                     <p class='text-gray-300 font-medium'>Send payment to UPI ID:</p>
-                    <div class='bg-black/60 border border-white/10 p-3.5 rounded-2xl font-mono text-orange-400 font-black select-all text-sm tracking-wider'>raj-prashant@fam</div>
+                    <div class='bg-black/60 border border-white/10 p-3.5 rounded-2xl font-mono text-cyan-400 font-black select-all text-sm tracking-wider'>raj-prashant@fam</div>
                     
                     <p class='text-gray-400 text-[11px] text-left font-semibold'>Payment screenshot upload karein:</p>
                     <input type='file' id='payment-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300'>
@@ -533,10 +534,10 @@
             const dBtn = document.getElementById('adm-tab-dep');
             const wBtn = document.getElementById('adm-tab-wit');
             if(tab === 'deposit') {
-                dBtn.className = "py-3 bg-gradient-to-r from-orange-600 to-amber-600 rounded-2xl font-black text-xs shadow-lg transition";
+                dBtn.className = "py-3 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-2xl font-black text-xs shadow-lg transition";
                 wBtn.className = "py-3 bg-black/50 border border-white/10 text-gray-400 rounded-2xl font-black text-xs shadow transition";
             } else {
-                wBtn.className = "py-3 bg-gradient-to-r from-orange-600 to-amber-600 rounded-2xl font-black text-xs shadow-lg transition";
+                wBtn.className = "py-3 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-2xl font-black text-xs shadow-lg transition";
                 dBtn.className = "py-3 bg-black/50 border border-white/10 text-gray-400 rounded-2xl font-black text-xs shadow transition";
             }
             loadAdminRequests();
