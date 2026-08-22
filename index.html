@@ -457,16 +457,13 @@
                     <p class='text-gray-300 font-medium'>Send payment to UPI ID:</p>
                     <div class='bg-black/60 border border-white/10 p-3.5 rounded-2xl font-mono text-cyan-400 font-black select-all text-xs tracking-wider'>raj-prashant@fam</div>
                     
-                    <!-- Direct Stable QR Code Container -->
+                    <!-- Direct Stable QR Code Container with Real QR Image Fallback -->
                     <div class='flex justify-center my-2'>
-                        <div class='bg-white p-3 rounded-2xl shadow-xl border border-white/20 inline-block'>
-                            <div class='w-36 h-36 bg-gray-900 rounded-xl flex flex-col items-center justify-center text-white border border-gray-700 p-2 text-center'>
-                                <i class='fa-solid fa-qrcode text-3xl mb-1 text-cyan-400 animate-pulse'></i>
-                                <span class='text-[10px] font-extrabold text-white'>Scan via any UPI App</span>
-                                <span class='text-[10px] text-amber-400 font-black mt-0.5'>Pay ₹${amt}</span>
-                            </div>
+                        <div class='bg-white p-3 rounded-2xl shadow-xl border border-white/25 inline-block'>
+                            <img src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=raj-prashant@fam&pn=ZyloBet&am=${amt}&cu=INR' alt='UPI QR Code' class='w-36 h-36 object-contain rounded-xl'>
                         </div>
                     </div>
+                    <p class='text-[10px] text-gray-400'>Scan & Pay ₹${amt} via GPay / PhonePe / Paytm</p>
 
                     <p class='text-gray-400 text-[11px] text-left font-semibold'>Payment screenshot upload karein:</p>
                     <input type='file' id='payment-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300'>
@@ -602,7 +599,7 @@
                 alert("Deposit Request Rejected.");
             }
             reqs = reqs.filter(x => x.id !== id);
-            localStorage.setItem('zylobet_deposit_requests', JSON.stringify(reqs));
+            localStorage.setItem('zylobet_deposit_requests', JSON.stringify(requests));
             loadAdminRequests();
         }
 
