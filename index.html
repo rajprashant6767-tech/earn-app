@@ -38,6 +38,39 @@
             background: linear-gradient(90deg, transparent, rgba(0, 180, 255, 0.5), transparent);
         }
 
+        /* 3D Realistic Glossy Icons Styling */
+        .icon-3d-coin {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: radial-gradient(circle at 30% 30%, #fde047 0%, #eab308 50%, #ca8a04 100%);
+            border-radius: 50%;
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.8), inset 0 -3px 6px rgba(0, 0, 0, 0.5), 0 4px 10px rgba(234, 179, 8, 0.4);
+            color: #713f12;
+            font-size: 14px;
+            font-weight: 900;
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
+        }
+
+        .icon-3d-gem {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: radial-gradient(circle at 30% 30%, #67e8f9 0%, #06b6d4 50%, #0e7490 100%);
+            border-radius: 10px;
+            transform: rotate(45deg);
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.8), inset 0 -3px 6px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(6, 182, 212, 0.5);
+            color: #ecfeff;
+            font-size: 13px;
+        }
+        .icon-3d-gem i {
+            transform: rotate(-45deg);
+        }
+
         .shiny-green-btn {
             background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
             box-shadow: 0 0 20px rgba(16, 185, 129, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
@@ -117,16 +150,16 @@
 
                 <div class="grid grid-cols-2 gap-4">
                     <div onclick="openHistory('coins')" class="bg-black/40 p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-amber-400/40 transition group">
-                        <p class="text-2xl font-black text-amber-400 group-hover:scale-105 transition origin-left flex items-center gap-1.5">
-                            <i class="fa-solid fa-coins text-xl"></i> <span id="user-coins">1,250</span>
+                        <p class="text-2xl font-black text-amber-400 group-hover:scale-105 transition origin-left flex items-center gap-2">
+                            <span class="icon-3d-coin"><i class="fa-solid fa-c"></i></span> <span id="user-coins">1,250</span>
                         </p>
                         <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-2 tracking-wider">
                             <span>COINS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-amber-400/80"></i>
                         </p>
                     </div>
                     <div onclick="openHistory('gems')" class="bg-black/40 p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-cyan-400/40 transition group">
-                        <p class="text-2xl font-black text-cyan-400 group-hover:scale-105 transition origin-left flex items-center gap-1.5">
-                            <i class="fa-solid fa-gem text-xl"></i> <span id="user-gems">12</span>
+                        <p class="text-2xl font-black text-cyan-400 group-hover:scale-105 transition origin-left flex items-center gap-2.5">
+                            <span class="icon-3d-gem"><i class="fa-solid fa-gem"></i></span> <span id="user-gems">12</span>
                         </p>
                         <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-2 tracking-wider">
                             <span>DIAMONDS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-cyan-400/80"></i>
@@ -387,18 +420,21 @@
             if(hasUsedReferral === 'true') {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-red-400";
                 statusMsg.innerText = "❌ You have already redeemed a referral code!";
+                setTimeout(() => { statusMsg.innerText = ""; }, 3000);
                 return;
             }
 
             if(!enteredCode) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-red-400";
                 statusMsg.innerText = "❌ Please enter a valid referral code.";
+                setTimeout(() => { statusMsg.innerText = ""; }, 3000);
                 return;
             }
 
             if(enteredCode === myReferralCode) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-red-400";
                 statusMsg.innerText = "❌ You cannot use your own referral code!";
+                setTimeout(() => { statusMsg.innerText = ""; }, 3000);
                 return;
             }
 
@@ -413,6 +449,7 @@
             localStorage.setItem('zylobet_ref_used', 'true');
             statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
             statusMsg.innerText = "🎉 Referral code applied successfully! +300 Coins added.";
+            setTimeout(() => { statusMsg.innerText = ""; }, 3000);
             inputField.disabled = true;
         }
 
@@ -424,6 +461,7 @@
             if(!promoVal) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-red-400";
                 statusMsg.innerText = "❌ Please enter a promo code.";
+                setTimeout(() => { statusMsg.innerText = ""; }, 3000);
                 return;
             }
 
@@ -433,12 +471,14 @@
             if(!foundPromo) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-red-400";
                 statusMsg.innerText = "❌ Invalid Promo Code!";
+                setTimeout(() => { statusMsg.innerText = ""; }, 3000);
                 return;
             }
 
             if(!foundPromo.active) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-red-400";
                 statusMsg.innerText = "❌ This Promo Code is currently Deactivated!";
+                setTimeout(() => { statusMsg.innerText = ""; }, 3000);
                 return;
             }
 
@@ -446,12 +486,14 @@
             if(now > foundPromo.expiryTime) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-red-400";
                 statusMsg.innerText = "❌ This Promo Code has Expired!";
+                setTimeout(() => { statusMsg.innerText = ""; }, 3000);
                 return;
             }
 
             if(foundPromo.usedCount >= foundPromo.maxUsers) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-red-400";
                 statusMsg.innerText = "❌ Promo Code usage limit reached!";
+                setTimeout(() => { statusMsg.innerText = ""; }, 3000);
                 return;
             }
 
@@ -459,6 +501,7 @@
             if(userRedeemed.includes(promoVal)) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-red-400";
                 statusMsg.innerText = "❌ You have already redeemed this promo code!";
+                setTimeout(() => { statusMsg.innerText = ""; }, 3000);
                 return;
             }
 
@@ -488,6 +531,7 @@
 
             statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
             statusMsg.innerText = `🎉 Promo Code Applied Successfully! +${foundPromo.rewardAmount} ${foundPromo.rewardType.toUpperCase()} added.`;
+            setTimeout(() => { statusMsg.innerText = ""; }, 3000);
             promoInput.value = '';
         }
 
@@ -504,7 +548,7 @@
                     let colorClass = item.type === 'spend' ? 'text-red-400' : 'text-amber-400';
                     html += `
                         <div class='flex justify-between bg-black/40 p-3 rounded-2xl border border-white/5 items-center'>
-                            <div><p class='font-black ${colorClass} text-sm'>${item.amount} <i class='fa-solid fa-coins text-xs'></i></p><p class='text-[10px] text-gray-300 font-bold mt-0.5'>Source: ${item.title}</p></div>
+                            <div><p class='font-black ${colorClass} text-sm'>${item.amount} <span class='icon-3d-coin' style='width:18px;height:18px;font-size:9px;'><i class='fa-solid fa-c'></i></span></p><p class='text-[10px] text-gray-300 font-bold mt-0.5'>Source: ${item.title}</p></div>
                             <span class='text-[10px] text-gray-400 font-bold'>${item.time}</span>
                         </div>`;
                 });
@@ -517,7 +561,7 @@
                 history.forEach(item => {
                     html += `
                         <div class='flex justify-between bg-black/40 p-3 rounded-2xl border border-white/5 items-center'>
-                            <div><p class='font-black text-cyan-400 text-sm'>${item.amount} <i class='fa-solid fa-gem text-xs'></i></p><p class='text-[10px] text-gray-300 font-bold mt-0.5'>Source: ${item.title}</p></div>
+                            <div><p class='font-black text-cyan-400 text-sm'>${item.amount} <span class='icon-3d-gem' style='width:18px;height:18px;font-size:8px;'><i class='fa-solid fa-gem'></i></span></p><p class='text-[10px] text-gray-300 font-bold mt-0.5'>Source: ${item.title}</p></div>
                             <span class='text-[10px] text-gray-400 font-bold'>${item.time}</span>
                         </div>`;
                 });
@@ -531,8 +575,8 @@
             document.getElementById('modal-title').innerText = "DEPOSIT DIAMONDS";
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs'>
-                    <div class='bg-cyan-500/10 border border-cyan-500/30 p-3 rounded-2xl text-cyan-300 font-bold text-center tracking-wide'>
-                        💎 1 Diamond = ₹1 Rs
+                    <div class='bg-cyan-500/10 border border-cyan-500/30 p-3 rounded-2xl text-cyan-300 font-bold text-center tracking-wide flex items-center justify-center gap-1.5'>
+                        <span class='icon-3d-gem' style='width:20px;height:20px;font-size:9px;'><i class='fa-solid fa-gem'></i></span> 1 Diamond = ₹1 Rs
                     </div>
                     <div>
                         <label class='text-gray-300 font-bold block mb-1.5 uppercase tracking-wider text-[11px]'>Enter Diamond Amount (1 - 1000)</label>
@@ -687,7 +731,7 @@
                 reqs.forEach(r => {
                     container.innerHTML += `
                         <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-3 text-xs shadow-lg'>
-                            <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-cyan-400 text-sm'>${r.amount} Diamonds 💎</span></div>
+                            <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-cyan-400 text-sm flex items-center gap-1'>${r.amount} Diamonds <span class='icon-3d-gem' style='width:18px;height:18px;font-size:8px;'><i class='fa-solid fa-gem'></i></span></span></div>
                             <button onclick="document.getElementById('modal-img').src='${r.proof}'; document.getElementById('img-modal').classList.remove('hidden');" class='w-full bg-white/5 hover:bg-white/10 py-2.5 rounded-xl font-black text-[11px] transition border border-white/5 text-gray-200'>View Proof Screenshot</button>
                             <div class='grid grid-cols-2 gap-2 pt-1'>
                                 <button onclick="handleAdmDep(${r.id}, 'approve', ${r.amount})" class='shiny-green-btn py-3 rounded-xl font-black text-white transition shadow-md'>APPROVE</button>
@@ -704,7 +748,7 @@
                 reqs.forEach(r => {
                     container.innerHTML += `
                         <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-3 text-xs shadow-lg'>
-                            <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-amber-400 text-sm'>${r.amount} Coins 🪙</span></div>
+                            <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-amber-400 text-sm flex items-center gap-1'>${r.amount} Coins <span class='icon-3d-coin' style='width:18px;height:18px;font-size:9px;'><i class='fa-solid fa-c'></i></span></span></div>
                             <p class='text-gray-400 font-bold'>Method: <span class="text-white">${r.method}</span></p>
                             <div class='grid grid-cols-2 gap-2 pt-1'>
                                 <button onclick="handleAdmWit(${r.id}, 'approve')" class='shiny-green-btn py-3 rounded-xl font-black text-white transition shadow-md'>APPROVE</button>
@@ -715,7 +759,7 @@
             }
         }
 
-        // ADMIN PROMO MANAGER (Showing ONLY Active & Non-Expired Codes)
+        // ADMIN PROMO MANAGER
         function loadAdminPromoManager() {
             const container = document.getElementById('admin-requests-container');
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
@@ -762,7 +806,6 @@
                 <div class='space-y-3 pt-2'>
                     <h3 class='text-xs font-black text-gray-300 uppercase tracking-wider'>Active Promo Codes</h3>`;
 
-            // Filter out expired or deactivated codes so they do not show in the admin list
             let activePromos = promos.filter(p => p.active && Date.now() <= p.expiryTime);
 
             if(activePromos.length === 0) {
@@ -770,9 +813,9 @@
             } else {
                 promos.forEach((p, idx) => {
                     let isExpired = Date.now() > p.expiryTime;
-                    if (!p.active || isExpired) return; // Skip showing deactivated or expired codes
+                    if (!p.active || isExpired) return;
 
-                    let symbol = p.rewardType === 'coins' ? '🪙 Coins' : '💎 Diamonds';
+                    let symbol = p.rewardType === 'coins' ? '<span class="icon-3d-coin" style="width:14px;height:14px;font-size:7px;"><i class="fa-solid fa-c"></i></span> Coins' : '<span class="icon-3d-gem" style="width:14px;height:14px;font-size:6px;"><i class="fa-solid fa-gem"></i></span> Diamonds';
 
                     html += `
                         <div class='cyber-card p-3.5 rounded-2xl border border-white/10 space-y-2 text-xs'>
@@ -780,7 +823,7 @@
                                 <span class='text-pink-400 text-sm'>${p.code}</span>
                                 <span class='text-emerald-400 font-bold'>ACTIVE</span>
                             </div>
-                            <div class='flex justify-between text-[11px] text-gray-300 font-semibold'>
+                            <div class='flex justify-between text-[11px] text-gray-300 font-semibold items-center'>
                                 <span>Reward: +${p.rewardAmount} ${symbol}</span>
                                 <span>Limit: ${p.usedCount} / ${p.maxUsers}</span>
                             </div>
