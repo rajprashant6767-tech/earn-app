@@ -38,7 +38,6 @@
             background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.4), transparent);
         }
 
-        /* 🟡 FREE FIRE GOLD COIN STYLE */
         .ff-gold-coin {
             display: inline-flex;
             align-items: center;
@@ -53,7 +52,6 @@
             font-size: 13px;
         }
 
-        /* 💎 FREE FIRE DIAMOND STYLE */
         .ff-diamond {
             display: inline-flex;
             align-items: center;
@@ -68,9 +66,7 @@
             color: #ffffff;
             font-size: 13px;
         }
-        .ff-diamond i {
-            transform: rotate(-45deg);
-        }
+        .ff-diamond i { transform: rotate(-45deg); }
 
         input, select, textarea {
             pointer-events: auto !important;
@@ -120,7 +116,7 @@
     <!-- Main App Container -->
     <div id="main-app" class="opacity-0 transition-opacity duration-500 space-y-5">
         
-        <!-- Admin Panel Toggle Bar with Shiny Green Button -->
+        <!-- Admin Panel Toggle Bar -->
         <div id="admin-toggle-bar" class="hidden mb-2 cyber-card p-3 rounded-2xl flex justify-between items-center text-xs shadow-xl backdrop-blur-md border-emerald-500/40">
             <span class="text-emerald-400 font-extrabold flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-sm"></i> Admin Mode Active</span>
             <button onclick="toggleAdminView()" id="view-toggle-btn" class="shiny-green-btn text-white px-4 py-2 rounded-xl font-black shadow-lg transition active:scale-95">Open Admin Panel</button>
@@ -174,18 +170,6 @@
                     </div>
                 </div>
             </div>
-
-            <div class="cyber-card p-5 rounded-3xl flex items-center justify-between">
-                <div class="flex items-center gap-3.5">
-                    <div class="w-12 h-12 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 text-xl font-bold">
-                        <i class="fa-solid fa-bolt-lightning"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-xs font-black text-white uppercase tracking-wider">Elite VIP Status</h2>
-                        <p class="text-[10px] text-gray-400 mt-0.5">Fast automated deposits & secure payouts.</p>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- TAB 2: REFERRAL VIEW -->
@@ -234,16 +218,10 @@
                     <button onclick="applyPromoCode()" class='w-full py-4 bg-gradient-to-r from-rose-600 via-purple-600 to-blue-600 rounded-2xl font-black text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>APPLY CODE</button>
                     <p id="promo-status-msg" class="text-[11px] h-4 font-semibold text-center"></p>
                 </div>
-
-                <div class='text-center pt-3 border-t border-white/10 mt-2'>
-                    <a href='https://t.me/+2vDL5Gmbee0zNDFl' target='_blank' class='inline-flex items-center gap-2 text-xs text-sky-400 font-bold bg-sky-500/10 border border-sky-500/20 px-5 py-3 rounded-2xl w-full justify-center transition hover:bg-sky-500/20 active:scale-95'>
-                        <i class='fa-brands fa-telegram text-base'></i> Join Official Telegram Channel
-                    </a>
-                </div>
             </div>
         </div>
 
-        <!-- TAB 4: WITHDRAW VIEW -->
+        <!-- TAB 4: WITHDRAW VIEW (UPDATED WITH 3 SEPARATE SECTIONS & PACKAGES) -->
         <div id="tab-withdraw" class="hidden space-y-5">
             <div class="cyber-card p-6 rounded-3xl space-y-5 border border-emerald-500/30">
                 <div class="text-center space-y-2">
@@ -251,25 +229,93 @@
                         <i class="fa-solid fa-wallet"></i>
                     </div>
                     <h2 class="text-base font-black text-emerald-400">Withdraw Earnings</h2>
-                    <p class="text-[11px] text-gray-400">Convert your gaming coins safely & securely.</p>
+                    <p class="text-[11px] text-gray-400">Choose your payout method & packages below:</p>
                 </div>
 
-                <div class="space-y-4 pt-1">
-                    <div>
-                        <label class="text-[11px] text-gray-300 font-bold block mb-1.5 uppercase tracking-wider">Select Payout Method</label>
-                        <select id='w-method' class='w-full bg-black/50 border border-white/10 p-3.5 text-xs rounded-2xl text-white font-bold focus:outline-none focus:border-emerald-500 transition'>
-                            <option>UPI</option>
-                            <option>Amazon Gift Card</option>
-                            <option>Play Store Gift Card</option>
-                        </select>
+                <!-- Payout Section Tabs -->
+                <div class="grid grid-cols-3 gap-2 bg-black/40 p-1.5 rounded-2xl border border-white/10">
+                    <button onclick="switchWithdrawSection('upi')" id="w-tab-upi" class="py-2.5 rounded-xl font-black text-[11px] text-emerald-400 bg-emerald-500/20 transition flex items-center justify-center gap-1.5"><i class="fa-solid fa-building-columns"></i> UPI</button>
+                    <button onclick="switchWithdrawSection('amazon')" id="w-tab-amazon" class="py-2.5 rounded-xl font-black text-[11px] text-gray-400 transition flex items-center justify-center gap-1.5"><i class="fa-brands fa-amazon"></i> Amazon</button>
+                    <button onclick="switchWithdrawSection('playstore')" id="w-tab-playstore" class="py-2.5 rounded-xl font-black text-[11px] text-gray-400 transition flex items-center justify-center gap-1.5"><i class="fa-brands fa-google-play"></i> PlayStore</button>
+                </div>
+
+                <!-- SECTION 1: UPI -->
+                <div id="withdraw-section-upi" class="space-y-4 pt-1">
+                    <label class="text-[11px] text-gray-300 font-bold block uppercase tracking-wider">Select Coin Package</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="selectWPackage(5500, 50)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="5500">
+                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">5,500 <i class="fa-solid fa-coins text-xs"></i></p>
+                            <p class="text-[11px] text-emerald-400 font-bold mt-1">₹50 Cash</p>
+                        </div>
+                        <div onclick="selectWPackage(10750, 100)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="10750">
+                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">10,750 <i class="fa-solid fa-coins text-xs"></i></p>
+                            <p class="text-[11px] text-emerald-400 font-bold mt-1">₹100 Cash</p>
+                        </div>
+                        <div onclick="selectWPackage(20500, 200)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="20500">
+                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">20,500 <i class="fa-solid fa-coins text-xs"></i></p>
+                            <p class="text-[11px] text-emerald-400 font-bold mt-1">₹200 Cash</p>
+                        </div>
+                        <div onclick="selectWPackage(50000, 500)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="50000">
+                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">50,000 <i class="fa-solid fa-coins text-xs"></i></p>
+                            <p class="text-[11px] text-emerald-400 font-bold mt-1">₹500 Cash</p>
+                        </div>
                     </div>
 
                     <div>
-                        <label class="text-[11px] text-gray-300 font-bold block mb-1.5 uppercase tracking-wider">Enter Coins Amount</label>
-                        <input type='number' id='w-amt' placeholder='e.g. 500' class='w-full bg-black/50 border border-white/10 p-3.5 text-xs rounded-2xl text-amber-400 font-black focus:outline-none focus:border-emerald-500 transition'>
+                        <label class="text-[11px] text-gray-300 font-bold block mb-1.5 uppercase tracking-wider">Enter Your UPI ID</label>
+                        <input type="text" id="w-upi-id" placeholder="e.g. username@oksbi" class="w-full bg-black/50 border border-white/10 p-3.5 text-xs rounded-2xl text-sky-400 font-bold focus:outline-none focus:border-emerald-500 transition">
                     </div>
+                    <button onclick="submitWithdrawRequest('UPI')" class='w-full py-4 bg-gradient-to-r from-emerald-600 to-green-600 rounded-2xl font-black text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>SUBMIT UPI WITHDRAWAL</button>
+                </div>
 
-                    <button onclick="submitWithdraw()" class='w-full py-4 bg-gradient-to-r from-emerald-600 to-green-600 rounded-2xl font-black text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>SUBMIT WITHDRAWAL</button>
+                <!-- SECTION 2: AMAZON GIFT CARD -->
+                <div id="withdraw-section-amazon" class="hidden space-y-4 pt-1">
+                    <label class="text-[11px] text-gray-300 font-bold block uppercase tracking-wider">Select Amazon Package</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="selectWPackage(5500, 50)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="5500">
+                            <p class="text-amber-400 font-black text-sm">5,500 Coins</p>
+                            <p class="text-[11px] text-sky-400 font-bold mt-1">₹50 Amazon Card</p>
+                        </div>
+                        <div onclick="selectWPackage(10750, 100)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="10750">
+                            <p class="text-amber-400 font-black text-sm">10,750 Coins</p>
+                            <p class="text-[11px] text-sky-400 font-bold mt-1">₹100 Amazon Card</p>
+                        </div>
+                        <div onclick="selectWPackage(20500, 200)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="20500">
+                            <p class="text-amber-400 font-black text-sm">20,500 Coins</p>
+                            <p class="text-[11px] text-sky-400 font-bold mt-1">₹200 Amazon Card</p>
+                        </div>
+                        <div onclick="selectWPackage(50000, 500)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="50000">
+                            <p class="text-amber-400 font-black text-sm">50,000 Coins</p>
+                            <p class="text-[11px] text-sky-400 font-bold mt-1">₹500 Amazon Card</p>
+                        </div>
+                    </div>
+                    <p class='text-[11px] text-amber-300 bg-amber-500/10 border border-amber-500/30 p-3 rounded-xl font-semibold'>🎁 Redeem code withdrawal history mein aayega!</p>
+                    <button onclick="submitWithdrawRequest('Amazon Gift Card')" class='w-full py-4 bg-gradient-to-r from-emerald-600 to-green-600 rounded-2xl font-black text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>REQUEST AMAZON CARD</button>
+                </div>
+
+                <!-- SECTION 3: PLAY STORE GIFT CARD -->
+                <div id="withdraw-section-playstore" class="hidden space-y-4 pt-1">
+                    <label class="text-[11px] text-gray-300 font-bold block uppercase tracking-wider">Select PlayStore Package</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="selectWPackage(5500, 50)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="5500">
+                            <p class="text-amber-400 font-black text-sm">5,500 Coins</p>
+                            <p class="text-[11px] text-indigo-400 font-bold mt-1">₹50 PlayStore Card</p>
+                        </div>
+                        <div onclick="selectWPackage(10750, 100)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="10750">
+                            <p class="text-amber-400 font-black text-sm">10,750 Coins</p>
+                            <p class="text-[11px] text-indigo-400 font-bold mt-1">₹100 PlayStore Card</p>
+                        </div>
+                        <div onclick="selectWPackage(20500, 200)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="20500">
+                            <p class="text-amber-400 font-black text-sm">20,500 Coins</p>
+                            <p class="text-[11px] text-indigo-400 font-bold mt-1">₹200 PlayStore Card</p>
+                        </div>
+                        <div onclick="selectWPackage(50000, 500)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="50000">
+                            <p class="text-amber-400 font-black text-sm">50,000 Coins</p>
+                            <p class="text-[11px] text-indigo-400 font-bold mt-1">₹500 PlayStore Card</p>
+                        </div>
+                    </div>
+                    <p class='text-[11px] text-amber-300 bg-amber-500/10 border border-amber-500/30 p-3 rounded-xl font-semibold'>🎁 Redeem code withdrawal history mein aayega!</p>
+                    <button onclick="submitWithdrawRequest('Play Store Gift Card')" class='w-full py-4 bg-gradient-to-r from-emerald-600 to-green-600 rounded-2xl font-black text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>REQUEST PLAYSTORE CARD</button>
                 </div>
             </div>
         </div>
@@ -286,7 +332,6 @@
                 </button>
             </div>
 
-            <!-- Admin Tabs -->
             <div class="grid grid-cols-3 gap-2">
                 <button onclick="switchAdminTab('deposit')" id="adm-tab-dep" class="py-2.5 bg-gradient-to-r from-sky-600 to-blue-600 rounded-xl font-black text-[11px] shadow transition">Deposit</button>
                 <button onclick="switchAdminTab('withdraw')" id="adm-tab-wit" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[11px] shadow transition">Withdraw</button>
@@ -408,14 +453,34 @@
 
         if(!localStorage.getItem('zylobet_coin_history')) {
             localStorage.setItem('zylobet_coin_history', JSON.stringify([
-                { title: "Welcome Bonus", amount: "+1,000 Coins", type: "earn", time: "Today" },
-                { title: "Active Balance", amount: "+250 Coins", type: "earn", time: "Today" }
+                { title: "Welcome Bonus", amount: "+1,000 Coins", type: "earn", time: "Today", status: "Success" },
+                { title: "Active Balance", amount: "+250 Coins", type: "earn", time: "Today", status: "Success" }
             ]));
         }
         if(!localStorage.getItem('zylobet_gem_history')) {
             localStorage.setItem('zylobet_gem_history', JSON.stringify([
-                { title: "Initial Diamonds", amount: `+${userGems} Diamonds`, type: "earn", time: "Active" }
+                { title: "Initial Diamonds", amount: `+${userGems} Diamonds`, type: "earn", time: "Active", status: "Success" }
             ]));
+        }
+
+        // Selected withdrawal package tracking
+        let selectedWCoins = 0;
+        let selectedWAmount = 0;
+
+        function switchWithdrawSection(sec) {
+            ['upi', 'amazon', 'playstore'].forEach(s => {
+                document.getElementById('withdraw-section-' + s).classList.add('hidden');
+                document.getElementById('w-tab-' + s).className = "py-2.5 rounded-xl font-black text-[11px] text-gray-400 transition flex items-center justify-center gap-1.5";
+            });
+            document.getElementById('withdraw-section-' + sec).classList.remove('hidden');
+            document.getElementById('w-tab-' + sec).className = "py-2.5 rounded-xl font-black text-[11px] text-emerald-400 bg-emerald-500/25 transition flex items-center justify-center gap-1.5";
+        }
+
+        function selectWPackage(coins, rs) {
+            selectedWCoins = coins;
+            selectedWAmount = rs;
+            document.querySelectorAll('.w-pkg-card').forEach(c => c.classList.remove('border-emerald-400', 'bg-emerald-500/10'));
+            event.currentTarget.classList.add('border-emerald-400', 'bg-emerald-500/10');
         }
 
         function applyReferralCode() {
@@ -450,7 +515,7 @@
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
 
             let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-            coinHistory.unshift({ title: `Referral Bonus (${enteredCode})`, amount: "+300 Coins", type: "earn", time: "Just now" });
+            coinHistory.unshift({ title: `Referral Bonus (${enteredCode})`, amount: "+300 Coins", type: "earn", time: "Just now", status: "Success" });
             localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
 
             localStorage.setItem('zylobet_ref_used', 'true');
@@ -518,7 +583,7 @@
                 document.getElementById('user-coins').innerText = userCoins.toLocaleString();
 
                 let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-                coinHistory.unshift({ title: `Promo (${promoVal})`, amount: `+${foundPromo.rewardAmount} Coins`, type: "earn", time: "Just now" });
+                coinHistory.unshift({ title: `Promo (${promoVal})`, amount: `+${foundPromo.rewardAmount} Coins`, type: "earn", time: "Just now", status: "Success" });
                 localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
             } else {
                 userGems += foundPromo.rewardAmount;
@@ -526,7 +591,7 @@
                 document.getElementById('user-gems').innerText = userGems;
 
                 let gemHistory = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
-                gemHistory.unshift({ title: `Promo (${promoVal})`, amount: `+${foundPromo.rewardAmount} Diamonds`, type: "earn", time: "Just now" });
+                gemHistory.unshift({ title: `Promo (${promoVal})`, amount: `+${foundPromo.rewardAmount} Diamonds`, type: "earn", time: "Just now", status: "Success" });
                 localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHistory));
             }
 
@@ -548,15 +613,23 @@
             const content = document.getElementById('modal-content');
 
             if(type === 'coins') {
-                title.innerText = "COINS TRANSACTION HISTORY";
+                title.innerText = "COINS TRANSACTION & WITHDRAWAL HISTORY";
                 let history = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
                 let html = "<div class='space-y-2.5 max-h-60 overflow-y-auto text-xs pr-1'>";
                 history.forEach(item => {
                     let colorClass = item.type === 'spend' ? 'text-rose-400' : 'text-amber-400';
+                    let statusColor = item.status === 'Pending' ? 'text-amber-400' : (item.status === 'Rejected' ? 'text-rose-400' : 'text-emerald-400');
+                    let redeemInfo = item.redeemCode ? `<p class='text-[10px] text-sky-300 font-bold mt-0.5 bg-sky-500/10 p-1.5 rounded-lg'>🔑 Redeem Code: <span class="font-mono text-white">${item.redeemCode}</span></p>` : '';
+                    
                     html += `
-                        <div class='flex justify-between bg-black/40 p-3 rounded-2xl border border-white/5 items-center'>
-                            <div><p class='font-black ${colorClass} text-sm flex items-center gap-1.5'>${item.amount} <span class='ff-gold-coin' style='width:22px;height:22px;font-size:10px;'><i class='fa-solid fa-coins'></i></span></p><p class='text-[10px] text-gray-300 font-bold mt-0.5'>Source: ${item.title}</p></div>
-                            <span class='text-[10px] text-gray-400 font-bold'>${item.time}</span>
+                        <div class='bg-black/40 p-3.5 rounded-2xl border border-white/5 space-y-1.5'>
+                            <div class='flex justify-between items-center'>
+                                <p class='font-black ${colorClass} text-sm flex items-center gap-1.5'>${item.amount} <span class='ff-gold-coin' style='width:20px;height:20px;font-size:9px;'><i class='fa-solid fa-coins'></i></span></p>
+                                <span class='text-[10px] font-extrabold ${statusColor} px-2 py-0.5 rounded-full bg-white/5 border border-white/10'>${item.status}</span>
+                            </div>
+                            <p class='text-[10px] text-gray-300 font-bold'>Source: ${item.title}</p>
+                            ${redeemInfo}
+                            <p class='text-[9px] text-gray-500 font-semibold text-right'>${item.time}</p>
                         </div>`;
                 });
                 html += "</div>";
@@ -568,13 +641,73 @@
                 history.forEach(item => {
                     html += `
                         <div class='flex justify-between bg-black/40 p-3 rounded-2xl border border-white/5 items-center'>
-                            <div><p class='font-black text-cyan-400 text-sm flex items-center gap-1.5'>${item.amount} <span class='ff-diamond' style='width:22px;height:22px;font-size:9px;'><i class='fa-solid fa-gem'></i></span></p><p class='text-[10px] text-gray-300 font-bold mt-0.5'>Source: ${item.title}</p></div>
-                            <span class='text-[10px] text-gray-400 font-bold'>${item.time}</span>
+                            <div><p class='font-black text-cyan-400 text-sm flex items-center gap-1.5'>${item.amount} <span class='ff-diamond' style='width:20px;height:20px;font-size:8px;'><i class='fa-solid fa-gem'></i></span></p><p class='text-[10px] text-gray-300 font-bold mt-0.5'>Source: ${item.title}</p></div>
+                            <span class='text-[10px] text-emerald-400 font-bold'>Success</span>
                         </div>`;
                 });
                 html += "</div>";
                 content.innerHTML = html;
             }
+        }
+
+        function submitWithdrawRequest(method) {
+            if(!selectedWCoins || !selectedWAmount) {
+                alert("❌ Please select a coin package first!");
+                return;
+            }
+
+            if(selectedWCoins > userCoins) {
+                alert("❌ Insufficient Coins Balance!");
+                return;
+            }
+
+            let extraDetails = "";
+            if(method === 'UPI') {
+                const upiId = document.getElementById('w-upi-id').value.trim();
+                if(!upiId) {
+                    alert("❌ Please enter your UPI ID!");
+                    return;
+                }
+                extraDetails = ` (UPI: ${upiId})`;
+            }
+
+            // Deduct coins
+            userCoins -= selectedWCoins;
+            localStorage.setItem('zylobet_coins', userCoins);
+            document.getElementById('user-coins').innerText = userCoins.toLocaleString();
+
+            // Save to withdrawal requests for admin
+            let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
+            let reqId = Date.now();
+            reqs.push({
+                id: reqId,
+                username: "@" + username,
+                method: method,
+                amount: selectedWCoins,
+                rupees: selectedWAmount,
+                details: extraDetails,
+                status: "Pending",
+                time: "Just now"
+            });
+            localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
+
+            // Save to user coin history
+            let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
+            coinHistory.unshift({
+                id: reqId,
+                title: `${method} Payout (₹${selectedWAmount}) ${extraDetails}`,
+                amount: `-${selectedWCoins} Coins`,
+                type: "spend",
+                status: "Pending",
+                time: "Just now"
+            });
+            localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
+
+            alert(`🎉 ${method} Withdrawal Request Sent Successfully! Status: Pending.`);
+            selectedWCoins = 0;
+            selectedWAmount = 0;
+            document.querySelectorAll('.w-pkg-card').forEach(c => c.classList.remove('border-emerald-400', 'bg-emerald-500/10'));
+            if(method === 'UPI') document.getElementById('w-upi-id').value = '';
         }
 
         function openDepositModal() {
@@ -633,87 +766,26 @@
                     <p id='proof-err' class='text-rose-400 text-[11px] h-4 font-semibold text-left'></p>
                     
                     <button onclick="submitDepositProof('${username}', ${amt})" class='w-full py-4 shiny-green-btn rounded-2xl font-black text-xs text-white shadow-xl transition active:scale-95 tracking-wide'>SEND PROOF</button>
-                    
-                    <div class='bg-blue-500/10 border border-blue-500/30 p-3.5 rounded-2xl text-left space-y-2.5 mt-2'>
-                        <p class='text-blue-300 text-[11px] font-semibold leading-relaxed'>
-                            <i class='fa-solid fa-circle-info mr-1'></i> <b>Note:</b> Deposit ka amount 24 hours ke andar add kar diya jayega. Agar payment ho gaya ho aur amount add na hua ho to hame contact karen:
-                        </p>
-                        <div class='text-center pt-1'>
-                            <a href='https://t.me/Raj_Prashant' target='_blank' class='inline-flex items-center gap-1.5 text-xs text-blue-400 font-black bg-blue-500/20 px-4 py-2 rounded-xl transition hover:bg-blue-500/30'>
-                                <i class='fa-brands fa-telegram text-base'></i> @Raj_Prashant
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class='bg-rose-500/10 border border-rose-500/30 p-3.5 rounded-2xl text-left'>
-                        <p class='text-rose-400 text-[11px] font-semibold leading-relaxed'>
-                            <i class='fa-solid fa-triangle-exclamation mr-1'></i> <b>Warning:</b> Agar koi user galat payment karega matlab deposit amount se kam karega, toh request reject kar di jayegi, payment manually check hoga!
-                        </p>
-                    </div>
                 </div>`;
         }
 
         function copyUpiId() {
-            const upiText = document.getElementById('upi-id-text').innerText;
-            navigator.clipboard.writeText(upiText);
+            navigator.clipboard.writeText(document.getElementById('upi-id-text').innerText);
             alert("UPI ID Copied Successfully!");
         }
 
         function submitDepositProof(uname, amt) {
             const fileInput = document.getElementById('payment-proof-file');
-            const proofErr = document.getElementById('proof-err');
-
-            if(fileInput.files.length === 0) {
-                proofErr.innerText = "❌ Please select a payment proof screenshot first!";
-                return;
-            }
-
+            if(fileInput.files.length === 0) { alert("❌ Please select screenshot!"); return; }
             const reader = new FileReader();
             reader.onload = function(e) {
                 let requests = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
-                requests.push({
-                    id: Date.now(),
-                    username: "@" + uname,
-                    amount: amt,
-                    proof: e.target.result,
-                    time: "Just now"
-                });
+                requests.push({ id: Date.now(), username: "@" + uname, amount: amt, proof: e.target.result, time: "Just now" });
                 localStorage.setItem('zylobet_deposit_requests', JSON.stringify(requests));
-
-                alert(`Deposit request for ${amt} Diamonds submitted successfully!`);
+                alert(`Deposit request for ${amt} Diamonds submitted!`);
                 closeModal();
             };
             reader.readAsDataURL(fileInput.files[0]);
-        }
-
-        function submitWithdraw() {
-            const method = document.getElementById('w-method').value;
-            const amt = parseInt(document.getElementById('w-amt').value);
-            
-            if(!amt || amt <= 0) { 
-                alert("Please enter a valid coin amount"); 
-                return; 
-            }
-
-            if(amt > userCoins) {
-                alert("Insufficient Coins Balance!");
-                return;
-            }
-
-            userCoins -= amt;
-            localStorage.setItem('zylobet_coins', userCoins);
-            document.getElementById('user-coins').innerText = userCoins.toLocaleString();
-
-            let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
-            reqs.push({ id: Date.now(), username: "@" + username, method: method, amount: amt, time: "Just now" });
-            localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
-
-            let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-            coinHistory.unshift({ title: `Withdrawal (${method})`, amount: `-${amt} Coins`, type: "spend", time: "Just now" });
-            localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
-
-            alert("Withdrawal Request Sent Successfully! Coins deducted.");
-            document.getElementById('w-amt').value = '';
         }
 
         function closeModal() { document.getElementById('modal').classList.add('hidden'); }
@@ -755,32 +827,96 @@
                 reqs.forEach(r => {
                     container.innerHTML += `
                         <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-3 text-xs shadow-lg'>
-                            <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-cyan-400 text-sm flex items-center gap-1.5'>${r.amount} Diamonds <span class='ff-diamond' style='width:20px;height:20px;font-size:8px;'><i class='fa-solid fa-gem'></i></span></span></div>
-                            <button onclick="document.getElementById('modal-img').src='${r.proof}'; document.getElementById('img-modal').classList.remove('hidden');" class='w-full bg-white/5 hover:bg-white/10 py-2.5 rounded-xl font-black text-[11px] transition border border-white/5 text-gray-200'>View Proof Screenshot</button>
-                            <div class='grid grid-cols-2 gap-2 pt-1'>
-                                <button onclick="handleAdmDep(${r.id}, 'approve', ${r.amount})" class='shiny-green-btn py-3 rounded-xl font-black text-white transition shadow-md'>APPROVE</button>
-                                <button onclick="handleAdmDep(${r.id}, 'reject', 0)" class='bg-rose-600 hover:bg-rose-500 py-3 rounded-xl font-black text-white transition shadow-md'>REJECT</button>
+                            <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-cyan-400 text-sm'>${r.amount} Diamonds</span></div>
+                            <button onclick="document.getElementById('modal-img').src='${r.proof}'; document.getElementById('img-modal').classList.remove('hidden');" class='w-full bg-white/5 hover:bg-white/10 py-2 rounded-xl font-bold'>View Proof</button>
+                            <div class='grid grid-cols-2 gap-2'>
+                                <button onclick="handleAdmDep(${r.id}, 'approve', ${r.amount})" class='shiny-green-btn py-2.5 rounded-xl font-black text-white'>APPROVE</button>
+                                <button onclick="handleAdmDep(${r.id}, 'reject', 0)" class='bg-rose-600 py-2.5 rounded-xl font-black text-white'>REJECT</button>
                             </div>
                         </div>`;
                 });
             } else if(adminTab === 'withdraw') {
                 let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
-                if(reqs.length === 0) {
+                let pendingReqs = reqs.filter(r => r.status === 'Pending');
+                if(pendingReqs.length === 0) {
                     container.innerHTML = `<div class='cyber-card p-6 text-center text-gray-500 text-xs rounded-2xl border border-white/5'>No pending withdrawal requests.</div>`;
                     return;
                 }
-                reqs.forEach(r => {
+                pendingReqs.forEach(r => {
+                    let redeemInputHTML = (r.method === 'Amazon Gift Card' || r.method === 'Play Store Gift Card') ? 
+                        `<input type='text' id='redeem-code-${r.id}' placeholder='Enter Redeem Code' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-xl text-sky-400 font-bold uppercase'>` : '';
+
                     container.innerHTML += `
                         <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-3 text-xs shadow-lg'>
-                            <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-amber-400 text-sm flex items-center gap-1.5'>${r.amount} Coins <span class='ff-gold-coin' style='width:20px;height:20px;font-size:9px;'><i class='fa-solid fa-coins'></i></span></span></div>
-                            <p class='text-gray-400 font-bold'>Method: <span class="text-white">${r.method}</span></p>
+                            <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-amber-400 text-sm'>${r.amount} Coins (₹${r.rupees})</span></div>
+                            <p class='text-gray-300 font-bold'>Method: <span class="text-white">${r.method}</span> ${r.details || ''}</p>
+                            ${redeemInputHTML}
                             <div class='grid grid-cols-2 gap-2 pt-1'>
-                                <button onclick="handleAdmWit(${r.id}, 'approve')" class='shiny-green-btn py-3 rounded-xl font-black text-white transition shadow-md'>APPROVE</button>
-                                <button onclick="handleAdmWit(${r.id}, 'reject')" class='bg-rose-600 hover:bg-rose-500 py-3 rounded-xl font-black text-white transition shadow-md'>REJECT</button>
+                                <button onclick="handleAdmWit(${r.id}, 'approve', '${r.method}')" class='shiny-green-btn py-2.5 rounded-xl font-black text-white'>APPROVE</button>
+                                <button onclick="handleAdmWit(${r.id}, 'reject', '${r.method}')" class='bg-rose-600 py-2.5 rounded-xl font-black text-white'>REJECT</button>
                             </div>
                         </div>`;
                 });
             }
+        }
+
+        function handleAdmDep(id, action, amt) {
+            let reqs = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
+            if(action === 'approve') {
+                userGems += amt;
+                localStorage.setItem('zylobet_gems', userGems);
+                document.getElementById('user-gems').innerText = userGems;
+
+                let gemHistory = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
+                gemHistory.unshift({ title: "Approved Deposit", amount: `+${amt} Diamonds`, type: "earn", time: "Just now" });
+                localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHistory));
+                alert(`Approved! ${amt} Diamonds added.`);
+            } else {
+                alert("Deposit Request Rejected.");
+            }
+            reqs = reqs.filter(x => x.id !== id);
+            localStorage.setItem('zylobet_deposit_requests', JSON.stringify(reqs));
+            loadAdminRequests();
+        }
+
+        function handleAdmWit(id, action, method) {
+            let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
+            let req = reqs.find(x => x.id === id);
+            let redeemCode = "";
+
+            if(action === 'approve') {
+                if(method === 'Amazon Gift Card' || method === 'Play Store Gift Card') {
+                    const codeInput = document.getElementById('redeem-code-' + id);
+                    redeemCode = codeInput ? codeInput.value.trim() : "";
+                    if(!redeemCode) {
+                        alert("❌ Please enter the Redeem Code before approving!");
+                        return;
+                    }
+                }
+                req.status = "Success";
+                req.redeemCode = redeemCode;
+                alert("Withdrawal Approved & Redeem Code Sent!");
+            } else {
+                req.status = "Rejected";
+                // Refund coins on rejection
+                userCoins += req.amount;
+                localStorage.setItem('zylobet_coins', userCoins);
+                document.getElementById('user-coins').innerText = userCoins.toLocaleString();
+                alert("Withdrawal Rejected & Coins Refunded.");
+            }
+
+            localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
+
+            // Update user coin history status
+            let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
+            let historyItem = coinHistory.find(h => h.id === id);
+            if(historyItem) {
+                historyItem.status = req.status;
+                if(redeemCode) historyItem.redeemCode = redeemCode;
+            }
+            localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
+
+            loadAdminRequests();
         }
 
         // ADMIN PROMO MANAGER
@@ -825,128 +961,29 @@
                         </div>
                     </div>
                     <button onclick='createPromoCode()' class='w-full py-3 bg-gradient-to-r from-rose-600 to-purple-600 rounded-xl font-black text-xs text-white shadow-lg transition'>CREATE & ACTIVATE CODE</button>
-                </div>
-
-                <div class='space-y-3 pt-2'>
-                    <h3 class='text-xs font-black text-gray-300 uppercase tracking-wider'>Active Promo Codes</h3>`;
-
-            let activePromos = promos.filter(p => p.active && Date.now() <= p.expiryTime);
-
-            if(activePromos.length === 0) {
-                html += `<div class='cyber-card p-5 text-center text-gray-500 text-xs rounded-2xl'>No active promo codes available.</div>`;
-            } else {
-                promos.forEach((p, idx) => {
-                    let isExpired = Date.now() > p.expiryTime;
-                    if (!p.active || isExpired) return;
-
-                    let symbol = p.rewardType === 'coins' ? '<span class="ff-gold-coin" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> Coins' : '<span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span> Diamonds';
-
-                    html += `
-                        <div class='cyber-card p-3.5 rounded-2xl border border-white/10 space-y-2 text-xs'>
-                            <div class='flex justify-between font-black'>
-                                <span class='text-rose-400 text-sm'>${p.code}</span>
-                                <span class='text-emerald-400 font-bold'>ACTIVE</span>
-                            </div>
-                            <div class='flex justify-between text-[11px] text-gray-300 font-semibold items-center'>
-                                <span>Reward: +${p.rewardAmount} ${symbol}</span>
-                                <span>Limit: ${p.usedCount} / ${p.maxUsers}</span>
-                            </div>
-                            <button onclick='togglePromoStatus(${idx})' class='w-full py-2 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-xl transition'>DEACTIVATE</button>
-                        </div>`;
-                });
-            }
-            html += `</div>`;
+                </div>`;
             container.innerHTML = html;
         }
 
         function createPromoCode() {
-            const codeInput = document.getElementById('adm-code-input');
-            const typeInput = document.getElementById('adm-reward-type');
-            const amtInput = document.getElementById('adm-reward-amt');
-            const timeValInput = document.getElementById('adm-time-value');
-            const timeUnitInput = document.getElementById('adm-time-unit');
-            const limitInput = document.getElementById('adm-limit-input');
+            const codeVal = document.getElementById('adm-code-input').value.trim().toUpperCase();
+            const rewardType = document.getElementById('adm-reward-type').value;
+            const rewardAmount = parseInt(document.getElementById('adm-reward-amt').value) || 100;
+            const timeVal = parseInt(document.getElementById('adm-time-value').value) || 30;
+            const timeUnit = document.getElementById('adm-time-unit').value;
+            const maxUsr = parseInt(document.getElementById('adm-limit-input').value) || 50;
 
-            const codeVal = codeInput.value.trim().toUpperCase();
-            const rewardType = typeInput.value;
-            const rewardAmount = parseInt(amtInput.value) || 100;
-            const timeValue = parseInt(timeValInput.value) || 30;
-            const timeUnit = timeUnitInput.value;
-            const maxUsr = parseInt(limitInput.value) || 50;
-
-            if(!codeVal) {
-                alert("Please enter a promo code name!");
-                return;
-            }
+            if(!codeVal) { alert("Enter promo code!"); return; }
 
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
-            
-            if(promos.some(p => p.code === codeVal)) {
-                alert("This promo code already exists!");
-                return;
-            }
+            let durationMs = timeVal * 60 * 1000;
+            if(timeUnit === 'sec') durationMs = timeVal * 1000;
+            if(timeUnit === 'hour') durationMs = timeVal * 3600 * 1000;
 
-            let durationMs = timeValue * 60 * 1000;
-            if(timeUnit === 'sec') {
-                durationMs = timeValue * 1000;
-            } else if(timeUnit === 'hour') {
-                durationMs = timeValue * 60 * 60 * 1000;
-            }
-
-            const expiryTime = Date.now() + durationMs;
-
-            promos.push({
-                code: codeVal,
-                rewardType: rewardType,
-                rewardAmount: rewardAmount,
-                expiryTime: expiryTime,
-                maxUsers: maxUsr,
-                usedCount: 0,
-                active: true
-            });
-
+            promos.push({ code: codeVal, rewardType, rewardAmount, expiryTime: Date.now() + durationMs, maxUsers: maxUsr, usedCount: 0, active: true });
             localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
-            alert(`Promo Code '${codeVal}' Created Successfully!`);
+            alert("Promo Code Created!");
             loadAdminPromoManager();
-        }
-
-        function togglePromoStatus(index) {
-            let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
-            if(promos[index]) {
-                promos[index].active = !promos[index].active;
-                localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
-                loadAdminPromoManager();
-            }
-        }
-
-        function handleAdmDep(id, action, amt) {
-            let reqs = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
-            if(action === 'approve') {
-                let gems = parseInt(localStorage.getItem('zylobet_gems')) || 12;
-                gems += amt;
-                localStorage.setItem('zylobet_gems', gems);
-                document.getElementById('user-gems').innerText = gems;
-
-                let gemHistory = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
-                gemHistory.unshift({ title: "Approved Deposit", amount: `+${amt} Diamonds`, type: "earn", time: "Just now" });
-                localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHistory));
-
-                alert(`Approved! ${amt} Diamonds added to user balance.`);
-            } else {
-                alert("Deposit Request Rejected.");
-            }
-            reqs = reqs.filter(x => x.id !== id);
-            localStorage.setItem('zylobet_deposit_requests', JSON.stringify(reqs));
-            loadAdminRequests();
-        }
-
-        function handleAdmWit(id, action) {
-            let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
-            if(action === 'approve') { alert("Withdrawal Request Approved."); }
-            else { alert("Withdrawal Request Rejected."); }
-            reqs = reqs.filter(x => x.id !== id);
-            localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
-            loadAdminRequests();
         }
     </script>
 </body>
