@@ -385,10 +385,10 @@
         </button>
     </nav>
 
-    <!-- Modals (Bigger, cleaner box for History) -->
-    <div id="modal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md p-4 flex flex-col justify-center">
+    <!-- Modals -->
+    <div id="modal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md p-5 flex flex-col justify-center">
         <div class="cyber-card p-6 rounded-3xl border border-white/10 shadow-2xl max-w-md w-full mx-auto">
-            <h2 id="modal-title" class="font-black text-center mb-4 text-xs tracking-widest text-sky-400 uppercase">Request</h2>
+            <h2 id="modal-title" class="font-black text-center mb-5 text-sm tracking-widest text-sky-400 uppercase">Request</h2>
             <div id="modal-content" class="space-y-4 max-h-[70vh] overflow-y-auto pr-1"></div>
             <button onclick="closeModal()" class="w-full mt-5 bg-white/5 hover:bg-white/10 text-gray-400 text-xs font-bold py-3 rounded-2xl transition border border-white/5">CLOSE</button>
         </div>
@@ -476,7 +476,8 @@
 
         if(!localStorage.getItem('zylobet_coin_history')) {
             localStorage.setItem('zylobet_coin_history', JSON.stringify([
-                { title: "Welcome Bonus", amount: "+1,000 Coins", type: "earn", time: "Today", status: "Success" }
+                { title: "Welcome Bonus", amount: "+1,000 Coins", type: "earn", time: "Today", status: "Success" },
+                { title: "Active Balance", amount: "+250 Coins", type: "earn", time: "Today", status: "Success" }
             ]));
         }
         if(!localStorage.getItem('zylobet_withdraw_history')) {
@@ -557,9 +558,31 @@
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
             let foundPromo = promos.find(p => p.code === promoVal);
 
-            if(!foundPromo || !foundPromo.active || Date.now() > foundPromo.expiryTime || foundPromo.usedCount >= foundPromo.maxUsers) {
+            if(!foundPromo) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ Invalid or Expired Promo Code!";
+                statusMsg.innerText = "❌ Invalid Promo Code!";
+                setTimeout(() => { statusMsg.innerText = ""; }, 3000);
+                return;
+            }
+
+            if(!foundPromo.active) {
+                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
+                statusMsg.innerText = "❌ This Promo Code is currently Deactivated!";
+                setTimeout(() => { statusMsg.innerText = ""; }, 3000);
+                return;
+            }
+
+            const now = Date.now();
+            if(now > foundPromo.expiryTime) {
+                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
+                statusMsg.innerText = "❌ This Promo Code has Expired!";
+                setTimeout(() => { statusMsg.innerText = ""; }, 3000);
+                return;
+            }
+
+            if(foundPromo.usedCount >= foundPromo.maxUsers) {
+                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
+                statusMsg.innerText = "❌ Promo Code usage limit reached!";
                 setTimeout(() => { statusMsg.innerText = ""; }, 3000);
                 return;
             }
@@ -594,7 +617,7 @@
             localStorage.setItem('zylobet_user_redeemed_' + userId, JSON.stringify(userRedeemed));
 
             statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
-            statusMsg.innerText = `🎉 +${foundPromo.rewardAmount} Added Successfully!`;
+            statusMsg.innerText = `🎉 Promo Code Applied Successfully! +${foundPromo.rewardAmount} ${foundPromo.rewardType.toUpperCase()} added.`;
             setTimeout(() => { statusMsg.innerText = ""; }, 3000);
             promoInput.value = '';
         }
@@ -631,10 +654,10 @@
                 let html = "<div class='space-y-3'>";
                 withdraws.forEach(item => {
                     let statusColor = item.status === 'Pending' ? 'text-amber-400 bg-amber-500/10 border-amber-500/30' : (item.status === 'Rejected' ? 'text-rose-400 bg-rose-500/10 border-rose-500/30' : 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30');
-                    let redeemCodeBox = item.redeemCode ? `<div class='mt-2.5 p-2.5 rounded-xl bg-sky-500/10 border border-sky-500/30 text-xs font-mono text-sky-300'>🔑 Redeem Code: <b class="text-white select-all">${item.redeemCode}</b></div>` : '';
+                    let redeemCodeBox = item.redeemCode ? `<div class='mt-2.5 p-3 rounded-xl bg-sky-500/10 border border-sky-500/30 text-xs font-mono text-sky-300'>🔑 Redeem Code: <b class="text-white select-all text-sm">${item.redeemCode}</b></div>` : '';
 
                     html += `
-                        <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2'>
+                        <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2.5'>
                             <div class='flex justify-between items-center'>
                                 <span class='text-xs font-black text-amber-400'>${item.amount} Coins (₹${item.rupees})</span>
                                 <span class='text-[10px] font-extrabold px-2.5 py-1 rounded-full border ${statusColor}'>${item.status}</span>
@@ -938,7 +961,7 @@
             loadAdminRequests();
         }
 
-        // ADMIN PROMO MANAGER
+        // ADMIN PROMO MANAGER (FIXED: Reactivates existing code if created again)
         function loadAdminPromoManager() {
             const container = document.getElementById('admin-requests-container');
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
@@ -1036,32 +1059,37 @@
 
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
             
-            if(promos.some(p => p.code === codeVal)) {
-                alert("This promo code already exists!");
-                return;
-            }
-
             let durationMs = timeValue * 60 * 1000;
             if(timeUnit === 'sec') {
                 durationMs = timeValue * 1000;
             } else if(timeUnit === 'hour') {
                 durationMs = timeValue * 60 * 60 * 1000;
             }
-
             const expiryTime = Date.now() + durationMs;
 
-            promos.push({
-                code: codeVal,
-                rewardType: rewardType,
-                rewardAmount: rewardAmount,
-                expiryTime: expiryTime,
-                maxUsers: maxUsr,
-                usedCount: 0,
-                active: true
-            });
+            let existingPromo = promos.find(p => p.code === codeVal);
+            if(existingPromo) {
+                existingPromo.rewardType = rewardType;
+                existingPromo.rewardAmount = rewardAmount;
+                existingPromo.expiryTime = expiryTime;
+                existingPromo.maxUsers = maxUsr;
+                existingPromo.usedCount = 0;
+                existingPromo.active = true;
+                alert(`Promo Code '${codeVal}' Updated & Reactivated Successfully!`);
+            } else {
+                promos.push({
+                    code: codeVal,
+                    rewardType: rewardType,
+                    rewardAmount: rewardAmount,
+                    expiryTime: expiryTime,
+                    maxUsers: maxUsr,
+                    usedCount: 0,
+                    active: true
+                });
+                alert(`Promo Code '${codeVal}' Created Successfully!`);
+            }
 
             localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
-            alert(`Promo Code '${codeVal}' Created Successfully!`);
             loadAdminPromoManager();
         }
 
