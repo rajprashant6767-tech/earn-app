@@ -543,7 +543,7 @@
             inputField.disabled = true;
         }
 
-        // SECURE PROMO CODE REDEEM LOGIC (Strictly checks activation and single-use per user)
+        // PROMO CODE REDEEM LOGIC (Strictly checks single use per user)
         function applyPromoCode() {
             const promoInput = document.getElementById('promo-input');
             const statusMsg = document.getElementById('promo-status-msg');
@@ -959,7 +959,7 @@
             loadAdminRequests();
         }
 
-        // ADMIN PROMO MANAGER
+        // ADMIN PROMO MANAGER (Strict single-use & active/deactive rule enforced)
         function loadAdminPromoManager() {
             const container = document.getElementById('admin-requests-container');
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
@@ -1004,28 +1004,25 @@
                 </div>
 
                 <div class='space-y-3 pt-2'>
-                    <h3 class='text-xs font-black text-gray-300 uppercase tracking-wider'>Active / Inactive Codes</h3>`;
+                    <h3 class='text-xs font-black text-gray-300 uppercase tracking-wider'>Active Promo Codes</h3>`;
 
             if(promos.length === 0) {
-                html += `<div class='cyber-card p-5 text-center text-gray-500 text-xs rounded-2xl'>No promo codes found.</div>`;
+                html += `<div class='cyber-card p-5 text-center text-gray-500 text-xs rounded-2xl'>No active promo codes available.</div>`;
             } else {
                 promos.forEach((p, idx) => {
-                    let statusText = p.active ? '<span class="text-emerald-400 font-bold">ACTIVE</span>' : '<span class="text-rose-400 font-bold">DEACTIVATED</span>';
-                    let toggleBtnText = p.active ? 'DEACTIVATE' : 'ACTIVATE';
-                    let toggleBtnClass = p.active ? 'bg-red-600 hover:bg-red-500' : 'bg-emerald-600 hover:bg-emerald-500';
-                    let symbol = p.rewardType === 'coins' ? 'Coins' : 'Diamonds';
+                    let symbol = p.rewardType === 'coins' ? '<span class="ff-gold-coin" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> Coins' : '<span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span> Diamonds';
 
                     html += `
                         <div class='cyber-card p-3.5 rounded-2xl border border-white/10 space-y-2 text-xs'>
                             <div class='flex justify-between font-black'>
                                 <span class='text-rose-400 text-sm'>${p.code}</span>
-                                ${statusText}
+                                <span class='text-emerald-400 font-bold'>ACTIVE</span>
                             </div>
                             <div class='flex justify-between text-[11px] text-gray-300 font-semibold items-center'>
                                 <span>Reward: +${p.rewardAmount} ${symbol}</span>
                                 <span>Uses: ${p.usedCount} / ${p.maxUsers}</span>
                             </div>
-                            <button onclick='togglePromoStatus(${idx})' class='w-full py-2 ${toggleBtnClass} text-white font-black rounded-xl transition'>${toggleBtnText}</button>
+                            <button onclick='deactivatePromo(${idx})' class='w-full py-2 bg-red-600 hover:bg-red-500 text-white font-black rounded-xl transition'>DEACTIVATE</button>
                         </div>`;
                 });
             }
@@ -1054,10 +1051,8 @@
             }
 
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
-            let existingPromo = promos.find(p => p.code === codeVal);
-
-            if(existingPromo) {
-                alert("❌ This promo code name already exists! Please use a different name or reactivate it from the list.");
+            if(promos.some(p => p.code === codeVal)) {
+                alert("❌ This promo code already exists!");
                 return;
             }
 
@@ -1084,11 +1079,12 @@
             loadAdminPromoManager();
         }
 
-        function togglePromoStatus(index) {
+        function deactivatePromo(index) {
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
             if(promos[index]) {
-                promos[index].active = !promos[index].active;
+                promos.splice(index, 1); // Permanently remove from list on deactivation
                 localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
+                alert("Promo code deactivated and removed successfully!");
                 loadAdminPromoManager();
             }
         }
