@@ -20,6 +20,7 @@
             color: #f1f5f9; 
             font-family: 'Outfit', sans-serif; 
             overflow-x: hidden; 
+            -webkit-font-smoothing: antialiased;
         }
 
         .cyber-card { 
@@ -42,29 +43,29 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             background: radial-gradient(circle at 30% 30%, #fffb96 0%, #f59e0b 50%, #b45309 100%);
             border: 2px solid #fef08a;
             border-radius: 50%;
             box-shadow: inset 0 2px 4px rgba(255,255,255,0.8), 0 3px 8px rgba(245, 158, 11, 0.5);
             color: #451a03;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .ff-diamond {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             background: radial-gradient(circle at 35% 35%, #a5f3fc 0%, #06b6d4 50%, #0369a1 100%);
             border: 2px solid #e0f2fe;
-            border-radius: 8px;
+            border-radius: 6px;
             transform: rotate(45deg);
             box-shadow: inset 0 2px 4px rgba(255,255,255,0.9), 0 3px 10px rgba(6, 182, 212, 0.6);
             color: #ffffff;
-            font-size: 13px;
+            font-size: 11px;
         }
         .ff-diamond i { transform: rotate(-45deg); }
 
@@ -79,333 +80,240 @@
             box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
             transition: all 0.3s ease;
         }
-        .shiny-green-btn:hover {
-            box-shadow: 0 0 25px rgba(16, 185, 129, 0.7);
-            filter: brightness(1.1);
-        }
+        .shiny-green-btn:hover { filter: brightness(1.1); }
 
-        @keyframes cyberPulse {
-            0%, 100% { transform: scale(1); opacity: 0.9; }
-            50% { transform: scale(1.03); opacity: 1; }
-        }
-        .animate-cyber { animation: cyberPulse 3s infinite ease-in-out; }
-
-        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar { width: 3px; }
         ::-webkit-scrollbar-track { background: #05070c; }
-        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
     </style>
 </head>
 <body class="p-4 pb-28 max-w-lg mx-auto">
 
-    <!-- Unique Futuristic Intro Screen -->
-    <div id="intro-screen" class="fixed inset-0 z-[100] bg-[#05070c] flex flex-col items-center justify-center transition-opacity duration-700">
-        <div class="text-center space-y-5">
-            <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-sky-500 via-indigo-600 to-rose-500 mx-auto flex items-center justify-center text-white text-4xl shadow-2xl animate-cyber border border-sky-400/30">
+    <!-- Intro Screen -->
+    <div id="intro-screen" class="fixed inset-0 z-[100] bg-[#05070c] flex flex-col items-center justify-center transition-opacity duration-300">
+        <div class="text-center space-y-4">
+            <div class="w-20 h-20 rounded-2xl bg-sky-600 mx-auto flex items-center justify-center text-white text-3xl shadow-xl">
                 <i class="fa-solid fa-gamepad"></i>
             </div>
-            <div>
-                <h1 class="text-3xl font-black tracking-wider bg-gradient-to-r from-sky-400 via-white to-rose-400 bg-clip-text text-transparent italic">ZYLOBET</h1>
-                <p class="text-[10px] text-gray-400 mt-1 uppercase tracking-[0.25em] font-bold">Next-Gen Web3 Gaming</p>
-            </div>
-            <div class="w-40 h-1.5 bg-gray-900 rounded-full mx-auto overflow-hidden mt-4 border border-gray-800">
-                <div id="intro-bar" class="h-full bg-gradient-to-r from-sky-400 to-rose-500 w-0 transition-all duration-500"></div>
+            <h1 class="text-2xl font-black text-sky-400 italic">ZYLOBET</h1>
+            <div class="w-32 h-1 bg-gray-800 rounded-full mx-auto overflow-hidden">
+                <div id="intro-bar" class="h-full bg-sky-400 w-full transition-all duration-300"></div>
             </div>
         </div>
     </div>
 
     <!-- Main App Container -->
-    <div id="main-app" class="opacity-0 transition-opacity duration-500 space-y-5">
+    <div id="main-app" class="space-y-4 opacity-0 transition-opacity duration-300">
         
         <!-- Admin Panel Toggle Bar -->
-        <div id="admin-toggle-bar" class="hidden mb-2 cyber-card p-3 rounded-2xl flex justify-between items-center text-xs shadow-xl backdrop-blur-md border-emerald-500/40">
-            <span class="text-emerald-400 font-extrabold flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-sm"></i> Admin Mode Active</span>
-            <button onclick="toggleAdminView()" id="view-toggle-btn" class="shiny-green-btn text-white px-4 py-2 rounded-xl font-black shadow-lg transition active:scale-95">Open Admin Panel</button>
+        <div id="admin-toggle-bar" class="hidden cyber-card p-3 rounded-2xl flex justify-between items-center text-xs border-emerald-500/30">
+            <span class="text-emerald-400 font-bold"><i class="fa-solid fa-shield-halved"></i> Admin Mode Active</span>
+            <button onclick="toggleAdminView()" id="view-toggle-btn" class="shiny-green-btn text-white px-3.5 py-1.5 rounded-xl font-black">Open Admin</button>
         </div>
 
         <!-- HEADER SECTION -->
-        <header class="cyber-card p-4 rounded-3xl flex justify-between items-center">
-            <div class="flex items-center gap-3.5">
-                <div id="user-avatar-container" class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 to-rose-500 flex items-center justify-center font-black text-xl shadow-lg border border-sky-400/30 overflow-hidden text-white">
+        <header class="cyber-card p-4 rounded-2xl flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div id="user-avatar-container" class="w-10 h-10 rounded-xl bg-sky-600 flex items-center justify-center font-bold text-white overflow-hidden">
                     <span id="user-avatar-text">U</span>
                 </div>
                 <div>
-                    <h1 class="text-base font-black tracking-wide text-sky-400 italic leading-none">ZyloBet</h1>
-                    <p id="tg-user" class="text-xs text-rose-400 font-bold mt-1 tracking-wide">@Loading...</p>
+                    <h1 class="text-sm font-black text-sky-400">ZyloBet</h1>
+                    <p id="tg-user" class="text-xs text-rose-400 font-bold">@Loading...</p>
                 </div>
             </div>
-            <div class="bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-2xl flex items-center gap-1.5 text-[11px] font-bold text-gray-300">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Live
+            <div class="bg-white/5 px-3 py-1 rounded-xl text-[10px] font-bold text-emerald-400 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Live
             </div>
         </header>
 
         <!-- TAB 1: HOME VIEW -->
-        <div id="tab-home" class="space-y-5">
-            <div class="cyber-card p-6 rounded-3xl space-y-5">
-                <div class="flex justify-between items-center pb-4 border-b border-white/10">
+        <div id="tab-home" class="space-y-4">
+            <div class="cyber-card p-5 rounded-2xl space-y-4">
+                <div class="flex justify-between items-center pb-3 border-b border-white/10">
                     <div>
-                        <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Quick Deposit</p>
-                        <p class="text-xs text-white font-semibold mt-0.5">Instant UPI Diamond Top-up</p>
+                        <p class="text-[10px] text-gray-400 uppercase font-bold">Quick Deposit</p>
+                        <p class="text-xs text-white font-semibold">Instant Diamond Top-up</p>
                     </div>
-                    <button onclick="openDepositModal()" class="shiny-green-btn text-white text-xs px-5 py-2.5 rounded-2xl font-black shadow-lg transition active:scale-95 tracking-wide">
-                        <i class="fa-solid fa-plus mr-1"></i> DEPOSIT
-                    </button>
+                    <button onclick="openDepositModal()" class="shiny-green-btn text-white text-xs px-4 py-2 rounded-xl font-black">DEPOSIT</button>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div onclick="openHistory('coins')" class="bg-black/30 p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-amber-400/40 transition group">
-                        <p class="text-2xl font-black text-amber-400 group-hover:scale-105 transition origin-left flex items-center gap-2.5">
+                <div class="grid grid-cols-2 gap-3">
+                    <div onclick="openHistory('coins')" class="bg-black/30 p-3.5 rounded-xl border border-white/5 cursor-pointer">
+                        <p class="text-xl font-black text-amber-400 flex items-center gap-2">
                             <span class="ff-gold-coin"><i class="fa-solid fa-coins"></i></span> <span id="user-coins">1,250</span>
                         </p>
-                        <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-2 tracking-wider">
-                            <span>COINS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-amber-400/80"></i>
-                        </p>
+                        <p class="text-[10px] text-gray-400 font-bold mt-1">COINS 🪙</p>
                     </div>
-                    <div onclick="openHistory('gems')" class="bg-black/30 p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-cyan-400/40 transition group">
-                        <p class="text-2xl font-black text-cyan-400 group-hover:scale-105 transition origin-left flex items-center gap-2.5">
+                    <div onclick="openHistory('gems')" class="bg-black/30 p-3.5 rounded-xl border border-white/5 cursor-pointer">
+                        <p class="text-xl font-black text-cyan-400 flex items-center gap-2">
                             <span class="ff-diamond"><i class="fa-solid fa-gem"></i></span> <span id="user-gems">12</span>
                         </p>
-                        <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-2 tracking-wider">
-                            <span>DIAMONDS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-cyan-400/80"></i>
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="cyber-card p-5 rounded-3xl flex items-center justify-between">
-                <div class="flex items-center gap-3.5">
-                    <div class="w-12 h-12 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 text-xl font-bold">
-                        <i class="fa-solid fa-bolt-lightning"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-xs font-black text-white uppercase tracking-wider">Elite VIP Status</h2>
-                        <p class="text-[10px] text-gray-400 mt-0.5">Fast automated deposits & secure payouts.</p>
+                        <p class="text-[10px] text-gray-400 font-bold mt-1">DIAMONDS 💎</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- TAB 2: REFERRAL VIEW -->
-        <div id="tab-refer" class="hidden space-y-5">
-            <div class="cyber-card p-6 rounded-3xl space-y-5 border border-sky-500/20">
-                <div class="text-center space-y-2">
-                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-sky-500/20 to-indigo-500/10 border border-sky-500/30 text-sky-400 flex items-center justify-center mx-auto text-xl shadow-lg">
-                        <i class="fa-solid fa-users"></i>
-                    </div>
-                    <h2 class="text-base font-black text-sky-400">Refer & Earn Rewards</h2>
-                    <p class="text-[11px] text-gray-400">Invite your friend and both get +300 Coins instantly!</p>
-                </div>
-
-                <div class="flex justify-between items-center bg-black/30 p-4 rounded-2xl border border-white/5">
+        <div id="tab-refer" class="hidden space-y-4">
+            <div class="cyber-card p-5 rounded-2xl space-y-4">
+                <h2 class="text-sm font-black text-sky-400">Refer & Earn (+300 Coins for Both)</h2>
+                <div class="flex justify-between items-center bg-black/30 p-3 rounded-xl border border-white/5">
                     <div>
-                        <p class="text-[10px] text-gray-400 uppercase font-semibold tracking-wider">My Referral Code</p>
-                        <p id="ref-code" class="font-black tracking-widest text-sky-400 text-lg mt-0.5">Loading...</p>
+                        <p class="text-[10px] text-gray-400">My Referral Code</p>
+                        <p id="ref-code" class="font-black text-sky-400 text-base">Loading...</p>
                     </div>
-                    <button onclick="copyRef()" class="text-xs bg-white/10 hover:bg-white/20 px-4 py-2.5 rounded-xl font-bold transition active:scale-95 text-white">COPY</button>
+                    <button onclick="copyRef()" class="text-xs bg-white/10 px-3 py-2 rounded-lg font-bold text-white">COPY</button>
                 </div>
-                
-                <div class="pt-3 border-t border-white/10 space-y-2.5">
-                    <p class="text-[11px] text-gray-300 font-semibold">Have a friend's referral code?</p>
-                    <div class="flex gap-2">
-                        <input type="text" id="friend-ref-input" placeholder="Enter Code (e.g. ZYL1234)" class="w-full bg-black/50 border border-white/10 px-4 py-3 text-xs rounded-2xl uppercase font-extrabold text-amber-400 focus:outline-none focus:border-sky-500 transition">
-                        <button onclick="applyReferralCode()" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white text-xs px-5 py-3 rounded-2xl font-extrabold transition shrink-0 active:scale-95 shadow-md">APPLY</button>
-                    </div>
+                <div class="space-y-2">
+                    <input type="text" id="friend-ref-input" placeholder="Enter Friend's Code" class="w-full bg-black/50 border border-white/10 p-3 text-xs rounded-xl uppercase font-bold text-amber-400">
+                    <button onclick="applyReferralCode()" class="w-full py-3 bg-blue-600 text-white text-xs rounded-xl font-bold">APPLY CODE</button>
                     <p id="ref-status-msg" class="text-[11px] h-4 font-semibold"></p>
                 </div>
             </div>
         </div>
 
         <!-- TAB 3: PROMO CODE VIEW -->
-        <div id="tab-promo" class="hidden space-y-5">
-            <div class="cyber-card p-6 rounded-3xl space-y-5 border border-rose-500/20">
-                <div class="text-center space-y-2">
-                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-rose-500/20 to-purple-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto text-xl shadow-lg">
-                        <i class="fa-solid fa-gift"></i>
-                    </div>
-                    <h2 class="text-base font-black text-rose-400">Promo Code & Bonuses</h2>
-                    <p class="text-[11px] text-gray-400">Redeem exclusive bonus codes instantly.</p>
-                </div>
-
-                <div class="space-y-3.5 pt-1">
-                    <input type="text" id="promo-input" class='w-full bg-black/50 border border-white/10 p-4 text-xs rounded-2xl text-rose-300 font-black uppercase focus:outline-none focus:border-rose-500 transition tracking-wider' placeholder='ENTER PROMO CODE'>
-                    <button onclick="applyPromoCode()" class='w-full py-4 bg-gradient-to-r from-rose-600 via-purple-600 to-blue-600 rounded-2xl font-black text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>APPLY CODE</button>
+        <div id="tab-promo" class="hidden space-y-4">
+            <div class="cyber-card p-5 rounded-2xl space-y-4">
+                <h2 class="text-sm font-black text-rose-400">Promo Code</h2>
+                <div class="space-y-2">
+                    <input type="text" id="promo-input" class='w-full bg-black/50 border border-white/10 p-3 text-xs rounded-xl text-rose-300 font-bold uppercase' placeholder='ENTER CODE'>
+                    <button onclick="applyPromoCode()" class='w-full py-3 bg-rose-600 rounded-xl font-bold text-xs text-white'>REDEEM CODE</button>
                     <p id="promo-status-msg" class="text-[11px] h-4 font-semibold text-center"></p>
-                </div>
-
-                <div class='text-center pt-3 border-t border-white/10 mt-2'>
-                    <a href='https://t.me/+2vDL5Gmbee0zNDFl' target='_blank' class='inline-flex items-center gap-2 text-xs text-sky-400 font-bold bg-sky-500/10 border border-sky-500/20 px-5 py-3 rounded-2xl w-full justify-center transition hover:bg-sky-500/20 active:scale-95'>
-                        <i class='fa-brands fa-telegram text-base'></i> Join Official Telegram Channel
-                    </a>
                 </div>
             </div>
         </div>
 
         <!-- TAB 4: WITHDRAW VIEW -->
-        <div id="tab-withdraw" class="hidden space-y-5">
-            <div class="cyber-card p-6 rounded-3xl space-y-5 border border-emerald-500/30">
-                <div class="text-center space-y-2">
-                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500/20 to-green-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto text-xl shadow-lg">
-                        <i class="fa-solid fa-wallet"></i>
-                    </div>
-                    <h2 class="text-base font-black text-emerald-400">Withdraw Earnings</h2>
-                    <p class="text-[11px] text-gray-400">Choose your payout method & packages below:</p>
+        <div id="tab-withdraw" class="hidden space-y-4">
+            <div class="cyber-card p-5 rounded-2xl space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-sm font-black text-emerald-400">Withdraw Earnings</h2>
+                    <button onclick="openHistory('withdrawals')" class="text-[10px] bg-emerald-500/20 text-emerald-300 px-3 py-1.5 rounded-lg font-bold border border-emerald-500/30">📜 Withdraw History</button>
                 </div>
 
-                <!-- Payout Section Tabs -->
-                <div class="grid grid-cols-3 gap-2 bg-black/40 p-1.5 rounded-2xl border border-white/10">
-                    <button onclick="switchWithdrawSection('upi')" id="w-tab-upi" class="py-2.5 rounded-xl font-black text-[11px] text-emerald-400 bg-emerald-500/25 transition flex items-center justify-center gap-1.5"><i class="fa-solid fa-building-columns"></i> UPI</button>
-                    <button onclick="switchWithdrawSection('amazon')" id="w-tab-amazon" class="py-2.5 rounded-xl font-black text-[11px] text-gray-400 transition flex items-center justify-center gap-1.5"><i class="fa-brands fa-amazon"></i> Amazon</button>
-                    <button onclick="switchWithdrawSection('playstore')" id="w-tab-playstore" class="py-2.5 rounded-xl font-black text-[11px] text-gray-400 transition flex items-center justify-center gap-1.5"><i class="fa-brands fa-google-play"></i> PlayStore</button>
+                <div class="grid grid-cols-3 gap-2 bg-black/40 p-1 rounded-xl border border-white/10">
+                    <button onclick="switchWithdrawSection('upi')" id="w-tab-upi" class="py-2 rounded-lg font-bold text-[11px] text-emerald-400 bg-emerald-500/20">UPI</button>
+                    <button onclick="switchWithdrawSection('amazon')" id="w-tab-amazon" class="py-2 rounded-lg font-bold text-[11px] text-gray-400">Amazon</button>
+                    <button onclick="switchWithdrawSection('playstore')" id="w-tab-playstore" class="py-2 rounded-lg font-bold text-[11px] text-gray-400">PlayStore</button>
                 </div>
 
-                <!-- SECTION 1: UPI -->
-                <div id="withdraw-section-upi" class="space-y-4 pt-1">
-                    <label class="text-[11px] text-gray-300 font-bold block uppercase tracking-wider">Select Coin Package</label>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div onclick="selectWPackage(5500, 50)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="5500">
-                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">5,500 <i class="fa-solid fa-coins text-xs"></i></p>
-                            <p class="text-[11px] text-emerald-400 font-bold mt-1">₹50 Cash</p>
+                <!-- UPI Section -->
+                <div id="withdraw-section-upi" class="space-y-3">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div onclick="selectWPackage(5500, 50)" class="w-pkg-card bg-black/50 border border-white/10 p-3 rounded-xl cursor-pointer text-center" data-coins="5500">
+                            <p class="text-amber-400 font-black text-xs">5,500 Coins</p>
+                            <p class="text-[10px] text-emerald-400 font-bold">₹50 Cash</p>
                         </div>
-                        <div onclick="selectWPackage(10750, 100)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="10750">
-                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">10,750 <i class="fa-solid fa-coins text-xs"></i></p>
-                            <p class="text-[11px] text-emerald-400 font-bold mt-1">₹100 Cash</p>
+                        <div onclick="selectWPackage(10750, 100)" class="w-pkg-card bg-black/50 border border-white/10 p-3 rounded-xl cursor-pointer text-center" data-coins="10750">
+                            <p class="text-amber-400 font-black text-xs">10,750 Coins</p>
+                            <p class="text-[10px] text-emerald-400 font-bold">₹100 Cash</p>
                         </div>
-                        <div onclick="selectWPackage(20500, 200)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="20500">
-                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">20,500 <i class="fa-solid fa-coins text-xs"></i></p>
-                            <p class="text-[11px] text-emerald-400 font-bold mt-1">₹200 Cash</p>
+                        <div onclick="selectWPackage(20500, 200)" class="w-pkg-card bg-black/50 border border-white/10 p-3 rounded-xl cursor-pointer text-center" data-coins="20500">
+                            <p class="text-amber-400 font-black text-xs">20,500 Coins</p>
+                            <p class="text-[10px] text-emerald-400 font-bold">₹200 Cash</p>
                         </div>
-                        <div onclick="selectWPackage(50000, 500)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="50000">
-                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">50,000 <i class="fa-solid fa-coins text-xs"></i></p>
-                            <p class="text-[11px] text-emerald-400 font-bold mt-1">₹500 Cash</p>
+                        <div onclick="selectWPackage(50000, 500)" class="w-pkg-card bg-black/50 border border-white/10 p-3 rounded-xl cursor-pointer text-center" data-coins="50000">
+                            <p class="text-amber-400 font-black text-xs">50,000 Coins</p>
+                            <p class="text-[10px] text-emerald-400 font-bold">₹500 Cash</p>
                         </div>
                     </div>
-
-                    <div>
-                        <label class="text-[11px] text-gray-300 font-bold block mb-1.5 uppercase tracking-wider">Enter Your UPI ID</label>
-                        <input type="text" id="w-upi-id" placeholder="e.g. username@oksbi" class="w-full bg-black/50 border border-white/10 p-3.5 text-xs rounded-2xl text-sky-400 font-bold focus:outline-none focus:border-emerald-500 transition">
-                    </div>
-                    <button onclick="submitWithdrawRequest('UPI')" class='w-full py-4 bg-gradient-to-r from-emerald-600 to-green-600 rounded-2xl font-black text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>SUBMIT UPI WITHDRAWAL</button>
+                    <input type="text" id="w-upi-id" placeholder="Enter UPI ID" class="w-full bg-black/50 border border-white/10 p-3 text-xs rounded-xl text-sky-400 font-bold">
+                    <button onclick="submitWithdrawRequest('UPI')" class='w-full py-3 bg-emerald-600 rounded-xl font-bold text-xs text-white'>SUBMIT UPI WITHDRAWAL</button>
                 </div>
 
-                <!-- SECTION 2: AMAZON GIFT CARD -->
-                <div id="withdraw-section-amazon" class="hidden space-y-4 pt-1">
-                    <label class="text-[11px] text-gray-300 font-bold block uppercase tracking-wider">Select Amazon Package</label>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div onclick="selectWPackage(5500, 50)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="5500">
-                            <p class="text-amber-400 font-black text-sm">5,500 Coins</p>
-                            <p class="text-[11px] text-sky-400 font-bold mt-1">₹50 Amazon Card</p>
+                <!-- Amazon Section -->
+                <div id="withdraw-section-amazon" class="hidden space-y-3">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div onclick="selectWPackage(5500, 50)" class="w-pkg-card bg-black/50 border border-white/10 p-3 rounded-xl cursor-pointer text-center" data-coins="5500">
+                            <p class="text-amber-400 font-black text-xs">5,500 Coins</p>
+                            <p class="text-[10px] text-sky-400 font-bold">₹50 Card</p>
                         </div>
-                        <div onclick="selectWPackage(10750, 100)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="10750">
-                            <p class="text-amber-400 font-black text-sm">10,750 Coins</p>
-                            <p class="text-[11px] text-sky-400 font-bold mt-1">₹100 Amazon Card</p>
-                        </div>
-                        <div onclick="selectWPackage(20500, 200)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="20500">
-                            <p class="text-amber-400 font-black text-sm">20,500 Coins</p>
-                            <p class="text-[11px] text-sky-400 font-bold mt-1">₹200 Amazon Card</p>
-                        </div>
-                        <div onclick="selectWPackage(50000, 500)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="50000">
-                            <p class="text-amber-400 font-black text-sm">50,000 Coins</p>
-                            <p class="text-[11px] text-sky-400 font-bold mt-1">₹500 Amazon Card</p>
+                        <div onclick="selectWPackage(10750, 100)" class="w-pkg-card bg-black/50 border border-white/10 p-3 rounded-xl cursor-pointer text-center" data-coins="10750">
+                            <p class="text-amber-400 font-black text-xs">10,750 Coins</p>
+                            <p class="text-[10px] text-sky-400 font-bold">₹100 Card</p>
                         </div>
                     </div>
-                    <p class='text-[11px] text-amber-300 bg-amber-500/10 border border-amber-500/30 p-3 rounded-xl font-semibold'>🎁 Redeem code withdrawal history mein aayega!</p>
-                    <button onclick="submitWithdrawRequest('Amazon Gift Card')" class='w-full py-4 bg-gradient-to-r from-emerald-600 to-green-600 rounded-2xl font-black text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>REQUEST AMAZON CARD</button>
+                    <p class='text-[10px] text-amber-300 bg-amber-500/10 p-2.5 rounded-xl'>🎁 Redeem code withdrawal history mein aayega!</p>
+                    <button onclick="submitWithdrawRequest('Amazon Gift Card')" class='w-full py-3 bg-emerald-600 rounded-xl font-bold text-xs text-white'>REQUEST AMAZON CARD</button>
                 </div>
 
-                <!-- SECTION 3: PLAY STORE GIFT CARD -->
-                <div id="withdraw-section-playstore" class="hidden space-y-4 pt-1">
-                    <label class="text-[11px] text-gray-300 font-bold block uppercase tracking-wider">Select PlayStore Package</label>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div onclick="selectWPackage(5500, 50)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="5500">
-                            <p class="text-amber-400 font-black text-sm">5,500 Coins</p>
-                            <p class="text-[11px] text-indigo-400 font-bold mt-1">₹50 PlayStore Card</p>
+                <!-- PlayStore Section -->
+                <div id="withdraw-section-playstore" class="hidden space-y-3">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div onclick="selectWPackage(5500, 50)" class="w-pkg-card bg-black/50 border border-white/10 p-3 rounded-xl cursor-pointer text-center" data-coins="5500">
+                            <p class="text-amber-400 font-black text-xs">5,500 Coins</p>
+                            <p class="text-[10px] text-indigo-400 font-bold">₹50 Card</p>
                         </div>
-                        <div onclick="selectWPackage(10750, 100)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="10750">
-                            <p class="text-amber-400 font-black text-sm">10,750 Coins</p>
-                            <p class="text-[11px] text-indigo-400 font-bold mt-1">₹100 PlayStore Card</p>
-                        </div>
-                        <div onclick="selectWPackage(20500, 200)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="20500">
-                            <p class="text-amber-400 font-black text-sm">20,500 Coins</p>
-                            <p class="text-[11px] text-indigo-400 font-bold mt-1">₹200 PlayStore Card</p>
-                        </div>
-                        <div onclick="selectWPackage(50000, 500)" class="w-pkg-card bg-black/50 border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="50000">
-                            <p class="text-amber-400 font-black text-sm">50,000 Coins</p>
-                            <p class="text-[11px] text-indigo-400 font-bold mt-1">₹500 PlayStore Card</p>
+                        <div onclick="selectWPackage(10750, 100)" class="w-pkg-card bg-black/50 border border-white/10 p-3 rounded-xl cursor-pointer text-center" data-coins="10750">
+                            <p class="text-amber-400 font-black text-xs">10,750 Coins</p>
+                            <p class="text-[10px] text-indigo-400 font-bold">₹100 Card</p>
                         </div>
                     </div>
-                    <p class='text-[11px] text-amber-300 bg-amber-500/10 border border-amber-500/30 p-3 rounded-xl font-semibold'>🎁 Redeem code withdrawal history mein aayega!</p>
-                    <button onclick="submitWithdrawRequest('Play Store Gift Card')" class='w-full py-4 bg-gradient-to-r from-emerald-600 to-green-600 rounded-2xl font-black text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide'>REQUEST PLAYSTORE CARD</button>
+                    <p class='text-[10px] text-amber-300 bg-amber-500/10 p-2.5 rounded-xl'>🎁 Redeem code withdrawal history mein aayega!</p>
+                    <button onclick="submitWithdrawRequest('Play Store Gift Card')" class='w-full py-3 bg-emerald-600 rounded-xl font-bold text-xs text-white'>REQUEST PLAYSTORE CARD</button>
                 </div>
             </div>
         </div>
 
         <!-- ADMIN PANEL VIEW -->
-        <div id="admin-view" class="hidden space-y-4">
-            <div class="cyber-card p-4 rounded-3xl border border-sky-500/30 flex justify-between items-center">
-                <div>
-                    <h1 class="text-base font-black text-sky-400 italic">ZyloBet Admin Panel</h1>
-                    <p class="text-[10px] text-gray-400">Live Requests & Promo Manager</p>
-                </div>
-                <button onclick="loadAdminRequests()" class="bg-white/10 hover:bg-white/20 text-xs px-3.5 py-2 rounded-xl font-bold text-amber-400 transition active:scale-95">
-                    <i class="fa-solid fa-rotate mr-1"></i> Refresh
-                </button>
+        <div id="admin-view" class="hidden space-y-3">
+            <div class="cyber-card p-3 rounded-xl flex justify-between items-center text-xs">
+                <span class="text-sky-400 font-bold">Admin Panel</span>
+                <button onclick="loadAdminRequests()" class="bg-white/10 px-3 py-1 rounded-lg text-amber-400 font-bold">Refresh</button>
             </div>
-
             <div class="grid grid-cols-3 gap-2">
-                <button onclick="switchAdminTab('deposit')" id="adm-tab-dep" class="py-2.5 bg-gradient-to-r from-sky-600 to-blue-600 rounded-xl font-black text-[11px] shadow transition">Deposit</button>
-                <button onclick="switchAdminTab('withdraw')" id="adm-tab-wit" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[11px] shadow transition">Withdraw</button>
-                <button onclick="switchAdminTab('promo')" id="adm-tab-promo" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[11px] shadow transition">Promos</button>
+                <button onclick="switchAdminTab('deposit')" id="adm-tab-dep" class="py-2 bg-sky-600 rounded-lg font-bold text-[11px]">Deposit</button>
+                <button onclick="switchAdminTab('withdraw')" id="adm-tab-wit" class="py-2 bg-black/50 text-gray-400 rounded-lg font-bold text-[11px]">Withdraw</button>
+                <button onclick="switchAdminTab('promo')" id="adm-tab-promo" class="py-2 bg-black/50 text-gray-400 rounded-lg font-bold text-[11px]">Promos</button>
             </div>
-
-            <div id="admin-requests-container" class="space-y-3"></div>
+            <div id="admin-requests-container" class="space-y-2"></div>
         </div>
     </div>
 
-    <!-- FIXED CYBER BOTTOM NAVIGATION BAR -->
-    <nav class="fixed bottom-3 left-4 right-4 max-w-lg mx-auto bg-[#070a14]/90 backdrop-blur-xl border border-white/10 px-3 py-2.5 flex justify-around items-center z-40 rounded-3xl shadow-2xl">
-        <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center gap-1 text-sky-400 transition py-1 px-4 rounded-2xl bg-sky-500/10">
-            <i class="fa-solid fa-house text-base"></i>
-            <span class="text-[10px] font-extrabold tracking-wide">Home</span>
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="fixed bottom-3 left-4 right-4 max-w-lg mx-auto bg-[#070a14]/95 backdrop-blur-md border border-white/10 px-3 py-2 flex justify-around items-center z-40 rounded-2xl shadow-xl">
+        <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center gap-0.5 text-sky-400 py-1 px-3 rounded-xl bg-sky-500/10">
+            <i class="fa-solid fa-house text-sm"></i>
+            <span class="text-[9px] font-bold">Home</span>
         </button>
-        <button onclick="switchTab('refer')" id="nav-refer" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition py-1 px-4 rounded-2xl">
-            <i class="fa-solid fa-users text-base"></i>
-            <span class="text-[10px] font-extrabold tracking-wide">Refer</span>
+        <button onclick="switchTab('refer')" id="nav-refer" class="flex flex-col items-center gap-0.5 text-gray-400 py-1 px-3 rounded-xl">
+            <i class="fa-solid fa-users text-sm"></i>
+            <span class="text-[9px] font-bold">Refer</span>
         </button>
-        <button onclick="switchTab('promo')" id="nav-promo" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition py-1 px-4 rounded-2xl">
-            <i class="fa-solid fa-gift text-base"></i>
-            <span class="text-[10px] font-extrabold tracking-wide">Promo</span>
+        <button onclick="switchTab('promo')" id="nav-promo" class="flex flex-col items-center gap-0.5 text-gray-400 py-1 px-3 rounded-xl">
+            <i class="fa-solid fa-gift text-sm"></i>
+            <span class="text-[9px] font-bold">Promo</span>
         </button>
-        <button onclick="switchTab('withdraw')" id="nav-withdraw" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition py-1 px-4 rounded-2xl">
-            <i class="fa-solid fa-wallet text-base"></i>
-            <span class="text-[10px] font-extrabold tracking-wide">Withdraw</span>
+        <button onclick="switchTab('withdraw')" id="nav-withdraw" class="flex flex-col items-center gap-0.5 text-gray-400 py-1 px-3 rounded-xl">
+            <i class="fa-solid fa-wallet text-sm"></i>
+            <span class="text-[9px] font-bold">Withdraw</span>
         </button>
     </nav>
 
     <!-- Modals -->
-    <div id="modal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md p-5 flex flex-col justify-center">
-        <div class="cyber-card p-6 rounded-3xl border border-white/10 shadow-2xl">
-            <h2 id="modal-title" class="font-black text-center mb-5 text-sm tracking-widest text-sky-400 uppercase">Request</h2>
-            <div id="modal-content" class="space-y-4"></div>
-            <button onclick="closeModal()" class="w-full mt-5 bg-white/5 hover:bg-white/10 text-gray-400 text-xs font-bold py-3 rounded-2xl transition border border-white/5">CANCEL</button>
+    <div id="modal" class="hidden fixed inset-0 z-50 bg-black/90 p-4 flex flex-col justify-center">
+        <div class="cyber-card p-5 rounded-2xl">
+            <h2 id="modal-title" class="font-bold text-center mb-4 text-xs tracking-wider text-sky-400 uppercase">Request</h2>
+            <div id="modal-content" class="space-y-3"></div>
+            <button onclick="closeModal()" class="w-full mt-4 bg-white/10 text-gray-300 text-xs font-bold py-2.5 rounded-xl">CANCEL</button>
         </div>
     </div>
 
-    <div id="img-modal" class="hidden fixed inset-0 z-50 bg-black/95 backdrop-blur-xl p-5 flex flex-col items-center justify-center">
-        <img id="modal-img" src="" alt="Proof" class="max-h-[75vh] max-w-full rounded-2xl border border-white/10 mb-5 object-contain shadow-2xl">
-        <button onclick="document.getElementById('img-modal').classList.add('hidden')" class="px-8 py-3 bg-white/10 hover:bg-white/20 rounded-2xl font-black text-xs text-white transition border border-white/10">CLOSE PROOF</button>
+    <div id="img-modal" class="hidden fixed inset-0 z-50 bg-black/95 p-4 flex flex-col items-center justify-center">
+        <img id="modal-img" src="" alt="Proof" class="max-h-[70vh] max-w-full rounded-xl mb-4 object-contain">
+        <button onclick="document.getElementById('img-modal').classList.add('hidden')" class="px-6 py-2.5 bg-white/10 rounded-xl font-bold text-xs text-white">CLOSE</button>
     </div>
 
     <script>
         window.addEventListener('DOMContentLoaded', () => {
-            const bar = document.getElementById('intro-bar');
-            setTimeout(() => { bar.style.width = '100%'; }, 200);
             setTimeout(() => {
                 const intro = document.getElementById('intro-screen');
                 intro.style.opacity = '0';
-                setTimeout(() => {
-                    intro.remove();
-                    document.getElementById('main-app').style.opacity = '1';
-                }, 700);
-            }, 1500);
+                setTimeout(() => { intro.remove(); document.getElementById('main-app').style.opacity = '1'; }, 300);
+            }, 500);
         });
 
         const ADMIN_ID = "7927224931";
@@ -420,10 +328,7 @@
         document.getElementById('tg-user').innerText = "@" + username;
         document.getElementById('ref-code').innerText = myReferralCode;
 
-        const avatarContainer = document.getElementById('user-avatar-container');
-        if(user && user.photo_url) {
-            avatarContainer.innerHTML = `<img src="${user.photo_url}" alt="Profile" class="w-full h-full object-cover">`;
-        } else if(user && user.first_name) {
+        if(user && user.first_name) {
             document.getElementById('user-avatar-text').innerText = user.first_name.charAt(0).toUpperCase();
         }
 
@@ -437,30 +342,26 @@
         function toggleAdminView() {
             isViewingAdmin = !isViewingAdmin;
             if(isViewingAdmin) {
-                document.getElementById('tab-home').classList.add('hidden');
-                document.getElementById('tab-refer').classList.add('hidden');
-                document.getElementById('tab-promo').classList.add('hidden');
-                document.getElementById('tab-withdraw').classList.add('hidden');
+                ['home', 'refer', 'promo', 'withdraw'].forEach(t => document.getElementById('tab-' + t).classList.add('hidden'));
                 document.querySelector('nav').classList.add('hidden');
                 document.getElementById('admin-view').classList.remove('hidden');
-                document.getElementById('view-toggle-btn').innerText = "Back to User App";
+                document.getElementById('view-toggle-btn').innerText = "Back to App";
                 loadAdminRequests();
             } else {
                 document.getElementById('admin-view').classList.add('hidden');
                 document.querySelector('nav').classList.remove('hidden');
                 switchTab('home');
-                document.getElementById('view-toggle-btn').innerText = "Open Admin Panel";
+                document.getElementById('view-toggle-btn').innerText = "Open Admin";
             }
         }
 
         function switchTab(tab) {
             ['home', 'refer', 'promo', 'withdraw'].forEach(t => {
                 document.getElementById('tab-' + t).classList.add('hidden');
-                document.getElementById('nav-' + t).className = "flex flex-col items-center gap-1 text-gray-400 hover:text-white transition py-1 px-4 rounded-2xl";
+                document.getElementById('nav-' + t).className = "flex flex-col items-center gap-0.5 text-gray-400 py-1 px-3 rounded-xl";
             });
-
             document.getElementById('tab-' + tab).classList.remove('hidden');
-            document.getElementById('nav-' + tab).className = "flex flex-col items-center gap-1 text-sky-400 transition py-1 px-4 rounded-2xl bg-sky-500/10";
+            document.getElementById('nav-' + tab).className = "flex flex-col items-center gap-0.5 text-sky-400 py-1 px-3 rounded-xl bg-sky-500/10";
         }
 
         let userCoins = parseInt(localStorage.getItem('zylobet_coins')) || 1250;
@@ -471,8 +372,7 @@
 
         if(!localStorage.getItem('zylobet_coin_history')) {
             localStorage.setItem('zylobet_coin_history', JSON.stringify([
-                { title: "Welcome Bonus", amount: "+1,000 Coins", type: "earn", time: "Today", status: "Success" },
-                { title: "Active Balance", amount: "+250 Coins", type: "earn", time: "Today", status: "Success" }
+                { title: "Welcome Bonus", amount: "+1,000 Coins", type: "earn", time: "Today", status: "Success" }
             ]));
         }
         if(!localStorage.getItem('zylobet_gem_history')) {
@@ -487,10 +387,10 @@
         function switchWithdrawSection(sec) {
             ['upi', 'amazon', 'playstore'].forEach(s => {
                 document.getElementById('withdraw-section-' + s).classList.add('hidden');
-                document.getElementById('w-tab-' + s).className = "py-2.5 rounded-xl font-black text-[11px] text-gray-400 transition flex items-center justify-center gap-1.5";
+                document.getElementById('w-tab-' + s).className = "py-2 rounded-lg font-bold text-[11px] text-gray-400";
             });
             document.getElementById('withdraw-section-' + sec).classList.remove('hidden');
-            document.getElementById('w-tab-' + sec).className = "py-2.5 rounded-xl font-black text-[11px] text-emerald-400 bg-emerald-500/25 transition flex items-center justify-center gap-1.5";
+            document.getElementById('w-tab-' + sec).className = "py-2 rounded-lg font-bold text-[11px] text-emerald-400 bg-emerald-500/20";
         }
 
         function selectWPackage(coins, rs) {
@@ -505,24 +405,15 @@
             const statusMsg = document.getElementById('ref-status-msg');
             const enteredCode = inputField.value.trim().toUpperCase();
 
-            const hasUsedReferral = localStorage.getItem('zylobet_ref_used');
-            if(hasUsedReferral === 'true') {
-                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ You have already redeemed a referral code!";
+            if(localStorage.getItem('zylobet_ref_used') === 'true') {
+                statusMsg.className = "text-[11px] h-4 font-bold text-rose-400";
+                statusMsg.innerText = "❌ Already used a referral code!";
                 setTimeout(() => { statusMsg.innerText = ""; }, 3000);
                 return;
             }
-
-            if(!enteredCode) {
-                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ Please enter a valid referral code.";
-                setTimeout(() => { statusMsg.innerText = ""; }, 3000);
-                return;
-            }
-
-            if(enteredCode === myReferralCode) {
-                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ You cannot use your own referral code!";
+            if(!enteredCode || enteredCode === myReferralCode) {
+                statusMsg.className = "text-[11px] h-4 font-bold text-rose-400";
+                statusMsg.innerText = "❌ Invalid Code!";
                 setTimeout(() => { statusMsg.innerText = ""; }, 3000);
                 return;
             }
@@ -532,12 +423,12 @@
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
 
             let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-            coinHistory.unshift({ title: `Referral Bonus (${enteredCode})`, amount: "+300 Coins", type: "earn", time: "Just now", status: "Success" });
+            coinHistory.unshift({ title: `Referral (${enteredCode})`, amount: "+300 Coins", type: "earn", time: "Just now", status: "Success" });
             localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
 
             localStorage.setItem('zylobet_ref_used', 'true');
-            statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
-            statusMsg.innerText = "🎉 Referral code applied successfully! +300 Coins added.";
+            statusMsg.className = "text-[11px] h-4 font-bold text-emerald-400";
+            statusMsg.innerText = "🎉 +300 Coins added successfully!";
             setTimeout(() => { statusMsg.innerText = ""; }, 3000);
             inputField.disabled = true;
         }
@@ -547,49 +438,20 @@
             const statusMsg = document.getElementById('promo-status-msg');
             const promoVal = promoInput.value.trim().toUpperCase();
             
-            if(!promoVal) {
-                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ Please enter a promo code.";
-                setTimeout(() => { statusMsg.innerText = ""; }, 3000);
-                return;
-            }
-
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
             let foundPromo = promos.find(p => p.code === promoVal);
 
-            if(!foundPromo) {
-                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ Invalid Promo Code!";
-                setTimeout(() => { statusMsg.innerText = ""; }, 3000);
-                return;
-            }
-
-            if(!foundPromo.active) {
-                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ This Promo Code is currently Deactivated!";
-                setTimeout(() => { statusMsg.innerText = ""; }, 3000);
-                return;
-            }
-
-            const now = Date.now();
-            if(now > foundPromo.expiryTime) {
-                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ This Promo Code has Expired!";
-                setTimeout(() => { statusMsg.innerText = ""; }, 3000);
-                return;
-            }
-
-            if(foundPromo.usedCount >= foundPromo.maxUsers) {
-                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ Promo Code usage limit reached!";
+            if(!foundPromo || !foundPromo.active || Date.now() > foundPromo.expiryTime || foundPromo.usedCount >= foundPromo.maxUsers) {
+                statusMsg.className = "text-[11px] h-4 font-bold text-rose-400";
+                statusMsg.innerText = "❌ Invalid or Expired Promo Code!";
                 setTimeout(() => { statusMsg.innerText = ""; }, 3000);
                 return;
             }
 
             let userRedeemed = JSON.parse(localStorage.getItem('zylobet_user_redeemed_' + userId)) || [];
             if(userRedeemed.includes(promoVal)) {
-                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ You have already redeemed this promo code!";
+                statusMsg.className = "text-[11px] h-4 font-bold text-rose-400";
+                statusMsg.innerText = "❌ Already redeemed!";
                 setTimeout(() => { statusMsg.innerText = ""; }, 3000);
                 return;
             }
@@ -598,7 +460,6 @@
                 userCoins += foundPromo.rewardAmount;
                 localStorage.setItem('zylobet_coins', userCoins);
                 document.getElementById('user-coins').innerText = userCoins.toLocaleString();
-
                 let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
                 coinHistory.unshift({ title: `Promo (${promoVal})`, amount: `+${foundPromo.rewardAmount} Coins`, type: "earn", time: "Just now", status: "Success" });
                 localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
@@ -606,7 +467,6 @@
                 userGems += foundPromo.rewardAmount;
                 localStorage.setItem('zylobet_gems', userGems);
                 document.getElementById('user-gems').innerText = userGems;
-
                 let gemHistory = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
                 gemHistory.unshift({ title: `Promo (${promoVal})`, amount: `+${foundPromo.rewardAmount} Diamonds`, type: "earn", time: "Just now", status: "Success" });
                 localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHistory));
@@ -614,12 +474,11 @@
 
             foundPromo.usedCount += 1;
             localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
-
             userRedeemed.push(promoVal);
             localStorage.setItem('zylobet_user_redeemed_' + userId, JSON.stringify(userRedeemed));
 
-            statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
-            statusMsg.innerText = `🎉 Promo Code Applied Successfully! +${foundPromo.rewardAmount} ${foundPromo.rewardType.toUpperCase()} added.`;
+            statusMsg.className = "text-[11px] h-4 font-bold text-emerald-400";
+            statusMsg.innerText = `🎉 +${foundPromo.rewardAmount} Added Successfully!`;
             setTimeout(() => { statusMsg.innerText = ""; }, 3000);
             promoInput.value = '';
         }
@@ -629,8 +488,8 @@
             const title = document.getElementById('modal-title');
             const content = document.getElementById('modal-content');
 
-            if(type === 'coins') {
-                title.innerText = "COINS TRANSACTION & WITHDRAWAL HISTORY";
+            if(type === 'coins' || type === 'withdrawals') {
+                title.innerText = "COINS & WITHDRAWAL HISTORY";
                 let history = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
                 let html = "<div class='space-y-2.5 max-h-60 overflow-y-auto text-xs pr-1'>";
                 history.forEach(item => {
@@ -642,7 +501,7 @@
                         <div class='bg-black/40 p-3.5 rounded-2xl border border-white/5 space-y-1.5'>
                             <div class='flex justify-between items-center'>
                                 <p class='font-black ${colorClass} text-sm flex items-center gap-1.5'>${item.amount} <span class='ff-gold-coin' style='width:20px;height:20px;font-size:9px;'><i class='fa-solid fa-coins'></i></span></p>
-                                <span class='text-[10px] font-extrabold ${statusColor} px-2 py-0.5 rounded-full bg-white/5 border border-white/10'>${item.status}</span>
+                                <span class='text-[10px] font-extrabold ${statusColor} px-2 py-0.5 rounded-full bg-white/5 border border-white/10'>${item.status || 'Success'}</span>
                             </div>
                             <p class='text-[10px] text-gray-300 font-bold'>Source: ${item.title}</p>
                             ${redeemInfo}
