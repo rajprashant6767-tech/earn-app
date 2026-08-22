@@ -416,7 +416,6 @@
             inputField.disabled = true;
         }
 
-        // PROMO CODE REDEEM LOGIC
         function applyPromoCode() {
             const promoInput = document.getElementById('promo-input');
             const statusMsg = document.getElementById('promo-status-msg');
@@ -716,7 +715,7 @@
             }
         }
 
-        // ADMIN PROMO MANAGER WITH SEC / MIN / HOUR SUPPORT
+        // ADMIN PROMO MANAGER (Showing ONLY Active & Non-Expired Codes)
         function loadAdminPromoManager() {
             const container = document.getElementById('admin-requests-container');
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
@@ -761,29 +760,31 @@
                 </div>
 
                 <div class='space-y-3 pt-2'>
-                    <h3 class='text-xs font-black text-gray-300 uppercase tracking-wider'>Active / Created Promo Codes</h3>`;
+                    <h3 class='text-xs font-black text-gray-300 uppercase tracking-wider'>Active Promo Codes</h3>`;
 
-            if(promos.length === 0) {
-                html += `<div class='cyber-card p-5 text-center text-gray-500 text-xs rounded-2xl'>No promo codes created yet.</div>`;
+            // Filter out expired or deactivated codes so they do not show in the admin list
+            let activePromos = promos.filter(p => p.active && Date.now() <= p.expiryTime);
+
+            if(activePromos.length === 0) {
+                html += `<div class='cyber-card p-5 text-center text-gray-500 text-xs rounded-2xl'>No active promo codes available.</div>`;
             } else {
                 promos.forEach((p, idx) => {
                     let isExpired = Date.now() > p.expiryTime;
-                    let statusText = p.active && !isExpired ? "<span class='text-emerald-400 font-bold'>ACTIVE</span>" : "<span class='text-red-400 font-bold'>DEACTIVATED / EXPIRED</span>";
-                    let actionBtnText = p.active ? "DEACTIVATE" : "ACTIVATE";
-                    let actionBtnClass = p.active ? "bg-red-600 hover:bg-red-500" : "bg-emerald-600 hover:bg-emerald-500";
+                    if (!p.active || isExpired) return; // Skip showing deactivated or expired codes
+
                     let symbol = p.rewardType === 'coins' ? '🪙 Coins' : '💎 Diamonds';
 
                     html += `
                         <div class='cyber-card p-3.5 rounded-2xl border border-white/10 space-y-2 text-xs'>
                             <div class='flex justify-between font-black'>
                                 <span class='text-pink-400 text-sm'>${p.code}</span>
-                                <span>${statusText}</span>
+                                <span class='text-emerald-400 font-bold'>ACTIVE</span>
                             </div>
                             <div class='flex justify-between text-[11px] text-gray-300 font-semibold'>
                                 <span>Reward: +${p.rewardAmount} ${symbol}</span>
                                 <span>Limit: ${p.usedCount} / ${p.maxUsers}</span>
                             </div>
-                            <button onclick='togglePromoStatus(${idx})' class='w-full py-2 ${actionBtnClass} text-white font-black rounded-xl transition'>${actionBtnText}</button>
+                            <button onclick='togglePromoStatus(${idx})' class='w-full py-2 bg-red-600 hover:bg-red-500 text-white font-black rounded-xl transition'>DEACTIVATE</button>
                         </div>`;
                 });
             }
@@ -818,7 +819,7 @@
                 return;
             }
 
-            let durationMs = timeValue * 60 * 1000; // default min
+            let durationMs = timeValue * 60 * 1000;
             if(timeUnit === 'sec') {
                 durationMs = timeValue * 1000;
             } else if(timeUnit === 'hour') {
