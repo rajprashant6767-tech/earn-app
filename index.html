@@ -38,33 +38,37 @@
             background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.6), transparent);
         }
 
+        /* Ultimate 3D Free Fire Style Gold Coin */
         .ff-gold-coin {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 34px;
-            height: 34px;
+            width: 32px;
+            height: 32px;
             background: radial-gradient(circle at 30% 30%, #fffb96 0%, #f59e0b 50%, #b45309 100%);
             border: 2px solid #fef08a;
             border-radius: 50%;
-            box-shadow: inset 0 3px 6px rgba(255,255,255,0.9), 0 4px 12px rgba(245, 158, 11, 0.6);
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.9), 0 3px 8px rgba(245, 158, 11, 0.6);
             color: #451a03;
-            font-size: 14px;
+            font-size: 13px;
+            flex-shrink: 0;
         }
 
+        /* Ultimate 3D Free Fire Style Diamond */
         .ff-diamond {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 34px;
-            height: 34px;
+            width: 32px;
+            height: 32px;
             background: radial-gradient(circle at 35% 35%, #a5f3fc 0%, #06b6d4 50%, #0369a1 100%);
             border: 2px solid #e0f2fe;
-            border-radius: 10px;
+            border-radius: 9px;
             transform: rotate(45deg);
-            box-shadow: inset 0 3px 6px rgba(255,255,255,0.95), 0 4px 14px rgba(6, 182, 212, 0.7);
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.95), 0 3px 10px rgba(6, 182, 212, 0.7);
             color: #ffffff;
-            font-size: 14px;
+            font-size: 13px;
+            flex-shrink: 0;
         }
         .ff-diamond i { transform: rotate(-45deg); }
 
@@ -157,7 +161,7 @@
                             <span class="ff-gold-coin"><i class="fa-solid fa-coins"></i></span> <span id="user-coins">1,250</span>
                         </p>
                         <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-2 tracking-wider">
-                            <span>COINS 🪙</span> <i class="fa-solid fa-clock-rotate-left text-xs text-amber-400/80"></i>
+                            <span>COINS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-amber-400/80"></i>
                         </p>
                     </div>
                     <div onclick="openHistory('gems')" class="cyber-card p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-cyan-400/40 transition group">
@@ -165,36 +169,40 @@
                             <span class="ff-diamond"><i class="fa-solid fa-gem"></i></span> <span id="user-gems">12</span>
                         </p>
                         <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-2 tracking-wider">
-                            <span>DIAMONDS 💎</span> <i class="fa-solid fa-clock-rotate-left text-xs text-cyan-400/80"></i>
+                            <span>DIAMONDS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-cyan-400/80"></i>
                         </p>
                     </div>
                 </div>
             </div>
 
-            <!-- COIN TO DIAMOND CONVERSION BOX -->
+            <!-- COIN TO DIAMOND CONVERSION BOX WITH SELECTION & BIG BUTTON -->
             <div class="cyber-card p-5 rounded-3xl space-y-4 border border-amber-500/30 bg-gradient-to-br from-amber-950/20 via-black/40 to-cyan-950/20 shadow-xl">
                 <div class="flex items-center justify-between border-b border-white/10 pb-3">
                     <div class="flex items-center gap-2.5">
-                        <span class="ff-gold-coin" style="width:28px;height:28px;font-size:11px;"><i class="fa-solid fa-coins"></i></span>
-                        <h2 class="text-xs font-black text-amber-400 uppercase tracking-wider">Convert Coins to Diamonds 💎🪙</h2>
+                        <span class="ff-gold-coin"><i class="fa-solid fa-coins"></i></span>
+                        <h2 class="text-xs font-black text-amber-400 uppercase tracking-wider">Convert Coins to Diamonds</h2>
                     </div>
                     <span class="text-[10px] bg-amber-500/10 text-amber-300 font-bold px-2.5 py-1 rounded-xl border border-amber-500/20">Instant Exchange</span>
                 </div>
 
                 <div class="grid grid-cols-3 gap-2.5">
-                    <div onclick="convertCoinsToDiamonds(120, 1)" class="cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-cyan-400 hover:bg-cyan-500/10 transition text-center group active:scale-95">
+                    <div onclick="selectConvertPackage(120, 1)" id="conv-pkg-1" class="conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-cyan-400 transition text-center group active:scale-95">
                         <p class="text-amber-400 font-black text-xs">120 Coins</p>
-                        <p class="text-[10px] text-cyan-400 font-extrabold mt-1">➔ 1 Diamond 💎</p>
+                        <p class="text-[10px] text-cyan-400 font-extrabold mt-1 flex items-center justify-center gap-1">➔ 1 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span></p>
                     </div>
-                    <div onclick="convertCoinsToDiamonds(510, 5)" class="cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-cyan-400 hover:bg-cyan-500/10 transition text-center group active:scale-95">
+                    <div onclick="selectConvertPackage(510, 5)" id="conv-pkg-2" class="conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-cyan-400 transition text-center group active:scale-95">
                         <p class="text-amber-400 font-black text-xs">510 Coins</p>
-                        <p class="text-[10px] text-cyan-400 font-extrabold mt-1">➔ 5 Diamonds 💎</p>
+                        <p class="text-[10px] text-cyan-400 font-extrabold mt-1 flex items-center justify-center gap-1">➔ 5 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span></p>
                     </div>
-                    <div onclick="convertCoinsToDiamonds(1000, 10)" class="cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-cyan-400 hover:bg-cyan-500/10 transition text-center group active:scale-95">
+                    <div onclick="selectConvertPackage(1000, 10)" id="conv-pkg-3" class="conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-cyan-400 transition text-center group active:scale-95">
                         <p class="text-amber-400 font-black text-xs">1,000 Coins</p>
-                        <p class="text-[10px] text-cyan-400 font-extrabold mt-1">➔ 10 Diamonds 💎</p>
+                        <p class="text-[10px] text-cyan-400 font-extrabold mt-1 flex items-center justify-center gap-1">➔ 10 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span></p>
                     </div>
                 </div>
+
+                <button onclick="executeConversion()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-500 rounded-2xl font-black text-xs text-black shadow-lg transition hover:brightness-110 active:scale-95 tracking-wide flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate text-sm"></i> CONVERT NOW
+                </button>
             </div>
 
             <div class="cyber-card p-5 rounded-3xl flex items-center justify-between">
@@ -675,15 +683,32 @@
             });
         }
 
-        // COIN TO DIAMOND CONVERSION FUNCTION
-        function convertCoinsToDiamonds(coinCost, diamondGain) {
-            if (userCoins < coinCost) {
-                alert(`❌ Insufficient Coins! You need at least ${coinCost} coins to convert.`);
+        // SELECT CONVERT PACKAGE LOGIC
+        let selectedConvCoins = 0;
+        let selectedConvGems = 0;
+
+        function selectConvertPackage(coins, gems) {
+            selectedConvCoins = coins;
+            selectedConvGems = gems;
+            document.querySelectorAll('.conv-card').forEach(c => c.classList.remove('border-amber-400', 'bg-amber-500/10'));
+            if(coins === 120) document.getElementById('conv-pkg-1').classList.add('border-amber-400', 'bg-amber-500/10');
+            if(coins === 510) document.getElementById('conv-pkg-2').classList.add('border-amber-400', 'bg-amber-500/10');
+            if(coins === 1000) document.getElementById('conv-pkg-3').classList.add('border-amber-400', 'bg-amber-500/10');
+        }
+
+        function executeConversion() {
+            if (!selectedConvCoins || !selectedConvGems) {
+                alert("❌ Please select a conversion package first!");
                 return;
             }
 
-            userCoins -= coinCost;
-            userGems += diamondGain;
+            if (userCoins < selectedConvCoins) {
+                alert(`❌ Insufficient Coins! You need at least ${selectedConvCoins} coins.`);
+                return;
+            }
+
+            userCoins -= selectedConvCoins;
+            userGems += selectedConvGems;
 
             localStorage.setItem('zylobet_coins', userCoins);
             localStorage.setItem('zylobet_gems', userGems);
@@ -692,14 +717,17 @@
             document.getElementById('user-gems').innerText = userGems;
 
             let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-            coinHistory.unshift({ title: `Converted to ${diamondGain} Diamonds`, amount: `-${coinCost} Coins`, type: "spend", time: "Just now", status: "Success" });
+            coinHistory.unshift({ title: `Converted to ${selectedConvGems} Diamonds`, amount: `-${selectedConvCoins} Coins`, type: "spend", time: "Just now", status: "Success" });
             localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
 
             let gemHistory = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
-            gemHistory.unshift({ title: `Coin Conversion Exchange`, amount: `+${diamondGain} Diamonds`, type: "earn", time: "Just now", status: "Success" });
+            gemHistory.unshift({ title: `Coin Conversion Exchange`, amount: `+${selectedConvGems} Diamonds`, type: "earn", time: "Just now", status: "Success" });
             localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHistory));
 
-            alert(`🎉 Successfully converted ${coinCost} Coins into ${diamondGain} Diamonds!`);
+            alert(`🎉 Successfully converted ${selectedConvCoins} Coins into ${selectedConvGems} Diamonds!`);
+            selectedConvCoins = 0;
+            selectedConvGems = 0;
+            document.querySelectorAll('.conv-card').forEach(c => c.classList.remove('border-amber-400', 'bg-amber-500/10'));
         }
 
         function openHistory(type) {
@@ -795,7 +823,6 @@
                 extraDetails = ` (UPI: ${upiId})`;
             }
 
-            // Deduct coins successfully
             userCoins -= selectedWCoins;
             localStorage.setItem('zylobet_coins', userCoins);
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
@@ -1200,7 +1227,7 @@
 
             let usedCodes = JSON.parse(localStorage.getItem('zylobet_used_promo_names')) || [];
             if(usedCodes.includes(codeVal)) {
-                alert("❌ ERROR: Yeh promo code pehle bhi use/create ho chuka hai! Aap ek hi code ko dobara create nahi kar sakte.");
+                alert("❌ ERROR: Yeh promo code pehle bhi use/create ho chuka hai! Aap ek hi code ko dobara create nahi kar सकते.");
                 return;
             }
 
