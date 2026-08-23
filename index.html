@@ -42,14 +42,14 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             background: radial-gradient(circle at 30% 30%, #fffb96 0%, #f59e0b 50%, #b45309 100%);
             border: 2px solid #fef08a;
             border-radius: 50%;
             box-shadow: inset 0 2px 4px rgba(255,255,255,0.9), 0 3px 8px rgba(245, 158, 11, 0.6);
             color: #451a03;
-            font-size: 13px;
+            font-size: 11px;
             flex-shrink: 0;
         }
 
@@ -57,15 +57,15 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             background: radial-gradient(circle at 35% 35%, #a5f3fc 0%, #06b6d4 50%, #0369a1 100%);
             border: 2px solid #e0f2fe;
-            border-radius: 9px;
+            border-radius: 8px;
             transform: rotate(45deg);
             box-shadow: inset 0 2px 4px rgba(255,255,255,0.95), 0 3px 10px rgba(6, 182, 212, 0.7);
             color: #ffffff;
-            font-size: 13px;
+            font-size: 11px;
             flex-shrink: 0;
         }
         .ff-diamond i { transform: rotate(-45deg); }
@@ -593,18 +593,9 @@
                         <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span> Select conversion package:
                     </div>
                     <div class='grid grid-cols-3 gap-2.5'>
-                        <div onclick="selectModalConv(120, 1)" id='m-conv-1' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>
-                            120 <span class="ff-gold-coin" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-coins"></i></span><br>
-                            <span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 1 <span class="ff-diamond" style="width:14px;height:14px;font-size:5px;"><i class="fa-solid fa-gem"></i></span></span>
-                        </div>
-                        <div onclick="selectModalConv(510, 5)" id='m-conv-2' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>
-                            510 <span class="ff-gold-coin" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-coins"></i></span><br>
-                            <span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 5 <span class="ff-diamond" style="width:14px;height:14px;font-size:5px;"><i class="fa-solid fa-gem"></i></span></span>
-                        </div>
-                        <div onclick="selectModalConv(1000, 10)" id='m-conv-3' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>
-                            1k <span class="ff-gold-coin" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-coins"></i></span><br>
-                            <span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 10 <span class="ff-diamond" style="width:14px;height:14px;font-size:5px;"><i class="fa-solid fa-gem"></i></span></span>
-                        </div>
+                        <div onclick="selectModalConv(120, 1)" id='m-conv-1' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>120 🪙 <br><span class="text-cyan-400">➔ 1 💎</span></div>
+                        <div onclick="selectModalConv(510, 5)" id='m-conv-2' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>510 🪙 <br><span class="text-cyan-400">➔ 5 💎</span></div>
+                        <div onclick="selectModalConv(1000, 10)" id='m-conv-3' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>1k 🪙 <br><span class="text-cyan-400">➔ 10 💎</span></div>
                     </div>
                     <button onclick="executeModalConversion()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-2xl font-black text-xs text-black cursor-pointer shadow-lg">CONVERT NOW</button>
                 </div>`;
@@ -620,21 +611,10 @@
         function executeModalConversion() {
             if (!modalConvCoins || userCoins < modalConvCoins) { alert("❌ Insufficient coins or none selected!"); return; }
             userCoins -= modalConvCoins; userGems += modalConvGems;
-            localStorage.setItem('zylobet_coins', userCoins);
-            localStorage.setItem('zylobet_gems', userGems);
+            localStorage.setItem('zylobet_coins', userCoins); localStorage.setItem('zylobet_gems', userGems);
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
             document.getElementById('user-gems').innerText = userGems;
-
-            let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-            coinHistory.unshift({ title: "Converted to Diamonds", amount: `-${modalConvCoins} Coins`, type: "spend", time: "Just now" });
-            localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
-
-            let gemHistory = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
-            gemHistory.unshift({ title: "Converted from Coins", amount: `+${modalConvGems} Diamonds`, type: "earn", time: "Just now" });
-            localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHistory));
-
-            alert(`🎉 Converted successfully!`); 
-            closeModal();
+            alert(`🎉 Converted successfully!`); closeModal();
         }
 
         function openDepositModal() {
@@ -646,10 +626,10 @@
                         <span class="ff-diamond" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-gem"></i></span> 1 Diamond = ₹1 Rs
                     </div>
                     <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300'>
-                        <div onclick="selectDepositOffer(50)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center'>50 💎 (+3 Free)</div>
-                        <div onclick="selectDepositOffer(100)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center'>100 💎 (+8 Free)</div>
-                        <div onclick="selectDepositOffer(200)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center'>200 💎 (+18 Free)</div>
-                        <div onclick="selectDepositOffer(500)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center'>500 💎 (+50 Free)</div>
+                        <div onclick="selectDepositOffer(50)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center flex items-center justify-center gap-1.5'>50 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> (+3 Free)</div>
+                        <div onclick="selectDepositOffer(100)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center flex items-center justify-center gap-1.5'>100 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> (+8 Free)</div>
+                        <div onclick="selectDepositOffer(200)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center flex items-center justify-center gap-1.5'>200 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> (+18 Free)</div>
+                        <div onclick="selectDepositOffer(500)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center flex items-center justify-center gap-1.5'>500 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> (+50 Free)</div>
                     </div>
                     <div>
                         <label class='text-gray-300 font-bold block mb-1.5 uppercase text-[11px]'>Enter Diamond Amount</label>
@@ -702,12 +682,17 @@
                 </div>`;
         }
 
+        // SAFE TELEGRAM WEBVIEW OPENER FOR UPI OR BROWSER REDIRECT
         function openUpiApp(link, amt) {
-            try {
-                window.location.href = link;
-            } catch(e) {
-                window.open(`https://mercury.phonepe.com/pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}&cu=INR`, '_blank');
+            if (window.Telegram?.WebApp) {
+                try {
+                    window.Telegram.WebApp.openInvoice(link, function(status) {});
+                    return;
+                } catch(e) {}
             }
+            // Fallback safe HTTP redirect for webview
+            const fallbackUrl = `https://mercury.phonepe.com/pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}&cu=INR`;
+            window.open(fallbackUrl, '_system') || window.location.assign(link);
         }
 
         // AUTOMATED GMAIL VERIFICATION API CALL HANDLER
@@ -910,10 +895,15 @@
             if(promos.length === 0) {
                 activeListHTML += "<p class='text-[11px] text-gray-500'>No promo codes created yet.</p>";
             } else {
-                promos.forEach(p => {
+                promos.forEach((p, index) => {
+                    let statusColor = p.active ? 'text-emerald-400' : 'text-rose-400';
+                    let toggleText = p.active ? 'Deactivate' : 'Activate';
                     activeListHTML += `<div class='cyber-card p-3 rounded-xl border border-white/5 flex justify-between items-center text-xs'>
-                        <div><span class='font-black text-rose-400'>${p.code}</span> <span class='text-[10px] text-gray-300'>(${p.rewardAmount} ${p.rewardType})</span></div>
-                        <span class='text-[10px] text-emerald-400 font-bold'>Used: ${p.usedCount}/${p.maxUsers}</span>
+                        <div><span class='font-black text-rose-400'>${p.code}</span> <span class='text-[10px] text-gray-300'>(${p.rewardAmount} ${p.rewardType})</span><br><span class='text-[9px] ${statusColor}'>Status: ${p.active ? 'Active' : 'Deactivated'}</span></div>
+                        <div class='flex gap-2 items-center'>
+                            <span class='text-[10px] text-gray-400 font-bold'>${p.usedCount}/${p.maxUsers}</span>
+                            <button onclick="togglePromoStatus(${index})" class='px-2.5 py-1 rounded-lg text-[10px] font-bold ${p.active ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'} cursor-pointer'>${toggleText}</button>
+                        </div>
                     </div>`;
                 });
             }
@@ -952,6 +942,15 @@
                     <button onclick='createPromoCode()' class='w-full py-3 bg-gradient-to-r from-rose-600 to-purple-600 rounded-xl font-black text-white cursor-pointer shadow-lg'>CREATE & ACTIVATE CODE</button>
                     ${activeListHTML}
                 </div>`;
+        }
+
+        function togglePromoStatus(index) {
+            let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
+            if(promos[index]) {
+                promos[index].active = !promos[index].active;
+                localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
+                loadAdminPromoManager();
+            }
         }
 
         function createPromoCode() {
