@@ -769,7 +769,9 @@
                 let html = "<div class='space-y-3'>";
                 withdraws.forEach(item => {
                     let redeemBox = item.redeemCode ? `<p class='text-xs text-sky-300 font-mono mt-1'>🔑 Redeem Code: <b>${item.redeemCode}</b></p>` : '';
-                    html += `<div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-1'><div class='flex justify-between'><span class='text-amber-400 font-black flex items-center gap-1'><span class="ff-gold-coin" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> ${item.amount} (₹${item.rupees})</span><span class='text-xs text-amber-300 font-bold'>${item.status}</span></div><p class='text-[11px] text-gray-300'>Method: ${item.method}</p>${redeemBox}</div>`;
+                    let commentBox = item.adminComment ? `<p class='text-xs text-rose-400 mt-1'>💬 Reason: <b>${item.adminComment}</b></p>` : '';
+                    let statusColor = item.status.includes('Rejected') ? 'text-rose-400' : 'text-amber-300';
+                    html += `<div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-1'><div class='flex justify-between'><span class='text-amber-400 font-black flex items-center gap-1'><span class="ff-gold-coin" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> ${item.amount} (₹${item.rupees})</span><span class='text-xs ${statusColor} font-bold'>${item.status}</span></div><p class='text-[11px] text-gray-300'>Method: ${item.method}</p>${redeemBox}${commentBox}</div>`;
                 });
                 content.innerHTML = html + "</div>";
             }
@@ -798,6 +800,10 @@
             let hist = JSON.parse(localStorage.getItem('zylobet_withdraw_history')) || [];
             hist.unshift(newReq);
             localStorage.setItem('zylobet_withdraw_history', JSON.stringify(hist));
+
+            let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
+            coinHist.unshift({ title: `Withdrawal Request (${method})`, amount: `-${selectedWCoins} Coins`, type: "spend", time: "Just now" });
+            localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHist));
 
             alert(`🎉 ${method} Withdrawal Request Sent Successfully!`);
             if(method === 'UPI') document.getElementById('w-upi-id').value = '';
@@ -845,7 +851,11 @@
                         <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-amber-400 text-sm flex items-center gap-1'><span class="ff-gold-coin" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> ${r.amount} (₹${r.rupees})</span></div>
                         <p class='text-gray-300 font-bold'>Method: <span class="text-white">${r.method}</span> ${r.details || ''}</p>
                         ${redeemInputHTML}
-                        <button onclick="approveWithdraw(${r.id}, '${r.method}')" class='shiny-green-btn w-full py-2.5 rounded-xl font-black text-white cursor-pointer mt-2'>APPROVE & SEND</button>
+                        <input type='text' id='admin-comment-${r.id}' placeholder='Enter comment/reason (optional for approval, required for rejection)' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-xl text-gray-300 font-semibold mt-2'>
+                        <div class="grid grid-cols-2 gap-2 mt-2">
+                            <button onclick="approveWithdraw(${r.id}, '${r.method}')" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
+                            <button onclick="rejectWithdraw(${r.id})" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
+                        </div>
                     </div>`;
             });
         }
@@ -854,6 +864,8 @@
             let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
             let req = reqs.find(x => x.id === id);
             let redeemCode = "";
+            const commentInput = document.getElementById('admin-comment-' + id);
+            let adminComment = commentInput ? commentInput.value.trim() : "";
 
             if(method === 'Amazon Gift Card' || method === 'Play Store Gift Card') {
                 const codeInput = document.getElementById('redeem-code-' + id);
@@ -867,6 +879,7 @@
             if(req) { 
                 req.status = "Success"; 
                 req.redeemCode = redeemCode;
+                req.adminComment = adminComment;
             }
             localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
 
@@ -875,11 +888,45 @@
             if(histItem) {
                 histItem.status = "Success";
                 histItem.redeemCode = redeemCode;
+                histItem.adminComment = adminComment;
             }
             localStorage.setItem('zylobet_withdraw_history', JSON.stringify(history));
 
             alert("Payout Approved Successfully!");
             loadAdminRequests();
+        }
+
+        function rejectWithdraw(id) {
+            let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
+            let req = reqs.find(x => x.id === id);
+            const commentInput = document.getElementById('admin-comment-' + id);
+            let adminComment = commentInput ? commentInput.value.trim() : "Rejected by Admin";
+            
+            if(req && req.status === "Pending") {
+                req.status = "Rejected (Refunded)";
+                req.adminComment = adminComment;
+                localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
+
+                // Refund coins to user balance
+                userCoins += req.amount;
+                localStorage.setItem('zylobet_coins', userCoins);
+                document.getElementById('user-coins').innerText = userCoins.toLocaleString();
+
+                let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
+                coinHist.unshift({ title: `Withdrawal Refund (${req.method})`, amount: `+${req.amount} Coins`, type: "earn", time: "Just now" });
+                localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHist));
+
+                let history = JSON.parse(localStorage.getItem('zylobet_withdraw_history')) || [];
+                let histItem = history.find(h => h.id === id);
+                if(histItem) {
+                    histItem.status = "Rejected (Refunded)";
+                    histItem.adminComment = adminComment;
+                }
+                localStorage.setItem('zylobet_withdraw_history', JSON.stringify(history));
+
+                alert(`❌ Payout Rejected! ${req.amount} Coins refunded successfully.`);
+                loadAdminRequests();
+            }
         }
 
         function loadAdminPromoManager() {
@@ -992,4 +1039,3 @@
     </script>
 </body>
 </html>
-
