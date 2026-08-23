@@ -742,6 +742,7 @@
                 extraDetails = ` (UPI: ${upiId})`;
             }
 
+            // FIXED: Deduct coins from user balance immediately upon request
             userCoins -= selectedWCoins;
             localStorage.setItem('zylobet_coins', userCoins);
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
@@ -766,6 +767,18 @@
             withdrawHistory.unshift(newReq);
             localStorage.setItem('zylobet_withdraw_history', JSON.stringify(withdrawHistory));
 
+            // Add to coin history spend log
+            let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
+            coinHistory.unshift({
+                id: reqId,
+                title: `${method} Payout Request (₹${selectedWAmount})`,
+                amount: `-${selectedWCoins} Coins`,
+                type: "spend",
+                time: "Just now",
+                status: "Pending"
+            });
+            localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
+
             alert(`🎉 ${method} Withdrawal Request Sent Successfully! Status: Pending.`);
             selectedWCoins = 0;
             selectedWAmount = 0;
@@ -773,7 +786,7 @@
             if(method === 'UPI') document.getElementById('w-upi-id').value = '';
         }
 
-        // DEPOSIT MODAL WITH BONUS OFFERS DISPLAY
+        // DEPOSIT MODAL WITH BONUS OFFERS DISPLAY (200 diamonds pe 18 free)
         function openDepositModal() {
             document.getElementById('modal').classList.remove('hidden');
             document.getElementById('modal-title').innerText = "DEPOSIT DIAMONDS & GET BONUS";
@@ -791,7 +804,7 @@
                         <div class='grid grid-cols-2 gap-2 text-[10px] font-bold text-gray-300'>
                             <div class='bg-black/40 p-2 rounded-xl border border-white/5'>💎 50 Dias ➔ <span class='text-emerald-400'>+3 Free</span></div>
                             <div class='bg-black/40 p-2 rounded-xl border border-white/5'>💎 100 Dias ➔ <span class='text-emerald-400'>+8 Free</span></div>
-                            <div class='bg-black/40 p-2 rounded-xl border border-white/5'>💎 200 Dias ➔ <span class='text-emerald-400'>+15 Free</span></div>
+                            <div class='bg-black/40 p-2 rounded-xl border border-white/5'>💎 200 Dias ➔ <span class='text-emerald-400'>+18 Free</span></div>
                             <div class='bg-black/40 p-2 rounded-xl border border-white/5'>💎 500 Dias ➔ <span class='text-emerald-400'>+50 Free</span></div>
                         </div>
                     </div>
@@ -810,7 +823,7 @@
             let amt = parseInt(val) || 0;
             let bonus = 0;
             if(amt >= 500) bonus = 50;
-            else if(amt >= 200) bonus = 15;
+            else if(amt >= 200) bonus = 18; // Updated to 18 free
             else if(amt >= 100) bonus = 8;
             else if(amt >= 50) bonus = 3;
 
@@ -835,7 +848,7 @@
 
             let bonus = 0;
             if(amt >= 500) bonus = 50;
-            else if(amt >= 200) bonus = 15;
+            else if(amt >= 200) bonus = 18;
             else if(amt >= 100) bonus = 8;
             else if(amt >= 50) bonus = 3;
 
@@ -1015,6 +1028,12 @@
                 userCoins += req.amount;
                 localStorage.setItem('zylobet_coins', userCoins);
                 document.getElementById('user-coins').innerText = userCoins.toLocaleString();
+                
+                // Refund log in coin history
+                let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
+                coinHistory.unshift({ title: "Withdrawal Rejected & Refunded", amount: `+${req.amount} Coins`, type: "earn", time: "Just now", status: "Success" });
+                localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
+
                 alert("Withdrawal Rejected & Coins Refunded.");
             }
 
