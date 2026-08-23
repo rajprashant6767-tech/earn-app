@@ -38,7 +38,6 @@
             background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.6), transparent);
         }
 
-        /* Original 3D Styled Gold Coin */
         .ff-gold-coin {
             display: inline-flex;
             align-items: center;
@@ -54,7 +53,6 @@
             flex-shrink: 0;
         }
 
-        /* Original 3D Styled Diamond */
         .ff-diamond {
             display: inline-flex;
             align-items: center;
@@ -157,7 +155,7 @@
 
                 <div class="grid grid-cols-2 gap-4">
                     <div onclick="openHistory('coins')" class="cyber-card p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-amber-400/40 transition group">
-                        <p class="text-xl font-black text-amber-400 group-hover:scale-105 transition origin-left flex items-center gap-2">
+                        <p class="text-xl font-black text-amber-400 group-hover:scale-105 transition origin-left flex items-center gap-2.5">
                             <span class="ff-gold-coin"><i class="fa-solid fa-coins"></i></span> <span id="user-coins">1,250</span>
                         </p>
                         <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-2 tracking-wider">
@@ -165,7 +163,7 @@
                         </p>
                     </div>
                     <div onclick="openHistory('gems')" class="cyber-card p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-cyan-400/40 transition group">
-                        <p class="text-xl font-black text-cyan-400 group-hover:scale-105 transition origin-left flex items-center gap-2">
+                        <p class="text-xl font-black text-cyan-400 group-hover:scale-105 transition origin-left flex items-center gap-2.5">
                             <span class="ff-diamond"><i class="fa-solid fa-gem"></i></span> <span id="user-gems">12</span>
                         </p>
                         <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-2 tracking-wider">
@@ -174,15 +172,17 @@
                     </div>
                 </div>
 
-                <!-- SUPER INTUITIVE CONVERT / EXCHANGE BANNER WITH 3D COIN & DIAMOND ICON -->
+                <!-- CLEAN CONVERT / EXCHANGE BANNER WITH COIN ➔ DIAMOND 3D ICONS -->
                 <div onclick="openConvertModal()" class="cyber-card p-4 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-950/40 via-black/50 to-cyan-950/30 cursor-pointer hover:border-amber-400 transition flex items-center justify-between group shadow-lg">
                     <div class="flex items-center gap-3.5">
-                        <div class="w-12 h-11 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-xs group-hover:scale-110 transition font-black tracking-tight shrink-0 shadow-inner gap-1">
-                            <span class="ff-gold-coin" style="width:22px;height:22px;font-size:9px;"><i class="fa-solid fa-coins"></i></span> ➔ <span class="ff-diamond" style="width:20px;height:20px;font-size:8px;"><i class="fa-solid fa-gem"></i></span>
+                        <div class="flex items-center gap-1.5">
+                            <span class="ff-gold-coin" style="width:26px;height:26px;font-size:10px;"><i class="fa-solid fa-coins"></i></span>
+                            <span class="text-amber-400 font-bold text-xs">➔</span>
+                            <span class="ff-diamond" style="width:24px;height:24px;font-size:9px;"><i class="fa-solid fa-gem"></i></span>
                         </div>
                         <div>
-                            <h3 class="text-xs font-black text-white uppercase tracking-wider">CONVERT COINS TO DIAMONDS</h3>
-                            <p class="text-[10px] text-amber-300 font-semibold mt-0.5">Tap here to exchange (120 Coins = 1 Diamond)</p>
+                            <h3 class="text-xs font-black text-white uppercase tracking-wider">EXCHANGE COINS TO DIAMONDS</h3>
+                            <p class="text-[10px] text-amber-300 font-semibold mt-0.5">Rate: 120 Coins = 1 Diamond</p>
                         </div>
                     </div>
                     <div class="bg-gradient-to-r from-amber-500 to-yellow-500 text-black px-3.5 py-2 rounded-xl font-black text-xs shadow-md group-hover:brightness-110 transition flex items-center gap-1.5 shrink-0">
@@ -774,7 +774,7 @@
                     html += `
                         <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2.5'>
                             <div class='flex justify-between items-center'>
-                                <span class='text-xs font-black text-amber-400'>${item.amount} <span class='ff-gold-coin' style='width:20px;height:20px;font-size:9px;'><i class='fa-solid fa-coins'></i></span> (₹${item.rupees})</span>
+                                <span class='text-xs font-black text-amber-400'>${item.amount} Coins (₹${item.rupees})</span>
                                 <span class='text-[10px] font-extrabold px-2.5 py-1 rounded-full border ${statusColor}'>${item.status}</span>
                             </div>
                             <p class='text-[11px] text-gray-300 font-bold'>Method: <span class="text-white">${item.method}</span> ${item.details || ''}</p>
