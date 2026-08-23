@@ -250,9 +250,20 @@
                     <p class="text-[11px] text-gray-400">Choose your payout method & packages below:</p>
                 </div>
 
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-[11px] text-gray-300 font-bold uppercase tracking-wider">Select Payout Method</span>
-                    <button onclick="openHistory('withdrawals')" class="text-[10px] bg-emerald-500/20 text-emerald-300 px-4 py-2 rounded-xl font-extrabold border border-emerald-500/40 transition active:scale-95">📜 Withdrawal History</button>
+                <!-- PROMINENT WITHDRAWAL HISTORY BANNER -->
+                <div onclick="openHistory('withdrawals')" class="cyber-card p-4 rounded-2xl border border-emerald-500/40 bg-gradient-to-r from-emerald-950/40 via-emerald-900/20 to-transparent cursor-pointer hover:border-emerald-400 transition flex items-center justify-between group shadow-xl">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-lg group-hover:scale-110 transition">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-black text-white uppercase tracking-wider">Track Withdrawal History</h3>
+                            <p class="text-[10px] text-emerald-300 font-semibold mt-0.5">Check Pending, Success & Copy Redeem Codes</p>
+                        </div>
+                    </div>
+                    <div class="bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-xl font-black text-xs border border-emerald-500/30 group-hover:bg-emerald-500 group-hover:text-black transition">
+                        VIEW <i class="fa-solid fa-chevron-right ml-1"></i>
+                    </div>
                 </div>
 
                 <!-- Payout Section Tabs -->
@@ -476,8 +487,7 @@
 
         if(!localStorage.getItem('zylobet_coin_history')) {
             localStorage.setItem('zylobet_coin_history', JSON.stringify([
-                { title: "Welcome Bonus", amount: "+1,000 Coins", type: "earn", time: "Today", status: "Success" },
-                { title: "Active Balance", amount: "+250 Coins", type: "earn", time: "Today", status: "Success" }
+                { title: "Welcome Bonus", amount: "+1,000 Coins", type: "earn", time: "Today", status: "Success" }
             ]));
         }
         if(!localStorage.getItem('zylobet_withdraw_history')) {
@@ -487,9 +497,6 @@
             localStorage.setItem('zylobet_gem_history', JSON.stringify([
                 { title: "Initial Diamonds", amount: `+${userGems} Diamonds`, type: "earn", time: "Active", status: "Success" }
             ]));
-        }
-        if(!localStorage.getItem('zylobet_used_promo_names')) {
-            localStorage.setItem('zylobet_used_promo_names', JSON.stringify([]));
         }
 
         let selectedWCoins = 0;
@@ -625,6 +632,15 @@
             promoInput.value = '';
         }
 
+        // Helper to copy text with alert confirmation
+        function copyTextToClipboard(text, label) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert(`✅ ${label} Copied: ${text}`);
+            }).catch(err => {
+                alert("❌ Failed to copy!");
+            });
+        }
+
         function openHistory(type) {
             document.getElementById('modal').classList.remove('hidden');
             const title = document.getElementById('modal-title');
@@ -657,7 +673,15 @@
                 let html = "<div class='space-y-3'>";
                 withdraws.forEach(item => {
                     let statusColor = item.status === 'Pending' ? 'text-amber-400 bg-amber-500/10 border-amber-500/30' : (item.status === 'Rejected' ? 'text-rose-400 bg-rose-500/10 border-rose-500/30' : 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30');
-                    let redeemCodeBox = item.redeemCode ? `<div class='mt-2.5 p-3 rounded-xl bg-sky-500/10 border border-sky-500/30 text-xs font-mono text-sky-300'>🔑 Redeem Code: <b class="text-white select-all text-sm">${item.redeemCode}</b></div>` : '';
+                    
+                    // Added COPY button next to redeem code
+                    let redeemCodeBox = item.redeemCode ? 
+                        `<div class='mt-2.5 p-3 rounded-xl bg-sky-500/10 border border-sky-500/30 flex justify-between items-center text-xs font-mono text-sky-300'>
+                            <span>🔑 Code: <b class="text-white select-all text-sm">${item.redeemCode}</b></span>
+                            <button onclick='copyTextToClipboard("${item.redeemCode}", "Redeem Code")' class='bg-sky-500/30 hover:bg-sky-500/50 text-white px-3 py-1.5 rounded-lg font-bold text-[11px] transition active:scale-95'>
+                                <i class='fa-regular fa-copy mr-1'></i> COPY
+                            </button>
+                        </div>` : '';
 
                     html += `
                         <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2.5'>
@@ -799,17 +823,6 @@
                     <p id='proof-err' class='text-rose-400 text-[11px] h-4 font-semibold text-left'></p>
                     
                     <button onclick="submitDepositProof('${username}', ${amt})" class='w-full py-4 shiny-green-btn rounded-2xl font-black text-xs text-white shadow-xl transition active:scale-95 tracking-wide'>SEND PROOF</button>
-                    
-                    <div class='bg-blue-500/10 border border-blue-500/30 p-3.5 rounded-2xl text-left space-y-2.5 mt-2'>
-                        <p class='text-blue-300 text-[11px] font-semibold leading-relaxed'>
-                            <i class='fa-solid fa-circle-info mr-1'></i> <b>Note:</b> Deposit ka amount 24 hours ke andar add kar diya jayega. Agar payment ho gaya ho aur amount add na hua ho to hame contact karen:
-                        </p>
-                        <div class='text-center pt-1'>
-                            <a href='https://t.me/Raj_Prashant' target='_blank' class='inline-flex items-center gap-1.5 text-xs text-blue-400 font-black bg-blue-500/20 px-4 py-2 rounded-xl transition hover:bg-blue-500/30'>
-                                <i class='fa-brands fa-telegram text-base'></i> @Raj_Prashant
-                            </a>
-                        </div>
-                    </div>
                 </div>`;
         }
 
@@ -890,10 +903,18 @@
                     let redeemInputHTML = (r.method === 'Amazon Gift Card' || r.method === 'Play Store Gift Card') ? 
                         `<input type='text' id='redeem-code-${r.id}' placeholder='Enter Redeem Code' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-xl text-sky-400 font-bold uppercase'>` : '';
 
+                    // Added COPY button for UPI ID in Admin Panel so admin can easily copy user's UPI or details if needed
+                    let detailsBox = r.details ? 
+                        `<div class='flex justify-between items-center bg-black/40 p-2.5 rounded-xl border border-white/10 mt-1'>
+                            <span class='text-sky-300 font-mono select-all text-xs'>${r.details}</span>
+                            <button onclick='copyTextToClipboard("${r.details.replace(/[^a-zA-Z0-9@.]/g, '')}", "User Details")' class='bg-sky-500/20 hover:bg-sky-500/40 text-sky-300 px-2.5 py-1 rounded-lg font-bold text-[10px]'>COPY</button>
+                        </div>` : '';
+
                     container.innerHTML += `
                         <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-3 text-xs shadow-lg'>
                             <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-amber-400 text-sm'>${r.amount} Coins (₹${r.rupees})</span></div>
-                            <p class='text-gray-300 font-bold'>Method: <span class="text-white">${r.method}</span> ${r.details || ''}</p>
+                            <p class='text-gray-300 font-bold'>Method: <span class="text-white">${r.method}</span></p>
+                            ${detailsBox}
                             ${redeemInputHTML}
                             <div class='grid grid-cols-2 gap-2 pt-1'>
                                 <button onclick="handleAdmWit(${r.id}, 'approve', '${r.method}')" class='shiny-green-btn py-2.5 rounded-xl font-black text-white'>APPROVE</button>
@@ -961,7 +982,7 @@
             loadAdminRequests();
         }
 
-        // ADMIN PROMO MANAGER (PERMANENT UNIQUE CODE RESTRICTION)
+        // ADMIN PROMO MANAGER
         function loadAdminPromoManager() {
             const container = document.getElementById('admin-requests-container');
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
@@ -1002,7 +1023,7 @@
                             <input type='number' id='adm-limit-input' value='50' min='1' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-xl text-white font-bold'>
                         </div>
                     </div>
-                    <button onclick='createPromoCode()' class='w-full py-3 bg-gradient-to-r from-rose-600 to-purple-600 rounded-xl font-black text-xs text-white shadow-xl transition'>CREATE & ACTIVATE CODE</button>
+                    <button onclick='createPromoCode()' class='w-full py-3 bg-gradient-to-r from-rose-600 to-purple-600 rounded-xl font-black text-xs text-white shadow-lg transition'>CREATE & ACTIVATE CODE</button>
                 </div>
 
                 <div class='space-y-3 pt-2'>
@@ -1054,11 +1075,16 @@
 
             let usedCodes = JSON.parse(localStorage.getItem('zylobet_used_promo_names')) || [];
             if(usedCodes.includes(codeVal)) {
-                alert("❌ This promo code name has already been used before and cannot be created again!");
+                alert("❌ ERROR: Yeh promo code pehle bhi use/create ho chuka hai! Aap ek hi code ko dobara create nahi kar sakte.");
                 return;
             }
 
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
+            if(promos.some(p => p.code === codeVal)) {
+                alert("❌ This promo code already exists!");
+                return;
+            }
+
             let durationMs = timeValue * 60 * 1000;
             if(timeUnit === 'sec') {
                 durationMs = timeValue * 1000;
