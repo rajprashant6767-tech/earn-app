@@ -202,7 +202,7 @@
                         <i class="fa-solid fa-users"></i>
                     </div>
                     <h2 class="text-base font-black text-sky-400">Refer & Earn Rewards</h2>
-                    <p class="text-[11px] text-gray-400">Invite friends and earn instant coin bonuses.</p>
+                    <p class="text-[11px] text-gray-400">Invite friends and get +300 <span class="ff-gold-coin" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> Coins instantly!</p>
                 </div>
 
                 <div class="flex justify-between items-center cyber-card p-4 rounded-2xl border border-white/5">
@@ -660,6 +660,8 @@
             let bonus = amt >= 500 ? 50 : (amt >= 200 ? 18 : (amt >= 100 ? 8 : (amt >= 50 ? 3 : 0)));
             let totalDiamonds = amt + bonus;
 
+            const upiLink = `upi://pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}&tn=ZyloBet%20Deposit&cu=INR`;
+
             document.getElementById('modal-title').innerText = `PAY ₹${amt} FOR ${totalDiamonds} DIAMONDS`;
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs text-center'>
@@ -669,31 +671,49 @@
                     </div>
                     <div class='flex justify-center my-2'>
                         <div class='bg-white p-3 rounded-2xl shadow-xl inline-block'>
-                            <img src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}&tn=ZyloBet%20Deposit&cu=INR' alt='QR' class='w-36 h-36 object-contain rounded-xl'>
+                            <img src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiLink)}' alt='QR' class='w-36 h-36 object-contain rounded-xl'>
                         </div>
                     </div>
-                    <a href='upi://pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}&tn=ZyloBet%20Deposit&cu=INR' class='w-full py-3.5 bg-gradient-to-r from-sky-500 to-blue-600 rounded-2xl font-black text-xs text-white flex items-center justify-center gap-2'>
+                    <button onclick="openUpiApp('${upiLink}')" class='w-full py-3.5 bg-gradient-to-r from-sky-500 to-blue-600 rounded-2xl font-black text-xs text-white flex items-center justify-center gap-2 cursor-pointer shadow-lg'>
                         <i class='fa-solid fa-bolt'></i> PAY VIA UPI APP (₹${amt})
-                    </a>
+                    </button>
                     <p class='text-gray-400 text-[11px] text-left font-semibold mt-2'>Enter 12-Digit UTR / Reference Number:</p>
                     <input type='text' id='deposit-utr-input' placeholder='e.g. 4235xxxxxxxx' class='w-full bg-black/50 border border-white/10 p-3 text-xs rounded-2xl text-amber-400 font-bold uppercase'>
                     <button onclick="verifyAndAddDeposit(${totalDiamonds}, ${amt})" class='w-full py-4 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>VERIFY & GET DIAMONDS</button>
                 </div>`;
         }
 
-        // AUTOMATED GMAIL VERIFICATION API CALL HANDLER
+        // SAFE UPI OPENER FOR TELEGRAM WEBVIEW
+        function openUpiApp(link) {
+            try {
+                window.location.href = link;
+            } catch(e) {
+                window.open(link, '_blank');
+            }
+        }
+
+        // AUTOMATED GMAIL VERIFICATION API CALL HANDLER (WITH TIMEOUT CONTROLLER)
         function verifyAndAddDeposit(totalDias, paidRs) {
             const utrVal = document.getElementById('deposit-utr-input').value.trim();
             if(!utrVal || utrVal.length < 8) { alert("❌ Please enter a valid UTR number!"); return; }
 
-            alert("⏳ Verifying payment automatically from Gmail...");
+            alert("⏳ Connecting to server & scanning Gmail. Please wait 10-20 seconds...");
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 45000);
 
             fetch('https://connect-gmail-to-zylobet.onrender.com/verify-payment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ utr: utrVal, expected_amount: paidRs })
+                body: JSON.stringify({ utr: utrVal, expected_amount: paidRs }),
+                signal: controller.signal
             })
-            .then(res => res.json().then(data => ({ status: res.status, body: data })))
+            .then(async res => {
+                clearTimeout(timeoutId);
+                let data;
+                try { data = await res.json(); } catch(e) { data = { success: false, detail: "Invalid response" }; }
+                return { status: res.status, body: data };
+            })
             .then(res => {
                 if(res.status === 200 && res.body.success) {
                     userGems += totalDias;
@@ -707,12 +727,17 @@
                     alert(`🎉 Payment Verified Successfully! +${totalDias} Diamonds added automatically.`);
                     closeModal();
                 } else {
-                    alert("❌ Verification Failed: UTR not found in Gmail yet or amount mismatch! Please make sure you paid and try again.");
+                    alert(`❌ Verification Failed: ${res.body.detail || "UTR not found in Gmail yet! Please make sure payment email has arrived."}`);
                 }
             })
             .catch(err => {
-                console.error(err);
-                alert("❌ Server connection error! Try again in a few seconds.");
+                clearTimeout(timeoutId);
+                if (err.name === 'AbortError') {
+                    alert("⚠️ Server took too long to respond (Render Free Tier wakeup delay). Please try clicking 'Verify' again!");
+                } else {
+                    console.error(err);
+                    alert("❌ Connection error! Please ensure your backend is active on Render and try again.");
+                }
             });
         }
 
