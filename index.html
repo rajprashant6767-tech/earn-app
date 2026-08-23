@@ -364,14 +364,14 @@
                     <h1 class="text-base font-black text-sky-400 italic">ZyloBet Admin Control Center</h1>
                     <p class="text-[10px] text-gray-400">Manage Payout Approvals and Vouchers</p>
                 </div>
-                <button onclick="loadAdminRequests()" class="bg-white/10 hover:bg-white/20 text-xs px-3.5 py-2 rounded-xl font-bold text-amber-400 transition active:scale-95 shadow cursor-pointer">
+                <button onclick="loadAdminActivePanel()" class="bg-white/10 hover:bg-white/20 text-xs px-3.5 py-2 rounded-xl font-bold text-amber-400 transition active:scale-95 shadow cursor-pointer">
                     <i class="fa-solid fa-rotate mr-1"></i> Refresh
                 </button>
             </div>
 
             <div class="grid grid-cols-2 gap-2">
                 <button onclick="switchAdminTab('withdraw')" id="adm-tab-wit" class="py-2.5 bg-gradient-to-r from-sky-600 to-blue-600 rounded-xl font-black text-[11px] shadow transition cursor-pointer">Pending Payouts</button>
-                <button onclick="switchAdminTab('promo')" id="adm-tab-promo" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[11px] shadow transition cursor-pointer">Promo Creator</button>
+                <button onclick="switchAdminTab('promo')" id="adm-tab-promo" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[11px] shadow transition cursor-pointer">Promo Manager</button>
             </div>
 
             <div id="admin-requests-container" class="space-y-3"></div>
@@ -409,7 +409,6 @@
 
     <!-- SCRIPT CONTROLLER ENGINE -->
     <script>
-        // INTRO LOADING SCREEN CONTROLLER
         window.addEventListener('DOMContentLoaded', () => {
             const bar = document.getElementById('intro-bar');
             setTimeout(() => { bar.style.width = '100%'; }, 200);
@@ -459,7 +458,7 @@
                 document.querySelector('nav').classList.add('hidden');
                 document.getElementById('admin-view').classList.remove('hidden');
                 document.getElementById('view-toggle-btn').innerText = "Back to User App";
-                loadAdminRequests();
+                loadAdminActivePanel();
             } else {
                 document.getElementById('admin-view').classList.add('hidden');
                 document.querySelector('nav').classList.remove('hidden');
@@ -594,9 +593,18 @@
                         <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span> Select conversion package:
                     </div>
                     <div class='grid grid-cols-3 gap-2.5'>
-                        <div onclick="selectModalConv(120, 1)" id='m-conv-1' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>120 🪙 <br><span class="text-cyan-400">➔ 1 💎</span></div>
-                        <div onclick="selectModalConv(510, 5)" id='m-conv-2' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>510 🪙 <br><span class="text-cyan-400">➔ 5 💎</span></div>
-                        <div onclick="selectModalConv(1000, 10)" id='m-conv-3' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>1k 🪙 <br><span class="text-cyan-400">➔ 10 💎</span></div>
+                        <div onclick="selectModalConv(120, 1)" id='m-conv-1' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>
+                            120 <span class="ff-gold-coin" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-coins"></i></span><br>
+                            <span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 1 <span class="ff-diamond" style="width:14px;height:14px;font-size:5px;"><i class="fa-solid fa-gem"></i></span></span>
+                        </div>
+                        <div onclick="selectModalConv(510, 5)" id='m-conv-2' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>
+                            510 <span class="ff-gold-coin" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-coins"></i></span><br>
+                            <span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 5 <span class="ff-diamond" style="width:14px;height:14px;font-size:5px;"><i class="fa-solid fa-gem"></i></span></span>
+                        </div>
+                        <div onclick="selectModalConv(1000, 10)" id='m-conv-3' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>
+                            1k <span class="ff-gold-coin" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-coins"></i></span><br>
+                            <span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 10 <span class="ff-diamond" style="width:14px;height:14px;font-size:5px;"><i class="fa-solid fa-gem"></i></span></span>
+                        </div>
                     </div>
                     <button onclick="executeModalConversion()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-2xl font-black text-xs text-black cursor-pointer shadow-lg">CONVERT NOW</button>
                 </div>`;
@@ -612,10 +620,21 @@
         function executeModalConversion() {
             if (!modalConvCoins || userCoins < modalConvCoins) { alert("❌ Insufficient coins or none selected!"); return; }
             userCoins -= modalConvCoins; userGems += modalConvGems;
-            localStorage.setItem('zylobet_coins', userCoins); localStorage.setItem('zylobet_gems', userGems);
+            localStorage.setItem('zylobet_coins', userCoins);
+            localStorage.setItem('zylobet_gems', userGems);
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
             document.getElementById('user-gems').innerText = userGems;
-            alert(`🎉 Converted successfully!`); closeModal();
+
+            let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
+            coinHistory.unshift({ title: "Converted to Diamonds", amount: `-${modalConvCoins} Coins`, type: "spend", time: "Just now" });
+            localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
+
+            let gemHistory = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
+            gemHistory.unshift({ title: "Converted from Coins", amount: `+${modalConvGems} Diamonds`, type: "earn", time: "Just now" });
+            localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHistory));
+
+            alert(`🎉 Converted successfully!`); 
+            closeModal();
         }
 
         function openDepositModal() {
@@ -674,7 +693,7 @@
                             <img src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiLink)}' alt='QR' class='w-36 h-36 object-contain rounded-xl'>
                         </div>
                     </div>
-                    <button onclick="openUpiApp('${upiLink}')" class='w-full py-3.5 bg-gradient-to-r from-sky-500 to-blue-600 rounded-2xl font-black text-xs text-white flex items-center justify-center gap-2 cursor-pointer shadow-lg'>
+                    <button onclick="openUpiApp('${upiLink}', ${amt})" class='w-full py-3.5 bg-gradient-to-r from-sky-500 to-blue-600 rounded-2xl font-black text-xs text-white flex items-center justify-center gap-2 cursor-pointer shadow-lg'>
                         <i class='fa-solid fa-bolt'></i> PAY VIA UPI APP (₹${amt})
                     </button>
                     <p class='text-gray-400 text-[11px] text-left font-semibold mt-2'>Enter 12-Digit UTR / Reference Number:</p>
@@ -683,15 +702,15 @@
                 </div>`;
         }
 
-        function openUpiApp(link) {
+        function openUpiApp(link, amt) {
             try {
                 window.location.href = link;
             } catch(e) {
-                window.open(link, '_blank');
+                window.open(`https://mercury.phonepe.com/pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}&cu=INR`, '_blank');
             }
         }
 
-        // AUTOMATED GMAIL VERIFICATION API CALL HANDLER (WITH TIMEOUT CONTROLLER)
+        // AUTOMATED GMAIL VERIFICATION API CALL HANDLER
         function verifyAndAddDeposit(totalDias, paidRs) {
             const utrVal = document.getElementById('deposit-utr-input').value.trim();
             if(!utrVal || utrVal.length < 8) { alert("❌ Please enter a valid UTR number!"); return; }
@@ -820,6 +839,14 @@
             }
         }
 
+        function loadAdminActivePanel() {
+            if(adminTab === 'withdraw') {
+                loadAdminRequests();
+            } else {
+                loadAdminPromoManager();
+            }
+        }
+
         function loadAdminRequests() {
             const container = document.getElementById('admin-requests-container');
             container.innerHTML = '';
@@ -877,6 +904,21 @@
 
         function loadAdminPromoManager() {
             const container = document.getElementById('admin-requests-container');
+            let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
+            
+            let activeListHTML = "<div class='space-y-2 mt-3'><p class='text-[10px] text-gray-400 font-bold uppercase'>Active Promos:</p>";
+            if(promos.length === 0) {
+                activeListHTML += "<p class='text-[11px] text-gray-500'>No promo codes created yet.</p>";
+            } else {
+                promos.forEach(p => {
+                    activeListHTML += `<div class='cyber-card p-3 rounded-xl border border-white/5 flex justify-between items-center text-xs'>
+                        <div><span class='font-black text-rose-400'>${p.code}</span> <span class='text-[10px] text-gray-300'>(${p.rewardAmount} ${p.rewardType})</span></div>
+                        <span class='text-[10px] text-emerald-400 font-bold'>Used: ${p.usedCount}/${p.maxUsers}</span>
+                    </div>`;
+                });
+            }
+            activeListHTML += "</div>";
+
             container.innerHTML = `
                 <div class='cyber-card p-4 rounded-3xl space-y-3 border border-rose-500/30 text-xs'>
                     <h3 class='font-black text-rose-400 uppercase tracking-wider'>Create Advanced Promo Code</h3>
@@ -908,6 +950,7 @@
                         </div>
                     </div>
                     <button onclick='createPromoCode()' class='w-full py-3 bg-gradient-to-r from-rose-600 to-purple-600 rounded-xl font-black text-white cursor-pointer shadow-lg'>CREATE & ACTIVATE CODE</button>
+                    ${activeListHTML}
                 </div>`;
         }
 
@@ -946,7 +989,7 @@
 
             localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
             alert(`🎉 Promo Code '${codeVal}' Created Successfully!`);
-            codeInput.value = '';
+            loadAdminPromoManager();
         }
     </script>
 </body>
