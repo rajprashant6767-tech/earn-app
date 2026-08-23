@@ -157,7 +157,7 @@
                             <span class="ff-gold-coin"><i class="fa-solid fa-coins"></i></span> <span id="user-coins">1,250</span>
                         </p>
                         <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-2 tracking-wider">
-                            <span>COINS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-amber-400/80"></i>
+                            <span>COINS 🪙</span> <i class="fa-solid fa-clock-rotate-left text-xs text-amber-400/80"></i>
                         </p>
                     </div>
                     <div onclick="openHistory('gems')" class="cyber-card p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-cyan-400/40 transition group">
@@ -165,8 +165,34 @@
                             <span class="ff-diamond"><i class="fa-solid fa-gem"></i></span> <span id="user-gems">12</span>
                         </p>
                         <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-2 tracking-wider">
-                            <span>DIAMONDS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-cyan-400/80"></i>
+                            <span>DIAMONDS 💎</span> <i class="fa-solid fa-clock-rotate-left text-xs text-cyan-400/80"></i>
                         </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COIN TO DIAMOND CONVERSION BOX -->
+            <div class="cyber-card p-5 rounded-3xl space-y-4 border border-amber-500/30 bg-gradient-to-br from-amber-950/20 via-black/40 to-cyan-950/20 shadow-xl">
+                <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                    <div class="flex items-center gap-2.5">
+                        <span class="ff-gold-coin" style="width:28px;height:28px;font-size:11px;"><i class="fa-solid fa-coins"></i></span>
+                        <h2 class="text-xs font-black text-amber-400 uppercase tracking-wider">Convert Coins to Diamonds 💎🪙</h2>
+                    </div>
+                    <span class="text-[10px] bg-amber-500/10 text-amber-300 font-bold px-2.5 py-1 rounded-xl border border-amber-500/20">Instant Exchange</span>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2.5">
+                    <div onclick="convertCoinsToDiamonds(120, 1)" class="cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-cyan-400 hover:bg-cyan-500/10 transition text-center group active:scale-95">
+                        <p class="text-amber-400 font-black text-xs">120 Coins</p>
+                        <p class="text-[10px] text-cyan-400 font-extrabold mt-1">➔ 1 Diamond 💎</p>
+                    </div>
+                    <div onclick="convertCoinsToDiamonds(510, 5)" class="cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-cyan-400 hover:bg-cyan-500/10 transition text-center group active:scale-95">
+                        <p class="text-amber-400 font-black text-xs">510 Coins</p>
+                        <p class="text-[10px] text-cyan-400 font-extrabold mt-1">➔ 5 Diamonds 💎</p>
+                    </div>
+                    <div onclick="convertCoinsToDiamonds(1000, 10)" class="cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-cyan-400 hover:bg-cyan-500/10 transition text-center group active:scale-95">
+                        <p class="text-amber-400 font-black text-xs">1,000 Coins</p>
+                        <p class="text-[10px] text-cyan-400 font-extrabold mt-1">➔ 10 Diamonds 💎</p>
                     </div>
                 </div>
             </div>
@@ -649,6 +675,33 @@
             });
         }
 
+        // COIN TO DIAMOND CONVERSION FUNCTION
+        function convertCoinsToDiamonds(coinCost, diamondGain) {
+            if (userCoins < coinCost) {
+                alert(`❌ Insufficient Coins! You need at least ${coinCost} coins to convert.`);
+                return;
+            }
+
+            userCoins -= coinCost;
+            userGems += diamondGain;
+
+            localStorage.setItem('zylobet_coins', userCoins);
+            localStorage.setItem('zylobet_gems', userGems);
+
+            document.getElementById('user-coins').innerText = userCoins.toLocaleString();
+            document.getElementById('user-gems').innerText = userGems;
+
+            let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
+            coinHistory.unshift({ title: `Converted to ${diamondGain} Diamonds`, amount: `-${coinCost} Coins`, type: "spend", time: "Just now", status: "Success" });
+            localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
+
+            let gemHistory = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
+            gemHistory.unshift({ title: `Coin Conversion Exchange`, amount: `+${diamondGain} Diamonds`, type: "earn", time: "Just now", status: "Success" });
+            localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHistory));
+
+            alert(`🎉 Successfully converted ${coinCost} Coins into ${diamondGain} Diamonds!`);
+        }
+
         function openHistory(type) {
             document.getElementById('modal').classList.remove('hidden');
             const title = document.getElementById('modal-title');
@@ -742,6 +795,7 @@
                 extraDetails = ` (UPI: ${upiId})`;
             }
 
+            // Deduct coins successfully
             userCoins -= selectedWCoins;
             localStorage.setItem('zylobet_coins', userCoins);
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
@@ -784,7 +838,6 @@
             if(method === 'UPI') document.getElementById('w-upi-id').value = '';
         }
 
-        // DEPOSIT MODAL WITH INTERACTIVE CLICKABLE OFFERS
         function openDepositModal() {
             document.getElementById('modal').classList.remove('hidden');
             document.getElementById('modal-title').innerText = "DEPOSIT DIAMONDS & GET BONUS";
@@ -794,16 +847,15 @@
                         <span class='ff-diamond' style='width:24px;height:24px;font-size:10px;'><i class='fa-solid fa-gem'></i></span> 1 Diamond = ₹1 Rs
                     </div>
 
-                    <!-- INTERACTIVE BONUS OFFERS (Clickable) -->
                     <div class='cyber-card p-3.5 rounded-2xl border border-amber-500/30 bg-amber-500/5 space-y-2'>
                         <p class='text-amber-400 font-black uppercase text-[11px] tracking-wider flex items-center gap-1.5'>
                             <i class='fa-solid fa-fire text-rose-500 animate-bounce'></i> Click an Offer to Select:
                         </p>
                         <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300'>
-                            <div onclick="selectDepositOffer(50)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>💎 50 Dias ➔ <span class='text-emerald-400 font-black'>+3 Free</span></div>
-                            <div onclick="selectDepositOffer(100)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>💎 100 Dias ➔ <span class='text-emerald-400 font-black'>+8 Free</span></div>
-                            <div onclick="selectDepositOffer(200)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>💎 200 Dias ➔ <span class='text-emerald-400 font-black'>+18 Free</span></div>
-                            <div onclick="selectDepositOffer(500)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>💎 500 Dias ➔ <span class='text-emerald-400 font-black'>+50 Free</span></div>
+                            <div onclick="selectDepositOffer(50)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>💎 50 Diamonds ➔ <span class='text-emerald-400 font-black'>+3 Free</span></div>
+                            <div onclick="selectDepositOffer(100)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>💎 100 Diamonds ➔ <span class='text-emerald-400 font-black'>+8 Free</span></div>
+                            <div onclick="selectDepositOffer(200)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>💎 200 Diamonds ➔ <span class='text-emerald-400 font-black'>+18 Free</span></div>
+                            <div onclick="selectDepositOffer(500)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>💎 500 Diamonds ➔ <span class='text-emerald-400 font-black'>+50 Free</span></div>
                         </div>
                     </div>
 
@@ -817,7 +869,6 @@
                 </div>`;
         }
 
-        // Auto-select offer when clicked
         function selectDepositOffer(amount) {
             const input = document.getElementById('deposit-amount-input');
             if (input) {
