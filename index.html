@@ -38,40 +38,6 @@
             background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.6), transparent);
         }
 
-        /* Ultimate 3D Free Fire Style Gold Coin */
-        .ff-gold-coin {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            background: radial-gradient(circle at 30% 30%, #fffb96 0%, #f59e0b 50%, #b45309 100%);
-            border: 2px solid #fef08a;
-            border-radius: 50%;
-            box-shadow: inset 0 2px 4px rgba(255,255,255,0.9), 0 3px 8px rgba(245, 158, 11, 0.6);
-            color: #451a03;
-            font-size: 13px;
-            flex-shrink: 0;
-        }
-
-        /* Ultimate 3D Free Fire Style Diamond */
-        .ff-diamond {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            background: radial-gradient(circle at 35% 35%, #a5f3fc 0%, #06b6d4 50%, #0369a1 100%);
-            border: 2px solid #e0f2fe;
-            border-radius: 9px;
-            transform: rotate(45deg);
-            box-shadow: inset 0 2px 4px rgba(255,255,255,0.95), 0 3px 10px rgba(6, 182, 212, 0.7);
-            color: #ffffff;
-            font-size: 13px;
-            flex-shrink: 0;
-        }
-        .ff-diamond i { transform: rotate(-45deg); }
-
         input, select, textarea {
             pointer-events: auto !important;
             user-select: text !important;
@@ -156,17 +122,19 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
+                    <!-- Coin Box with Emoji 🪙 -->
                     <div onclick="openHistory('coins')" class="cyber-card p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-amber-400/40 transition group">
-                        <p class="text-2xl font-black text-amber-400 group-hover:scale-105 transition origin-left flex items-center gap-2.5">
-                            <span class="ff-gold-coin"><i class="fa-solid fa-coins"></i></span> <span id="user-coins">1,250</span>
+                        <p class="text-xl font-black text-amber-400 group-hover:scale-105 transition origin-left flex items-center gap-2">
+                            <span class="text-2xl">🪙</span> <span id="user-coins">1,250</span>
                         </p>
                         <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-2 tracking-wider">
                             <span>COINS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-amber-400/80"></i>
                         </p>
                     </div>
+                    <!-- Diamond Box with Emoji 💎 -->
                     <div onclick="openHistory('gems')" class="cyber-card p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-cyan-400/40 transition group">
-                        <p class="text-2xl font-black text-cyan-400 group-hover:scale-105 transition origin-left flex items-center gap-2.5">
-                            <span class="ff-diamond"><i class="fa-solid fa-gem"></i></span> <span id="user-gems">12</span>
+                        <p class="text-xl font-black text-cyan-400 group-hover:scale-105 transition origin-left flex items-center gap-2">
+                            <span class="text-2xl">💎</span> <span id="user-gems">12</span>
                         </p>
                         <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-2 tracking-wider">
                             <span>DIAMONDS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-cyan-400/80"></i>
@@ -175,28 +143,28 @@
                 </div>
             </div>
 
-            <!-- COIN TO DIAMOND CONVERSION BOX WITH SELECTION & BIG BUTTON -->
+            <!-- COIN TO DIAMOND CONVERSION BOX WITH SELECTION & BIG CONVERT BUTTON -->
             <div class="cyber-card p-5 rounded-3xl space-y-4 border border-amber-500/30 bg-gradient-to-br from-amber-950/20 via-black/40 to-cyan-950/20 shadow-xl">
                 <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                    <div class="flex items-center gap-2.5">
-                        <span class="ff-gold-coin"><i class="fa-solid fa-coins"></i></span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">🪙💎</span>
                         <h2 class="text-xs font-black text-amber-400 uppercase tracking-wider">Convert Coins to Diamonds</h2>
                     </div>
                     <span class="text-[10px] bg-amber-500/10 text-amber-300 font-bold px-2.5 py-1 rounded-xl border border-amber-500/20">Instant Exchange</span>
                 </div>
 
                 <div class="grid grid-cols-3 gap-2.5">
-                    <div onclick="selectConvertPackage(120, 1)" id="conv-pkg-1" class="conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-cyan-400 transition text-center group active:scale-95">
-                        <p class="text-amber-400 font-black text-xs">120 Coins</p>
-                        <p class="text-[10px] text-cyan-400 font-extrabold mt-1 flex items-center justify-center gap-1">➔ 1 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span></p>
+                    <div onclick="selectConvertPackage(120, 1)" id="conv-pkg-1" class="conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-amber-400 transition text-center group active:scale-95">
+                        <p class="text-amber-400 font-black text-xs">120 🪙</p>
+                        <p class="text-[10px] text-cyan-400 font-extrabold mt-1">➔ 1 💎</p>
                     </div>
-                    <div onclick="selectConvertPackage(510, 5)" id="conv-pkg-2" class="conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-cyan-400 transition text-center group active:scale-95">
-                        <p class="text-amber-400 font-black text-xs">510 Coins</p>
-                        <p class="text-[10px] text-cyan-400 font-extrabold mt-1 flex items-center justify-center gap-1">➔ 5 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span></p>
+                    <div onclick="selectConvertPackage(510, 5)" id="conv-pkg-2" class="conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-amber-400 transition text-center group active:scale-95">
+                        <p class="text-amber-400 font-black text-xs">510 🪙</p>
+                        <p class="text-[10px] text-cyan-400 font-extrabold mt-1">➔ 5 💎</p>
                     </div>
-                    <div onclick="selectConvertPackage(1000, 10)" id="conv-pkg-3" class="conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-cyan-400 transition text-center group active:scale-95">
-                        <p class="text-amber-400 font-black text-xs">1,000 Coins</p>
-                        <p class="text-[10px] text-cyan-400 font-extrabold mt-1 flex items-center justify-center gap-1">➔ 10 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span></p>
+                    <div onclick="selectConvertPackage(1000, 10)" id="conv-pkg-3" class="conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-amber-400 transition text-center group active:scale-95">
+                        <p class="text-amber-400 font-black text-xs">1,000 🪙</p>
+                        <p class="text-[10px] text-cyan-400 font-extrabold mt-1">➔ 10 💎</p>
                     </div>
                 </div>
 
@@ -312,19 +280,19 @@
                     <label class="text-[11px] text-gray-300 font-bold block uppercase tracking-wider">Select Coin Package</label>
                     <div class="grid grid-cols-2 gap-3">
                         <div onclick="selectWPackage(5500, 50)" class="w-pkg-card cyber-card border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="5500">
-                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">5,500 <i class="fa-solid fa-coins text-xs"></i></p>
+                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">5,500 🪙</p>
                             <p class="text-[11px] text-emerald-400 font-bold mt-1">₹50 Cash</p>
                         </div>
                         <div onclick="selectWPackage(10750, 100)" class="w-pkg-card cyber-card border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="10750">
-                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">10,750 <i class="fa-solid fa-coins text-xs"></i></p>
+                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">10,750 🪙</p>
                             <p class="text-[11px] text-emerald-400 font-bold mt-1">₹100 Cash</p>
                         </div>
                         <div onclick="selectWPackage(20500, 200)" class="w-pkg-card cyber-card border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="20500">
-                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">20,500 <i class="fa-solid fa-coins text-xs"></i></p>
+                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">20,500 🪙</p>
                             <p class="text-[11px] text-emerald-400 font-bold mt-1">₹200 Cash</p>
                         </div>
                         <div onclick="selectWPackage(50000, 500)" class="w-pkg-card cyber-card border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="50000">
-                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">50,000 <i class="fa-solid fa-coins text-xs"></i></p>
+                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">50,000 🪙</p>
                             <p class="text-[11px] text-emerald-400 font-bold mt-1">₹500 Cash</p>
                         </div>
                     </div>
@@ -744,7 +712,7 @@
                     html += `
                         <div class='cyber-card p-4 rounded-2xl border border-white/5 flex justify-between items-center'>
                             <div>
-                                <p class='font-black ${colorClass} text-sm flex items-center gap-1.5'>${item.amount} <span class='ff-gold-coin' style='width:20px;height:20px;font-size:9px;'><i class='fa-solid fa-coins'></i></span></p>
+                                <p class='font-black ${colorClass} text-sm flex items-center gap-1.5'>${item.amount} 🪙</p>
                                 <p class='text-[10px] text-gray-300 font-bold mt-1'>Source: ${item.title}</p>
                             </div>
                             <span class='text-[10px] text-gray-400 font-bold'>${item.time}</span>
@@ -791,7 +759,7 @@
                     html += `
                         <div class='cyber-card p-4 rounded-2xl border border-white/5 flex justify-between items-center'>
                             <div>
-                                <p class='font-black text-cyan-400 text-sm flex items-center gap-1.5'>${item.amount} <span class='ff-diamond' style='width:20px;height:20px;font-size:8px;'><i class='fa-solid fa-gem'></i></span></p>
+                                <p class='font-black text-cyan-400 text-sm flex items-center gap-1.5'>${item.amount} 💎</p>
                                 <p class='text-[10px] text-gray-300 font-bold mt-1'>Source: ${item.title}</p>
                             </div>
                             <span class='text-[10px] text-emerald-400 font-bold'>Success</span>
@@ -871,7 +839,7 @@
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs'>
                     <div class='bg-cyan-500/10 border border-cyan-500/30 p-3 rounded-2xl text-cyan-300 font-bold text-center tracking-wide flex items-center justify-center gap-2'>
-                        <span class='ff-diamond' style='width:24px;height:24px;font-size:10px;'><i class='fa-solid fa-gem'></i></span> 1 Diamond = ₹1 Rs
+                        <span>💎</span> 1 Diamond = ₹1 Rs
                     </div>
 
                     <div class='cyber-card p-3.5 rounded-2xl border border-amber-500/30 bg-amber-500/5 space-y-2'>
@@ -879,10 +847,10 @@
                             <i class='fa-solid fa-fire text-rose-500 animate-bounce'></i> Click an Offer to Select:
                         </p>
                         <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300'>
-                            <div onclick="selectDepositOffer(50)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>💎 50 Diamonds ➔ <span class='text-emerald-400 font-black'>+3 Free</span></div>
-                            <div onclick="selectDepositOffer(100)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>💎 100 Diamonds ➔ <span class='text-emerald-400 font-black'>+8 Free</span></div>
-                            <div onclick="selectDepositOffer(200)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>💎 200 Diamonds ➔ <span class='text-emerald-400 font-black'>+18 Free</span></div>
-                            <div onclick="selectDepositOffer(500)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>💎 500 Diamonds ➔ <span class='text-emerald-400 font-black'>+50 Free</span></div>
+                            <div onclick="selectDepositOffer(50)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>50 Diamonds ➔ <span class='text-emerald-400 font-black'>+3 Free 💎</span></div>
+                            <div onclick="selectDepositOffer(100)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>100 Diamonds ➔ <span class='text-emerald-400 font-black'>+8 Free 💎</span></div>
+                            <div onclick="selectDepositOffer(200)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>200 Diamonds ➔ <span class='text-emerald-400 font-black'>+18 Free 💎</span></div>
+                            <div onclick="selectDepositOffer(500)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>500 Diamonds ➔ <span class='text-emerald-400 font-black'>+50 Free 💎</span></div>
                         </div>
                     </div>
 
@@ -915,7 +883,7 @@
             const box = document.getElementById('bonus-calc-box');
             if(bonus > 0) {
                 box.classList.remove('hidden');
-                box.innerHTML = `🎁 Bonus Applied: +${bonus} Free Diamonds! Total you will get: <b>${amt + bonus} Diamonds</b>`;
+                box.innerHTML = `🎁 Bonus Applied: +${bonus} Free Diamonds! Total you will get: <b>${amt + bonus} Diamonds 💎</b>`;
             } else {
                 box.classList.add('hidden');
             }
@@ -1185,7 +1153,7 @@
                 html += `<div class='cyber-card p-5 text-center text-gray-500 text-xs rounded-2xl'>No active promo codes available.</div>`;
             } else {
                 promos.forEach((p, idx) => {
-                    let symbol = p.rewardType === 'coins' ? '<span class="ff-gold-coin" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> Coins' : '<span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span> Diamonds';
+                    let symbol = p.rewardType === 'coins' ? 'Coins 🪙' : 'Diamonds 💎';
 
                     html += `
                         <div class='cyber-card p-3.5 rounded-2xl border border-white/10 space-y-2 text-xs'>
@@ -1227,7 +1195,7 @@
 
             let usedCodes = JSON.parse(localStorage.getItem('zylobet_used_promo_names')) || [];
             if(usedCodes.includes(codeVal)) {
-                alert("❌ ERROR: Yeh promo code pehle bhi use/create ho chuka hai! Aap ek hi code ko dobara create nahi kar सकते.");
+                alert("❌ ERROR: Yeh promo code pehle bhi use/create ho chuka hai! Aap ek hi code ko dobara create nahi kar sakte.");
                 return;
             }
 
