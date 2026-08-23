@@ -172,22 +172,23 @@
                     </div>
                 </div>
 
-                <!-- CLEAN CONVERT / EXCHANGE BANNER WITH COIN ➔ DIAMOND ICONS & NO RATE TEXT -->
-                <div onclick="openConvertModal()" class="cyber-card p-4 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-950/40 via-black/50 to-cyan-950/30 cursor-pointer hover:border-amber-400 transition flex items-center justify-between group shadow-lg">
+                <!-- NON-CLICKABLE CARD WITH EXCLUSIVE "EXCHANGE" BUTTON -->
+                <div class="cyber-card p-4 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-950/40 via-black/50 to-cyan-950/30 flex items-center justify-between shadow-lg">
                     <div class="flex items-center gap-3.5">
                         <div class="flex items-center gap-1.5 bg-amber-500/20 px-3 py-2 rounded-xl border border-amber-500/30 shrink-0">
-                            <span class="ff-gold-coin" style="width:20px;height:20px;font-size:8px;"><i class="fa-solid fa-coins"></i></span>
+                            <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span>
                             <span class="text-amber-400 font-bold text-xs">➔</span>
                             <span class="ff-diamond" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-gem"></i></span>
                         </div>
                         <div>
-                            <h3 class="text-xs font-black text-white uppercase tracking-wider">Convert Coins to Diamonds</h3>
-                            <p class="text-[10px] text-amber-300 font-semibold mt-0.5">Tap here to exchange instantly</p>
+                            <h3 class="text-xs font-black text-white uppercase tracking-wider">CONVERT COINS TO DIAMONDS</h3>
+                            <p class="text-[10px] text-amber-300 font-semibold mt-0.5">Exchange your coins instantly</p>
                         </div>
                     </div>
-                    <div class="bg-gradient-to-r from-amber-500 to-yellow-500 text-black px-3.5 py-2 rounded-xl font-black text-xs shadow-md group-hover:brightness-110 transition flex items-center gap-1.5 shrink-0">
+                    <!-- ONLY THIS BUTTON OPENS THE CONVERSION MODAL -->
+                    <button onclick="openConvertModal()" class="bg-gradient-to-r from-amber-500 to-yellow-500 text-black px-4 py-2.5 rounded-xl font-black text-xs shadow-md hover:brightness-110 active:scale-95 transition flex items-center gap-1.5 shrink-0 cursor-pointer">
                         <i class="fa-solid fa-rotate"></i> EXCHANGE
-                    </div>
+                    </button>
                 </div>
             </div>
         </div>
