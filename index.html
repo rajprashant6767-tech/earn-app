@@ -38,6 +38,40 @@
             background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.6), transparent);
         }
 
+        /* Original 3D Styled Gold Coin */
+        .ff-gold-coin {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: radial-gradient(circle at 30% 30%, #fffb96 0%, #f59e0b 50%, #b45309 100%);
+            border: 2px solid #fef08a;
+            border-radius: 50%;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.9), 0 3px 8px rgba(245, 158, 11, 0.6);
+            color: #451a03;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        /* Original 3D Styled Diamond */
+        .ff-diamond {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: radial-gradient(circle at 35% 35%, #a5f3fc 0%, #06b6d4 50%, #0369a1 100%);
+            border: 2px solid #e0f2fe;
+            border-radius: 9px;
+            transform: rotate(45deg);
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.95), 0 3px 10px rgba(6, 182, 212, 0.7);
+            color: #ffffff;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+        .ff-diamond i { transform: rotate(-45deg); }
+
         input, select, textarea {
             pointer-events: auto !important;
             user-select: text !important;
@@ -124,7 +158,7 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div onclick="openHistory('coins')" class="cyber-card p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-amber-400/40 transition group">
                         <p class="text-xl font-black text-amber-400 group-hover:scale-105 transition origin-left flex items-center gap-2">
-                            <span class="text-2xl">🪙</span> <span id="user-coins">1,250</span>
+                            <span class="ff-gold-coin"><i class="fa-solid fa-coins"></i></span> <span id="user-coins">1,250</span>
                         </p>
                         <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-2 tracking-wider">
                             <span>COINS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-amber-400/80"></i>
@@ -132,7 +166,7 @@
                     </div>
                     <div onclick="openHistory('gems')" class="cyber-card p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-cyan-400/40 transition group">
                         <p class="text-xl font-black text-cyan-400 group-hover:scale-105 transition origin-left flex items-center gap-2">
-                            <span class="text-2xl">💎</span> <span id="user-gems">12</span>
+                            <span class="ff-diamond"><i class="fa-solid fa-gem"></i></span> <span id="user-gems">12</span>
                         </p>
                         <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-2 tracking-wider">
                             <span>DIAMONDS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-cyan-400/80"></i>
@@ -140,18 +174,18 @@
                     </div>
                 </div>
 
-                <!-- COMPACT CONVERT / EXCHANGE BANNER WITH ARROW INDICATOR -->
+                <!-- SUPER INTUITIVE CONVERT / EXCHANGE BANNER WITH 3D COIN & DIAMOND ICON -->
                 <div onclick="openConvertModal()" class="cyber-card p-4 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-950/40 via-black/50 to-cyan-950/30 cursor-pointer hover:border-amber-400 transition flex items-center justify-between group shadow-lg">
-                    <div class="flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-base group-hover:scale-110 transition">
-                            🪙 ➔ 💎
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-12 h-11 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-xs group-hover:scale-110 transition font-black tracking-tight shrink-0 shadow-inner gap-1">
+                            <span class="ff-gold-coin" style="width:22px;height:22px;font-size:9px;"><i class="fa-solid fa-coins"></i></span> ➔ <span class="ff-diamond" style="width:20px;height:20px;font-size:8px;"><i class="fa-solid fa-gem"></i></span>
                         </div>
                         <div>
-                            <h3 class="text-xs font-black text-white uppercase tracking-wider">Convert Coins to Diamonds</h3>
-                            <p class="text-[10px] text-amber-300 font-semibold mt-0.5">Tap here to exchange (120 🪙 = 1 💎)</p>
+                            <h3 class="text-xs font-black text-white uppercase tracking-wider">CONVERT COINS TO DIAMONDS</h3>
+                            <p class="text-[10px] text-amber-300 font-semibold mt-0.5">Tap here to exchange (120 Coins = 1 Diamond)</p>
                         </div>
                     </div>
-                    <div class="bg-gradient-to-r from-amber-500 to-yellow-500 text-black px-3.5 py-2 rounded-xl font-black text-xs shadow-md group-hover:brightness-110 transition flex items-center gap-1.5">
+                    <div class="bg-gradient-to-r from-amber-500 to-yellow-500 text-black px-3.5 py-2 rounded-xl font-black text-xs shadow-md group-hover:brightness-110 transition flex items-center gap-1.5 shrink-0">
                         <i class="fa-solid fa-rotate"></i> EXCHANGE
                     </div>
                 </div>
@@ -252,19 +286,19 @@
                     <label class="text-[11px] text-gray-300 font-bold block uppercase tracking-wider">Select Coin Package</label>
                     <div class="grid grid-cols-2 gap-3">
                         <div onclick="selectWPackage(5500, 50)" class="w-pkg-card cyber-card border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="5500">
-                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">5,500 🪙</p>
+                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">5,500 <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span></p>
                             <p class="text-[11px] text-emerald-400 font-bold mt-1">₹50 Cash</p>
                         </div>
                         <div onclick="selectWPackage(10750, 100)" class="w-pkg-card cyber-card border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="10750">
-                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">10,750 🪙</p>
+                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">10,750 <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span></p>
                             <p class="text-[11px] text-emerald-400 font-bold mt-1">₹100 Cash</p>
                         </div>
                         <div onclick="selectWPackage(20500, 200)" class="w-pkg-card cyber-card border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="20500">
-                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">20,500 🪙</p>
+                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">20,500 <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span></p>
                             <p class="text-[11px] text-emerald-400 font-bold mt-1">₹200 Cash</p>
                         </div>
                         <div onclick="selectWPackage(50000, 500)" class="w-pkg-card cyber-card border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="50000">
-                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">50,000 🪙</p>
+                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">50,000 <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span></p>
                             <p class="text-[11px] text-emerald-400 font-bold mt-1">₹500 Cash</p>
                         </div>
                     </div>
@@ -281,19 +315,19 @@
                     <label class="text-[11px] text-gray-300 font-bold block uppercase tracking-wider">Select Amazon Package</label>
                     <div class="grid grid-cols-2 gap-3">
                         <div onclick="selectWPackage(5500, 50)" class="w-pkg-card cyber-card border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="5500">
-                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">5,500 🪙</p>
+                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">5,500 <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span></p>
                             <p class="text-[11px] text-sky-400 font-bold mt-1">₹50 Amazon Card</p>
                         </div>
                         <div onclick="selectWPackage(10750, 100)" class="w-pkg-card cyber-card border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="10750">
-                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">10,750 🪙</p>
+                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">10,750 <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span></p>
                             <p class="text-[11px] text-sky-400 font-bold mt-1">₹100 Amazon Card</p>
                         </div>
                         <div onclick="selectWPackage(20500, 200)" class="w-pkg-card cyber-card border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="20500">
-                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">20,500 🪙</p>
+                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">20,500 <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span></p>
                             <p class="text-[11px] text-sky-400 font-bold mt-1">₹200 Amazon Card</p>
                         </div>
                         <div onclick="selectWPackage(50000, 500)" class="w-pkg-card cyber-card border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="50000">
-                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">50,000 🪙</p>
+                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">50,000 <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span></p>
                             <p class="text-[11px] text-sky-400 font-bold mt-1">₹500 Amazon Card</p>
                         </div>
                     </div>
@@ -306,19 +340,19 @@
                     <label class="text-[11px] text-gray-300 font-bold block uppercase tracking-wider">Select PlayStore Package</label>
                     <div class="grid grid-cols-2 gap-3">
                         <div onclick="selectWPackage(5500, 50)" class="w-pkg-card cyber-card border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="5500">
-                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">5,500 🪙</p>
+                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">5,500 <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span></p>
                             <p class="text-[11px] text-indigo-400 font-bold mt-1">₹50 PlayStore Card</p>
                         </div>
                         <div onclick="selectWPackage(10750, 100)" class="w-pkg-card cyber-card border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="10750">
-                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">10,750 🪙</p>
+                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">10,750 <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span></p>
                             <p class="text-[11px] text-indigo-400 font-bold mt-1">₹100 PlayStore Card</p>
                         </div>
                         <div onclick="selectWPackage(20500, 200)" class="w-pkg-card cyber-card border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="20500">
-                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">20,500 🪙</p>
+                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">20,500 <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span></p>
                             <p class="text-[11px] text-indigo-400 font-bold mt-1">₹200 PlayStore Card</p>
                         </div>
                         <div onclick="selectWPackage(50000, 500)" class="w-pkg-card cyber-card border border-white/10 p-3.5 rounded-2xl cursor-pointer hover:border-emerald-400 transition text-center" data-coins="50000">
-                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">50,000 🪙</p>
+                            <p class="text-amber-400 font-black text-sm flex items-center justify-center gap-1">50,000 <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span></p>
                             <p class="text-[11px] text-indigo-400 font-bold mt-1">₹500 PlayStore Card</p>
                         </div>
                     </div>
@@ -461,7 +495,7 @@
 
         if(!localStorage.getItem('zylobet_coin_history')) {
             localStorage.setItem('zylobet_coin_history', JSON.stringify([
-                { title: "Welcome Bonus", amount: "+1,000 🪙", type: "earn", time: "Today", status: "Success" }
+                { title: "Welcome Bonus", amount: "+1,000 Coins", type: "earn", time: "Today", status: "Success" }
             ]));
         }
         if(!localStorage.getItem('zylobet_withdraw_history')) {
@@ -469,7 +503,7 @@
         }
         if(!localStorage.getItem('zylobet_gem_history')) {
             localStorage.setItem('zylobet_gem_history', JSON.stringify([
-                { title: "Initial Diamonds", amount: `+${userGems} 💎`, type: "earn", time: "Active", status: "Success" }
+                { title: "Initial Diamonds", amount: `+${userGems} Diamonds`, type: "earn", time: "Active", status: "Success" }
             ]));
         }
 
@@ -517,7 +551,7 @@
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
 
             let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-            coinHistory.unshift({ title: `Referral Bonus (${enteredCode})`, amount: "+300 🪙", type: "earn", time: "Just now", status: "Success" });
+            coinHistory.unshift({ title: `Referral Bonus (${enteredCode})`, amount: "+300 Coins", type: "earn", time: "Just now", status: "Success" });
             localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
 
             localStorage.setItem('zylobet_ref_used', 'true');
@@ -584,14 +618,14 @@
                 localStorage.setItem('zylobet_coins', userCoins);
                 document.getElementById('user-coins').innerText = userCoins.toLocaleString();
                 let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-                coinHistory.unshift({ title: `Promo (${promoVal})`, amount: `+${foundPromo.rewardAmount} 🪙`, type: "earn", time: "Just now", status: "Success" });
+                coinHistory.unshift({ title: `Promo (${promoVal})`, amount: `+${foundPromo.rewardAmount} Coins`, type: "earn", time: "Just now", status: "Success" });
                 localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
             } else {
                 userGems += foundPromo.rewardAmount;
                 localStorage.setItem('zylobet_gems', userGems);
                 document.getElementById('user-gems').innerText = userGems;
                 let gemHistory = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
-                gemHistory.unshift({ title: `Promo (${promoVal})`, amount: `+${foundPromo.rewardAmount} 💎`, type: "earn", time: "Just now", status: "Success" });
+                gemHistory.unshift({ title: `Promo (${promoVal})`, amount: `+${foundPromo.rewardAmount} Diamonds`, type: "earn", time: "Just now", status: "Success" });
                 localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHistory));
             }
 
@@ -629,22 +663,22 @@
             document.getElementById('modal-title').innerText = "CONVERT COINS TO DIAMONDS";
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs'>
-                    <div class='bg-amber-500/10 border border-amber-500/30 p-3 rounded-2xl text-amber-300 font-bold text-center tracking-wide'>
-                        🪙 Select conversion package below:
+                    <div class='bg-amber-500/10 border border-amber-500/30 p-3 rounded-2xl text-amber-300 font-bold text-center tracking-wide flex items-center justify-center gap-2'>
+                        <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span> Select conversion package below:
                     </div>
 
                     <div class='grid grid-cols-3 gap-2.5'>
                         <div onclick="selectModalConv(120, 1)" id='m-conv-1' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition active:scale-95'>
-                            <p class='text-amber-400 font-black text-xs'>120 🪙</p>
-                            <p class='text-[10px] text-cyan-400 font-extrabold mt-1'>➔ 1 💎</p>
+                            <p class='text-amber-400 font-black text-xs flex items-center justify-center gap-1'>120 <span class="ff-gold-coin" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-coins"></i></span></p>
+                            <p class='text-[10px] text-cyan-400 font-extrabold mt-1 flex items-center justify-center gap-1'>➔ 1 <span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span></p>
                         </div>
                         <div onclick="selectModalConv(510, 5)" id='m-conv-2' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition active:scale-95'>
-                            <p class='text-amber-400 font-black text-xs'>510 🪙</p>
-                            <p class='text-[10px] text-cyan-400 font-extrabold mt-1'>➔ 5 💎</p>
+                            <p class='text-amber-400 font-black text-xs flex items-center justify-center gap-1'>510 <span class="ff-gold-coin" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-coins"></i></span></p>
+                            <p class='text-[10px] text-cyan-400 font-extrabold mt-1 flex items-center justify-center gap-1'>➔ 5 <span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span></p>
                         </div>
                         <div onclick="selectModalConv(1000, 10)" id='m-conv-3' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition active:scale-95'>
-                            <p class='text-amber-400 font-black text-xs'>1,000 🪙</p>
-                            <p class='text-[10px] text-cyan-400 font-extrabold mt-1'>➔ 10 💎</p>
+                            <p class='text-amber-400 font-black text-xs flex items-center justify-center gap-1'>1,000 <span class="ff-gold-coin" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-coins"></i></span></p>
+                            <p class='text-[10px] text-cyan-400 font-extrabold mt-1 flex items-center justify-center gap-1'>➔ 10 <span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span></p>
                         </div>
                     </div>
 
@@ -686,11 +720,11 @@
             document.getElementById('user-gems').innerText = userGems;
 
             let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-            coinHistory.unshift({ title: `Converted to ${modalConvGems} 💎`, amount: `-${modalConvCoins} 🪙`, type: "spend", time: "Just now", status: "Success" });
+            coinHistory.unshift({ title: `Converted to ${modalConvGems} Diamonds`, amount: `-${modalConvCoins} Coins`, type: "spend", time: "Just now", status: "Success" });
             localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
 
             let gemHistory = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
-            gemHistory.unshift({ title: `Coin Conversion Exchange`, amount: `+${modalConvGems} 💎`, type: "earn", time: "Just now", status: "Success" });
+            gemHistory.unshift({ title: `Coin Conversion Exchange`, amount: `+${modalConvGems} Diamonds`, type: "earn", time: "Just now", status: "Success" });
             localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHistory));
 
             alert(`🎉 Successfully converted ${modalConvCoins} Coins into ${modalConvGems} Diamonds!`);
@@ -711,7 +745,7 @@
                     html += `
                         <div class='cyber-card p-4 rounded-2xl border border-white/5 flex justify-between items-center'>
                             <div>
-                                <p class='font-black ${colorClass} text-sm flex items-center gap-1.5'>${item.amount}</p>
+                                <p class='font-black ${colorClass} text-sm flex items-center gap-1.5'>${item.amount} <span class='ff-gold-coin' style='width:20px;height:20px;font-size:9px;'><i class='fa-solid fa-coins'></i></span></p>
                                 <p class='text-[10px] text-gray-300 font-bold mt-1'>Source: ${item.title}</p>
                             </div>
                             <span class='text-[10px] text-gray-400 font-bold'>${item.time}</span>
@@ -740,7 +774,7 @@
                     html += `
                         <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2.5'>
                             <div class='flex justify-between items-center'>
-                                <span class='text-xs font-black text-amber-400'>${item.amount} 🪙 (₹${item.rupees})</span>
+                                <span class='text-xs font-black text-amber-400'>${item.amount} <span class='ff-gold-coin' style='width:20px;height:20px;font-size:9px;'><i class='fa-solid fa-coins'></i></span> (₹${item.rupees})</span>
                                 <span class='text-[10px] font-extrabold px-2.5 py-1 rounded-full border ${statusColor}'>${item.status}</span>
                             </div>
                             <p class='text-[11px] text-gray-300 font-bold'>Method: <span class="text-white">${item.method}</span> ${item.details || ''}</p>
@@ -758,7 +792,7 @@
                     html += `
                         <div class='cyber-card p-4 rounded-2xl border border-white/5 flex justify-between items-center'>
                             <div>
-                                <p class='font-black text-cyan-400 text-sm flex items-center gap-1.5'>${item.amount}</p>
+                                <p class='font-black text-cyan-400 text-sm flex items-center gap-1.5'>${item.amount} <span class='ff-diamond' style='width:20px;height:20px;font-size:8px;'><i class='fa-solid fa-gem'></i></span></p>
                                 <p class='text-[10px] text-gray-300 font-bold mt-1'>Source: ${item.title}</p>
                             </div>
                             <span class='text-[10px] text-emerald-400 font-bold'>Success</span>
@@ -818,7 +852,7 @@
             coinHistory.unshift({
                 id: reqId,
                 title: `${method} Payout Request (₹${selectedWAmount})`,
-                amount: `-${selectedWCoins} 🪙`,
+                amount: `-${selectedWCoins} Coins`,
                 type: "spend",
                 time: "Just now",
                 status: "Pending"
@@ -838,7 +872,7 @@
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs'>
                     <div class='bg-cyan-500/10 border border-cyan-500/30 p-3 rounded-2xl text-cyan-300 font-bold text-center tracking-wide flex items-center justify-center gap-2'>
-                        <span>💎</span> 1 Diamond = ₹1 Rs
+                        <span class="ff-diamond" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-gem"></i></span> 1 Diamond = ₹1 Rs
                     </div>
 
                     <div class='cyber-card p-3.5 rounded-2xl border border-amber-500/30 bg-amber-500/5 space-y-2'>
@@ -846,10 +880,10 @@
                             <i class='fa-solid fa-fire text-rose-500 animate-bounce'></i> Click an Offer to Select:
                         </p>
                         <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300'>
-                            <div onclick="selectDepositOffer(50)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>50 💎 ➔ <span class='text-emerald-400 font-black'>+3 Free</span></div>
-                            <div onclick="selectDepositOffer(100)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>100 💎 ➔ <span class='text-emerald-400 font-black'>+8 Free</span></div>
-                            <div onclick="selectDepositOffer(200)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>200 💎 ➔ <span class='text-emerald-400 font-black'>+18 Free</span></div>
-                            <div onclick="selectDepositOffer(500)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>500 💎 ➔ <span class='text-emerald-400 font-black'>+50 Free</span></div>
+                            <div onclick="selectDepositOffer(50)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>50 Diamonds ➔ <span class='text-emerald-400 font-black'>+3 Free</span></div>
+                            <div onclick="selectDepositOffer(100)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>100 Diamonds ➔ <span class='text-emerald-400 font-black'>+8 Free</span></div>
+                            <div onclick="selectDepositOffer(200)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>200 Diamonds ➔ <span class='text-emerald-400 font-black'>+18 Free</span></div>
+                            <div onclick="selectDepositOffer(500)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>500 Diamonds ➔ <span class='text-emerald-400 font-black'>+50 Free</span></div>
                         </div>
                     </div>
 
@@ -882,7 +916,7 @@
             const box = document.getElementById('bonus-calc-box');
             if(bonus > 0) {
                 box.classList.remove('hidden');
-                box.innerHTML = `🎁 Bonus Applied: +${bonus} Free 💎! Total you will get: <b>${amt + bonus} 💎</b>`;
+                box.innerHTML = `🎁 Bonus Applied: +${bonus} Free Diamonds! Total you will get: <b>${amt + bonus} Diamonds</b>`;
             } else {
                 box.classList.add('hidden');
             }
@@ -906,7 +940,7 @@
 
             let totalDiamonds = amt + bonus;
 
-            document.getElementById('modal-title').innerText = `PAY ₹${amt} FOR ${totalDiamonds} 💎`;
+            document.getElementById('modal-title').innerText = `PAY ₹${amt} FOR ${totalDiamonds} DIAMONDS`;
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs text-center max-h-[70vh] overflow-y-auto px-1'>
                     <div class='cyber-card border border-white/10 p-3.5 rounded-2xl space-y-1 text-left'>
@@ -996,7 +1030,7 @@
                 reqs.forEach(r => {
                     container.innerHTML += `
                         <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-3 text-xs shadow-lg'>
-                            <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-cyan-400 text-sm'>${r.amount} 💎 (Inc. Bonus)</span></div>
+                            <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-cyan-400 text-sm'>${r.amount} Diamonds (Inc. Bonus)</span></div>
                             <button onclick="document.getElementById('modal-img').src='${r.proof}'; document.getElementById('img-modal').classList.remove('hidden');" class='w-full bg-white/5 hover:bg-white/10 py-2 rounded-xl font-bold'>View Proof</button>
                             <div class='grid grid-cols-2 gap-2'>
                                 <button onclick="handleAdmDep(${r.id}, 'approve', ${r.amount})" class='shiny-green-btn py-2.5 rounded-xl font-black text-white'>APPROVE</button>
@@ -1026,7 +1060,7 @@
 
                     container.innerHTML += `
                         <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-3 text-xs shadow-lg'>
-                            <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-amber-400 text-sm'>${r.amount} 🪙 (₹${r.rupees})</span></div>
+                            <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-amber-400 text-sm'>${r.amount} Coins (₹${r.rupees})</span></div>
                             <p class='text-gray-300 font-bold'>Method: <span class="text-white">${r.method}</span></p>
                             ${detailsBox}
                             ${redeemInputHTML}
@@ -1082,7 +1116,7 @@
                 document.getElementById('user-coins').innerText = userCoins.toLocaleString();
                 
                 let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-                coinHistory.unshift({ title: "Withdrawal Rejected & Refunded", amount: `+${req.amount} 🪙`, type: "earn", time: "Just now", status: "Success" });
+                coinHistory.unshift({ title: "Withdrawal Rejected & Refunded", amount: `+${req.amount} Coins`, type: "earn", time: "Just now", status: "Success" });
                 localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
 
                 alert("Withdrawal Rejected & Coins Refunded.");
