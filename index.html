@@ -172,8 +172,8 @@
                     </div>
                 </div>
 
-                <!-- CONVERT BANNER -->
-                <div onclick="openConvertModal()" class="cyber-card p-4 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-950/40 via-black/50 to-cyan-950/30 cursor-pointer hover:border-amber-400 transition flex items-center justify-between group shadow-lg">
+                <!-- NON-CLICKABLE BANNER WITH WORKING EXCHANGE BUTTON -->
+                <div class="cyber-card p-4 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-950/40 via-black/50 to-cyan-950/30 flex items-center justify-between shadow-lg">
                     <div class="flex items-center gap-3.5">
                         <div class="flex items-center gap-1.5 bg-amber-500/20 px-3 py-2 rounded-xl border border-amber-500/30 shrink-0">
                             <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span>
@@ -185,7 +185,7 @@
                             <p class="text-[10px] text-amber-300 font-semibold mt-0.5">Exchange your coins instantly</p>
                         </div>
                     </div>
-                    <button class="bg-gradient-to-r from-amber-500 to-yellow-500 text-black px-4 py-2.5 rounded-xl font-black text-xs shadow-md hover:brightness-110 active:scale-95 transition flex items-center gap-1.5 shrink-0 cursor-pointer">
+                    <button onclick="openConvertModal()" class="bg-gradient-to-r from-amber-500 to-yellow-500 text-black px-4 py-2.5 rounded-xl font-black text-xs shadow-md hover:brightness-110 active:scale-95 transition flex items-center gap-1.5 shrink-0 cursor-pointer">
                         <i class="fa-solid fa-rotate"></i> EXCHANGE
                     </button>
                 </div>
@@ -657,7 +657,7 @@
             });
         }
 
-        // OPEN CONVERT POPUP MODAL
+        // OPEN CONVERT POPUP MODAL (Fixed: Only EXCHANGE button triggers this)
         function openConvertModal() {
             document.getElementById('modal').classList.remove('hidden');
             document.getElementById('modal-title').innerText = "CONVERT COINS TO DIAMONDS";
@@ -889,7 +889,7 @@
 
                     <div>
                         <label class='text-gray-300 font-bold block mb-1.5 uppercase tracking-wider text-[11px]'>Enter Diamond Amount (1 - 1000)</label>
-                        <input type='number' id='deposit-amount-input' min='1' max='1000' placeholder='e.g. 50' oninput='calculateBonus(this.value)' class='w-full bg-black/50 border border-white/10 p-3.5 rounded-2xl font-black text-cyan-400 focus:outline-none focus:border-sky-500 transition'>
+                        <input type='number' id='deposit-amount-input' min='1' max='1000' placeholder='e.g. 50' oninput='updateBonusDisplay(this.value)' class='w-full bg-black/50 border border-white/10 p-3.5 rounded-2xl font-black text-cyan-400 focus:outline-none focus:border-sky-500 transition'>
                     </div>
                     <div id='bonus-calc-box' class='hidden text-[11px] font-bold text-emerald-400 bg-emerald-500/10 p-2.5 rounded-xl border border-emerald-500/30 text-center'></div>
                     <p id='deposit-err' class='text-rose-400 text-[11px] h-4 font-semibold'></p>
@@ -901,11 +901,11 @@
             const input = document.getElementById('deposit-amount-input');
             if (input) {
                 input.value = amount;
-                calculateBonus(amount);
+                updateBonusDisplay(amount);
             }
         }
 
-        function calculateBonus(val) {
+        function updateBonusDisplay(val) {
             let amt = parseInt(val) || 0;
             let bonus = 0;
             if(amt >= 500) bonus = 50;
@@ -914,11 +914,13 @@
             else if(amt >= 50) bonus = 3;
 
             const box = document.getElementById('bonus-calc-box');
-            if(bonus > 0) {
-                box.classList.remove('hidden');
-                box.innerHTML = `🎁 Bonus Applied: +${bonus} Free Diamonds! Total you will get: <b>${amt + bonus} Diamonds</b>`;
-            } else {
-                box.classList.add('hidden');
+            if(box) {
+                if(bonus > 0) {
+                    box.classList.remove('hidden');
+                    box.innerHTML = `🎁 Bonus Applied: +${bonus} Free Diamonds! Total you will get: <b>${amt + bonus} Diamonds</b>`;
+                } else {
+                    box.classList.add('hidden');
+                }
             }
         }
 
@@ -967,6 +969,11 @@
                     
                     <button onclick="submitDepositProof('${username}', ${totalDiamonds})" class='w-full py-4 shiny-green-btn rounded-2xl font-black text-xs text-white shadow-xl transition active:scale-95 tracking-wide'>SEND PROOF</button>
                 </div>`;
+        }
+
+        function copyUpiId() {
+            navigator.clipboard.writeText(document.getElementById('upi-id-text').innerText);
+            alert("UPI ID Copied Successfully!");
         }
 
         function submitDepositProof(uname, totalDias) {
