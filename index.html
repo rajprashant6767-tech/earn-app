@@ -121,6 +121,7 @@
                     </button>
                 </div>
 
+                <!-- COINS & DIAMONDS WITH CLEAN EXCHANGE BUTTON -->
                 <div class="grid grid-cols-2 gap-4">
                     <div onclick="openHistory('coins')" class="cyber-card p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-amber-400/40 transition group">
                         <p class="text-xl font-black text-amber-400 group-hover:scale-105 transition origin-left flex items-center gap-2">
@@ -139,46 +140,20 @@
                         </p>
                     </div>
                 </div>
-            </div>
 
-            <!-- COIN TO DIAMOND CONVERSION BOX -->
-            <div class="cyber-card p-5 rounded-3xl space-y-4 border border-amber-500/30 bg-gradient-to-br from-amber-950/20 via-black/40 to-cyan-950/20 shadow-xl">
-                <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                    <div class="flex items-center gap-2">
-                        <span class="text-lg">🪙💎</span>
-                        <h2 class="text-xs font-black text-amber-400 uppercase tracking-wider">Convert Coins to Diamonds</h2>
+                <!-- COMPACT CONVERT / EXCHANGE BANNER (Jaise aapne mark kiya tha) -->
+                <div onclick="openConvertModal()" class="cyber-card p-4 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-950/40 via-black/50 to-cyan-950/30 cursor-pointer hover:border-amber-400 transition flex items-center justify-between group shadow-lg">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-base group-hover:scale-110 transition">
+                            🪙💎
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-black text-white uppercase tracking-wider">Convert Coins to Diamonds</h3>
+                            <p class="text-[10px] text-amber-300 font-semibold mt-0.5">Instant Exchange (120 Coins = 1 Diamond)</p>
+                        </div>
                     </div>
-                    <span class="text-[10px] bg-amber-500/10 text-amber-300 font-bold px-2.5 py-1 rounded-xl border border-amber-500/20">Instant Exchange</span>
-                </div>
-
-                <div class="grid grid-cols-3 gap-2.5">
-                    <div onclick="selectConvertPackage(120, 1)" id="conv-pkg-1" class="conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-amber-400 transition text-center group active:scale-95">
-                        <p class="text-amber-400 font-black text-xs">120 🪙</p>
-                        <p class="text-[10px] text-cyan-400 font-extrabold mt-1">➔ 1 💎</p>
-                    </div>
-                    <div onclick="selectConvertPackage(510, 5)" id="conv-pkg-2" class="conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-amber-400 transition text-center group active:scale-95">
-                        <p class="text-amber-400 font-black text-xs">510 🪙</p>
-                        <p class="text-[10px] text-cyan-400 font-extrabold mt-1">➔ 5 💎</p>
-                    </div>
-                    <div onclick="selectConvertPackage(1000, 10)" id="conv-pkg-3" class="conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-amber-400 transition text-center group active:scale-95">
-                        <p class="text-amber-400 font-black text-xs">1,000 🪙</p>
-                        <p class="text-[10px] text-cyan-400 font-extrabold mt-1">➔ 10 💎</p>
-                    </div>
-                </div>
-
-                <button onclick="executeConversion()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-500 rounded-2xl font-black text-xs text-black shadow-lg transition hover:brightness-110 active:scale-95 tracking-wide flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-rotate text-sm"></i> CONVERT NOW
-                </button>
-            </div>
-
-            <div class="cyber-card p-5 rounded-3xl flex items-center justify-between">
-                <div class="flex items-center gap-3.5">
-                    <div class="w-12 h-12 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 text-xl font-bold">
-                        <i class="fa-solid fa-bolt-lightning"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-xs font-black text-white uppercase tracking-wider">Elite VIP Status</h2>
-                        <p class="text-[10px] text-gray-400 mt-0.5">Fast automated deposits & secure payouts.</p>
+                    <div class="bg-gradient-to-r from-amber-500 to-yellow-500 text-black px-3.5 py-2 rounded-xl font-black text-xs shadow-md group-hover:brightness-110 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-rotate"></i> EXCHANGE
                     </div>
                 </div>
             </div>
@@ -543,7 +518,7 @@
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
 
             let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-            coinHistory.unshift({ title: `Referral Bonus (${enteredCode})`, amount: "+300 Coins", type: "earn", time: "Just now", status: "Success" });
+            coinHistory.unshift({ title: `Referral Bonus (${enteredCode})`, amount: "+300 🪙", type: "earn", time: "Just now", status: "Success" });
             localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
 
             localStorage.setItem('zylobet_ref_used', 'true');
@@ -610,14 +585,14 @@
                 localStorage.setItem('zylobet_coins', userCoins);
                 document.getElementById('user-coins').innerText = userCoins.toLocaleString();
                 let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-                coinHistory.unshift({ title: `Promo (${promoVal})`, amount: `+${foundPromo.rewardAmount} Coins`, type: "earn", time: "Just now", status: "Success" });
+                coinHistory.unshift({ title: `Promo (${promoVal})`, amount: `+${foundPromo.rewardAmount} 🪙`, type: "earn", time: "Just now", status: "Success" });
                 localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
             } else {
                 userGems += foundPromo.rewardAmount;
                 localStorage.setItem('zylobet_gems', userGems);
                 document.getElementById('user-gems').innerText = userGems;
                 let gemHistory = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
-                gemHistory.unshift({ title: `Promo (${promoVal})`, amount: `+${foundPromo.rewardAmount} Diamonds`, type: "earn", time: "Just now", status: "Success" });
+                gemHistory.unshift({ title: `Promo (${promoVal})`, amount: `+${foundPromo.rewardAmount} 💎`, type: "earn", time: "Just now", status: "Success" });
                 localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHistory));
             }
 
@@ -627,7 +602,7 @@
             localStorage.setItem('zylobet_user_redeemed_' + userId, JSON.stringify(userRedeemed));
 
             statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
-            statusMsg.innerText = `🎉 Promo Code Applied Successfully! +${foundPromo.rewardAmount} ${foundPromo.rewardType.toUpperCase()} added.`;
+            statusMsg.innerText = `🎉 Promo Code Applied Successfully! +${foundPromo.rewardAmount} Added.`;
             setTimeout(() => { statusMsg.innerText = ""; }, 3000);
             promoInput.value = '';
         }
@@ -639,7 +614,7 @@
             return match ? match[0] : detailsStr.replace(/[^a-zA-Z0-9@.]/g, '');
         }
 
-        // Copy Helper with clean text verification
+        // Copy Helper
         function copyTextToClipboard(text, label) {
             let cleanText = label === "UPI ID" ? extractUpi(text) : text;
             navigator.clipboard.writeText(cleanText).then(() => {
@@ -649,32 +624,61 @@
             });
         }
 
-        // SELECT CONVERT PACKAGE LOGIC
-        let selectedConvCoins = 0;
-        let selectedConvGems = 0;
+        // OPEN CONVERT POPUP MODAL
+        function openConvertModal() {
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('modal-title').innerText = "CONVERT COINS TO DIAMONDS";
+            document.getElementById('modal-content').innerHTML = `
+                <div class='space-y-4 text-xs'>
+                    <div class='bg-amber-500/10 border border-amber-500/30 p-3 rounded-2xl text-amber-300 font-bold text-center tracking-wide'>
+                        🪙 Select conversion package below:
+                    </div>
 
-        function selectConvertPackage(coins, gems) {
-            selectedConvCoins = coins;
-            selectedConvGems = gems;
-            document.querySelectorAll('.conv-card').forEach(c => c.classList.remove('border-amber-400', 'bg-amber-500/10'));
-            if(coins === 120) document.getElementById('conv-pkg-1').classList.add('border-amber-400', 'bg-amber-500/10');
-            if(coins === 510) document.getElementById('conv-pkg-2').classList.add('border-amber-400', 'bg-amber-500/10');
-            if(coins === 1000) document.getElementById('conv-pkg-3').classList.add('border-amber-400', 'bg-amber-500/10');
+                    <div class='grid grid-cols-3 gap-2.5'>
+                        <div onclick="selectModalConv(120, 1)" id='m-conv-1' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition active:scale-95'>
+                            <p class='text-amber-400 font-black text-xs'>120 🪙</p>
+                            <p class='text-[10px] text-cyan-400 font-extrabold mt-1'>➔ 1 💎</p>
+                        </div>
+                        <div onclick="selectModalConv(510, 5)" id='m-conv-2' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition active:scale-95'>
+                            <p class='text-amber-400 font-black text-xs'>510 🪙</p>
+                            <p class='text-[10px] text-cyan-400 font-extrabold mt-1'>➔ 5 💎</p>
+                        </div>
+                        <div onclick="selectModalConv(1000, 10)" id='m-conv-3' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition active:scale-95'>
+                            <p class='text-amber-400 font-black text-xs'>1,000 🪙</p>
+                            <p class='text-[10px] text-cyan-400 font-extrabold mt-1'>➔ 10 💎</p>
+                        </div>
+                    </div>
+
+                    <button onclick="executeModalConversion()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-500 rounded-2xl font-black text-xs text-black shadow-lg transition hover:brightness-110 active:scale-95 tracking-wide flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate text-sm"></i> CONVERT NOW
+                    </button>
+                </div>`;
         }
 
-        function executeConversion() {
-            if (!selectedConvCoins || !selectedConvGems) {
-                alert("❌ Please select a conversion package first!");
+        let modalConvCoins = 0;
+        let modalConvGems = 0;
+
+        function selectModalConv(coins, gems) {
+            modalConvCoins = coins;
+            modalConvGems = gems;
+            document.querySelectorAll('.m-conv-card').forEach(c => c.classList.remove('border-amber-400', 'bg-amber-500/10'));
+            if(coins === 120) document.getElementById('m-conv-1').classList.add('border-amber-400', 'bg-amber-500/10');
+            if(coins === 510) document.getElementById('m-conv-2').classList.add('border-amber-400', 'bg-amber-500/10');
+            if(coins === 1000) document.getElementById('m-conv-3').classList.add('border-amber-400', 'bg-amber-500/10');
+        }
+
+        function executeModalConversion() {
+            if (!modalConvCoins || !modalConvGems) {
+                alert("❌ Please select a package first!");
+                return;
+            }
+            if (userCoins < modalConvCoins) {
+                alert(`❌ Insufficient Coins! You need at least ${modalConvCoins} coins.`);
                 return;
             }
 
-            if (userCoins < selectedConvCoins) {
-                alert(`❌ Insufficient Coins! You need at least ${selectedConvCoins} coins.`);
-                return;
-            }
-
-            userCoins -= selectedConvCoins;
-            userGems += selectedConvGems;
+            userCoins -= modalConvCoins;
+            userGems += modalConvGems;
 
             localStorage.setItem('zylobet_coins', userCoins);
             localStorage.setItem('zylobet_gems', userGems);
@@ -683,17 +687,15 @@
             document.getElementById('user-gems').innerText = userGems;
 
             let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-            coinHistory.unshift({ title: `Converted to ${selectedConvGems} Diamonds`, amount: `-${selectedConvCoins} Coins`, type: "spend", time: "Just now", status: "Success" });
+            coinHistory.unshift({ title: `Converted to ${modalConvGems} 💎`, amount: `-${modalConvCoins} 🪙`, type: "spend", time: "Just now", status: "Success" });
             localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
 
             let gemHistory = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
-            gemHistory.unshift({ title: `Coin Conversion Exchange`, amount: `+${selectedConvGems} Diamonds`, type: "earn", time: "Just now", status: "Success" });
+            gemHistory.unshift({ title: `Coin Conversion Exchange`, amount: `+${modalConvGems} 💎`, type: "earn", time: "Just now", status: "Success" });
             localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHistory));
 
-            alert(`🎉 Successfully converted ${selectedConvCoins} Coins into ${selectedConvGems} Diamonds!`);
-            selectedConvCoins = 0;
-            selectedConvGems = 0;
-            document.querySelectorAll('.conv-card').forEach(c => c.classList.remove('border-amber-400', 'bg-amber-500/10'));
+            alert(`🎉 Successfully converted ${modalConvCoins} Coins into ${modalConvGems} Diamonds!`);
+            closeModal();
         }
 
         function openHistory(type) {
@@ -710,7 +712,7 @@
                     html += `
                         <div class='cyber-card p-4 rounded-2xl border border-white/5 flex justify-between items-center'>
                             <div>
-                                <p class='font-black ${colorClass} text-sm flex items-center gap-1.5'>${item.amount} 🪙</p>
+                                <p class='font-black ${colorClass} text-sm flex items-center gap-1.5'>${item.amount}</p>
                                 <p class='text-[10px] text-gray-300 font-bold mt-1'>Source: ${item.title}</p>
                             </div>
                             <span class='text-[10px] text-gray-400 font-bold'>${item.time}</span>
@@ -757,7 +759,7 @@
                     html += `
                         <div class='cyber-card p-4 rounded-2xl border border-white/5 flex justify-between items-center'>
                             <div>
-                                <p class='font-black text-cyan-400 text-sm flex items-center gap-1.5'>${item.amount} 💎</p>
+                                <p class='font-black text-cyan-400 text-sm flex items-center gap-1.5'>${item.amount}</p>
                                 <p class='text-[10px] text-gray-300 font-bold mt-1'>Source: ${item.title}</p>
                             </div>
                             <span class='text-[10px] text-emerald-400 font-bold'>Success</span>
