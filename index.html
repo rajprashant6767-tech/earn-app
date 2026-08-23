@@ -657,7 +657,7 @@
             });
         }
 
-        // OPEN CONVERT POPUP MODAL (Triggered strictly by EXCHANGE button)
+        // OPEN CONVERT POPUP MODAL
         function openConvertModal() {
             document.getElementById('modal').classList.remove('hidden');
             document.getElementById('modal-title').innerText = "CONVERT COINS TO DIAMONDS";
@@ -959,8 +959,8 @@
                     
                     <div class='flex justify-center my-2'>
                         <div class='bg-white p-3 rounded-2xl shadow-xl border border-white/25 inline-block'>
-                            <!-- DYNAMIC QR CODE WITH EXACT AMOUNT -->
-                            <img src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}&cu=INR' alt='UPI QR Code' class='w-36 h-36 object-contain rounded-xl'>
+                            <!-- DYNAMIC QR CODE WITH EXACT AMOUNT AND NOTE -->
+                            <img src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}&tn=ZyloBet%20Deposit&cu=INR' alt='UPI QR Code' class='w-36 h-36 object-contain rounded-xl'>
                         </div>
                     </div>
                     <p class='text-[10px] text-gray-400'>Scan & Pay exact ₹${amt} via GPay / PhonePe / Paytm</p>
