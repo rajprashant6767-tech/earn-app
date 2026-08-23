@@ -742,7 +742,6 @@
                 extraDetails = ` (UPI: ${upiId})`;
             }
 
-            // FIXED: Deduct coins from user balance immediately upon request
             userCoins -= selectedWCoins;
             localStorage.setItem('zylobet_coins', userCoins);
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
@@ -767,7 +766,6 @@
             withdrawHistory.unshift(newReq);
             localStorage.setItem('zylobet_withdraw_history', JSON.stringify(withdrawHistory));
 
-            // Add to coin history spend log
             let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
             coinHistory.unshift({
                 id: reqId,
@@ -786,7 +784,7 @@
             if(method === 'UPI') document.getElementById('w-upi-id').value = '';
         }
 
-        // DEPOSIT MODAL WITH BONUS OFFERS DISPLAY (200 diamonds pe 18 free)
+        // DEPOSIT MODAL WITH INTERACTIVE CLICKABLE OFFERS
         function openDepositModal() {
             document.getElementById('modal').classList.remove('hidden');
             document.getElementById('modal-title').innerText = "DEPOSIT DIAMONDS & GET BONUS";
@@ -796,16 +794,16 @@
                         <span class='ff-diamond' style='width:24px;height:24px;font-size:10px;'><i class='fa-solid fa-gem'></i></span> 1 Diamond = ₹1 Rs
                     </div>
 
-                    <!-- BONUS OFFERS BANNER -->
+                    <!-- INTERACTIVE BONUS OFFERS (Clickable) -->
                     <div class='cyber-card p-3.5 rounded-2xl border border-amber-500/30 bg-amber-500/5 space-y-2'>
                         <p class='text-amber-400 font-black uppercase text-[11px] tracking-wider flex items-center gap-1.5'>
-                            <i class='fa-solid fa-fire text-rose-500 animate-bounce'></i> Special Deposit Offers:
+                            <i class='fa-solid fa-fire text-rose-500 animate-bounce'></i> Click an Offer to Select:
                         </p>
-                        <div class='grid grid-cols-2 gap-2 text-[10px] font-bold text-gray-300'>
-                            <div class='bg-black/40 p-2 rounded-xl border border-white/5'>💎 50 Dias ➔ <span class='text-emerald-400'>+3 Free</span></div>
-                            <div class='bg-black/40 p-2 rounded-xl border border-white/5'>💎 100 Dias ➔ <span class='text-emerald-400'>+8 Free</span></div>
-                            <div class='bg-black/40 p-2 rounded-xl border border-white/5'>💎 200 Dias ➔ <span class='text-emerald-400'>+18 Free</span></div>
-                            <div class='bg-black/40 p-2 rounded-xl border border-white/5'>💎 500 Dias ➔ <span class='text-emerald-400'>+50 Free</span></div>
+                        <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300'>
+                            <div onclick="selectDepositOffer(50)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>💎 50 Dias ➔ <span class='text-emerald-400 font-black'>+3 Free</span></div>
+                            <div onclick="selectDepositOffer(100)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>💎 100 Dias ➔ <span class='text-emerald-400 font-black'>+8 Free</span></div>
+                            <div onclick="selectDepositOffer(200)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>💎 200 Dias ➔ <span class='text-emerald-400 font-black'>+18 Free</span></div>
+                            <div onclick="selectDepositOffer(500)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer hover:border-amber-400 text-center transition'>💎 500 Dias ➔ <span class='text-emerald-400 font-black'>+50 Free</span></div>
                         </div>
                     </div>
 
@@ -819,11 +817,20 @@
                 </div>`;
         }
 
+        // Auto-select offer when clicked
+        function selectDepositOffer(amount) {
+            const input = document.getElementById('deposit-amount-input');
+            if (input) {
+                input.value = amount;
+                calculateBonus(amount);
+            }
+        }
+
         function calculateBonus(val) {
             let amt = parseInt(val) || 0;
             let bonus = 0;
             if(amt >= 500) bonus = 50;
-            else if(amt >= 200) bonus = 18; // Updated to 18 free
+            else if(amt >= 200) bonus = 18;
             else if(amt >= 100) bonus = 8;
             else if(amt >= 50) bonus = 3;
 
@@ -1029,7 +1036,6 @@
                 localStorage.setItem('zylobet_coins', userCoins);
                 document.getElementById('user-coins').innerText = userCoins.toLocaleString();
                 
-                // Refund log in coin history
                 let coinHistory = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
                 coinHistory.unshift({ title: "Withdrawal Rejected & Refunded", amount: `+${req.amount} Coins`, type: "earn", time: "Just now", status: "Success" });
                 localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHistory));
