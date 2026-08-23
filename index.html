@@ -172,7 +172,7 @@
                     </div>
                 </div>
 
-                <!-- NON-CLICKABLE CARD WITH EXCLUSIVE "EXCHANGE" BUTTON -->
+                <!-- NON-CLICKABLE CARD WITH EXCLUSIVE EXCHANGE BUTTON -->
                 <div class="cyber-card p-4 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-950/40 via-black/50 to-cyan-950/30 flex items-center justify-between shadow-lg">
                     <div class="flex items-center gap-3.5">
                         <div class="flex items-center gap-1.5 bg-amber-500/20 px-3 py-2 rounded-xl border border-amber-500/30 shrink-0">
@@ -185,7 +185,6 @@
                             <p class="text-[10px] text-amber-300 font-semibold mt-0.5">Exchange your coins instantly</p>
                         </div>
                     </div>
-                    <!-- ONLY THIS BUTTON OPENS THE CONVERSION MODAL -->
                     <button onclick="openConvertModal()" class="bg-gradient-to-r from-amber-500 to-yellow-500 text-black px-4 py-2.5 rounded-xl font-black text-xs shadow-md hover:brightness-110 active:scale-95 transition flex items-center gap-1.5 shrink-0 cursor-pointer">
                         <i class="fa-solid fa-rotate"></i> EXCHANGE
                     </button>
@@ -658,7 +657,7 @@
             });
         }
 
-        // OPEN CONVERT POPUP MODAL
+        // OPEN CONVERT POPUP MODAL (Triggered strictly by EXCHANGE button)
         function openConvertModal() {
             document.getElementById('modal').classList.remove('hidden');
             document.getElementById('modal-title').innerText = "CONVERT COINS TO DIAMONDS";
@@ -960,10 +959,11 @@
                     
                     <div class='flex justify-center my-2'>
                         <div class='bg-white p-3 rounded-2xl shadow-xl border border-white/25 inline-block'>
+                            <!-- DYNAMIC QR CODE WITH EXACT AMOUNT -->
                             <img src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}&cu=INR' alt='UPI QR Code' class='w-36 h-36 object-contain rounded-xl'>
                         </div>
                     </div>
-                    <p class='text-[10px] text-gray-400'>Scan & Pay ₹${amt} via GPay / PhonePe / Paytm</p>
+                    <p class='text-[10px] text-gray-400'>Scan & Pay exact ₹${amt} via GPay / PhonePe / Paytm</p>
 
                     <p class='text-gray-400 text-[11px] text-left font-semibold'>Payment screenshot upload karein:</p>
                     <input type='file' id='payment-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300'>
