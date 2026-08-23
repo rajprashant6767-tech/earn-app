@@ -593,9 +593,9 @@
                         <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span> Select conversion package:
                     </div>
                     <div class='grid grid-cols-3 gap-2.5'>
-                        <div onclick="selectModalConv(120, 1)" id='m-conv-1' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>120 🪙 <br><span class="text-cyan-400">➔ 1 💎</span></div>
-                        <div onclick="selectModalConv(510, 5)" id='m-conv-2' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>510 🪙 <br><span class="text-cyan-400">➔ 5 💎</span></div>
-                        <div onclick="selectModalConv(1000, 10)" id='m-conv-3' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>1k 🪙 <br><span class="text-cyan-400">➔ 10 💎</span></div>
+                        <div onclick="selectModalConv(120, 1)" id='m-conv-1' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>120 <span class="ff-gold-coin" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-coins"></i></span> <br><span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 1 <span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span></span></div>
+                        <div onclick="selectModalConv(510, 5)" id='m-conv-2' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>510 <span class="ff-gold-coin" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-coins"></i></span> <br><span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 5 <span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span></span></div>
+                        <div onclick="selectModalConv(1000, 10)" id='m-conv-3' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>1k <span class="ff-gold-coin" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-coins"></i></span> <br><span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 10 <span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span></span></div>
                     </div>
                     <button onclick="executeModalConversion()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-2xl font-black text-xs text-black cursor-pointer shadow-lg">CONVERT NOW</button>
                 </div>`;
@@ -690,14 +690,17 @@
                 </div>`;
         }
 
-        // DIRECT QR / UPI DEEP-LINK HANDLER (AVOIDS 404 NGINX ERRORS)
+        // SAFE WEBVIEW UPI DEEP-LINK HANDLER (NO 404 OR SCHEME ERRORS)
         function openUpiApp(amt) {
             const upiString = `upi://pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}&tn=ZyloBet%20Deposit&cu=INR`;
             if (window.Telegram?.WebApp && typeof tg.openTelegramLink === 'function') {
-                tg.openTelegramLink(upiString);
-            } else {
-                window.location.href = upiString;
+                try {
+                    tg.openTelegramLink(upiString);
+                    return;
+                } catch(e) {}
             }
+            // Standard safe fallback
+            window.location.href = upiString;
         }
 
         // AUTOMATED GMAIL VERIFICATION API CALL HANDLER
@@ -901,8 +904,9 @@
                 activeListHTML += "<p class='text-[11px] text-gray-500'>No promo codes created yet.</p>";
             } else {
                 promos.forEach((p, index) => {
+                    let rewardIcon = p.rewardType === 'coins' ? `<span class="ff-gold-coin" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-coins"></i></span>` : `<span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span>`;
                     activeListHTML += `<div class='cyber-card p-3 rounded-xl border border-white/5 flex justify-between items-center text-xs'>
-                        <div><span class='font-black text-rose-400'>${p.code}</span> <span class='text-[10px] text-gray-300'>(${p.rewardAmount} ${p.rewardType})</span><br><span class='text-[9px] text-emerald-400'>Status: Active</span></div>
+                        <div><span class='font-black text-rose-400'>${p.code}</span> <span class='text-[10px] text-gray-300 flex items-center gap-1 mt-0.5'>(${p.rewardAmount} ${rewardIcon})</span></div>
                         <div class='flex gap-2 items-center'>
                             <span class='text-[10px] text-gray-400 font-bold'>${p.usedCount}/${p.maxUsers}</span>
                             <button onclick="deletePromoCode(${index})" class='px-2.5 py-1 bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg text-[10px] font-bold cursor-pointer'>Deactivate</button>
