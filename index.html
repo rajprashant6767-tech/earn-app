@@ -632,10 +632,18 @@
             promoInput.value = '';
         }
 
-        // Helper to copy text with alert confirmation
+        // Smart Helper to extract clean UPI ID
+        function extractUpi(detailsStr) {
+            if (!detailsStr) return "";
+            let match = detailsStr.match(/[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}/);
+            return match ? match[0] : detailsStr.replace(/[^a-zA-Z0-9@.]/g, '');
+        }
+
+        // Copy Helper with clean text verification
         function copyTextToClipboard(text, label) {
-            navigator.clipboard.writeText(text).then(() => {
-                alert(`✅ ${label} Copied: ${text}`);
+            let cleanText = label === "UPI ID" ? extractUpi(text) : text;
+            navigator.clipboard.writeText(cleanText).then(() => {
+                alert(`✅ ${label} Copied: ${cleanText}`);
             }).catch(err => {
                 alert("❌ Failed to copy!");
             });
@@ -673,8 +681,6 @@
                 let html = "<div class='space-y-3'>";
                 withdraws.forEach(item => {
                     let statusColor = item.status === 'Pending' ? 'text-amber-400 bg-amber-500/10 border-amber-500/30' : (item.status === 'Rejected' ? 'text-rose-400 bg-rose-500/10 border-rose-500/30' : 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30');
-                    
-                    // Added COPY button next to redeem code
                     let redeemCodeBox = item.redeemCode ? 
                         `<div class='mt-2.5 p-3 rounded-xl bg-sky-500/10 border border-sky-500/30 flex justify-between items-center text-xs font-mono text-sky-300'>
                             <span>🔑 Code: <b class="text-white select-all text-sm">${item.redeemCode}</b></span>
@@ -767,21 +773,54 @@
             if(method === 'UPI') document.getElementById('w-upi-id').value = '';
         }
 
+        // DEPOSIT MODAL WITH BONUS OFFERS DISPLAY
         function openDepositModal() {
             document.getElementById('modal').classList.remove('hidden');
-            document.getElementById('modal-title').innerText = "DEPOSIT DIAMONDS";
+            document.getElementById('modal-title').innerText = "DEPOSIT DIAMONDS & GET BONUS";
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs'>
                     <div class='bg-cyan-500/10 border border-cyan-500/30 p-3 rounded-2xl text-cyan-300 font-bold text-center tracking-wide flex items-center justify-center gap-2'>
                         <span class='ff-diamond' style='width:24px;height:24px;font-size:10px;'><i class='fa-solid fa-gem'></i></span> 1 Diamond = ₹1 Rs
                     </div>
+
+                    <!-- BONUS OFFERS BANNER -->
+                    <div class='cyber-card p-3.5 rounded-2xl border border-amber-500/30 bg-amber-500/5 space-y-2'>
+                        <p class='text-amber-400 font-black uppercase text-[11px] tracking-wider flex items-center gap-1.5'>
+                            <i class='fa-solid fa-fire text-rose-500 animate-bounce'></i> Special Deposit Offers:
+                        </p>
+                        <div class='grid grid-cols-2 gap-2 text-[10px] font-bold text-gray-300'>
+                            <div class='bg-black/40 p-2 rounded-xl border border-white/5'>💎 50 Dias ➔ <span class='text-emerald-400'>+3 Free</span></div>
+                            <div class='bg-black/40 p-2 rounded-xl border border-white/5'>💎 100 Dias ➔ <span class='text-emerald-400'>+8 Free</span></div>
+                            <div class='bg-black/40 p-2 rounded-xl border border-white/5'>💎 200 Dias ➔ <span class='text-emerald-400'>+15 Free</span></div>
+                            <div class='bg-black/40 p-2 rounded-xl border border-white/5'>💎 500 Dias ➔ <span class='text-emerald-400'>+50 Free</span></div>
+                        </div>
+                    </div>
+
                     <div>
                         <label class='text-gray-300 font-bold block mb-1.5 uppercase tracking-wider text-[11px]'>Enter Diamond Amount (1 - 1000)</label>
-                        <input type='number' id='deposit-amount-input' min='1' max='1000' placeholder='e.g. 100' class='w-full bg-black/50 border border-white/10 p-3.5 rounded-2xl font-black text-cyan-400 focus:outline-none focus:border-sky-500 transition'>
+                        <input type='number' id='deposit-amount-input' min='1' max='1000' placeholder='e.g. 50' oninput='calculateBonus(this.value)' class='w-full bg-black/50 border border-white/10 p-3.5 rounded-2xl font-black text-cyan-400 focus:outline-none focus:border-sky-500 transition'>
                     </div>
+                    <div id='bonus-calc-box' class='hidden text-[11px] font-bold text-emerald-400 bg-emerald-500/10 p-2.5 rounded-xl border border-emerald-500/30 text-center'></div>
                     <p id='deposit-err' class='text-rose-400 text-[11px] h-4 font-semibold'></p>
                     <button onclick='proceedToPayment()' class='w-full py-4 shiny-green-btn rounded-2xl font-black text-xs text-white shadow-xl transition active:scale-95 tracking-wide'>NEXT</button>
                 </div>`;
+        }
+
+        function calculateBonus(val) {
+            let amt = parseInt(val) || 0;
+            let bonus = 0;
+            if(amt >= 500) bonus = 50;
+            else if(amt >= 200) bonus = 15;
+            else if(amt >= 100) bonus = 8;
+            else if(amt >= 50) bonus = 3;
+
+            const box = document.getElementById('bonus-calc-box');
+            if(bonus > 0) {
+                box.classList.remove('hidden');
+                box.innerHTML = `🎁 Bonus Applied: +${bonus} Free Diamonds! Total you will get: <b>${amt + bonus} Diamonds</b>`;
+            } else {
+                box.classList.add('hidden');
+            }
         }
 
         function proceedToPayment() {
@@ -794,7 +833,15 @@
                 return;
             }
 
-            document.getElementById('modal-title').innerText = `PAYMENT FOR ${amt} DIAMONDS (₹${amt})`;
+            let bonus = 0;
+            if(amt >= 500) bonus = 50;
+            else if(amt >= 200) bonus = 15;
+            else if(amt >= 100) bonus = 8;
+            else if(amt >= 50) bonus = 3;
+
+            let totalDiamonds = amt + bonus;
+
+            document.getElementById('modal-title').innerText = `PAY ₹${amt} FOR ${totalDiamonds} DIAMONDS`;
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs text-center max-h-[70vh] overflow-y-auto px-1'>
                     <div class='cyber-card border border-white/10 p-3.5 rounded-2xl space-y-1 text-left'>
@@ -822,7 +869,7 @@
                     <input type='file' id='payment-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300'>
                     <p id='proof-err' class='text-rose-400 text-[11px] h-4 font-semibold text-left'></p>
                     
-                    <button onclick="submitDepositProof('${username}', ${amt})" class='w-full py-4 shiny-green-btn rounded-2xl font-black text-xs text-white shadow-xl transition active:scale-95 tracking-wide'>SEND PROOF</button>
+                    <button onclick="submitDepositProof('${username}', ${totalDiamonds})" class='w-full py-4 shiny-green-btn rounded-2xl font-black text-xs text-white shadow-xl transition active:scale-95 tracking-wide'>SEND PROOF</button>
                 </div>`;
         }
 
@@ -831,15 +878,15 @@
             alert("UPI ID Copied Successfully!");
         }
 
-        function submitDepositProof(uname, amt) {
+        function submitDepositProof(uname, totalDias) {
             const fileInput = document.getElementById('payment-proof-file');
             if(fileInput.files.length === 0) { alert("❌ Please select screenshot!"); return; }
             const reader = new FileReader();
             reader.onload = function(e) {
                 let requests = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
-                requests.push({ id: Date.now(), username: "@" + uname, amount: amt, proof: e.target.result, time: "Just now" });
+                requests.push({ id: Date.now(), username: "@" + uname, amount: totalDias, proof: e.target.result, time: "Just now" });
                 localStorage.setItem('zylobet_deposit_requests', JSON.stringify(requests));
-                alert(`Deposit request for ${amt} Diamonds submitted!`);
+                alert(`Deposit request for ${totalDias} Diamonds submitted!`);
                 closeModal();
             };
             reader.readAsDataURL(fileInput.files[0]);
@@ -884,7 +931,7 @@
                 reqs.forEach(r => {
                     container.innerHTML += `
                         <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-3 text-xs shadow-lg'>
-                            <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-cyan-400 text-sm'>${r.amount} Diamonds</span></div>
+                            <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-cyan-400 text-sm'>${r.amount} Diamonds (Inc. Bonus)</span></div>
                             <button onclick="document.getElementById('modal-img').src='${r.proof}'; document.getElementById('img-modal').classList.remove('hidden');" class='w-full bg-white/5 hover:bg-white/10 py-2 rounded-xl font-bold'>View Proof</button>
                             <div class='grid grid-cols-2 gap-2'>
                                 <button onclick="handleAdmDep(${r.id}, 'approve', ${r.amount})" class='shiny-green-btn py-2.5 rounded-xl font-black text-white'>APPROVE</button>
@@ -903,11 +950,13 @@
                     let redeemInputHTML = (r.method === 'Amazon Gift Card' || r.method === 'Play Store Gift Card') ? 
                         `<input type='text' id='redeem-code-${r.id}' placeholder='Enter Redeem Code' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-xl text-sky-400 font-bold uppercase'>` : '';
 
-                    // Added COPY button for UPI ID in Admin Panel so admin can easily copy user's UPI or details if needed
+                    let cleanUpi = extractUpi(r.details || '');
                     let detailsBox = r.details ? 
                         `<div class='flex justify-between items-center bg-black/40 p-2.5 rounded-xl border border-white/10 mt-1'>
                             <span class='text-sky-300 font-mono select-all text-xs'>${r.details}</span>
-                            <button onclick='copyTextToClipboard("${r.details.replace(/[^a-zA-Z0-9@.]/g, '')}", "User Details")' class='bg-sky-500/20 hover:bg-sky-500/40 text-sky-300 px-2.5 py-1 rounded-lg font-bold text-[10px]'>COPY</button>
+                            <button onclick='copyTextToClipboard("${cleanUpi}", "UPI ID")' class='bg-sky-500/20 hover:bg-sky-500/40 text-sky-300 px-3 py-1 rounded-lg font-bold text-[11px]'>
+                                <i class='fa-regular fa-copy mr-1'></i> COPY UPI
+                            </button>
                         </div>` : '';
 
                     container.innerHTML += `
@@ -933,7 +982,7 @@
                 document.getElementById('user-gems').innerText = userGems;
 
                 let gemHistory = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
-                gemHistory.unshift({ title: "Approved Deposit", amount: `+${amt} Diamonds`, type: "earn", time: "Just now" });
+                gemHistory.unshift({ title: "Approved Deposit (Inc. Bonus)", amount: `+${amt} Diamonds`, type: "earn", time: "Just now" });
                 localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHistory));
                 alert(`Approved! ${amt} Diamonds added.`);
             } else {
