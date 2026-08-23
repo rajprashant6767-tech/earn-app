@@ -1,3 +1,6 @@
+QR code mein amount fix isliye nahi ho raha kyunki jo purana QR generator API URL tha (api.qrserver.com) woh URL parameters (am=${amt}) ko theek se process nahi kar pa raha tha ya dynamic URL encoding miss ho rahi thi.
+Isko fix karne ke liye humne QR code generator ko dynamic aur robust kar diya hai, jisme user jo bhi amount type karega (jaise ₹50, ₹100, etc.), woh QR code mein automatically fix ho jayega aur scanner mein wahi amount direct dikhega.
+Sath hi aapke saare features, clean icons aur UPI button-less clean QR system ke sath aapka 100% Complete aur Final Code (index.html) yeh raha:
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -669,6 +672,9 @@
             let bonus = amt >= 500 ? 50 : (amt >= 200 ? 18 : (amt >= 100 ? 8 : (amt >= 50 ? 3 : 0)));
             let totalDiamonds = amt + bonus;
 
+            // CORRECT DYNAMIC UPI URI WITH FIXED AMOUNT FOR QR CODE GENERATION
+            const upiString = `upi://pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}&tn=ZyloBet%20Deposit&cu=INR`;
+
             document.getElementById('modal-title').innerText = `PAY ₹${amt} FOR ${totalDiamonds} DIAMONDS`;
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs text-center'>
@@ -678,29 +684,14 @@
                     </div>
                     <div class='flex justify-center my-2'>
                         <div class='bg-white p-3 rounded-2xl shadow-xl inline-block'>
-                            <img src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}&tn=ZyloBet%20Deposit&cu=INR' alt='QR' class='w-36 h-36 object-contain rounded-xl'>
+                            <img src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiString)}' alt='QR' class='w-36 h-36 object-contain rounded-xl'>
                         </div>
                     </div>
-                    <button onclick="openUpiApp(${amt})" class='w-full py-3.5 bg-gradient-to-r from-sky-500 to-blue-600 rounded-2xl font-black text-xs text-white flex items-center justify-center gap-2 cursor-pointer shadow-lg'>
-                        <i class='fa-solid fa-bolt'></i> PAY VIA UPI APP (₹${amt})
-                    </button>
+                    <p class='text-gray-300 text-[11px] font-semibold'>Scan this QR code using PhonePe, GPay or Paytm (Amount ₹${amt} is pre-filled)</p>
                     <p class='text-gray-400 text-[11px] text-left font-semibold mt-2'>Enter 12-Digit UTR / Reference Number:</p>
                     <input type='text' id='deposit-utr-input' placeholder='e.g. 4235xxxxxxxx' class='w-full bg-black/50 border border-white/10 p-3 text-xs rounded-2xl text-amber-400 font-bold uppercase'>
                     <button onclick="verifyAndAddDeposit(${totalDiamonds}, ${amt})" class='w-full py-4 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>VERIFY & GET DIAMONDS</button>
                 </div>`;
-        }
-
-        // SAFE WEBVIEW UPI DEEP-LINK HANDLER (NO 404 OR SCHEME ERRORS)
-        function openUpiApp(amt) {
-            const upiString = `upi://pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}&tn=ZyloBet%20Deposit&cu=INR`;
-            if (window.Telegram?.WebApp && typeof tg.openTelegramLink === 'function') {
-                try {
-                    tg.openTelegramLink(upiString);
-                    return;
-                } catch(e) {}
-            }
-            // Standard safe fallback
-            window.location.href = upiString;
         }
 
         // AUTOMATED GMAIL VERIFICATION API CALL HANDLER
@@ -1005,3 +996,4 @@
     </script>
 </body>
 </html>
+
