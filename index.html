@@ -593,9 +593,9 @@
                         <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span> Select conversion package:
                     </div>
                     <div class='grid grid-cols-3 gap-2.5'>
-                        <div onclick="selectModalConv(120, 1)" id='m-conv-1' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>120 <span class="ff-gold-coin" style="width:14px;height:14px;font-size:5px;"><i class="fa-solid fa-coins"></i></span> <br><span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 1 <span class="ff-diamond" style="width:14px;height:14px;font-size:5px;"><i class="fa-solid fa-gem"></i></span></span></div>
-                        <div onclick="selectModalConv(510, 5)" id='m-conv-2' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>510 <span class="ff-gold-coin" style="width:14px;height:14px;font-size:5px;"><i class="fa-solid fa-coins"></i></span> <br><span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 5 <span class="ff-diamond" style="width:14px;height:14px;font-size:5px;"><i class="fa-solid fa-gem"></i></span></span></div>
-                        <div onclick="selectModalConv(1000, 10)" id='m-conv-3' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>1k <span class="ff-gold-coin" style="width:14px;height:14px;font-size:5px;"><i class="fa-solid fa-coins"></i></span> <br><span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 10 <span class="ff-diamond" style="width:14px;height:14px;font-size:5px;"><i class="fa-solid fa-gem"></i></span></span></div>
+                        <div onclick="selectModalConv(120, 1)" id='m-conv-1' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>120 🪙 <br><span class="text-cyan-400">➔ 1 💎</span></div>
+                        <div onclick="selectModalConv(510, 5)" id='m-conv-2' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>510 🪙 <br><span class="text-cyan-400">➔ 5 💎</span></div>
+                        <div onclick="selectModalConv(1000, 10)" id='m-conv-3' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>1k 🪙 <br><span class="text-cyan-400">➔ 10 💎</span></div>
                     </div>
                     <button onclick="executeModalConversion()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-2xl font-black text-xs text-black cursor-pointer shadow-lg">CONVERT NOW</button>
                 </div>`;
@@ -690,13 +690,13 @@
                 </div>`;
         }
 
-        // STABLE PAYMENT GATEWAY REDIRECT TO PREVENT 404 & ERR_UNKNOWN_URL_SCHEME
+        // DIRECT QR / UPI DEEP-LINK HANDLER (AVOIDS 404 NGINX ERRORS)
         function openUpiApp(amt) {
-            const upiWebLink = `https://mercury.phonepe.com/pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}&cu=INR`;
-            if (window.Telegram?.WebApp) {
-                tg.openLink(upiWebLink);
+            const upiString = `upi://pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}&tn=ZyloBet%20Deposit&cu=INR`;
+            if (window.Telegram?.WebApp && typeof tg.openTelegramLink === 'function') {
+                tg.openTelegramLink(upiString);
             } else {
-                window.open(upiWebLink, '_blank');
+                window.location.href = upiString;
             }
         }
 
@@ -901,13 +901,11 @@
                 activeListHTML += "<p class='text-[11px] text-gray-500'>No promo codes created yet.</p>";
             } else {
                 promos.forEach((p, index) => {
-                    let statusColor = p.active ? 'text-emerald-400' : 'text-rose-400';
-                    let toggleText = p.active ? 'Deactivate' : 'Activate';
                     activeListHTML += `<div class='cyber-card p-3 rounded-xl border border-white/5 flex justify-between items-center text-xs'>
-                        <div><span class='font-black text-rose-400'>${p.code}</span> <span class='text-[10px] text-gray-300'>(${p.rewardAmount} ${p.rewardType})</span><br><span class='text-[9px] ${statusColor}'>Status: ${p.active ? 'Active' : 'Deactivated'}</span></div>
+                        <div><span class='font-black text-rose-400'>${p.code}</span> <span class='text-[10px] text-gray-300'>(${p.rewardAmount} ${p.rewardType})</span><br><span class='text-[9px] text-emerald-400'>Status: Active</span></div>
                         <div class='flex gap-2 items-center'>
                             <span class='text-[10px] text-gray-400 font-bold'>${p.usedCount}/${p.maxUsers}</span>
-                            <button onclick="togglePromoStatus(${index})" class='px-2.5 py-1 rounded-lg text-[10px] font-bold ${p.active ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'} cursor-pointer'>${toggleText}</button>
+                            <button onclick="deletePromoCode(${index})" class='px-2.5 py-1 bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg text-[10px] font-bold cursor-pointer'>Deactivate</button>
                         </div>
                     </div>`;
                 });
@@ -949,10 +947,9 @@
                 </div>`;
         }
 
-        function togglePromoStatus(index) {
+        function deletePromoCode(index) {
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
             if(promos[index]) {
-                // Deactivate means permanently delete the promo code as requested
                 promos.splice(index, 1);
                 localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
                 loadAdminPromoManager();
@@ -975,8 +972,10 @@
             if(!codeVal) { alert("❌ Please enter a promo code name!"); return; }
 
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
-            if(promos.some(p => p.code === codeVal)) {
-                alert("❌ This promo code already exists!");
+            let usedHistory = JSON.parse(localStorage.getItem('zylobet_global_promo_history')) || [];
+            
+            if(promos.some(p => p.code === codeVal) || usedHistory.includes(codeVal)) {
+                alert("❌ This promo code has already been created before and cannot be reused!");
                 return;
             }
 
@@ -992,7 +991,10 @@
                 active: true
             });
 
+            usedHistory.push(codeVal);
             localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
+            localStorage.setItem('zylobet_global_promo_history', JSON.stringify(usedHistory));
+
             alert(`🎉 Promo Code '${codeVal}' Created Successfully!`);
             loadAdminPromoManager();
         }
