@@ -593,9 +593,9 @@
                         <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span> Select conversion package:
                     </div>
                     <div class='grid grid-cols-3 gap-2.5'>
-                        <div onclick="selectModalConv(120, 1)" id='m-conv-1' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>120 🪙 <br><span class="text-cyan-400">➔ 1 💎</span></div>
-                        <div onclick="selectModalConv(510, 5)" id='m-conv-2' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>510 🪙 <br><span class="text-cyan-400">➔ 5 💎</span></div>
-                        <div onclick="selectModalConv(1000, 10)" id='m-conv-3' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>1k 🪙 <br><span class="text-cyan-400">➔ 10 💎</span></div>
+                        <div onclick="selectModalConv(120, 1)" id='m-conv-1' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>120 <span class="ff-gold-coin" style="width:14px;height:14px;font-size:5px;"><i class="fa-solid fa-coins"></i></span> <br><span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 1 <span class="ff-diamond" style="width:14px;height:14px;font-size:5px;"><i class="fa-solid fa-gem"></i></span></span></div>
+                        <div onclick="selectModalConv(510, 5)" id='m-conv-2' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>510 <span class="ff-gold-coin" style="width:14px;height:14px;font-size:5px;"><i class="fa-solid fa-coins"></i></span> <br><span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 5 <span class="ff-diamond" style="width:14px;height:14px;font-size:5px;"><i class="fa-solid fa-gem"></i></span></span></div>
+                        <div onclick="selectModalConv(1000, 10)" id='m-conv-3' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>1k <span class="ff-gold-coin" style="width:14px;height:14px;font-size:5px;"><i class="fa-solid fa-coins"></i></span> <br><span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 10 <span class="ff-diamond" style="width:14px;height:14px;font-size:5px;"><i class="fa-solid fa-gem"></i></span></span></div>
                     </div>
                     <button onclick="executeModalConversion()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-2xl font-black text-xs text-black cursor-pointer shadow-lg">CONVERT NOW</button>
                 </div>`;
@@ -611,9 +611,19 @@
         function executeModalConversion() {
             if (!modalConvCoins || userCoins < modalConvCoins) { alert("❌ Insufficient coins or none selected!"); return; }
             userCoins -= modalConvCoins; userGems += modalConvGems;
-            localStorage.setItem('zylobet_coins', userCoins); localStorage.setItem('zylobet_gems', userGems);
+            localStorage.setItem('zylobet_coins', userCoins);
+            localStorage.setItem('zylobet_gems', userGems);
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
             document.getElementById('user-gems').innerText = userGems;
+
+            let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
+            coinHist.unshift({ title: "Exchange to Diamonds", amount: `-${modalConvCoins} Coins`, type: "spend", time: "Just now" });
+            localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHist));
+
+            let gemHist = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
+            gemHist.unshift({ title: "Converted from Coins", amount: `+${modalConvGems} Diamonds`, type: "earn", time: "Just now" });
+            localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHist));
+
             alert(`🎉 Converted successfully!`); closeModal();
         }
 
@@ -659,8 +669,6 @@
             let bonus = amt >= 500 ? 50 : (amt >= 200 ? 18 : (amt >= 100 ? 8 : (amt >= 50 ? 3 : 0)));
             let totalDiamonds = amt + bonus;
 
-            const upiLink = `upi://pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}&tn=ZyloBet%20Deposit&cu=INR`;
-
             document.getElementById('modal-title').innerText = `PAY ₹${amt} FOR ${totalDiamonds} DIAMONDS`;
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs text-center'>
@@ -670,10 +678,10 @@
                     </div>
                     <div class='flex justify-center my-2'>
                         <div class='bg-white p-3 rounded-2xl shadow-xl inline-block'>
-                            <img src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiLink)}' alt='QR' class='w-36 h-36 object-contain rounded-xl'>
+                            <img src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}&tn=ZyloBet%20Deposit&cu=INR' alt='QR' class='w-36 h-36 object-contain rounded-xl'>
                         </div>
                     </div>
-                    <button onclick="openUpiApp('${upiLink}', ${amt})" class='w-full py-3.5 bg-gradient-to-r from-sky-500 to-blue-600 rounded-2xl font-black text-xs text-white flex items-center justify-center gap-2 cursor-pointer shadow-lg'>
+                    <button onclick="openUpiApp(${amt})" class='w-full py-3.5 bg-gradient-to-r from-sky-500 to-blue-600 rounded-2xl font-black text-xs text-white flex items-center justify-center gap-2 cursor-pointer shadow-lg'>
                         <i class='fa-solid fa-bolt'></i> PAY VIA UPI APP (₹${amt})
                     </button>
                     <p class='text-gray-400 text-[11px] text-left font-semibold mt-2'>Enter 12-Digit UTR / Reference Number:</p>
@@ -682,17 +690,10 @@
                 </div>`;
         }
 
-        // SAFE TELEGRAM WEBVIEW OPENER FOR UPI OR BROWSER REDIRECT
-        function openUpiApp(link, amt) {
-            if (window.Telegram?.WebApp) {
-                try {
-                    window.Telegram.WebApp.openInvoice(link, function(status) {});
-                    return;
-                } catch(e) {}
-            }
-            // Fallback safe HTTP redirect for webview
+        // STABLE PAYMENT REDIRECT TO PREVENT 404 & UNKNOWN SCHEME ERRORS
+        function openUpiApp(amt) {
             const fallbackUrl = `https://mercury.phonepe.com/pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}&cu=INR`;
-            window.open(fallbackUrl, '_system') || window.location.assign(link);
+            window.open(fallbackUrl, '_blank');
         }
 
         // AUTOMATED GMAIL VERIFICATION API CALL HANDLER
@@ -902,7 +903,8 @@
                         <div><span class='font-black text-rose-400'>${p.code}</span> <span class='text-[10px] text-gray-300'>(${p.rewardAmount} ${p.rewardType})</span><br><span class='text-[9px] ${statusColor}'>Status: ${p.active ? 'Active' : 'Deactivated'}</span></div>
                         <div class='flex gap-2 items-center'>
                             <span class='text-[10px] text-gray-400 font-bold'>${p.usedCount}/${p.maxUsers}</span>
-                            <button onclick="togglePromoStatus(${index})" class='px-2.5 py-1 rounded-lg text-[10px] font-bold ${p.active ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'} cursor-pointer'>${toggleText}</button>
+                            <button onclick="togglePromoStatus(${index})" class='px-2 py-1 rounded-lg text-[10px] font-bold ${p.active ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'} cursor-pointer'>${toggleText}</button>
+                            <button onclick="deletePromoCode(${index})" class='px-2 py-1 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-[10px] font-bold cursor-pointer'><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>`;
                 });
@@ -948,6 +950,15 @@
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
             if(promos[index]) {
                 promos[index].active = !promos[index].active;
+                localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
+                loadAdminPromoManager();
+            }
+        }
+
+        function deletePromoCode(index) {
+            let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
+            if(promos[index]) {
+                promos.remove ? promos.remove(index) : promos.splice(index, 1);
                 localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
                 loadAdminPromoManager();
             }
