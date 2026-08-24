@@ -138,18 +138,17 @@
                 </div>
             </div>
             <div class="bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-2xl flex items-center gap-1.5 text-[11px] font-bold text-gray-300 shadow-inner">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Live Auto
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Live Vault
             </div>
         </header>
 
         <!-- TAB 1: HOME & QUICK DEPOSIT INTERFACE -->
         <div id="tab-home" class="space-y-6">
-            <!-- AUTOMATED VAULT CARD -->
             <div class="cyber-card p-5 rounded-3xl space-y-4 shadow-2xl">
                 <div class="flex justify-between items-center pb-3 border-b border-white/10">
                     <div>
-                        <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Automated Vault</p>
-                        <p class="text-xs text-white font-semibold mt-0.5">Instant Automated Secure Top-up</p>
+                        <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Secure Vault</p>
+                        <p class="text-xs text-white font-semibold mt-0.5">Instant Manual Top-up</p>
                     </div>
                     <button onclick="openDepositModal()" class="shiny-green-btn text-white text-xs px-5 py-2.5 rounded-2xl font-black shadow-lg transition active:scale-95 tracking-wide cursor-pointer">
                         <i class="fa-solid fa-plus mr-1"></i> DEPOSIT
@@ -382,9 +381,10 @@
                 </button>
             </div>
 
-            <div class="grid grid-cols-2 gap-2">
-                <button onclick="switchAdminTab('withdraw')" id="adm-tab-wit" class="py-2.5 bg-gradient-to-r from-sky-600 to-blue-600 rounded-xl font-black text-[11px] shadow transition cursor-pointer">Pending Payouts</button>
-                <button onclick="switchAdminTab('promo')" id="adm-tab-promo" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[11px] shadow transition cursor-pointer">Promo Manager</button>
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="switchAdminTab('deposit')" id="adm-tab-dep" class="py-2.5 bg-gradient-to-r from-sky-600 to-blue-600 rounded-xl font-black text-[11px] shadow transition cursor-pointer">Deposits</button>
+                <button onclick="switchAdminTab('withdraw')" id="adm-tab-wit" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[11px] shadow transition cursor-pointer">Payouts</button>
+                <button onclick="switchAdminTab('promo')" id="adm-tab-promo" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[11px] shadow transition cursor-pointer">Promos</button>
             </div>
 
             <div id="admin-requests-container" class="space-y-3"></div>
@@ -459,7 +459,7 @@
         }
 
         let isViewingAdmin = false;
-        let adminTab = 'withdraw';
+        let adminTab = 'deposit';
 
         function toggleAdminView() {
             isViewingAdmin = !isViewingAdmin;
@@ -630,9 +630,9 @@
                         <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span> Select conversion package:
                     </div>
                     <div class='grid grid-cols-3 gap-2.5'>
-                        <div onclick="selectModalConv(120, 1)" id='m-conv-1' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>120 <span class="ff-gold-coin" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-coins"></i></span> <br><span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 1 <span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span></span></div>
-                        <div onclick="selectModalConv(510, 5)" id='m-conv-2' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>510 <span class="ff-gold-coin" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-coins"></i></span> <br><span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 5 <span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span></span></div>
-                        <div onclick="selectModalConv(1000, 10)" id='m-conv-3' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>1k <span class="ff-gold-coin" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-coins"></i></span> <br><span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 10 <span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span></span></div>
+                        <div onclick="selectModalConv(120, 1)" id='m-conv-1' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>120 🪙 <br><span class="text-cyan-400">➔ 1 💎</span></div>
+                        <div onclick="selectModalConv(510, 5)" id='m-conv-2' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>510 🪙 <br><span class="text-cyan-400">➔ 5 💎</span></div>
+                        <div onclick="selectModalConv(1000, 10)" id='m-conv-3' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>1k 🪙 <br><span class="text-cyan-400">➔ 10 💎</span></div>
                     </div>
                     <button onclick="executeModalConversion()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-2xl font-black text-xs text-black cursor-pointer shadow-lg">CONVERT NOW</button>
                 </div>`;
@@ -728,79 +728,54 @@
 
             document.getElementById('modal-title').innerText = `PAY ₹${amt} FOR ${totalDiamonds} DIAMONDS`;
             document.getElementById('modal-content').innerHTML = `
-                <div class='space-y-4 text-xs text-center'>
-                    <div class='cyber-card border border-white/10 p-3.5 rounded-2xl text-left'>
+                <div class='space-y-3 text-xs text-center'>
+                    <div class='bg-amber-500/10 border border-amber-500/20 p-2.5 rounded-xl text-amber-300 text-[11px] font-bold'>
+                        ⚠️ <b>IMPORTANT:</b> Pay exact ₹${amt} using QR, then enter UTR below. Admin will verify and approve instantly!
+                    </div>
+                    <div class='cyber-card border border-white/10 p-3 rounded-2xl text-left'>
                         <p class='text-gray-400 text-[10px] uppercase font-bold'>Account Name</p>
                         <p class='text-white font-black text-sm'>Prashant Raj</p>
                     </div>
-                    <div class='flex justify-center my-2'>
-                        <div class='bg-white p-3 rounded-2xl shadow-xl inline-block'>
-                            <img src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiString)}' alt='QR' class='w-36 h-36 object-contain rounded-xl'>
+                    <div class='flex justify-center my-1'>
+                        <div class='bg-white p-2.5 rounded-2xl shadow-xl inline-block'>
+                            <img src='https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(upiString)}' alt='QR' class='w-32 h-32 object-contain rounded-xl'>
                         </div>
                     </div>
-                    <p class='text-gray-300 text-[11px] font-semibold'>Scan this QR using PhonePe, GPay or Paytm (₹${amt} amount fixed)</p>
-                    <p class='text-gray-400 text-[11px] text-left font-semibold mt-2'>Enter 12-Digit UTR / Reference Number:</p>
+                    <p class='text-gray-400 text-[11px] text-left font-semibold mt-1'>Enter 12-Digit UTR / Reference Number:</p>
                     <input type='text' id='deposit-utr-input' placeholder='e.g. 4235xxxxxxxx' class='w-full bg-black/50 border border-white/10 p-3 text-xs rounded-2xl text-amber-400 font-bold uppercase'>
-                    <button onclick="verifyAndAddDeposit(${totalDiamonds}, ${amt})" class='w-full py-4 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>VERIFY & GET DIAMONDS</button>
+                    <button onclick="submitManualDeposit(${totalDiamonds}, ${amt})" class='w-full py-3.5 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>SUBMIT FOR APPROVAL</button>
                 </div>`;
         }
 
-        // FIXED AUTOMATED GMAIL VERIFICATION API CALL HANDLER
-        function verifyAndAddDeposit(totalDias, paidRs) {
+        // SUBMIT MANUAL DEPOSIT REQUEST FOR ADMIN APPROVAL
+        function submitManualDeposit(totalDias, paidRs) {
             const utrVal = document.getElementById('deposit-utr-input').value.trim();
-            if(!utrVal || utrVal.length < 8) { alert("❌ Please enter a valid UTR number!"); return; }
+            if(!utrVal || utrVal.length < 8) { alert("❌ Please enter a valid 12-digit UTR number!"); return; }
 
-            alert("⏳ Connecting to server & scanning Gmail. Please wait 5-10 seconds...");
+            let deposits = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
+            
+            // Check if UTR already submitted
+            if(deposits.some(d => d.utr === utrVal)) {
+                alert("❌ This UTR number has already been submitted!");
+                return;
+            }
 
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 45000);
+            let newDep = {
+                id: Date.now(),
+                username: "@" + username,
+                userId: userId,
+                amount: paidRs,
+                diamonds: totalDias,
+                utr: utrVal,
+                status: "Pending",
+                time: Date.now()
+            };
 
-            fetch('https://connect-gmail-to-zylobet.onrender.com/verify-payment', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ utr: utrVal, amount: paidRs }),
-                signal: controller.signal
-            })
-            .then(async res => {
-                clearTimeout(timeoutId);
-                let data;
-                try { data = await res.json(); } catch(e) { data = { status: false, message: "Invalid response" }; }
-                return { status: res.status, body: data };
-            })
-            .then(res => {
-                if(res.status === 200 && res.body.status === true) {
-                    userGems += totalDias;
-                    localStorage.setItem('zylobet_gems', userGems);
-                    document.getElementById('user-gems').innerText = userGems;
+            deposits.push(newDep);
+            localStorage.setItem('zylobet_deposit_requests', JSON.stringify(deposits));
 
-                    let baseBonus = paidRs >= 500 ? 50 : (paidRs >= 200 ? 18 : (paidRs >= 100 ? 8 : (paidRs >= 50 ? 3 : 0)));
-                    if(baseBonus > 0) {
-                        let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + userId)) || [];
-                        if(!usedBonuses.includes(paidRs)) {
-                            usedBonuses.push(paidRs);
-                            localStorage.setItem('zylobet_used_bonuses_' + userId, JSON.stringify(usedBonuses));
-                        }
-                    }
-
-                    let gemHistory = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
-                    gemHistory.unshift({ title: "Auto-Verified Deposit", amount: `+${totalDias} Diamonds`, type: "earn", time: Date.now(), status: "Success" });
-                    localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHistory));
-
-                    alert(`🎉 Payment Verified Successfully! +${totalDias} Diamonds added automatically.`);
-                    closeModal();
-                } else {
-                    alert(`❌ Verification Failed: ${res.body.message || "UTR not found in Gmail yet!"}`);
-                }
-            })
-            .catch(err => {
-                clearTimeout(timeoutId);
-                if (err.name === 'AbortError') {
-                    alert("⚠️ Server took too long to respond. Please try clicking 'Verify' again!");
-                } else {
-                    console.error(err);
-                    alert("❌ Connection error! Please ensure your backend is active on Render and try again.");
-                }
-            });
+            alert("🎉 Deposit Request Submitted! Admin will verify your UTR and approve diamonds shortly.");
+            closeModal();
         }
 
         function closeModal() { document.getElementById('modal').classList.add('hidden'); }
@@ -834,9 +809,9 @@
                 });
                 content.innerHTML = html + "</div>";
             } else if(type === 'withdrawals') {
-                title.innerText = "WITHDRAWAL HISTORY";
+                title.innerText = "PAYOUT & DEPOSIT HISTORY";
                 let withdraws = JSON.parse(localStorage.getItem('zylobet_withdraw_history')) || [];
-                if(withdraws.length === 0) { content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No withdrawals yet.</div>`; return; }
+                if(withdraws.length === 0) { content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No history yet.</div>`; return; }
                 let html = "<div class='space-y-3'>";
                 withdraws.forEach(item => {
                     let redeemBox = item.redeemCode ? `<div class='flex items-center gap-2 mt-1'><span class='text-xs text-sky-300 font-mono'>🔑 Redeem Code: <b>${item.redeemCode}</b></span><button onclick="copyRedeemCode('${item.redeemCode}')" class='bg-sky-500/20 hover:bg-sky-500/40 text-sky-300 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer'><i class="fa-solid fa-copy"></i> Copy</button></div>` : '';
@@ -882,25 +857,88 @@
 
         function switchAdminTab(tab) {
             adminTab = tab;
-            const wBtn = document.getElementById('adm-tab-wit');
-            const pBtn = document.getElementById('adm-tab-promo');
-            wBtn.className = "py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[11px] shadow transition cursor-pointer";
-            pBtn.className = "py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[11px] shadow transition cursor-pointer";
+            ['dep', 'wit', 'pro'].forEach(t => {
+                const btn = document.getElementById('adm-tab-' + t);
+                if(btn) btn.className = "py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[11px] shadow transition cursor-pointer";
+            });
 
-            if(tab === 'withdraw') {
-                wBtn.className = "py-2.5 bg-gradient-to-r from-sky-600 to-blue-600 rounded-xl font-black text-[11px] shadow transition cursor-pointer";
-                loadAdminRequests();
-            } else if(tab === 'promo') {
-                pBtn.className = "py-2.5 bg-gradient-to-r from-rose-600 to-purple-600 rounded-xl font-black text-[11px] shadow transition cursor-pointer";
-                loadAdminPromoManager();
-            }
+            const activeBtn = document.getElementById('adm-tab-' + (tab === 'deposit' ? 'dep' : (tab === 'withdraw' ? 'wit' : 'pro')));
+            if(activeBtn) activeBtn.className = "py-2.5 bg-gradient-to-r from-sky-600 to-blue-600 rounded-xl font-black text-[11px] shadow transition cursor-pointer";
+
+            if(tab === 'deposit') loadAdminDeposits();
+            else if(tab === 'withdraw') loadAdminRequests();
+            else if(tab === 'promo') loadAdminPromoManager();
         }
 
         function loadAdminActivePanel() {
-            if(adminTab === 'withdraw') {
-                loadAdminRequests();
-            } else {
-                loadAdminPromoManager();
+            if(adminTab === 'deposit') loadAdminDeposits();
+            else if(adminTab === 'withdraw') loadAdminRequests();
+            else loadAdminPromoManager();
+        }
+
+        function loadAdminDeposits() {
+            const container = document.getElementById('admin-requests-container');
+            container.innerHTML = '';
+            let deposits = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
+            let pending = deposits.filter(d => d.status === 'Pending');
+            
+            if(pending.length === 0) {
+                container.innerHTML = `<div class='cyber-card p-6 text-center text-gray-500 text-xs rounded-2xl'>No pending deposit requests.</div>`;
+                return;
+            }
+
+            pending.forEach(d => {
+                container.innerHTML += `
+                    <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2 text-xs'>
+                        <div class='flex justify-between font-black'><span class='text-cyan-400 text-sm'>${d.username}</span><span class='text-emerald-400 text-sm'>+${d.diamonds} 💎 (₹${d.amount})</span></div>
+                        <p class='text-gray-300 font-bold'>UTR Number: <span class="text-amber-400 font-mono">${d.utr}</span></p>
+                        <div class="grid grid-cols-2 gap-2 mt-2">
+                            <button onclick="approveDeposit(${d.id})" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
+                            <button onclick="rejectDeposit(${d.id})" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function approveDeposit(id) {
+            let deposits = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
+            let dep = deposits.find(x => x.id === id);
+            
+            if(dep && dep.status === "Pending") {
+                dep.status = "Success";
+                localStorage.setItem('zylobet_deposit_requests', JSON.stringify(deposits));
+
+                userGems += dep.diamonds;
+                localStorage.setItem('zylobet_gems', userGems);
+                document.getElementById('user-gems').innerText = userGems;
+
+                let baseBonus = dep.amount >= 500 ? 50 : (dep.amount >= 200 ? 18 : (dep.amount >= 100 ? 8 : (dep.amount >= 50 ? 3 : 0)));
+                if(baseBonus > 0) {
+                    let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + userId)) || [];
+                    if(!usedBonuses.includes(dep.amount)) {
+                        usedBonuses.push(dep.amount);
+                        localStorage.setItem('zylobet_used_bonuses_' + userId, JSON.stringify(usedBonuses));
+                    }
+                }
+
+                let gemHist = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
+                gemHist.unshift({ title: `Deposit Approved (₹${dep.amount})`, amount: `+${dep.diamonds} Diamonds`, type: "earn", time: Date.now(), status: "Success" });
+                localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHist));
+
+                alert("🎉 Deposit Approved Successfully! Diamonds added to user.");
+                loadAdminDeposits();
+            }
+        }
+
+        function rejectDeposit(id) {
+            let deposits = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
+            let dep = deposits.find(x => x.id === id);
+            
+            if(dep && dep.status === "Pending") {
+                dep.status = "Rejected";
+                localStorage.setItem('zylobet_deposit_requests', JSON.stringify(deposits));
+                alert("❌ Deposit Rejected.");
+                loadAdminDeposits();
             }
         }
 
