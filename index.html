@@ -745,12 +745,12 @@
                 </div>`;
         }
 
-        // AUTOMATED GMAIL VERIFICATION API CALL HANDLER
+        // FIXED AUTOMATED GMAIL VERIFICATION API CALL HANDLER
         function verifyAndAddDeposit(totalDias, paidRs) {
             const utrVal = document.getElementById('deposit-utr-input').value.trim();
             if(!utrVal || utrVal.length < 8) { alert("❌ Please enter a valid UTR number!"); return; }
 
-            alert("⏳ Connecting to server & scanning Gmail. Please wait 10-20 seconds...");
+            alert("⏳ Connecting to server & scanning Gmail. Please wait 5-10 seconds...");
 
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 45000);
@@ -758,17 +758,17 @@
             fetch('https://connect-gmail-to-zylobet.onrender.com/verify-payment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ utr: utrVal, expected_amount: paidRs }),
+                body: JSON.stringify({ utr: utrVal, amount: paidRs }),
                 signal: controller.signal
             })
             .then(async res => {
                 clearTimeout(timeoutId);
                 let data;
-                try { data = await res.json(); } catch(e) { data = { success: false, detail: "Invalid response" }; }
+                try { data = await res.json(); } catch(e) { data = { status: false, message: "Invalid response" }; }
                 return { status: res.status, body: data };
             })
             .then(res => {
-                if(res.status === 200 && res.body.success) {
+                if(res.status === 200 && res.body.status === true) {
                     userGems += totalDias;
                     localStorage.setItem('zylobet_gems', userGems);
                     document.getElementById('user-gems').innerText = userGems;
@@ -789,13 +789,13 @@
                     alert(`🎉 Payment Verified Successfully! +${totalDias} Diamonds added automatically.`);
                     closeModal();
                 } else {
-                    alert(`❌ Verification Failed: ${res.body.detail || "UTR not found in Gmail yet! Please make sure payment email has arrived."}`);
+                    alert(`❌ Verification Failed: ${res.body.message || "UTR not found in Gmail yet!"}`);
                 }
             })
             .catch(err => {
                 clearTimeout(timeoutId);
                 if (err.name === 'AbortError') {
-                    alert("⚠️ Server took too long to respond (Render Free Tier wakeup delay). Please try clicking 'Verify' again!");
+                    alert("⚠️ Server took too long to respond. Please try clicking 'Verify' again!");
                 } else {
                     console.error(err);
                     alert("❌ Connection error! Please ensure your backend is active on Render and try again.");
