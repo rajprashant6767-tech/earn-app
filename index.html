@@ -97,7 +97,7 @@
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
     </style>
 </head>
-<body class="p-4 pb-32 max-w-lg mx-auto">
+<body class="p-4 pb-36 max-w-lg mx-auto">
 
     <!-- INTRO LOADING ANIMATION SCREEN -->
     <div id="intro-screen" class="fixed inset-0 z-[100] bg-[#05070c] flex flex-col items-center justify-center transition-opacity duration-700">
@@ -116,7 +116,7 @@
     </div>
 
     <!-- MAIN APP WRAPPER -->
-    <div id="main-app" class="opacity-0 transition-opacity duration-500 space-y-5">
+    <div id="main-app" class="opacity-0 transition-opacity duration-500 space-y-6">
         
         <!-- ADMIN DASHBOARD ACCESS BAR -->
         <div id="admin-toggle-bar" class="hidden mb-2 cyber-card p-3 rounded-2xl flex justify-between items-center text-xs shadow-xl backdrop-blur-md border-emerald-500/40">
@@ -143,9 +143,10 @@
         </header>
 
         <!-- TAB 1: HOME & QUICK DEPOSIT INTERFACE -->
-        <div id="tab-home" class="space-y-5">
-            <div class="cyber-card p-6 rounded-3xl space-y-5">
-                <div class="flex justify-between items-center pb-4 border-b border-white/10">
+        <div id="tab-home" class="space-y-6">
+            <!-- AUTOMATED VAULT CARD -->
+            <div class="cyber-card p-5 rounded-3xl space-y-4 shadow-2xl">
+                <div class="flex justify-between items-center pb-3 border-b border-white/10">
                     <div>
                         <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Automated Vault</p>
                         <p class="text-xs text-white font-semibold mt-0.5">Instant Automated Secure Top-up</p>
@@ -173,24 +174,24 @@
                         </p>
                     </div>
                 </div>
+            </div>
 
-                <!-- COIN TO DIAMOND CONVERSION BANNER -->
-                <div class="cyber-card p-4 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-950/40 via-black/50 to-cyan-950/30 flex items-center justify-between shadow-lg">
-                    <div class="flex items-center gap-3.5">
-                        <div class="flex items-center gap-1.5 bg-amber-500/20 px-3 py-2 rounded-xl border border-amber-500/30 shrink-0">
-                            <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span>
-                            <span class="text-amber-400 font-bold text-xs">➔</span>
-                            <span class="ff-diamond" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-gem"></i></span>
-                        </div>
-                        <div>
-                            <h3 class="text-xs font-black text-white uppercase tracking-wider">EXCHANGE VAULT</h3>
-                            <p class="text-[10px] text-amber-300 font-semibold mt-0.5">Convert earned coins to gems</p>
-                        </div>
+            <!-- SEPARATED EXCHANGE VAULT BANNER -->
+            <div class="cyber-card p-5 rounded-3xl border border-amber-500/30 bg-gradient-to-r from-amber-950/40 via-black/60 to-cyan-950/40 flex items-center justify-between shadow-2xl">
+                <div class="flex items-center gap-3.5">
+                    <div class="flex items-center gap-1.5 bg-amber-500/20 px-3 py-2.5 rounded-2xl border border-amber-500/30 shrink-0">
+                        <span class="ff-gold-coin" style="width:22px;height:22px;font-size:9px;"><i class="fa-solid fa-coins"></i></span>
+                        <span class="text-amber-400 font-bold text-xs">➔</span>
+                        <span class="ff-diamond" style="width:20px;height:20px;font-size:7px;"><i class="fa-solid fa-gem"></i></span>
                     </div>
-                    <button onclick="openConvertModal()" class="bg-gradient-to-r from-amber-500 to-yellow-500 text-black px-4 py-2.5 rounded-xl font-black text-xs shadow-md hover:brightness-110 active:scale-95 transition flex items-center gap-1.5 shrink-0 cursor-pointer">
-                        <i class="fa-solid fa-rotate"></i> CONVERT
-                    </button>
+                    <div>
+                        <h3 class="text-xs font-black text-white uppercase tracking-wider">EXCHANGE VAULT</h3>
+                        <p class="text-[10px] text-amber-300 font-semibold mt-0.5">Convert earned coins to gems</p>
+                    </div>
                 </div>
+                <button onclick="openConvertModal()" class="bg-gradient-to-r from-amber-500 to-yellow-500 text-black px-4.5 py-3 rounded-2xl font-black text-xs shadow-md hover:brightness-110 active:scale-95 transition flex items-center gap-1.5 shrink-0 cursor-pointer">
+                    <i class="fa-solid fa-rotate"></i> CONVERT
+                </button>
             </div>
         </div>
 
@@ -485,7 +486,7 @@
 
         if(!localStorage.getItem('zylobet_coin_history')) {
             localStorage.setItem('zylobet_coin_history', JSON.stringify([
-                { title: "Welcome Bonus", amount: "+1,000 Coins", type: "earn", time: "Today", status: "Success" }
+                { title: "Welcome Bonus", amount: "+1,000 Coins", type: "earn", time: Date.now() - 3600000, status: "Success" }
             ]));
         }
         if(!localStorage.getItem('zylobet_withdraw_history')) {
@@ -493,8 +494,19 @@
         }
         if(!localStorage.getItem('zylobet_gem_history')) {
             localStorage.setItem('zylobet_gem_history', JSON.stringify([
-                { title: "Initial Diamonds", amount: `+${userGems} Diamonds`, type: "earn", time: "Active", status: "Success" }
+                { title: "Initial Diamonds", amount: `+${userGems} Diamonds`, type: "earn", time: Date.now() - 3600000, status: "Success" }
             ]));
+        }
+
+        function formatTimeAgo(timestamp) {
+            if(!timestamp) return "Just now";
+            const diffMin = Math.floor((Date.now() - timestamp) / 60000);
+            if (diffMin < 1) return "Just now";
+            if (diffMin < 60) return `${diffMin} min ago`;
+            const diffHr = Math.floor(diffMin / 60);
+            if (diffHr < 24) return `${diffHr} hr ago`;
+            const diffDay = Math.floor(diffHr / 24);
+            return `${diffDay} day ago`;
         }
 
         let selectedWCoins = 0;
@@ -537,6 +549,11 @@
             localStorage.setItem('zylobet_coins', userCoins);
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
             localStorage.setItem('zylobet_ref_used', 'true');
+            
+            let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
+            coinHist.unshift({ title: "Referral Bonus", amount: "+300 Coins", type: "earn", time: Date.now(), status: "Success" });
+            localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHist));
+
             statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
             statusMsg.innerText = "🎉 +300 Coins added successfully!";
         }
@@ -568,10 +585,18 @@
                 userCoins += foundPromo.rewardAmount;
                 localStorage.setItem('zylobet_coins', userCoins);
                 document.getElementById('user-coins').innerText = userCoins.toLocaleString();
+
+                let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
+                coinHist.unshift({ title: `Promo Code (${promoVal})`, amount: `+${foundPromo.rewardAmount} Coins`, type: "earn", time: Date.now(), status: "Success" });
+                localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHist));
             } else {
                 userGems += foundPromo.rewardAmount;
                 localStorage.setItem('zylobet_gems', userGems);
                 document.getElementById('user-gems').innerText = userGems;
+
+                let gemHist = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
+                gemHist.unshift({ title: `Promo Code (${promoVal})`, amount: `+${foundPromo.rewardAmount} Diamonds`, type: "earn", time: Date.now(), status: "Success" });
+                localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHist));
             }
 
             foundPromo.usedCount += 1;
@@ -617,11 +642,11 @@
             document.getElementById('user-gems').innerText = userGems;
 
             let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-            coinHist.unshift({ title: "Exchange to Diamonds", amount: `-${modalConvCoins} Coins`, type: "spend", time: "Just now" });
+            coinHist.unshift({ title: "Exchange to Diamonds", amount: `-${modalConvCoins} Coins`, type: "spend", time: Date.now(), status: "Success" });
             localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHist));
 
             let gemHist = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
-            gemHist.unshift({ title: "Converted from Coins", amount: `+${modalConvGems} Diamonds`, type: "earn", time: "Just now" });
+            gemHist.unshift({ title: "Converted from Coins", amount: `+${modalConvGems} Diamonds`, type: "earn", time: Date.now(), status: "Success" });
             localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHist));
 
             alert(`🎉 Converted successfully!`); closeModal();
@@ -708,7 +733,7 @@
                 </div>`;
         }
 
-        // AUTOMATED GMAIL VERIFICATION API CALL HANDLER & ONE-TIME BONUS LOCKER
+        // AUTOMATED GMAIL VERIFICATION API CALL HANDLER
         function verifyAndAddDeposit(totalDias, paidRs) {
             const utrVal = document.getElementById('deposit-utr-input').value.trim();
             if(!utrVal || utrVal.length < 8) { alert("❌ Please enter a valid UTR number!"); return; }
@@ -736,7 +761,6 @@
                     localStorage.setItem('zylobet_gems', userGems);
                     document.getElementById('user-gems').innerText = userGems;
 
-                    // Lock one-time bonus for this package amount so it can't be claimed again
                     let baseBonus = paidRs >= 500 ? 50 : (paidRs >= 200 ? 18 : (paidRs >= 100 ? 8 : (paidRs >= 50 ? 3 : 0)));
                     if(baseBonus > 0) {
                         let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + userId)) || [];
@@ -747,7 +771,7 @@
                     }
 
                     let gemHistory = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
-                    gemHistory.unshift({ title: "Auto-Verified Deposit", amount: `+${totalDias} Diamonds`, type: "earn", time: "Just now" });
+                    gemHistory.unshift({ title: "Auto-Verified Deposit", amount: `+${totalDias} Diamonds`, type: "earn", time: Date.now(), status: "Success" });
                     localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHistory));
 
                     alert(`🎉 Payment Verified Successfully! +${totalDias} Diamonds added automatically.`);
@@ -770,6 +794,11 @@
         function closeModal() { document.getElementById('modal').classList.add('hidden'); }
         function copyRef() { navigator.clipboard.writeText(document.getElementById('ref-code').innerText); alert("Referral Code Copied!"); }
 
+        function copyRedeemCode(code) {
+            navigator.clipboard.writeText(code);
+            alert("📋 Redeem Code Copied: " + code);
+        }
+
         function openHistory(type) {
             document.getElementById('modal').classList.remove('hidden');
             const title = document.getElementById('modal-title');
@@ -779,7 +808,8 @@
                 let history = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
                 let html = "<div class='space-y-3'>";
                 history.forEach(item => {
-                    html += `<div class='cyber-card p-4 rounded-2xl border border-white/5 flex justify-between items-center'><div><p class='font-black text-cyan-400 text-sm flex items-center gap-1.5'><span class="ff-diamond" style="width:22px;height:22px;font-size:8px;"><i class="fa-solid fa-gem"></i></span> ${item.amount}</p><p class='text-[10px] text-gray-300 font-bold'>${item.title}</p></div><span class='text-[10px] text-emerald-400 font-bold'>${item.time}</span></div>`;
+                    let amountColor = item.amount.startsWith('+') ? 'text-emerald-400' : 'text-rose-400';
+                    html += `<div class='cyber-card p-4 rounded-2xl border border-white/5 flex justify-between items-center'><div><p class='font-black ${amountColor} text-sm flex items-center gap-1.5'><span class="ff-diamond" style="width:22px;height:22px;font-size:8px;"><i class="fa-solid fa-gem"></i></span> ${item.amount}</p><p class='text-[10px] text-gray-300 font-bold'>${item.title}</p></div><span class='text-[10px] text-gray-400 font-bold'>${formatTimeAgo(item.time)}</span></div>`;
                 });
                 content.innerHTML = html + "</div>";
             } else if(type === 'coins') {
@@ -787,7 +817,8 @@
                 let history = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
                 let html = "<div class='space-y-3'>";
                 history.forEach(item => {
-                    html += `<div class='cyber-card p-4 rounded-2xl border border-white/5 flex justify-between items-center'><div><p class='font-black text-amber-400 text-sm flex items-center gap-1.5'><span class="ff-gold-coin" style="width:22px;height:22px;font-size:9px;"><i class="fa-solid fa-coins"></i></span> ${item.amount}</p><p class='text-[10px] text-gray-300 font-bold'>${item.title}</p></div><span class='text-[10px] text-gray-400 font-bold'>${item.time}</span></div>`;
+                    let amountColor = item.amount.startsWith('+') ? 'text-emerald-400' : 'text-rose-400';
+                    html += `<div class='cyber-card p-4 rounded-2xl border border-white/5 flex justify-between items-center'><div><p class='font-black ${amountColor} text-sm flex items-center gap-1.5'><span class="ff-gold-coin" style="width:22px;height:22px;font-size:9px;"><i class="fa-solid fa-coins"></i></span> ${item.amount}</p><p class='text-[10px] text-gray-300 font-bold'>${item.title}</p></div><span class='text-[10px] text-gray-400 font-bold'>${formatTimeAgo(item.time)}</span></div>`;
                 });
                 content.innerHTML = html + "</div>";
             } else if(type === 'withdrawals') {
@@ -796,7 +827,7 @@
                 if(withdraws.length === 0) { content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No withdrawals yet.</div>`; return; }
                 let html = "<div class='space-y-3'>";
                 withdraws.forEach(item => {
-                    let redeemBox = item.redeemCode ? `<p class='text-xs text-sky-300 font-mono mt-1'>🔑 Redeem Code: <b>${item.redeemCode}</b></p>` : '';
+                    let redeemBox = item.redeemCode ? `<div class='flex items-center gap-2 mt-1'><span class='text-xs text-sky-300 font-mono'>🔑 Redeem Code: <b>${item.redeemCode}</b></span><button onclick="copyRedeemCode('${item.redeemCode}')" class='bg-sky-500/20 hover:bg-sky-500/40 text-sky-300 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer'><i class="fa-solid fa-copy"></i> Copy</button></div>` : '';
                     let commentBox = item.adminComment ? `<p class='text-xs text-rose-400 mt-1'>💬 Reason: <b>${item.adminComment}</b></p>` : '';
                     let statusColor = item.status.includes('Rejected') ? 'text-rose-400' : 'text-amber-300';
                     html += `<div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-1'><div class='flex justify-between'><span class='text-amber-400 font-black flex items-center gap-1'><span class="ff-gold-coin" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> ${item.amount} (₹${item.rupees})</span><span class='text-xs ${statusColor} font-bold'>${item.status}</span></div><p class='text-[11px] text-gray-300'>Method: ${item.method}</p>${redeemBox}${commentBox}</div>`;
@@ -830,7 +861,7 @@
             localStorage.setItem('zylobet_withdraw_history', JSON.stringify(hist));
 
             let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-            coinHist.unshift({ title: `Withdrawal Request (${method})`, amount: `-${selectedWCoins} Coins`, type: "spend", time: "Just now" });
+            coinHist.unshift({ title: `Withdrawal Request (${method})`, amount: `-${selectedWCoins} Coins`, type: "spend", time: Date.now(), status: "Pending" });
             localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHist));
 
             alert(`🎉 ${method} Withdrawal Request Sent Successfully!`);
@@ -935,13 +966,12 @@
                 req.adminComment = adminComment;
                 localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
 
-                // Refund coins to user balance
                 userCoins += req.amount;
                 localStorage.setItem('zylobet_coins', userCoins);
                 document.getElementById('user-coins').innerText = userCoins.toLocaleString();
 
                 let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-                coinHist.unshift({ title: `Withdrawal Refund (${req.method})`, amount: `+${req.amount} Coins`, type: "earn", time: "Just now" });
+                coinHist.unshift({ title: `Withdrawal Refund (${req.method})`, amount: `+${req.amount} Coins`, type: "earn", time: Date.now(), status: "Success" });
                 localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHist));
 
                 let history = JSON.parse(localStorage.getItem('zylobet_withdraw_history')) || [];
