@@ -231,8 +231,8 @@
                     <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-rose-500/20 to-purple-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto text-xl shadow-lg">
                         <i class="fa-solid fa-gift"></i>
                     </div>
-                    <h2 class="text-base font-black text-rose-400">Promo Code Bonanza</h2>
-                    <p class="text-[11px] text-gray-400">Input official vouchers for instant account boosts.</p>
+                    <h2 class="text-base font-black text-rose-400">Promo Code Portal</h2>
+                    <p class="text-[11px] text-gray-400">Enter your official voucher below. New promo codes are available daily in our Telegram channel!</p>
                 </div>
 
                 <div class="space-y-3.5 pt-1">
@@ -593,9 +593,9 @@
                         <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span> Select conversion package:
                     </div>
                     <div class='grid grid-cols-3 gap-2.5'>
-                        <div onclick="selectModalConv(120, 1)" id='m-conv-1' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>120 <span class="ff-gold-coin" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-coins"></i></span> <br><span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 1 <span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span></span></div>
-                        <div onclick="selectModalConv(510, 5)" id='m-conv-2' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>510 <span class="ff-gold-coin" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-coins"></i></span> <br><span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 5 <span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span></span></div>
-                        <div onclick="selectModalConv(1000, 10)" id='m-conv-3' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>1k <span class="ff-gold-coin" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-coins"></i></span> <br><span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 10 <span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span></span></div>
+                        <div onclick="selectModalConv(120, 1)" id='m-conv-1' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>120 🪙 <br><span class="text-cyan-400">➔ 1 💎</span></div>
+                        <div onclick="selectModalConv(510, 5)" id='m-conv-2' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>510 🪙 <br><span class="text-cyan-400">➔ 5 💎</span></div>
+                        <div onclick="selectModalConv(1000, 10)" id='m-conv-3' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>1k 🪙 <br><span class="text-cyan-400">➔ 10 💎</span></div>
                     </div>
                     <button onclick="executeModalConversion()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-2xl font-black text-xs text-black cursor-pointer shadow-lg">CONVERT NOW</button>
                 </div>`;
@@ -635,6 +635,9 @@
                     <div class='bg-cyan-500/10 border border-cyan-500/30 p-3 rounded-2xl text-cyan-300 font-bold text-center flex items-center justify-center gap-2'>
                         <span class="ff-diamond" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-gem"></i></span> 1 Diamond = ₹1 Rs
                     </div>
+                    <div class='text-center text-[10px] text-amber-400 font-bold bg-amber-500/10 py-1.5 rounded-xl border border-amber-500/20'>
+                        ⚠️ Note: Free bonus is valid for ONE TIME use per package only!
+                    </div>
                     <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300'>
                         <div onclick="selectDepositOffer(50)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center flex items-center justify-center gap-1.5'>50 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> (+3 Free)</div>
                         <div onclick="selectDepositOffer(100)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center flex items-center justify-center gap-1.5'>100 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> (+8 Free)</div>
@@ -657,16 +660,31 @@
 
         function updateBonusDisplay(val) {
             let amt = parseInt(val) || 0;
-            let bonus = amt >= 500 ? 50 : (amt >= 200 ? 18 : (amt >= 100 ? 8 : (amt >= 50 ? 3 : 0)));
+            let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + userId)) || [];
+            
+            let baseBonus = amt >= 500 ? 50 : (amt >= 200 ? 18 : (amt >= 100 ? 8 : (amt >= 50 ? 3 : 0)));
+            let bonus = usedBonuses.includes(amt) ? 0 : baseBonus;
+            
             const box = document.getElementById('bonus-calc-box');
-            if(bonus > 0) { box.classList.remove('hidden'); box.innerHTML = `🎁 Bonus: +${bonus} Free Diamonds! Total: <b>${amt + bonus} 💎</b>`; }
-            else { box.classList.add('hidden'); }
+            if(baseBonus > 0) {
+                box.classList.remove('hidden');
+                if(bonus > 0) {
+                    box.innerHTML = `🎁 Bonus: +${bonus} Free Diamonds! (One-time offer) Total: <b>${amt + bonus} 💎</b>`;
+                } else {
+                    box.innerHTML = `ℹ️ You have already claimed the one-time free bonus for ₹${amt}. Total: <b>${amt} 💎</b>`;
+                }
+            } else {
+                box.classList.add('hidden');
+            }
         }
 
         function proceedToPayment() {
             const amt = parseInt(document.getElementById('deposit-amount-input').value);
             if(isNaN(amt) || amt < 1 || amt > 1000) { alert("❌ Enter valid amount (1 - 1000)"); return; }
-            let bonus = amt >= 500 ? 50 : (amt >= 200 ? 18 : (amt >= 100 ? 8 : (amt >= 50 ? 3 : 0)));
+            
+            let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + userId)) || [];
+            let baseBonus = amt >= 500 ? 50 : (amt >= 200 ? 18 : (amt >= 100 ? 8 : (amt >= 50 ? 3 : 0)));
+            let bonus = usedBonuses.includes(amt) ? 0 : baseBonus;
             let totalDiamonds = amt + bonus;
 
             const upiString = `upi://pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}.00&tn=ZyloBet%20Deposit&cu=INR`;
@@ -690,7 +708,7 @@
                 </div>`;
         }
 
-        // AUTOMATED GMAIL VERIFICATION API CALL HANDLER
+        // AUTOMATED GMAIL VERIFICATION API CALL HANDLER & ONE-TIME BONUS LOCKER
         function verifyAndAddDeposit(totalDias, paidRs) {
             const utrVal = document.getElementById('deposit-utr-input').value.trim();
             if(!utrVal || utrVal.length < 8) { alert("❌ Please enter a valid UTR number!"); return; }
@@ -717,6 +735,16 @@
                     userGems += totalDias;
                     localStorage.setItem('zylobet_gems', userGems);
                     document.getElementById('user-gems').innerText = userGems;
+
+                    // Lock one-time bonus for this package amount so it can't be claimed again
+                    let baseBonus = paidRs >= 500 ? 50 : (paidRs >= 200 ? 18 : (paidRs >= 100 ? 8 : (paidRs >= 50 ? 3 : 0)));
+                    if(baseBonus > 0) {
+                        let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + userId)) || [];
+                        if(!usedBonuses.includes(paidRs)) {
+                            usedBonuses.push(paidRs);
+                            localStorage.setItem('zylobet_used_bonuses_' + userId, JSON.stringify(usedBonuses));
+                        }
+                    }
 
                     let gemHistory = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
                     gemHistory.unshift({ title: "Auto-Verified Deposit", amount: `+${totalDias} Diamonds`, type: "earn", time: "Just now" });
