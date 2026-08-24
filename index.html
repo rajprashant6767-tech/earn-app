@@ -739,13 +739,14 @@
                         </div>
                     </div>
                     <p class='text-gray-300 text-[11px] font-semibold'>Scan this QR using PhonePe, GPay or Paytm (₹${amt} amount fixed)</p>
+                    
                     <p class='text-gray-400 text-[11px] text-left font-semibold mt-1'>Upload Payment Screenshot / Proof:</p>
                     <input type='file' id='deposit-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-sky-500 file:text-white hover:file:bg-sky-600 cursor-pointer'>
-                    <textarea id='deposit-note-input' rows='2' placeholder='Add transaction ID or remarks (optional)...' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-amber-400 font-bold uppercase'></textarea>
                     
-                    <div class='bg-amber-500/10 border border-amber-500/20 p-2.5 rounded-xl text-amber-300 text-[10px] font-bold text-left space-y-1'>
-                        <p>⚠️ <b>WARNING:</b> Submitting fake proofs will result in permanent account ban.</p>
-                        <p>ℹ️ <b>NOTE:</b> Admin will verify your screenshot and add diamonds within 5-10 minutes.</p>
+                    <!-- NOTE & WARNING SECTION WITH TELEGRAM CONTACT -->
+                    <div class='bg-amber-500/10 border border-amber-500/20 p-3 rounded-2xl text-amber-300 text-[11px] font-bold text-left space-y-1.5'>
+                        <p>⚠️ <b>Note:</b> Payment processing takes within 24 hours.</p>
+                        <p>📞 Agar payment nahi aaya to contact karen: <a href="https://t.me/Raj_Prashant" target="_blank" class="inline-flex items-center gap-1 text-sky-400 underline ml-1 bg-sky-500/20 px-2 py-0.5 rounded font-mono"><i class="fa-brands fa-telegram"></i> @Raj_Prashant</a></p>
                     </div>
 
                     <button onclick="submitManualDeposit(${totalDiamonds}, ${amt})" class='w-full py-3.5 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>SUBMIT PROOF FOR APPROVAL</button>
@@ -754,8 +755,6 @@
 
         function submitManualDeposit(totalDias, paidRs) {
             const fileInput = document.getElementById('deposit-proof-file');
-            const noteInput = document.getElementById('deposit-note-input');
-            const noteVal = noteInput ? noteInput.value.trim() : "";
 
             if (!fileInput.files || fileInput.files.length === 0) {
                 alert("❌ Please upload your payment screenshot/proof!");
@@ -776,7 +775,6 @@
                     amount: paidRs,
                     diamonds: totalDias,
                     proofImg: base64Image,
-                    note: noteVal,
                     status: "Pending",
                     time: Date.now()
                 };
@@ -785,10 +783,10 @@
                 localStorage.setItem('zylobet_deposit_requests', JSON.stringify(deposits));
 
                 let hist = JSON.parse(localStorage.getItem('zylobet_withdraw_history')) || [];
-                hist.unshift({ id: newDep.id, method: `Deposit (₹${paidRs})`, amount: totalDias + " Diamonds", rupees: paidRs, status: "Pending Verification", details: `Screenshot attached ${noteVal ? '('+noteVal+')' : ''}` });
+                hist.unshift({ id: newDep.id, method: `Deposit (₹${paidRs})`, amount: totalDias + " Diamonds", rupees: paidRs, status: "Pending Verification", details: `Screenshot attached` });
                 localStorage.setItem('zylobet_withdraw_history', JSON.stringify(hist));
 
-                alert("🎉 Payment screenshot submitted successfully! Admin will review and approve your diamonds shortly.");
+                alert("🎉 Payment screenshot submitted successfully! Admin will review and approve your diamonds within 24 hours.");
                 closeModal();
             };
 
@@ -905,13 +903,11 @@
             }
 
             pending.forEach(d => {
-                let imgTag = d.proofImg ? `<div class="mt-2"><a href="${d.proofImg}" target="_blank"><img src="${d.proofImg}" alt="Payment Proof" class="w-28 h-28 object-cover rounded-xl border border-white/20 mx-auto hover:opacity-90 transition"></a><p class="text-[9px] text-gray-400 text-center mt-1">Tap image to view full size</p></div>` : '';
-                let noteTag = d.note ? `<p class='text-gray-300 font-semibold bg-black/40 p-2 rounded-xl border border-white/5 mt-1'>Note: ${d.note}</p>` : '';
+                let imgTag = d.proofImg ? `<div class="mt-2"><a href="${d.proofImg}" target="_blank"><img src="${d.proofImg}" alt="Payment Proof" class="w-32 h-32 object-cover rounded-xl border border-white/20 mx-auto hover:opacity-90 transition"></a><p class="text-[9px] text-sky-400 text-center mt-1">Click image to view full size</p></div>` : '';
 
                 container.innerHTML += `
                     <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2 text-xs'>
                         <div class='flex justify-between font-black'><span class='text-cyan-400 text-sm'>${d.username}</span><span class='text-emerald-400 text-sm'>+${d.diamonds} 💎 (₹${d.amount})</span></div>
-                        ${noteTag}
                         ${imgTag}
                         <div class="grid grid-cols-2 gap-2 mt-3">
                             <button onclick="approveDeposit(${d.id})" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
