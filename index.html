@@ -729,9 +729,6 @@
             document.getElementById('modal-title').innerText = `PAY ₹${amt} FOR ${totalDiamonds} DIAMONDS`;
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-3 text-xs text-center'>
-                    <div class='bg-amber-500/10 border border-amber-500/20 p-2.5 rounded-xl text-amber-300 text-[11px] font-bold'>
-                        ⚠️ <b>WARNING & NOTE:</b> Pay exact ₹${amt} using the QR code below. After payment, insert your payment proof / details or reference number below for manual admin approval.
-                    </div>
                     <div class='cyber-card border border-white/10 p-3 rounded-2xl text-left'>
                         <p class='text-gray-400 text-[10px] uppercase font-bold'>Account Name</p>
                         <p class='text-white font-black text-sm'>Prashant Raj</p>
@@ -741,38 +738,61 @@
                             <img src='https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(upiString)}' alt='QR' class='w-32 h-32 object-contain rounded-xl'>
                         </div>
                     </div>
-                    <p class='text-gray-400 text-[11px] text-left font-semibold mt-1'>Insert Payment Proof / Transaction Details:</p>
-                    <textarea id='deposit-proof-input' rows='2' placeholder='Enter Transaction ID / Reference No / Payment Details...' class='w-full bg-black/50 border border-white/10 p-3 text-xs rounded-2xl text-amber-400 font-bold uppercase'></textarea>
+                    <p class='text-gray-300 text-[11px] font-semibold'>Scan this QR using PhonePe, GPay or Paytm (₹${amt} amount fixed)</p>
+                    <p class='text-gray-400 text-[11px] text-left font-semibold mt-1'>Upload Payment Screenshot / Proof:</p>
+                    <input type='file' id='deposit-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-sky-500 file:text-white hover:file:bg-sky-600 cursor-pointer'>
+                    <textarea id='deposit-note-input' rows='2' placeholder='Add transaction ID or remarks (optional)...' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-amber-400 font-bold uppercase'></textarea>
+                    
+                    <div class='bg-amber-500/10 border border-amber-500/20 p-2.5 rounded-xl text-amber-300 text-[10px] font-bold text-left space-y-1'>
+                        <p>⚠️ <b>WARNING:</b> Submitting fake proofs will result in permanent account ban.</p>
+                        <p>ℹ️ <b>NOTE:</b> Admin will verify your screenshot and add diamonds within 5-10 minutes.</p>
+                    </div>
+
                     <button onclick="submitManualDeposit(${totalDiamonds}, ${amt})" class='w-full py-3.5 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>SUBMIT PROOF FOR APPROVAL</button>
                 </div>`;
         }
 
         function submitManualDeposit(totalDias, paidRs) {
-            const proofVal = document.getElementById('deposit-proof-input').value.trim();
-            if(!proofVal || proofVal.length < 5) { alert("❌ Please enter valid payment proof / transaction details!"); return; }
+            const fileInput = document.getElementById('deposit-proof-file');
+            const noteInput = document.getElementById('deposit-note-input');
+            const noteVal = noteInput ? noteInput.value.trim() : "";
 
-            let deposits = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert("❌ Please upload your payment screenshot/proof!");
+                return;
+            }
 
-            let newDep = {
-                id: Date.now(),
-                username: "@" + username,
-                userId: userId,
-                amount: paidRs,
-                diamonds: totalDias,
-                proof: proofVal,
-                status: "Pending",
-                time: Date.now()
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const base64Image = e.target.result;
+                let deposits = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
+
+                let newDep = {
+                    id: Date.now(),
+                    username: "@" + username,
+                    userId: userId,
+                    amount: paidRs,
+                    diamonds: totalDias,
+                    proofImg: base64Image,
+                    note: noteVal,
+                    status: "Pending",
+                    time: Date.now()
+                };
+
+                deposits.push(newDep);
+                localStorage.setItem('zylobet_deposit_requests', JSON.stringify(deposits));
+
+                let hist = JSON.parse(localStorage.getItem('zylobet_withdraw_history')) || [];
+                hist.unshift({ id: newDep.id, method: `Deposit (₹${paidRs})`, amount: totalDias + " Diamonds", rupees: paidRs, status: "Pending Verification", details: `Screenshot attached ${noteVal ? '('+noteVal+')' : ''}` });
+                localStorage.setItem('zylobet_withdraw_history', JSON.stringify(hist));
+
+                alert("🎉 Payment screenshot submitted successfully! Admin will review and approve your diamonds shortly.");
+                closeModal();
             };
 
-            deposits.push(newDep);
-            localStorage.setItem('zylobet_deposit_requests', JSON.stringify(deposits));
-
-            let hist = JSON.parse(localStorage.getItem('zylobet_withdraw_history')) || [];
-            hist.unshift({ id: newDep.id, method: `Deposit (₹${paidRs})`, amount: totalDias + " Diamonds", rupees: paidRs, status: "Pending Verification", details: `Proof: ${proofVal}` });
-            localStorage.setItem('zylobet_withdraw_history', JSON.stringify(hist));
-
-            alert("🎉 Payment proof submitted successfully! Admin will review and approve your diamonds shortly.");
-            closeModal();
+            reader.readAsDataURL(file);
         }
 
         function closeModal() { document.getElementById('modal').classList.add('hidden'); }
@@ -812,7 +832,7 @@
                 let html = "<div class='space-y-3'>";
                 withdraws.forEach(item => {
                     let redeemBox = item.redeemCode ? `<div class='flex items-center gap-2 mt-1'><span class='text-xs text-sky-300 font-mono'>🔑 Redeem Code: <b>${item.redeemCode}</b></span><button onclick="copyRedeemCode('${item.redeemCode}')" class='bg-sky-500/20 hover:bg-sky-500/40 text-sky-300 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer'><i class="fa-solid fa-copy"></i> Copy</button></div>` : '';
-                    let commentBox = item.adminComment ? `<p class='text-xs text-rose-400 mt-1'>💬 Reason: <b>${item.adminComment}</b></p>s` : '';
+                    let commentBox = item.adminComment ? `<p class='text-xs text-rose-400 mt-1'>💬 Reason: <b>${item.adminComment}</b></p>` : '';
                     let statusColor = item.status.includes('Rejected') ? 'text-rose-400' : 'text-amber-300';
                     html += `<div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-1'><div class='flex justify-between'><span class='text-amber-400 font-black flex items-center gap-1'>${item.amount} (₹${item.rupees})</span><span class='text-xs ${statusColor} font-bold'>${item.status}</span></div><p class='text-[11px] text-gray-300'>Method: ${item.method}</p>${item.details ? `<p class='text-[10px] text-gray-400'>${item.details}</p>` : ''}${redeemBox}${commentBox}</div>`;
                 });
@@ -885,11 +905,15 @@
             }
 
             pending.forEach(d => {
+                let imgTag = d.proofImg ? `<div class="mt-2"><a href="${d.proofImg}" target="_blank"><img src="${d.proofImg}" alt="Payment Proof" class="w-28 h-28 object-cover rounded-xl border border-white/20 mx-auto hover:opacity-90 transition"></a><p class="text-[9px] text-gray-400 text-center mt-1">Tap image to view full size</p></div>` : '';
+                let noteTag = d.note ? `<p class='text-gray-300 font-semibold bg-black/40 p-2 rounded-xl border border-white/5 mt-1'>Note: ${d.note}</p>` : '';
+
                 container.innerHTML += `
                     <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2 text-xs'>
                         <div class='flex justify-between font-black'><span class='text-cyan-400 text-sm'>${d.username}</span><span class='text-emerald-400 text-sm'>+${d.diamonds} 💎 (₹${d.amount})</span></div>
-                        <p class='text-gray-300 font-semibold bg-black/40 p-2.5 rounded-xl border border-white/5'>Proof: <span class="text-amber-400">${d.proof}</span></p>
-                        <div class="grid grid-cols-2 gap-2 mt-2">
+                        ${noteTag}
+                        ${imgTag}
+                        <div class="grid grid-cols-2 gap-2 mt-3">
                             <button onclick="approveDeposit(${d.id})" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
                             <button onclick="rejectDeposit(${d.id})" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
                         </div>
