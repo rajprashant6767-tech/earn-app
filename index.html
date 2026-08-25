@@ -118,7 +118,7 @@
     <!-- MAIN APP WRAPPER -->
     <div id="main-app" class="opacity-0 transition-opacity duration-500 space-y-6">
         
-        <!-- ADMIN DASHBOARD ACCESS BAR (STRICTLY SECURED FOR ADMIN_ID ONLY) -->
+        <!-- ADMIN DASHBOARD ACCESS BAR (ONLY SHOWN TO ADMIN_ID) -->
         <div id="admin-toggle-bar" class="hidden mb-2 cyber-card p-3 rounded-2xl flex justify-between items-center text-xs shadow-xl backdrop-blur-md border-emerald-500/40">
             <span class="text-emerald-400 font-extrabold flex items-center gap-1.5">
                 <i class="fa-solid fa-shield-halved text-sm"></i> Admin Mode Enabled
@@ -507,7 +507,7 @@
 
         setInterval(() => {
             registerUserActivity();
-        }, 5000);
+        }, 3000);
 
         function showCustomAlert(msg) {
             document.getElementById('custom-alert-text').innerText = msg;
@@ -574,7 +574,8 @@
             let onlineCount = 0;
             let now = Date.now();
             userKeys.forEach(k => {
-                if(now - allUsers[k].lastActive < 20000) { // Active within 20 seconds
+                // Check if active within the last 15 seconds
+                if(now - allUsers[k].lastActive < 15000) {
                     onlineCount++;
                 }
             });
@@ -619,13 +620,13 @@
 
         function formatTimeAgo(timestamp) {
             if(!timestamp) return "Just now";
-            const diffMin = Math.floor((Date.now() - timestamp) / 60000);
-            if (diffMin < 1) return "Just now";
+            const diffSec = Math.floor((Date.now() - timestamp) / 1000);
+            if (diffSec < 10) return "Just now";
+            if (diffSec < 60) return `${diffSec} sec ago`;
+            const diffMin = Math.floor(diffSec / 60);
             if (diffMin < 60) return `${diffMin} min ago`;
             const diffHr = Math.floor(diffMin / 60);
-            if (diffHr < 24) return `${diffHr} hr ago`;
-            const diffDay = Math.floor(diffHr / 24);
-            return `${diffDay} day ago`;
+            return `${diffHr} hr ago`;
         }
 
         function openDepositStatusModal() {
