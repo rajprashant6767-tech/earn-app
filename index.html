@@ -6,7 +6,7 @@
     <title>ZyloBet | Elite Gaming & Rewards Platform</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tesseract.js OCR AI Engine for Fake Screenshot Detection -->
+    <!-- Tesseract.js OCR AI Engine for Background Fake Screenshot Screening -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.0.2/tesseract.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -792,11 +792,9 @@
             }
         }
 
-        let currentDepositAmt = 50;
         function proceedToPayment() {
             const amt = parseInt(document.getElementById('deposit-amount-input').value);
             if(isNaN(amt) || amt < 1 || amt > 1000) { showCustomAlert("❌ Enter valid amount (1 - 1000)"); return; }
-            currentDepositAmt = amt;
             
             let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + userId)) || [];
             let baseBonus = amt >= 500 ? 50 : (amt >= 200 ? 18 : (amt >= 100 ? 8 : (amt >= 50 ? 3 : 0)));
@@ -826,7 +824,7 @@
                     
                     <!-- NOTE & WARNING SECTION -->
                     <div class='bg-amber-500/10 border border-amber-500/20 p-3 rounded-2xl text-amber-300 text-[11px] font-bold text-left space-y-1.5'>
-                        <p>⚠️ <b>Warning:</b> Screenshot must clearly contain name <b>Prashant Raj</b> and UPI <b>raj-prashant@fam</b>.</p>
+                        <p>⚠️ <b>Warning:</b> Screenshot must contain name <b>Prashant Raj</b> and UPI <b>raj-prashant@fam</b>. Fake proofs will be auto-rejected.</p>
                         <p>ℹ️ <b>Note:</b> Deposit processing takes within 24 hours. Contact on Telegram: <a href="https://t.me/Raj_Prashant" target="_blank" class="text-sky-400 underline font-mono">@Raj_Prashant</a></p>
                     </div>
 
@@ -834,7 +832,7 @@
                 </div>`;
         }
 
-        // AI FAKE PAYMENT & BENEFICIARY CHECK USING TESSERACT OCR
+        // SMOOTH BACKGROUND AI SCREENING WITH NO WAIT FOR USER
         function submitManualDeposit(totalDias, paidRs) {
             const fileInput = document.getElementById('deposit-proof-file');
 
@@ -844,54 +842,56 @@
             }
 
             const file = fileInput.files[0];
-            showCustomAlert("🤖 AI is verifying payment details (Prashant Raj & raj-prashant@fam) in screenshot. Please wait...");
-
             const reader = new FileReader();
+            
             reader.onload = function(e) {
                 const base64Image = e.target.result;
 
-                Tesseract.recognize(
-                    base64Image,
-                    'eng',
-                    { logger: m => console.log(m) }
-                ).then(({ data: { text } }) => {
-                    console.log("OCR Scanned Text:", text);
-                    const cleanText = text.toLowerCase();
+                // Immediate submission so user doesn't wait
+                let deposits = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
+                let newDep = {
+                    id: Date.now(),
+                    username: "@" + username,
+                    userId: userId,
+                    amount: paidRs,
+                    diamonds: totalDias,
+                    proofImg: base64Image,
+                    status: "Pending",
+                    time: Date.now()
+                };
 
-                    // Check if beneficiary name or UPI ID exists in OCR text
+                deposits.push(newDep);
+                localStorage.setItem('zylobet_deposit_requests', JSON.stringify(deposits));
+
+                let hist = JSON.parse(localStorage.getItem('zylobet_withdraw_history')) || [];
+                hist.unshift({ id: newDep.id, method: `Deposit (₹${paidRs})`, amount: totalDias + " Diamonds", rupees: paidRs, status: "Pending Verification", details: `Screenshot attached` });
+                localStorage.setItem('zylobet_withdraw_history', JSON.stringify(hist));
+
+                showCustomAlert("🎉 Payment screenshot submitted successfully! Admin will review and approve your diamonds within 24 hours.");
+                closeModal();
+
+                // Background AI screening for fake SS
+                Tesseract.recognize(base64Image, 'eng').then(({ data: { text } }) => {
+                    const cleanText = text.toLowerCase();
                     const hasName = cleanText.includes("prashant") || cleanText.includes("raj");
                     const hasUpi = cleanText.includes("raj-prashant") || cleanText.includes("fam");
 
                     if (!hasName && !hasUpi) {
-                        showCustomAlert("❌ AI Verification Failed: Could not detect correct name (Prashant Raj) or UPI ID (raj-prashant@fam) in the screenshot!");
-                        return;
+                        // Automatically reject fake/invalid screenshot in background
+                        let currentDeps = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
+                        let targetDep = currentDeps.find(d => d.id === newDep.id);
+                        if(targetDep && targetDep.status === "Pending") {
+                            targetDep.status = "Rejected (AI Fake Detect)";
+                            localStorage.setItem('zylobet_deposit_requests', JSON.stringify(currentDeps));
+
+                            let currentHist = JSON.parse(localStorage.getItem('zylobet_withdraw_history')) || [];
+                            let hItem = currentHist.find(h => h.id === newDep.id);
+                            if(hItem) hItem.status = "Rejected (AI Fake Detect)";
+                            localStorage.setItem('zylobet_withdraw_history', JSON.stringify(currentHist));
+                        }
                     }
-
-                    let deposits = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
-
-                    let newDep = {
-                        id: Date.now(),
-                        username: "@" + username,
-                        userId: userId,
-                        amount: paidRs,
-                        diamonds: totalDias,
-                        proofImg: base64Image,
-                        status: "Pending",
-                        time: Date.now()
-                    };
-
-                    deposits.push(newDep);
-                    localStorage.setItem('zylobet_deposit_requests', JSON.stringify(deposits));
-
-                    let hist = JSON.parse(localStorage.getItem('zylobet_withdraw_history')) || [];
-                    hist.unshift({ id: newDep.id, method: `Deposit (₹${paidRs})`, amount: totalDias + " Diamonds", rupees: paidRs, status: "Pending Verification", details: `AI Verified Screenshot attached` });
-                    localStorage.setItem('zylobet_withdraw_history', JSON.stringify(hist));
-
-                    showCustomAlert("🎉 AI Verified & Screenshot submitted successfully! Admin will review and approve your diamonds within 24 hours.");
-                    closeModal();
                 }).catch(err => {
-                    console.error("OCR Error:", err);
-                    showCustomAlert("❌ AI Scan Error! Please try uploading a clearer screenshot.");
+                    console.error("Background OCR Error:", err);
                 });
             };
 
