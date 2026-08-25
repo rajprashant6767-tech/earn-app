@@ -6,6 +6,8 @@
     <title>ZyloBet | Elite Gaming & Rewards Platform</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tesseract.js OCR AI Engine for Fake Screenshot Detection -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.0.2/tesseract.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
@@ -818,7 +820,7 @@
                     <p class='text-gray-400 text-[11px] text-left font-semibold mt-1'>Upload Payment Screenshot / Proof:</p>
                     <input type='file' id='deposit-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-sky-500 file:text-white hover:file:bg-sky-600 cursor-pointer'>
                     
-                    <!-- NOTE & WARNING SECTION -->
+                    <!-- NOTE & WARNING SECTION (CORRECTED) -->
                     <div class='bg-amber-500/10 border border-amber-500/20 p-3 rounded-2xl text-amber-300 text-[11px] font-bold text-left space-y-1.5'>
                         <p>⚠️ <b>Warning:</b> Submitting fake proofs will result in permanent account ban.</p>
                         <p>ℹ️ <b>Note:</b> Deposit processing takes within 24 hours. If deposit money is not received, contact on Telegram: <a href="https://t.me/Raj_Prashant" target="_blank" class="text-sky-400 underline font-mono">@Raj_Prashant</a></p>
@@ -984,7 +986,6 @@
                     <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2 text-xs'>
                         <div class='flex justify-between font-black'><span class='text-cyan-400 text-sm'>${d.username}</span><span class='text-emerald-400 text-sm'>+${d.diamonds} 💎 (₹${d.amount})</span></div>
                         ${imgTag}
-                        <p class='text-[10px] text-sky-400 text-center font-bold'>🔍 Click screenshot to zoom / view fullscreen</p>
                         <div class="grid grid-cols-2 gap-2 mt-3">
                             <button onclick="approveDeposit(${d.id})" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
                             <button onclick="rejectDeposit(${d.id})" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
@@ -1188,7 +1189,7 @@
                             <input type='number' id='adm-time-value' value='60' min='1' class='w-full bg-black/50 border border-white/10 p-2.5 rounded-xl text-white font-bold'>
                         </div>
                         <div>
-                            <label class='text-[10px] text-gray-400 font-bold block mb-1'>Max Users Limit</label>
+                            <label class='text-[10px] text-gray-400 font-bold block yp-1'>Max Users Limit</label>
                             <input type='number' id='adm-limit-input' value='50' min='1' class='w-full bg-black/50 border border-white/10 p-2.5 rounded-xl text-white font-bold'>
                         </div>
                     </div>
