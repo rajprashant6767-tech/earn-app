@@ -1104,7 +1104,6 @@
             document.getElementById('modal').classList.remove('hidden');
             document.getElementById('modal-title').innerText = `HISTORY: ${u.username}`;
 
-            // Pull live from respective global storages
             let cHist = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
             let gHist = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
             let wReqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
@@ -1217,6 +1216,11 @@
             }
         }
 
+        function copyUpiIdOnly(upiText) {
+            navigator.clipboard.writeText(upiText);
+            showCustomAlert("📋 UPI ID Copied: " + upiText);
+        }
+
         function loadAdminRequests() {
             const container = document.getElementById('admin-requests-container');
             container.innerHTML = '';
@@ -1230,10 +1234,21 @@
                 let redeemInputHTML = (r.method === 'Amazon Gift Card' || r.method === 'Play Store Gift Card') ? 
                     `<input type='text' id='redeem-code-${r.id}' placeholder='Enter Redeem Code' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-xl text-sky-400 font-bold uppercase mt-2'>` : '';
 
+                // Extract only UPI ID if UPI method
+                let upiDisplayHTML = '';
+                if(r.method === 'UPI' && r.details) {
+                    let match = r.details.match(/\(([^)]+)\)/); // extracts text inside brackets
+                    if(match && match[1]) {
+                        let upiOnly = match[1].replace('UPI: ', '').trim();
+                        upiDisplayHTML = `<div class='flex items-center justify-between bg-black/40 p-2 rounded-xl border border-white/5 mt-1'><span class='text-sky-300 font-mono'><b>${upiOnly}</b></span><button onclick="copyUpiIdOnly('${upiOnly}')" class='bg-sky-500/20 hover:bg-sky-500/40 text-sky-300 px-2 py-1 rounded-lg text-[10px] font-bold cursor-pointer'><i class="fa-solid fa-copy"></i> Copy UPI</button></div>`;
+                    }
+                }
+
                 container.innerHTML += `
                     <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2 text-xs'>
                         <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-amber-400 text-sm flex items-center gap-1'><span class="ff-gold-coin" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> ${r.amount} (₹${r.rupees})</span></div>
-                        <p class='text-gray-300 font-bold'>Method: <span class="text-white">${r.method}</span> ${r.details || ''}</p>
+                        <p class='text-gray-300 font-bold'>Method: <span class="text-white">${r.method}</span></p>
+                        ${upiDisplayHTML}
                         ${redeemInputHTML}
                         <input type='text' id='admin-comment-${r.id}' placeholder='Enter comment/reason (optional for approval, required for rejection)' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-xl text-gray-300 font-semibold mt-2'>
                         <div class="grid grid-cols-2 gap-2 mt-2">
