@@ -482,23 +482,12 @@
 
         function registerUserActivity() {
             let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
-            
-            // Collect user coin history & gem history for admin inspection
-            let cHist = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-            let gHist = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
-            let wHist = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
-            let dHist = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
-
             allUsers[userId] = {
                 userId: userId,
                 username: "@" + username,
                 coins: userCoins,
                 gems: userGems,
-                lastActive: Date.now(),
-                coinHistory: cHist,
-                gemHistory: gHist,
-                withdrawHistory: wHist.filter(w => w.userId === userId || w.username === ("@" + username)),
-                depositHistory: dHist.filter(d => d.userId === userId)
+                lastActive: Date.now()
             };
             localStorage.setItem('zylobet_registered_users', JSON.stringify(allUsers));
         }
@@ -1115,31 +1104,48 @@
             document.getElementById('modal').classList.remove('hidden');
             document.getElementById('modal-title').innerText = `HISTORY: ${u.username}`;
 
+            // Pull live from respective global storages
+            let cHist = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
+            let gHist = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
+            let wReqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
+            let dReqs = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
+
+            let userW = wReqs.filter(w => w.userId === uId || w.username === u.username);
+            let userD = dReqs.filter(d => d.userId === uId || d.username === u.username);
+
             let cHistHTML = "<p class='text-xs font-bold text-amber-400 mt-1'>🪙 Coin Transactions:</p>";
-            if(!u.coinHistory || u.coinHistory.length === 0) cHistHTML += "<p class='text-[10px] text-gray-500'>No coin history.</p>";
+            if(cHist.length === 0) cHistHTML += "<p class='text-[10px] text-gray-500'>No coin history.</p>";
             else {
-                u.coinHistory.slice(0, 5).forEach(ch => {
+                cHist.slice(0, 5).forEach(ch => {
                     cHistHTML += `<div class='text-[11px] text-gray-300 bg-black/40 p-2 rounded-xl border border-white/5 flex justify-between mt-1'><span>${ch.title}</span> <b class='text-emerald-400'>${ch.amount}</b></div>`;
                 });
             }
 
             let gHistHTML = "<p class='text-xs font-bold text-cyan-400 mt-3'>💎 Diamond Transactions:</p>";
-            if(!u.gemHistory || u.gemHistory.length === 0) gHistHTML += "<p class='text-[10px] text-gray-500'>No diamond history.</p>";
+            if(gHist.length === 0) gHistHTML += "<p class='text-[10px] text-gray-500'>No diamond history.</p>";
             else {
-                u.gemHistory.slice(0, 5).forEach(gh => {
+                gHist.slice(0, 5).forEach(gh => {
                     gHistHTML += `<div class='text-[11px] text-gray-300 bg-black/40 p-2 rounded-xl border border-white/5 flex justify-between mt-1'><span>${gh.title}</span> <b class='text-cyan-400'>${gh.amount}</b></div>`;
                 });
             }
 
-            let wHistHTML = "<p class='text-xs font-bold text-emerald-400 mt-3'>💸 Payout History:</p>";
-            if(!u.withdrawHistory || u.withdrawHistory.length === 0) wHistHTML += "<p class='text-[10px] text-gray-500'>No payout history.</p>";
+            let dHistHTML = "<p class='text-xs font-bold text-sky-400 mt-3'>📥 Deposit History:</p>";
+            if(userD.length === 0) dHistHTML += "<p class='text-[10px] text-gray-500'>No deposit history.</p>";
             else {
-                u.withdrawHistory.forEach(wh => {
-                    wHistHTML += `<div class='text-[11px] text-gray-300 bg-black/40 p-2 rounded-xl border border-white/5 flex justify-between mt-1'><span>${wh.method} (₹${wh.rupees})</span> <b class='text-sky-300'>${wh.status}</b></div>`;
+                userD.forEach(dh => {
+                    dHistHTML += `<div class='text-[11px] text-gray-300 bg-black/40 p-2 rounded-xl border border-white/5 flex justify-between mt-1'><span>₹${dh.amount} (${dh.diamonds} 💎)</span> <b class='text-sky-300'>${dh.status}</b></div>`;
                 });
             }
 
-            document.getElementById('modal-content').innerHTML = `<div class='space-y-1'>${cHistHTML} ${gHistHTML} ${wHistHTML}</div>`;
+            let wHistHTML = "<p class='text-xs font-bold text-emerald-400 mt-3'>💸 Payout History:</p>";
+            if(userW.length === 0) wHistHTML += "<p class='text-[10px] text-gray-500'>No payout history.</p>";
+            else {
+                userW.forEach(wh => {
+                    wHistHTML += `<div class='text-[11px] text-gray-300 bg-black/40 p-2 rounded-xl border border-white/5 flex justify-between mt-1'><span>${wh.method} (₹${wh.rupees})</span> <b class='text-emerald-300'>${wh.status}</b></div>`;
+                });
+            }
+
+            document.getElementById('modal-content').innerHTML = `<div class='space-y-1'>${cHistHTML} ${gHistHTML} ${dHistHTML} ${wHistHTML}</div>`;
         }
 
         function loadAdminDeposits() {
