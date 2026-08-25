@@ -6,8 +6,6 @@
     <title>ZyloBet | Elite Gaming & Rewards Platform</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tesseract.js OCR AI Engine for Background Fake Screenshot Screening -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.0.2/tesseract.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
@@ -809,8 +807,6 @@
                     <div class='cyber-card border border-white/10 p-3 rounded-2xl text-left'>
                         <p class='text-gray-400 text-[10px] uppercase font-bold'>Account Name</p>
                         <p class='text-white font-black text-sm'>Prashant Raj</p>
-                        <p class='text-gray-400 text-[10px] uppercase font-bold mt-2'>UPI ID</p>
-                        <p class='text-sky-400 font-black text-xs'>raj-prashant@fam</p>
                     </div>
                     <div class='flex justify-center my-1'>
                         <div class='bg-white p-2.5 rounded-2xl shadow-xl inline-block'>
@@ -824,15 +820,14 @@
                     
                     <!-- NOTE & WARNING SECTION -->
                     <div class='bg-amber-500/10 border border-amber-500/20 p-3 rounded-2xl text-amber-300 text-[11px] font-bold text-left space-y-1.5'>
-                        <p>⚠️ <b>Warning:</b> Screenshot must contain name <b>Prashant Raj</b> and UPI <b>raj-prashant@fam</b>. Fake proofs will be auto-rejected.</p>
-                        <p>ℹ️ <b>Note:</b> Deposit processing takes within 24 hours. Contact on Telegram: <a href="https://t.me/Raj_Prashant" target="_blank" class="text-sky-400 underline font-mono">@Raj_Prashant</a></p>
+                        <p>⚠️ <b>Warning:</b> Submitting fake proofs will result in permanent account ban.</p>
+                        <p>ℹ️ <b>Note:</b> Deposit processing takes within 24 hours. If deposit money is not received, contact on Telegram: <a href="https://t.me/Raj_Prashant" target="_blank" class="text-sky-400 underline font-mono">@Raj_Prashant</a></p>
                     </div>
 
                     <button onclick="submitManualDeposit(${totalDiamonds}, ${amt})" class='w-full py-3.5 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>SUBMIT PROOF FOR APPROVAL</button>
                 </div>`;
         }
 
-        // SMOOTH BACKGROUND AI SCREENING WITH NO WAIT FOR USER
         function submitManualDeposit(totalDias, paidRs) {
             const fileInput = document.getElementById('deposit-proof-file');
 
@@ -846,9 +841,8 @@
             
             reader.onload = function(e) {
                 const base64Image = e.target.result;
-
-                // Immediate submission so user doesn't wait
                 let deposits = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
+
                 let newDep = {
                     id: Date.now(),
                     username: "@" + username,
@@ -863,36 +857,9 @@
                 deposits.push(newDep);
                 localStorage.setItem('zylobet_deposit_requests', JSON.stringify(deposits));
 
-                let hist = JSON.parse(localStorage.getItem('zylobet_withdraw_history')) || [];
-                hist.unshift({ id: newDep.id, method: `Deposit (₹${paidRs})`, amount: totalDias + " Diamonds", rupees: paidRs, status: "Pending Verification", details: `Screenshot attached` });
-                localStorage.setItem('zylobet_withdraw_history', JSON.stringify(hist));
-
+                // NOTE: NOT adding deposit to withdraw/payout history so withdraw log remains pure payouts only!
                 showCustomAlert("🎉 Payment screenshot submitted successfully! Admin will review and approve your diamonds within 24 hours.");
                 closeModal();
-
-                // Background AI screening for fake SS
-                Tesseract.recognize(base64Image, 'eng').then(({ data: { text } }) => {
-                    const cleanText = text.toLowerCase();
-                    const hasName = cleanText.includes("prashant") || cleanText.includes("raj");
-                    const hasUpi = cleanText.includes("raj-prashant") || cleanText.includes("fam");
-
-                    if (!hasName && !hasUpi) {
-                        // Automatically reject fake/invalid screenshot in background
-                        let currentDeps = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
-                        let targetDep = currentDeps.find(d => d.id === newDep.id);
-                        if(targetDep && targetDep.status === "Pending") {
-                            targetDep.status = "Rejected (AI Fake Detect)";
-                            localStorage.setItem('zylobet_deposit_requests', JSON.stringify(currentDeps));
-
-                            let currentHist = JSON.parse(localStorage.getItem('zylobet_withdraw_history')) || [];
-                            let hItem = currentHist.find(h => h.id === newDep.id);
-                            if(hItem) hItem.status = "Rejected (AI Fake Detect)";
-                            localStorage.setItem('zylobet_withdraw_history', JSON.stringify(currentHist));
-                        }
-                    }
-                }).catch(err => {
-                    console.error("Background OCR Error:", err);
-                });
             };
 
             reader.readAsDataURL(file);
@@ -929,15 +896,19 @@
                 });
                 content.innerHTML = html + "</div>";
             } else if(type === 'withdrawals') {
-                title.innerText = "PAYOUT & DEPOSIT HISTORY";
-                let withdraws = JSON.parse(localStorage.getItem('zylobet_withdraw_history')) || [];
-                if(withdraws.length === 0) { content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No history yet.</div>`; return; }
+                // ONLY SHOW ACTUAL PAYOUT / WITHDRAWAL HISTORY (DEPOSITS REMOVED)
+                title.innerText = "PAYOUT HISTORY";
+                let withdraws = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
+                if(withdraws.length === 0) { content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No payout history yet.</div>`; return; }
                 let html = "<div class='space-y-3'>";
                 withdraws.forEach(item => {
                     let redeemBox = item.redeemCode ? `<div class='flex items-center gap-2 mt-1'><span class='text-xs text-sky-300 font-mono'>🔑 Redeem Code: <b>${item.redeemCode}</b></span><button onclick="copyRedeemCode('${item.redeemCode}')" class='bg-sky-500/20 hover:bg-sky-500/40 text-sky-300 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer'><i class="fa-solid fa-copy"></i> Copy</button></div>` : '';
                     let commentBox = item.adminComment ? `<p class='text-xs text-rose-400 mt-1'>💬 Reason: <b>${item.adminComment}</b></p>` : '';
-                    let statusColor = item.status.includes('Rejected') ? 'text-rose-400' : 'text-amber-300';
-                    html += `<div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-1'><div class='flex justify-between'><span class='text-amber-400 font-black flex items-center gap-1'>${item.amount} (₹${item.rupees})</span><span class='text-xs ${statusColor} font-bold'>${item.status}</span></div><p class='text-[11px] text-gray-300'>Method: ${item.method}</p>${item.details ? `<p class='text-[10px] text-gray-400'>${item.details}</p>` : ''}${redeemBox}${commentBox}</div>`;
+                    
+                    // Success = Green, Rejected = Red
+                    let statusColor = item.status.includes('Success') ? 'text-emerald-400 font-bold' : (item.status.includes('Rejected') ? 'text-rose-400 font-bold' : 'text-amber-300 font-bold');
+                    
+                    html += `<div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-1'><div class='flex justify-between'><span class='text-amber-400 font-black flex items-center gap-1'><span class="ff-gold-coin" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> ${item.amount} (₹${item.rupees})</span><span class='text-xs ${statusColor}'>${item.status}</span></div><p class='text-[11px] text-gray-300'>Method: ${item.method}</p>${item.details ? `<p class='text-[10px] text-gray-400'>${item.details}</p>` : ''}${redeemBox}${commentBox}</div>`;
                 });
                 content.innerHTML = html + "</div>";
             }
@@ -962,10 +933,6 @@
             let newReq = { id: Date.now(), username: "@" + username, method: method, amount: selectedWCoins, rupees: selectedWAmount, details: extraDetails, status: "Pending" };
             reqs.push(newReq);
             localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
-
-            let hist = JSON.parse(localStorage.getItem('zylobet_withdraw_history')) || [];
-            hist.unshift(newReq);
-            localStorage.setItem('zylobet_withdraw_history', JSON.stringify(hist));
 
             let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
             coinHist.unshift({ title: `Withdrawal Request (${method})`, amount: `-${selectedWCoins} Coins`, type: "spend", time: Date.now(), status: "Pending" });
@@ -1047,11 +1014,6 @@
                 gemHist.unshift({ title: `Deposit Approved (₹${dep.amount})`, amount: `+${dep.diamonds} Diamonds`, type: "earn", time: Date.now(), status: "Success" });
                 localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHist));
 
-                let withdrawHist = JSON.parse(localStorage.getItem('zylobet_withdraw_history')) || [];
-                let hItem = withdrawHist.find(h => h.id === dep.id);
-                if(hItem) hItem.status = "Success (Approved)";
-                localStorage.setItem('zylobet_withdraw_history', JSON.stringify(withdrawHist));
-
                 showCustomAlert("🎉 Deposit Approved Successfully! Diamonds added to user.");
                 loadAdminDeposits();
             }
@@ -1064,11 +1026,6 @@
             if(dep && dep.status === "Pending") {
                 dep.status = "Rejected";
                 localStorage.setItem('zylobet_deposit_requests', JSON.stringify(deposits));
-
-                let withdrawHist = JSON.parse(localStorage.getItem('zylobet_withdraw_history')) || [];
-                let hItem = withdrawHist.find(h => h.id === dep.id);
-                if(hItem) hItem.status = "Rejected";
-                localStorage.setItem('zylobet_withdraw_history', JSON.stringify(withdrawHist));
 
                 showCustomAlert("❌ Deposit Rejected.");
                 loadAdminDeposits();
@@ -1119,20 +1076,11 @@
             }
 
             if(req) { 
-                req.status = "Success"; 
+                req.status = "Success (Approved)"; 
                 req.redeemCode = redeemCode;
                 req.adminComment = adminComment;
             }
             localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
-
-            let history = JSON.parse(localStorage.getItem('zylobet_withdraw_history')) || [];
-            let histItem = history.find(h => h.id === id);
-            if(histItem) {
-                histItem.status = "Success";
-                histItem.redeemCode = redeemCode;
-                histItem.adminComment = adminComment;
-            }
-            localStorage.setItem('zylobet_withdraw_history', JSON.stringify(history));
 
             showCustomAlert("Payout Approved Successfully!");
             loadAdminRequests();
@@ -1156,14 +1104,6 @@
                 let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
                 coinHist.unshift({ title: `Withdrawal Refund (${req.method})`, amount: `+${req.amount} Coins`, type: "earn", time: Date.now(), status: "Success" });
                 localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHist));
-
-                let history = JSON.parse(localStorage.getItem('zylobet_withdraw_history')) || [];
-                let histItem = history.find(h => h.id === id);
-                if(histItem) {
-                    histItem.status = "Rejected (Refunded)";
-                    histItem.adminComment = adminComment;
-                }
-                localStorage.setItem('zylobet_withdraw_history', JSON.stringify(history));
 
                 showCustomAlert(`❌ Payout Rejected! ${req.amount} Coins refunded successfully.`);
                 loadAdminRequests();
@@ -1221,7 +1161,7 @@
                             <input type='number' id='adm-limit-input' value='50' min='1' class='w-full bg-black/50 border border-white/10 p-2.5 rounded-xl text-white font-bold'>
                         </div>
                     </div>
-                    <button onclick='createPromoCode()' class='w-full py-3 bg-gradient-to-r from-rose-600 to-purple-600 rounded-xl font-black text-white cursor-pointer shadow-lg'>CREATE & ACTIVATE CODE</button>
+                    <button onclick='createPromoCode()' class='w-full py-3 bg-gradient-to-r from-rose-600 to-purple-600 rounded-xl font-black text-xs text-white cursor-pointer shadow-lg'>CREATE & ACTIVATE CODE</button>
                     ${activeListHTML}
                 </div>`;
         }
