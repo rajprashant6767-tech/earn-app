@@ -155,6 +155,12 @@
                     </button>
                 </div>
 
+                <!-- DEPOSIT STATUS CHECK BUTTON -->
+                <button onclick="openDepositStatusModal()" class="w-full py-2.5 px-4 rounded-2xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 text-sky-400 font-extrabold text-xs transition flex items-center justify-between shadow cursor-pointer">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left"></i> Check Deposit Status</span>
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </button>
+
                 <div class="grid grid-cols-2 gap-4">
                     <div onclick="openHistory('coins')" class="cyber-card p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-amber-400/40 transition group">
                         <p class="text-xl font-black text-amber-400 group-hover:scale-105 transition origin-left flex items-center gap-2.5">
@@ -172,19 +178,6 @@
                             <span>DIAMONDS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-cyan-400/80"></i>
                         </p>
                     </div>
-                </div>
-            </div>
-
-            <!-- LIVE DEPOSIT STATUS TRACKER ON HOME PAGE -->
-            <div class="cyber-card p-4 rounded-3xl border border-sky-500/30 space-y-3">
-                <div class="flex justify-between items-center pb-2 border-b border-white/10">
-                    <h3 class="text-xs font-black text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
-                        <i class="fa-solid fa-receipt"></i> Recent Deposit Status
-                    </h3>
-                    <span class="text-[10px] text-gray-400 font-bold">Real-time Tracker</span>
-                </div>
-                <div id="home-deposit-status-container" class="space-y-2">
-                    <!-- Dynamic status items will load here -->
                 </div>
             </div>
 
@@ -424,7 +417,18 @@
         </button>
     </nav>
 
-    <!-- PRO CYBER ALERT MODAL (REPLACES DEFAULT WHITE ALERT) -->
+    <!-- FULLSCREEN IMAGE ZOOM MODAL FOR ADMIN PROOF -->
+    <div id="image-zoom-modal" class="hidden fixed inset-0 z-[300] bg-black/95 backdrop-blur-lg p-4 flex flex-col items-center justify-center">
+        <button onclick="closeImageZoom()" class="absolute top-5 right-5 w-12 h-12 rounded-full bg-white/10 text-white font-black text-lg flex items-center justify-center hover:bg-white/20 transition cursor-pointer">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="max-w-xl w-full max-h-[85vh] overflow-auto flex items-center justify-center p-2">
+            <img id="zoomed-img-element" src="" alt="Zoomed Proof" class="max-w-full max-h-[80vh] object-contain rounded-2xl border border-white/20 shadow-2xl">
+        </div>
+        <p class="text-xs text-gray-400 mt-3 font-semibold">Tap anywhere or press X to close</p>
+    </div>
+
+    <!-- PRO CYBER ALERT MODAL -->
     <div id="custom-alert-modal" class="hidden fixed inset-0 z-[200] bg-black/80 backdrop-blur-md p-5 flex items-center justify-center">
         <div class="cyber-card p-6 rounded-3xl border border-sky-500/30 shadow-2xl max-w-sm w-full text-center space-y-4">
             <div class="w-12 h-12 rounded-2xl bg-sky-500/20 border border-sky-500/40 text-sky-400 flex items-center justify-center mx-auto text-xl">
@@ -456,7 +460,6 @@
                 setTimeout(() => {
                     intro.remove();
                     document.getElementById('main-app').style.opacity = '1';
-                    loadHomeDepositStatus();
                 }, 700);
             }, 1500);
         });
@@ -468,6 +471,15 @@
 
         function closeCustomAlert() {
             document.getElementById('custom-alert-modal').classList.add('hidden');
+        }
+
+        function openImageZoom(imgSrc) {
+            document.getElementById('zoomed-img-element').src = imgSrc;
+            document.getElementById('image-zoom-modal').classList.remove('hidden');
+        }
+
+        function closeImageZoom() {
+            document.getElementById('image-zoom-modal').classList.add('hidden');
         }
 
         const ADMIN_ID = "7927224931";
@@ -512,7 +524,6 @@
                 document.querySelector('nav').classList.remove('hidden');
                 switchTab('home');
                 document.getElementById('view-toggle-btn').innerText = "Open Admin Panel";
-                loadHomeDepositStatus();
             }
         }
 
@@ -524,9 +535,6 @@
 
             document.getElementById('tab-' + tab).classList.remove('hidden');
             document.getElementById('nav-' + tab).className = "flex flex-col items-center gap-1 text-sky-400 transition py-1 px-4 rounded-2xl bg-sky-500/10 cursor-pointer";
-            if(tab === 'home') {
-                loadHomeDepositStatus();
-            }
         }
 
         let userCoins = parseInt(localStorage.getItem('zylobet_coins')) || 1250;
@@ -560,32 +568,32 @@
             return `${diffDay} day ago`;
         }
 
-        function loadHomeDepositStatus() {
-            const container = document.getElementById('home-deposit-status-container');
-            if(!container) return;
+        function openDepositStatusModal() {
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('modal-title').innerText = "RECENT DEPOSIT STATUS";
             let deposits = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
-            let userDeps = deposits.filter(d => d.userId === userId).slice(0, 3); // Show recent 3
+            let userDeps = deposits.filter(d => d.userId === userId);
 
             if(userDeps.length === 0) {
-                container.innerHTML = `<p class='text-[11px] text-gray-500 text-center py-2'>No recent deposit requests found.</p>`;
+                document.getElementById('modal-content').innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No deposit requests found.</div>`;
                 return;
             }
 
-            let html = "";
-            userDeps.forEach(d => {
+            let html = "<div class='space-y-3'>";
+            userDeps.reverse().forEach(d => {
                 let statusColor = d.status === 'Success' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' : (d.status === 'Rejected' ? 'text-rose-400 bg-rose-500/10 border-rose-500/30' : 'text-amber-400 bg-amber-500/10 border-amber-500/30');
                 html += `
-                    <div class='cyber-card p-3 rounded-2xl border border-white/5 flex justify-between items-center text-xs'>
-                        <div>
-                            <p class='font-black text-white flex items-center gap-1.5'>
-                                <span class="ff-diamond" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> ${d.diamonds} Diamonds <span class='text-[10px] text-gray-400 font-semibold'>(₹${d.amount})</span>
-                            </p>
-                            <p class='text-[10px] text-gray-400 mt-0.5'>${formatTimeAgo(d.time)}</p>
+                    <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2'>
+                        <div class='flex justify-between items-center'>
+                            <span class='font-black text-cyan-400 text-sm flex items-center gap-1.5'>
+                                <span class="ff-diamond" style="width:20px;height:20px;font-size:8px;"><i class="fa-solid fa-gem"></i></span> +${d.diamonds} Diamonds (₹${d.amount})
+                            </span>
+                            <span class='px-2.5 py-1 rounded-xl font-black text-[10px] border ${statusColor}'>${d.status}</span>
                         </div>
-                        <span class='px-2.5 py-1 rounded-xl font-black text-[10px] border ${statusColor}'>${d.status}</span>
+                        <p class='text-[10px] text-gray-400'>Requested: ${formatTimeAgo(d.time)}</p>
                     </div>`;
             });
-            container.innerHTML = html;
+            document.getElementById('modal-content').innerHTML = html + "</div>";
         }
 
         let selectedWCoins = 0;
@@ -810,7 +818,7 @@
                     <p class='text-gray-400 text-[11px] text-left font-semibold mt-1'>Upload Payment Screenshot / Proof:</p>
                     <input type='file' id='deposit-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-sky-500 file:text-white hover:file:bg-sky-600 cursor-pointer'>
                     
-                    <!-- NOTE & WARNING SECTION (CORRECTED) -->
+                    <!-- NOTE & WARNING SECTION -->
                     <div class='bg-amber-500/10 border border-amber-500/20 p-3 rounded-2xl text-amber-300 text-[11px] font-bold text-left space-y-1.5'>
                         <p>⚠️ <b>Warning:</b> Submitting fake proofs will result in permanent account ban.</p>
                         <p>ℹ️ <b>Note:</b> Deposit processing takes within 24 hours. If deposit money is not received, contact on Telegram: <a href="https://t.me/Raj_Prashant" target="_blank" class="text-sky-400 underline font-mono">@Raj_Prashant</a></p>
@@ -855,7 +863,6 @@
 
                 showCustomAlert("🎉 Payment screenshot submitted successfully! Admin will review and approve your diamonds within 24 hours.");
                 closeModal();
-                loadHomeDepositStatus();
             };
 
             reader.readAsDataURL(file);
@@ -971,12 +978,13 @@
             }
 
             pending.forEach(d => {
-                let imgTag = d.proofImg ? `<div class="mt-2"><a href="${d.proofImg}" target="_blank"><img src="${d.proofImg}" alt="Payment Proof" class="w-32 h-32 object-cover rounded-xl border border-white/20 mx-auto hover:opacity-90 transition"></a><p class="text-[9px] text-sky-400 text-center mt-1">Click image to view full size</p></div>` : '';
+                let imgTag = d.proofImg ? `<div class="mt-2"><img src="${d.proofImg}" alt="Payment Proof" onclick="openImageZoom('${d.proofImg}')" class="w-32 h-32 object-cover rounded-xl border border-white/20 mx-auto cursor-pointer hover:opacity-90 hover:scale-[1.02] transition shadow-lg" title="Click to Zoom"></div>` : '';
 
                 container.innerHTML += `
                     <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2 text-xs'>
                         <div class='flex justify-between font-black'><span class='text-cyan-400 text-sm'>${d.username}</span><span class='text-emerald-400 text-sm'>+${d.diamonds} 💎 (₹${d.amount})</span></div>
                         ${imgTag}
+                        <p class='text-[10px] text-sky-400 text-center font-bold'>🔍 Click screenshot to zoom / view fullscreen</p>
                         <div class="grid grid-cols-2 gap-2 mt-3">
                             <button onclick="approveDeposit(${d.id})" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
                             <button onclick="rejectDeposit(${d.id})" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
