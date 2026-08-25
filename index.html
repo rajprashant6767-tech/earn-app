@@ -175,6 +175,19 @@
                 </div>
             </div>
 
+            <!-- LIVE DEPOSIT STATUS TRACKER ON HOME PAGE -->
+            <div class="cyber-card p-4 rounded-3xl border border-sky-500/30 space-y-3">
+                <div class="flex justify-between items-center pb-2 border-b border-white/10">
+                    <h3 class="text-xs font-black text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-receipt"></i> Recent Deposit Status
+                    </h3>
+                    <span class="text-[10px] text-gray-400 font-bold">Real-time Tracker</span>
+                </div>
+                <div id="home-deposit-status-container" class="space-y-2">
+                    <!-- Dynamic status items will load here -->
+                </div>
+            </div>
+
             <!-- SEPARATED EXCHANGE VAULT BANNER -->
             <div class="cyber-card p-5 rounded-3xl border border-amber-500/30 bg-gradient-to-r from-amber-950/40 via-black/60 to-cyan-950/40 flex items-center justify-between shadow-2xl">
                 <div class="flex items-center gap-3.5">
@@ -411,6 +424,18 @@
         </button>
     </nav>
 
+    <!-- PRO CYBER ALERT MODAL (REPLACES DEFAULT WHITE ALERT) -->
+    <div id="custom-alert-modal" class="hidden fixed inset-0 z-[200] bg-black/80 backdrop-blur-md p-5 flex items-center justify-center">
+        <div class="cyber-card p-6 rounded-3xl border border-sky-500/30 shadow-2xl max-w-sm w-full text-center space-y-4">
+            <div class="w-12 h-12 rounded-2xl bg-sky-500/20 border border-sky-500/40 text-sky-400 flex items-center justify-center mx-auto text-xl">
+                <i class="fa-solid fa-circle-info"></i>
+            </div>
+            <h3 class="text-sm font-black text-sky-400 uppercase tracking-widest">ZyloBet Notification</h3>
+            <p id="custom-alert-text" class="text-xs text-gray-300 font-semibold leading-relaxed"></p>
+            <button onclick="closeCustomAlert()" class="w-full py-3 bg-gradient-to-r from-sky-500 to-blue-600 rounded-xl font-black text-xs text-white shadow-lg cursor-pointer">OKAY</button>
+        </div>
+    </div>
+
     <!-- FULL POPUP MODAL DIALOG CONTAINER -->
     <div id="modal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md p-5 flex flex-col justify-center">
         <div class="cyber-card p-6 rounded-3xl border border-white/10 shadow-2xl max-w-md w-full mx-auto">
@@ -431,9 +456,19 @@
                 setTimeout(() => {
                     intro.remove();
                     document.getElementById('main-app').style.opacity = '1';
+                    loadHomeDepositStatus();
                 }, 700);
             }, 1500);
         });
+
+        function showCustomAlert(msg) {
+            document.getElementById('custom-alert-text').innerText = msg;
+            document.getElementById('custom-alert-modal').classList.remove('hidden');
+        }
+
+        function closeCustomAlert() {
+            document.getElementById('custom-alert-modal').classList.add('hidden');
+        }
 
         const ADMIN_ID = "7927224931";
         const tg = window.Telegram.WebApp;
@@ -477,6 +512,7 @@
                 document.querySelector('nav').classList.remove('hidden');
                 switchTab('home');
                 document.getElementById('view-toggle-btn').innerText = "Open Admin Panel";
+                loadHomeDepositStatus();
             }
         }
 
@@ -488,6 +524,9 @@
 
             document.getElementById('tab-' + tab).classList.remove('hidden');
             document.getElementById('nav-' + tab).className = "flex flex-col items-center gap-1 text-sky-400 transition py-1 px-4 rounded-2xl bg-sky-500/10 cursor-pointer";
+            if(tab === 'home') {
+                loadHomeDepositStatus();
+            }
         }
 
         let userCoins = parseInt(localStorage.getItem('zylobet_coins')) || 1250;
@@ -519,6 +558,34 @@
             if (diffHr < 24) return `${diffHr} hr ago`;
             const diffDay = Math.floor(diffHr / 24);
             return `${diffDay} day ago`;
+        }
+
+        function loadHomeDepositStatus() {
+            const container = document.getElementById('home-deposit-status-container');
+            if(!container) return;
+            let deposits = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
+            let userDeps = deposits.filter(d => d.userId === userId).slice(0, 3); // Show recent 3
+
+            if(userDeps.length === 0) {
+                container.innerHTML = `<p class='text-[11px] text-gray-500 text-center py-2'>No recent deposit requests found.</p>`;
+                return;
+            }
+
+            let html = "";
+            userDeps.forEach(d => {
+                let statusColor = d.status === 'Success' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' : (d.status === 'Rejected' ? 'text-rose-400 bg-rose-500/10 border-rose-500/30' : 'text-amber-400 bg-amber-500/10 border-amber-500/30');
+                html += `
+                    <div class='cyber-card p-3 rounded-2xl border border-white/5 flex justify-between items-center text-xs'>
+                        <div>
+                            <p class='font-black text-white flex items-center gap-1.5'>
+                                <span class="ff-diamond" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> ${d.diamonds} Diamonds <span class='text-[10px] text-gray-400 font-semibold'>(₹${d.amount})</span>
+                            </p>
+                            <p class='text-[10px] text-gray-400 mt-0.5'>${formatTimeAgo(d.time)}</p>
+                        </div>
+                        <span class='px-2.5 py-1 rounded-xl font-black text-[10px] border ${statusColor}'>${d.status}</span>
+                    </div>`;
+            });
+            container.innerHTML = html;
         }
 
         let selectedWCoins = 0;
@@ -646,7 +713,7 @@
         }
 
         function executeModalConversion() {
-            if (!modalConvCoins || userCoins < modalConvCoins) { alert("❌ Insufficient coins or none selected!"); return; }
+            if (!modalConvCoins || userCoins < modalConvCoins) { showCustomAlert("❌ Insufficient coins or none selected!"); return; }
             userCoins -= modalConvCoins; userGems += modalConvGems;
             localStorage.setItem('zylobet_coins', userCoins);
             localStorage.setItem('zylobet_gems', userGems);
@@ -661,7 +728,7 @@
             gemHist.unshift({ title: "Converted from Coins", amount: `+${modalConvGems} Diamonds`, type: "earn", time: Date.now(), status: "Success" });
             localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHist));
 
-            alert(`🎉 Converted successfully!`); closeModal();
+            showCustomAlert(`🎉 Converted successfully!`); closeModal();
         }
 
         function openDepositModal() {
@@ -717,7 +784,7 @@
 
         function proceedToPayment() {
             const amt = parseInt(document.getElementById('deposit-amount-input').value);
-            if(isNaN(amt) || amt < 1 || amt > 1000) { alert("❌ Enter valid amount (1 - 1000)"); return; }
+            if(isNaN(amt) || amt < 1 || amt > 1000) { showCustomAlert("❌ Enter valid amount (1 - 1000)"); return; }
             
             let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + userId)) || [];
             let baseBonus = amt >= 500 ? 50 : (amt >= 200 ? 18 : (amt >= 100 ? 8 : (amt >= 50 ? 3 : 0)));
@@ -743,10 +810,10 @@
                     <p class='text-gray-400 text-[11px] text-left font-semibold mt-1'>Upload Payment Screenshot / Proof:</p>
                     <input type='file' id='deposit-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-sky-500 file:text-white hover:file:bg-sky-600 cursor-pointer'>
                     
-                    <!-- NOTE & WARNING SECTION -->
+                    <!-- NOTE & WARNING SECTION (CORRECTED) -->
                     <div class='bg-amber-500/10 border border-amber-500/20 p-3 rounded-2xl text-amber-300 text-[11px] font-bold text-left space-y-1.5'>
                         <p>⚠️ <b>Warning:</b> Submitting fake proofs will result in permanent account ban.</p>
-                        <p>ℹ️ <b>Note:</b> Deposit processing takes within 24 hours. If deposit money is not received, deposit money will be refunded. Contact on Telegram: <a href="https://t.me/Raj_Prashant" target="_blank" class="text-sky-400 underline font-mono">@Raj_Prashant</a></p>
+                        <p>ℹ️ <b>Note:</b> Deposit processing takes within 24 hours. If deposit money is not received, contact on Telegram: <a href="https://t.me/Raj_Prashant" target="_blank" class="text-sky-400 underline font-mono">@Raj_Prashant</a></p>
                     </div>
 
                     <button onclick="submitManualDeposit(${totalDiamonds}, ${amt})" class='w-full py-3.5 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>SUBMIT PROOF FOR APPROVAL</button>
@@ -757,7 +824,7 @@
             const fileInput = document.getElementById('deposit-proof-file');
 
             if (!fileInput.files || fileInput.files.length === 0) {
-                alert("❌ Please upload your payment screenshot/proof!");
+                showCustomAlert("❌ Please upload your payment screenshot/proof!");
                 return;
             }
 
@@ -786,19 +853,20 @@
                 hist.unshift({ id: newDep.id, method: `Deposit (₹${paidRs})`, amount: totalDias + " Diamonds", rupees: paidRs, status: "Pending Verification", details: `Screenshot attached` });
                 localStorage.setItem('zylobet_withdraw_history', JSON.stringify(hist));
 
-                alert("🎉 Payment screenshot submitted successfully! Admin will review and approve your diamonds within 24 hours.");
+                showCustomAlert("🎉 Payment screenshot submitted successfully! Admin will review and approve your diamonds within 24 hours.");
                 closeModal();
+                loadHomeDepositStatus();
             };
 
             reader.readAsDataURL(file);
         }
 
         function closeModal() { document.getElementById('modal').classList.add('hidden'); }
-        function copyRef() { navigator.clipboard.writeText(document.getElementById('ref-code').innerText); alert("Referral Code Copied!"); }
+        function copyRef() { navigator.clipboard.writeText(document.getElementById('ref-code').innerText); showCustomAlert("Referral Code Copied!"); }
 
         function copyRedeemCode(code) {
             navigator.clipboard.writeText(code);
-            alert("📋 Redeem Code Copied: " + code);
+            showCustomAlert("📋 Redeem Code Copied: " + code);
         }
 
         function openHistory(type) {
@@ -839,13 +907,13 @@
         }
 
         function submitWithdrawRequest(method) {
-            if(!selectedWCoins || !selectedWAmount) { alert("❌ Select package first!"); return; }
-            if(selectedWCoins > userCoins) { alert("❌ Insufficient Coins!"); return; }
+            if(!selectedWCoins || !selectedWAmount) { showCustomAlert("❌ Select package first!"); return; }
+            if(selectedWCoins > userCoins) { showCustomAlert("❌ Insufficient Coins!"); return; }
             
             let extraDetails = "";
             if(method === 'UPI') {
                 const upiId = document.getElementById('w-upi-id').value.trim();
-                if(!upiId) { alert("❌ Enter your UPI ID!"); return; }
+                if(!upiId) { showCustomAlert("❌ Enter your UPI ID!"); return; }
                 extraDetails = ` (UPI: ${upiId})`;
             }
 
@@ -866,7 +934,7 @@
             coinHist.unshift({ title: `Withdrawal Request (${method})`, amount: `-${selectedWCoins} Coins`, type: "spend", time: Date.now(), status: "Pending" });
             localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHist));
 
-            alert(`🎉 ${method} Withdrawal Request Sent Successfully!`);
+            showCustomAlert(`🎉 ${method} Withdrawal Request Sent Successfully!`);
             if(method === 'UPI') document.getElementById('w-upi-id').value = '';
         }
 
@@ -947,7 +1015,7 @@
                 if(hItem) hItem.status = "Success (Approved)";
                 localStorage.setItem('zylobet_withdraw_history', JSON.stringify(withdrawHist));
 
-                alert("🎉 Deposit Approved Successfully! Diamonds added to user.");
+                showCustomAlert("🎉 Deposit Approved Successfully! Diamonds added to user.");
                 loadAdminDeposits();
             }
         }
@@ -965,7 +1033,7 @@
                 if(hItem) hItem.status = "Rejected";
                 localStorage.setItem('zylobet_withdraw_history', JSON.stringify(withdrawHist));
 
-                alert("❌ Deposit Rejected.");
+                showCustomAlert("❌ Deposit Rejected.");
                 loadAdminDeposits();
             }
         }
@@ -1008,7 +1076,7 @@
                 const codeInput = document.getElementById('redeem-code-' + id);
                 redeemCode = codeInput ? codeInput.value.trim() : "";
                 if(!redeemCode) {
-                    alert("❌ Please enter the Redeem Code before approving!");
+                    showCustomAlert("❌ Please enter the Redeem Code before approving!");
                     return;
                 }
             }
@@ -1029,7 +1097,7 @@
             }
             localStorage.setItem('zylobet_withdraw_history', JSON.stringify(history));
 
-            alert("Payout Approved Successfully!");
+            showCustomAlert("Payout Approved Successfully!");
             loadAdminRequests();
         }
 
@@ -1060,7 +1128,7 @@
                 }
                 localStorage.setItem('zylobet_withdraw_history', JSON.stringify(history));
 
-                alert(`❌ Payout Rejected! ${req.amount} Coins refunded successfully.`);
+                showCustomAlert(`❌ Payout Rejected! ${req.amount} Coins refunded successfully.`);
                 loadAdminRequests();
             }
         }
@@ -1143,13 +1211,13 @@
             const durationMin = parseInt(timeInput.value) || 60;
             const maxUsr = parseInt(limitInput.value) || 50;
 
-            if(!codeVal) { alert("❌ Please enter a promo code name!"); return; }
+            if(!codeVal) { showCustomAlert("❌ Please enter a promo code name!"); return; }
 
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
             let usedHistory = JSON.parse(localStorage.getItem('zylobet_global_promo_history')) || [];
             
             if(promos.some(p => p.code === codeVal) || usedHistory.includes(codeVal)) {
-                alert("❌ This promo code has already been created before and cannot be reused!");
+                showCustomAlert("❌ This promo code has already been created before and cannot be reused!");
                 return;
             }
 
@@ -1169,7 +1237,7 @@
             localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
             localStorage.setItem('zylobet_global_promo_history', JSON.stringify(usedHistory));
 
-            alert(`🎉 Promo Code '${codeVal}' Created Successfully!`);
+            showCustomAlert(`🎉 Promo Code '${codeVal}' Created Successfully!`);
             loadAdminPromoManager();
         }
     </script>
