@@ -471,12 +471,21 @@
         tg.ready();
         
         const user = tg.initDataUnsafe?.user;
-        const username = user ? (user.username || user.first_name) : "Player";
-        const userId = user?.id ? user.id.toString() : "0000";
+        // Smart Fallback: If Telegram user is missing, check URL params or generate unique session ID for testing
+        const urlParams = new URLSearchParams(window.location.search);
+        const forcedUserId = urlParams.get('userid');
+
+        const userId = forcedUserId || (user?.id ? user.id.toString() : ("test_user_" + (localStorage.getItem('zylobet_local_fallback_id') || (() => {
+            const newId = Math.floor(100000 + Math.random() * 900000).toString();
+            localStorage.setItem('zylobet_local_fallback_id', newId);
+            return newId;
+        })())));
+
+        const username = user?.username ? "@" + user.username : (user?.first_name ? user.first_name : ("Player_" + userId.slice(-4)));
         const myReferralCode = "ZYL" + userId.slice(-4);
 
-        let userCoins = parseInt(localStorage.getItem('zylobet_coins_' + userId)) || parseInt(localStorage.getItem('zylobet_coins')) || 1250;
-        let userGems = parseInt(localStorage.getItem('zylobet_gems_' + userId)) || parseInt(localStorage.getItem('zylobet_gems')) || 12;
+        let userCoins = parseInt(localStorage.getItem('zylobet_coins_' + userId)) || 1250;
+        let userGems = parseInt(localStorage.getItem('zylobet_gems_' + userId)) || 12;
 
         window.addEventListener('DOMContentLoaded', () => {
             const bar = document.getElementById('intro-bar');
@@ -497,7 +506,7 @@
             
             allUsers[userId] = {
                 userId: userId,
-                username: "@" + username,
+                username: username,
                 coins: userCoins,
                 gems: userGems,
                 lastActive: Date.now()
@@ -527,14 +536,14 @@
             document.getElementById('image-zoom-modal').classList.add('hidden');
         }
 
-        document.getElementById('tg-user').innerText = "@" + username;
+        document.getElementById('tg-user').innerText = username;
         document.getElementById('ref-code').innerText = myReferralCode;
 
         const avatarContainer = document.getElementById('user-avatar-container');
         if(user && user.photo_url) {
             avatarContainer.innerHTML = `<img src="${user.photo_url}" alt="Profile" class="w-full h-full object-cover">`;
-        } else if(user && user.first_name) {
-            document.getElementById('user-avatar-text').innerText = user.first_name.charAt(0).toUpperCase();
+        } else {
+            document.getElementById('user-avatar-text').innerText = username.replace('@', '').charAt(0).toUpperCase();
         }
 
         // STRICT ADMIN ACCESS: ONLY SHOWN TO ADMIN_ID
@@ -574,8 +583,7 @@
             let onlineCount = 0;
             let now = Date.now();
             userKeys.forEach(k => {
-                // Check if active within the last 15 seconds
-                if(now - allUsers[k].lastActive < 15000) {
+                if(now - allUsers[k].lastActive < 10000) { // Active within last 10 seconds
                     onlineCount++;
                 }
             });
@@ -912,7 +920,7 @@
 
                 let newDep = {
                     id: Date.now(),
-                    username: "@" + username,
+                    username: username,
                     userId: userId,
                     amount: paidRs,
                     diamonds: totalDias,
@@ -955,7 +963,7 @@
             const content = document.getElementById('modal-content');
             if(type === 'gems') {
                 title.innerText = "DIAMONDS HISTORY";
-                let history = JSON.parse(localStorage.getItem('zylobet_gem_history_' + userId)) || JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
+                let history = JSON.parse(localStorage.getItem('zylobet_gem_history_' + userId)) || [];
                 if(history.length === 0) { content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No diamond history yet.</div>`; return; }
                 let html = "<div class='space-y-3'>";
                 history.forEach(item => {
@@ -965,7 +973,7 @@
                 content.innerHTML = html + "</div>";
             } else if(type === 'coins') {
                 title.innerText = "COINS HISTORY";
-                let history = JSON.parse(localStorage.getItem('zylobet_coin_history_' + userId)) || JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
+                let history = JSON.parse(localStorage.getItem('zylobet_coin_history_' + userId)) || [];
                 if(history.length === 0) { content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No coin history yet.</div>`; return; }
                 let html = "<div class='space-y-3'>";
                 history.forEach(item => {
@@ -976,7 +984,7 @@
             } else if(type === 'withdrawals') {
                 title.innerText = "PAYOUT HISTORY";
                 let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
-                let userReqs = reqs.filter(r => r.userId === userId || r.username === ("@" + username));
+                let userReqs = reqs.filter(r => r.userId === userId || r.username === username);
                 
                 if(userReqs.length === 0) { 
                     content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No payout history yet.</div>`; 
@@ -1030,7 +1038,7 @@
             saveUserBalances();
 
             let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
-            let newReq = { id: Date.now(), username: "@" + username, userId: userId, method: method, amount: selectedWCoins, rupees: selectedWAmount, details: extraDetails, status: "Pending" };
+            let newReq = { id: Date.now(), username: username, userId: userId, method: method, amount: selectedWCoins, rupees: selectedWAmount, details: extraDetails, status: "Pending" };
             reqs.push(newReq);
             localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
 
