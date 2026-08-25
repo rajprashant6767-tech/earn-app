@@ -857,7 +857,6 @@
                 deposits.push(newDep);
                 localStorage.setItem('zylobet_deposit_requests', JSON.stringify(deposits));
 
-                // NOTE: NOT adding deposit to withdraw/payout history so withdraw log remains pure payouts only!
                 showCustomAlert("🎉 Payment screenshot submitted successfully! Admin will review and approve your diamonds within 24 hours.");
                 closeModal();
             };
@@ -896,19 +895,43 @@
                 });
                 content.innerHTML = html + "</div>";
             } else if(type === 'withdrawals') {
-                // ONLY SHOW ACTUAL PAYOUT / WITHDRAWAL HISTORY (DEPOSITS REMOVED)
                 title.innerText = "PAYOUT HISTORY";
-                let withdraws = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
-                if(withdraws.length === 0) { content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No payout history yet.</div>`; return; }
+                let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
+                let userReqs = reqs.filter(r => r.id); // Or user specific if needed
+                
+                if(userReqs.length === 0) { 
+                    content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No payout history yet.</div>`; 
+                    return; 
+                }
+
                 let html = "<div class='space-y-3'>";
-                withdraws.forEach(item => {
+                userReqs.reverse().forEach(item => {
                     let redeemBox = item.redeemCode ? `<div class='flex items-center gap-2 mt-1'><span class='text-xs text-sky-300 font-mono'>🔑 Redeem Code: <b>${item.redeemCode}</b></span><button onclick="copyRedeemCode('${item.redeemCode}')" class='bg-sky-500/20 hover:bg-sky-500/40 text-sky-300 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer'><i class="fa-solid fa-copy"></i> Copy</button></div>` : '';
                     let commentBox = item.adminComment ? `<p class='text-xs text-rose-400 mt-1'>💬 Reason: <b>${item.adminComment}</b></p>` : '';
                     
-                    // Success = Green, Rejected = Red
-                    let statusColor = item.status.includes('Success') ? 'text-emerald-400 font-bold' : (item.status.includes('Rejected') ? 'text-rose-400 font-bold' : 'text-amber-300 font-bold');
-                    
-                    html += `<div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-1'><div class='flex justify-between'><span class='text-amber-400 font-black flex items-center gap-1'><span class="ff-gold-coin" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> ${item.amount} (₹${item.rupees})</span><span class='text-xs ${statusColor}'>${item.status}</span></div><p class='text-[11px] text-gray-300'>Method: ${item.method}</p>${item.details ? `<p class='text-[10px] text-gray-400'>${item.details}</p>` : ''}${redeemBox}${commentBox}</div>`;
+                    // Success/Approved = Green, Rejected = Red, Pending = Amber
+                    let statusClass = 'text-amber-300 font-bold';
+                    let statusText = item.status;
+                    if(item.status.includes('Success') || item.status.includes('Approved')) {
+                        statusClass = 'text-emerald-400 font-bold';
+                        statusText = 'Success';
+                    } else if(item.status.includes('Rejected')) {
+                        statusClass = 'text-rose-400 font-bold';
+                        statusText = 'Rejected';
+                    }
+
+                    html += `<div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-1'>
+                        <div class='flex justify-between items-center'>
+                            <span class='text-amber-400 font-black flex items-center gap-1.5'>
+                                <span class="ff-gold-coin" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> ${item.amount} Coins (₹${item.rupees})
+                            </span>
+                            <span class='text-xs ${statusClass}'>${statusText}</span>
+                        </div>
+                        <p class='text-[11px] text-gray-300'>Method: ${item.method}</p>
+                        ${item.details ? `<p class='text-[10px] text-gray-400'>${item.details}</p>` : ''}
+                        ${redeemBox}
+                        ${commentBox}
+                    </div>`;
                 });
                 content.innerHTML = html + "</div>";
             }
@@ -930,7 +953,7 @@
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
 
             let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
-            let newReq = { id: Date.now(), username: "@" + username, method: method, amount: selectedWCoins, rupees: selectedWAmount, details: extraDetails, status: "Pending" };
+            let newReq = { id: Date.now(), username: "@" + username, userId: userId, method: method, amount: selectedWCoins, rupees: selectedWAmount, details: extraDetails, status: "Pending" };
             reqs.push(newReq);
             localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
 
@@ -1161,7 +1184,7 @@
                             <input type='number' id='adm-limit-input' value='50' min='1' class='w-full bg-black/50 border border-white/10 p-2.5 rounded-xl text-white font-bold'>
                         </div>
                     </div>
-                    <button onclick='createPromoCode()' class='w-full py-3 bg-gradient-to-r from-rose-600 to-purple-600 rounded-xl font-black text-xs text-white cursor-pointer shadow-lg'>CREATE & ACTIVATE CODE</button>
+                    <button onclick='createPromoCode()' class='w-full py-3 bg-gradient-to-r from-rose-600 to-purple-600 rounded-xl font-black text-white cursor-pointer shadow-lg'>CREATE & ACTIVATE CODE</button>
                     ${activeListHTML}
                 </div>`;
         }
