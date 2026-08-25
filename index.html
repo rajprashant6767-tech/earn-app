@@ -466,6 +466,18 @@
 
     <!-- SCRIPT CONTROLLER ENGINE -->
     <script>
+        const ADMIN_ID = "7927224931";
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        
+        const user = tg.initDataUnsafe?.user;
+        const username = user ? (user.username || user.first_name) : "Player";
+        const userId = user?.id ? user.id.toString() : "0000";
+        const myReferralCode = "ZYL" + userId.slice(-4);
+
+        let userCoins = parseInt(localStorage.getItem('zylobet_coins_' + userId)) || parseInt(localStorage.getItem('zylobet_coins')) || 1250;
+        let userGems = parseInt(localStorage.getItem('zylobet_gems_' + userId)) || parseInt(localStorage.getItem('zylobet_gems')) || 12;
+
         window.addEventListener('DOMContentLoaded', () => {
             const bar = document.getElementById('intro-bar');
             setTimeout(() => { bar.style.width = '100%'; }, 200);
@@ -480,41 +492,22 @@
             }, 1500);
         });
 
-        const ADMIN_ID = "7927224931";
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        
-        const user = tg.initDataUnsafe?.user;
-        const username = user ? (user.username || user.first_name) : "Player";
-        const userId = user?.id ? user.id.toString() : "0000";
-        const myReferralCode = "ZYL" + userId.slice(-4);
-
         function registerUserActivity() {
             let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
             
-            // Fetch live user specific history arrays
-            let cHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + userId)) || JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-            let gHist = JSON.parse(localStorage.getItem('zylobet_gem_history_' + userId)) || JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
-            let wReqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
-            let dReqs = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
-
             allUsers[userId] = {
                 userId: userId,
                 username: "@" + username,
                 coins: userCoins,
                 gems: userGems,
-                lastActive: Date.now(),
-                coinHistory: cHist,
-                gemHistory: gHist,
-                withdrawHistory: wReqs.filter(w => w.userId === userId || w.username === ("@" + username)),
-                depositHistory: dReqs.filter(d => d.userId === userId || d.username === ("@" + username))
+                lastActive: Date.now()
             };
             localStorage.setItem('zylobet_registered_users', JSON.stringify(allUsers));
         }
 
         setInterval(() => {
             registerUserActivity();
-        }, 10000);
+        }, 5000);
 
         function showCustomAlert(msg) {
             document.getElementById('custom-alert-text').innerText = msg;
@@ -581,7 +574,7 @@
             let onlineCount = 0;
             let now = Date.now();
             userKeys.forEach(k => {
-                if(now - allUsers[k].lastActive < 60000) {
+                if(now - allUsers[k].lastActive < 20000) { // Active within 20 seconds
                     onlineCount++;
                 }
             });
@@ -598,9 +591,6 @@
             document.getElementById('nav-' + tab).className = "flex flex-col items-center gap-1 text-sky-400 transition py-1 px-4 rounded-2xl bg-sky-500/10 cursor-pointer";
             registerUserActivity();
         }
-
-        let userCoins = parseInt(localStorage.getItem('zylobet_coins_' + userId)) || parseInt(localStorage.getItem('zylobet_coins')) || 1250;
-        let userGems = parseInt(localStorage.getItem('zylobet_gems_' + userId)) || parseInt(localStorage.getItem('zylobet_gems')) || 12;
         
         document.getElementById('user-coins').innerText = userCoins.toLocaleString();
         document.getElementById('user-gems').innerText = userGems;
@@ -1195,7 +1185,7 @@
                 localStorage.setItem('zylobet_deposit_requests', JSON.stringify(deposits));
 
                 let targetUserId = dep.userId || userId;
-                let targetGems = parseInt(localStorage.getItem('zylobet_gems_' + targetUserId)) || userGems;
+                let targetGems = parseInt(localStorage.getItem('zylobet_gems_' + targetUserId)) || 12;
                 targetGems += dep.diamonds;
                 localStorage.setItem('zylobet_gems_' + targetUserId, targetGems);
                 if(targetUserId === userId) {
@@ -1315,7 +1305,7 @@
                 localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
 
                 let targetUserId = req.userId || userId;
-                let targetCoins = parseInt(localStorage.getItem('zylobet_coins_' + targetUserId)) || userCoins;
+                let targetCoins = parseInt(localStorage.getItem('zylobet_coins_' + targetUserId)) || 1250;
                 targetCoins += req.amount;
                 localStorage.setItem('zylobet_coins_' + targetUserId, targetCoins);
                 if(targetUserId === userId) {
