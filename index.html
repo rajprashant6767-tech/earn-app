@@ -375,22 +375,37 @@
             </div>
         </div>
 
-        <!-- ADMIN DASHBOARD CONTROL PANEL -->
+        <!-- ADMIN DASHBOARD CONTROL PANEL WITH USER ACTIVITY & LIVE ONLINE STATS -->
         <div id="admin-view" class="hidden space-y-4">
             <div class="cyber-card p-4 rounded-3xl border border-sky-500/30 flex justify-between items-center shadow-xl">
                 <div>
                     <h1 class="text-base font-black text-sky-400 italic">ZyloBet Admin Control Center</h1>
-                    <p class="text-[10px] text-gray-400">Manage Payout Approvals and Vouchers</p>
+                    <p class="text-[10px] text-gray-400">Manage Payout Approvals and User Activity</p>
                 </div>
                 <button onclick="loadAdminActivePanel()" class="bg-white/10 hover:bg-white/20 text-xs px-3.5 py-2 rounded-xl font-bold text-amber-400 transition active:scale-95 shadow cursor-pointer">
                     <i class="fa-solid fa-rotate mr-1"></i> Refresh
                 </button>
             </div>
 
-            <div class="grid grid-cols-3 gap-2">
-                <button onclick="switchAdminTab('deposit')" id="adm-tab-dep" class="py-2.5 bg-gradient-to-r from-sky-600 to-blue-600 rounded-xl font-black text-[11px] shadow transition cursor-pointer">Deposits</button>
-                <button onclick="switchAdminTab('withdraw')" id="adm-tab-wit" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[11px] shadow transition cursor-pointer">Payouts</button>
-                <button onclick="switchAdminTab('promo')" id="adm-tab-promo" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[11px] shadow transition cursor-pointer">Promos</button>
+            <!-- LIVE STATS BAR (ONLINE USERS & TOTAL REGISTERED) -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="cyber-card p-3 rounded-2xl border border-emerald-500/30 text-center">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Online Users Now</p>
+                    <p id="stat-online-users" class="text-lg font-black text-emerald-400 mt-1 flex items-center justify-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> 1
+                    </p>
+                </div>
+                <div class="cyber-card p-3 rounded-2xl border border-sky-500/30 text-center">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Registered</p>
+                    <p id="stat-total-users" class="text-lg font-black text-sky-400 mt-1">1</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-4 gap-1.5">
+                <button onclick="switchAdminTab('deposit')" id="adm-tab-dep" class="py-2.5 bg-gradient-to-r from-sky-600 to-blue-600 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Deposits</button>
+                <button onclick="switchAdminTab('withdraw')" id="adm-tab-wit" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Payouts</button>
+                <button onclick="switchAdminTab('users')" id="adm-tab-usr" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Users Activity</button>
+                <button onclick="switchAdminTab('promo')" id="adm-tab-pro" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Promos</button>
             </div>
 
             <div id="admin-requests-container" class="space-y-3"></div>
@@ -460,9 +475,27 @@
                 setTimeout(() => {
                     intro.remove();
                     document.getElementById('main-app').style.opacity = '1';
+                    registerUserActivity();
                 }, 700);
             }, 1500);
         });
+
+        function registerUserActivity() {
+            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
+            allUsers[userId] = {
+                userId: userId,
+                username: "@" + username,
+                coins: userCoins,
+                gems: userGems,
+                lastActive: Date.now()
+            };
+            localStorage.setItem('zylobet_registered_users', JSON.stringify(allUsers));
+        }
+
+        // Keep heartbeat alive for live online counter
+        setInterval(() => {
+            registerUserActivity();
+        }, 10000);
 
         function showCustomAlert(msg) {
             document.getElementById('custom-alert-text').innerText = msg;
@@ -518,6 +551,7 @@
                 document.querySelector('nav').classList.add('hidden');
                 document.getElementById('admin-view').classList.remove('hidden');
                 document.getElementById('view-toggle-btn').innerText = "Back to User App";
+                updateAdminStats();
                 loadAdminActivePanel();
             } else {
                 document.getElementById('admin-view').classList.add('hidden');
@@ -525,6 +559,21 @@
                 switchTab('home');
                 document.getElementById('view-toggle-btn').innerText = "Open Admin Panel";
             }
+        }
+
+        function updateAdminStats() {
+            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
+            let userKeys = Object.keys(allUsers);
+            document.getElementById('stat-total-users').innerText = userKeys.length || 1;
+
+            let onlineCount = 0;
+            let now = Date.now();
+            userKeys.forEach(k => {
+                if(now - allUsers[k].lastActive < 60000) { // Active within last 60 seconds
+                    onlineCount++;
+                }
+            });
+            document.getElementById('stat-online-users').innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> ${Math.max(onlineCount, 1)}`;
         }
 
         function switchTab(tab) {
@@ -535,6 +584,7 @@
 
             document.getElementById('tab-' + tab).classList.remove('hidden');
             document.getElementById('nav-' + tab).className = "flex flex-col items-center gap-1 text-sky-400 transition py-1 px-4 rounded-2xl bg-sky-500/10 cursor-pointer";
+            registerUserActivity();
         }
 
         let userCoins = parseInt(localStorage.getItem('zylobet_coins')) || 1250;
@@ -636,6 +686,7 @@
             localStorage.setItem('zylobet_coins', userCoins);
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
             localStorage.setItem('zylobet_ref_used', 'true');
+            registerUserActivity();
             
             let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
             coinHist.unshift({ title: "Referral Bonus", amount: "+300 Coins", type: "earn", time: Date.now(), status: "Success" });
@@ -696,6 +747,7 @@
             userRedeemed.push(promoVal);
             localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
             localStorage.setItem('zylobet_user_redeemed_' + userId, JSON.stringify(userRedeemed));
+            registerUserActivity();
 
             statusMsg.className = "text-[11px] h-6 font-semibold text-emerald-400";
             statusMsg.innerText = `🎉 Success! +${foundPromo.rewardAmount} Added.`;
@@ -734,6 +786,7 @@
             localStorage.setItem('zylobet_gems', userGems);
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
             document.getElementById('user-gems').innerText = userGems;
+            registerUserActivity();
 
             let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
             coinHist.unshift({ title: "Exchange to Diamonds", amount: `-${modalConvCoins} Coins`, type: "spend", time: Date.now(), status: "Success" });
@@ -868,8 +921,8 @@
 
                 deposits.push(newDep);
                 localStorage.setItem('zylobet_deposit_requests', JSON.stringify(deposits));
+                registerUserActivity();
 
-                // Mark bonus as used so it disappears from UI
                 let baseBonus = paidRs >= 500 ? 50 : (paidRs >= 200 ? 18 : (paidRs >= 100 ? 8 : (paidRs >= 50 ? 3 : 0)));
                 if(baseBonus > 0) {
                     let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + userId)) || [];
@@ -972,6 +1025,7 @@
             userCoins -= selectedWCoins;
             localStorage.setItem('zylobet_coins', userCoins);
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
+            registerUserActivity();
 
             let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
             let newReq = { id: Date.now(), username: "@" + username, userId: userId, method: method, amount: selectedWCoins, rupees: selectedWAmount, details: extraDetails, status: "Pending" };
@@ -988,23 +1042,55 @@
 
         function switchAdminTab(tab) {
             adminTab = tab;
-            ['dep', 'wit', 'pro'].forEach(t => {
+            ['dep', 'wit', 'usr', 'pro'].forEach(t => {
                 const btn = document.getElementById('adm-tab-' + t);
-                if(btn) btn.className = "py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[11px] shadow transition cursor-pointer";
+                if(btn) btn.className = "py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[10px] shadow transition cursor-pointer";
             });
 
-            const activeBtn = document.getElementById('adm-tab-' + (tab === 'deposit' ? 'dep' : (tab === 'withdraw' ? 'wit' : 'pro')));
-            if(activeBtn) activeBtn.className = "py-2.5 bg-gradient-to-r from-sky-600 to-blue-600 rounded-xl font-black text-[11px] shadow transition cursor-pointer";
+            const activeBtn = document.getElementById('adm-tab-' + (tab === 'deposit' ? 'dep' : (tab === 'withdraw' ? 'wit' : (tab === 'users' ? 'usr' : 'pro'))));
+            if(activeBtn) activeBtn.className = "py-2.5 bg-gradient-to-r from-sky-600 to-blue-600 rounded-xl font-black text-[10px] shadow transition cursor-pointer";
 
             if(tab === 'deposit') loadAdminDeposits();
             else if(tab === 'withdraw') loadAdminRequests();
-            else if(tab === 'promo') loadAdminPromoManager();
+            else if(tab === 'users') loadAdminUsersActivity();
+            else loadAdminPromoManager();
         }
 
         function loadAdminActivePanel() {
+            updateAdminStats();
             if(adminTab === 'deposit') loadAdminDeposits();
             else if(adminTab === 'withdraw') loadAdminRequests();
+            else if(adminTab === 'users') loadAdminUsersActivity();
             else loadAdminPromoManager();
+        }
+
+        function loadAdminUsersActivity() {
+            const container = document.getElementById('admin-requests-container');
+            container.innerHTML = '';
+            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
+            let userKeys = Object.keys(allUsers);
+
+            if(userKeys.length === 0) {
+                container.innerHTML = `<div class='cyber-card p-6 text-center text-gray-500 text-xs rounded-2xl'>No user activity recorded yet.</div>`;
+                return;
+            }
+
+            let html = "<div class='space-y-2.5'><p class='text-[10px] text-gray-400 font-bold uppercase'>Registered Users & Live Activity:</p>";
+            userKeys.forEach(k => {
+                let u = allUsers[k];
+                html += `
+                    <div class='cyber-card p-3 rounded-2xl border border-white/10 flex justify-between items-center text-xs'>
+                        <div>
+                            <p class='font-black text-sky-400'>${u.username} <span class='text-[10px] text-gray-400 font-normal'>(ID: ${u.userId})</span></p>
+                            <p class='text-[10px] text-amber-300 mt-0.5'>Coins: <b>${u.coins}</b> | Diamonds: <b>${u.gems}</b></p>
+                        </div>
+                        <div class='text-right'>
+                            <span class='text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20'>Active</span>
+                            <p class='text-[9px] text-gray-400 mt-1'>${formatTimeAgo(u.lastActive)}</p>
+                        </div>
+                    </div>`;
+            });
+            container.innerHTML = html + "</div>";
         }
 
         function loadAdminDeposits() {
@@ -1144,6 +1230,7 @@
                 userCoins += req.amount;
                 localStorage.setItem('zylobet_coins', userCoins);
                 document.getElementById('user-coins').innerText = userCoins.toLocaleString();
+                registerUserActivity();
 
                 let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
                 coinHist.unshift({ title: `Withdrawal Refund (${req.method})`, amount: `+${req.amount} Coins`, type: "earn", time: Date.now(), status: "Success" });
