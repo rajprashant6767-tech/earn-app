@@ -244,7 +244,7 @@
                 <div class="space-y-3.5 pt-1">
                     <input type="text" id="promo-input" class='w-full bg-black/50 border border-white/10 p-4 text-xs rounded-2xl text-rose-300 font-black uppercase focus:outline-none focus:border-rose-500 transition tracking-wider' placeholder='ENTER VOUCHER CODE'>
                     <button onclick="applyPromoCode()" class='w-full py-4 bg-gradient-to-r from-rose-600 via-purple-600 to-blue-600 rounded-2xl font-black text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide cursor-pointer'>REDEEM VOUCHER</button>
-                    <p id="promo-status-msg" class="text-[11px] h-4 font-semibold text-center"></p>
+                    <p id="promo-status-msg" class="text-[11px] h-6 font-semibold text-center"></p>
                 </div>
 
                 <div class='text-center pt-3 border-t border-white/10 mt-2'>
@@ -650,21 +650,27 @@
             const statusMsg = document.getElementById('promo-status-msg');
             const promoVal = promoInput.value.trim().toUpperCase();
             
-            if(!promoVal) { statusMsg.innerText = "❌ Enter a code."; return; }
+            if(!promoVal) { 
+                statusMsg.innerText = "❌ Enter a code."; 
+                setTimeout(() => { if(statusMsg) statusMsg.innerText = ""; }, 4000);
+                return; 
+            }
 
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
             let foundPromo = promos.find(p => p.code === promoVal);
 
             if(!foundPromo || !foundPromo.active || Date.now() > foundPromo.expiryTime) {
-                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
+                statusMsg.className = "text-[11px] h-6 font-semibold text-rose-400";
                 statusMsg.innerText = "❌ Invalid or expired promo code!";
+                setTimeout(() => { if(statusMsg) statusMsg.innerText = ""; }, 4000);
                 return;
             }
 
             let userRedeemed = JSON.parse(localStorage.getItem('zylobet_user_redeemed_' + userId)) || [];
             if(userRedeemed.includes(promoVal)) {
-                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
+                statusMsg.className = "text-[11px] h-6 font-semibold text-rose-400";
                 statusMsg.innerText = "❌ You already redeemed this code!";
+                setTimeout(() => { if(statusMsg) statusMsg.innerText = ""; }, 4000);
                 return;
             }
 
@@ -691,9 +697,10 @@
             localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
             localStorage.setItem('zylobet_user_redeemed_' + userId, JSON.stringify(userRedeemed));
 
-            statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
+            statusMsg.className = "text-[11px] h-6 font-semibold text-emerald-400";
             statusMsg.innerText = `🎉 Success! +${foundPromo.rewardAmount} Added.`;
             promoInput.value = '';
+            setTimeout(() => { if(statusMsg) statusMsg.innerText = ""; }, 4000);
         }
 
         function openConvertModal() {
@@ -742,6 +749,14 @@
         function openDepositModal() {
             document.getElementById('modal').classList.remove('hidden');
             document.getElementById('modal-title').innerText = "DEPOSIT DIAMONDS & GET BONUS";
+            
+            let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + userId)) || [];
+
+            let b50HTML = !usedBonuses.includes(50) ? `<div onclick="selectDepositOffer(50)" id="pkg-btn-50" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center flex items-center justify-center gap-1.5'>50 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> (+3 Free)</div>` : '';
+            let b100HTML = !usedBonuses.includes(100) ? `<div onclick="selectDepositOffer(100)" id="pkg-btn-100" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center flex items-center justify-center gap-1.5'>100 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> (+8 Free)</div>` : '';
+            let b200HTML = !usedBonuses.includes(200) ? `<div onclick="selectDepositOffer(200)" id="pkg-btn-200" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center flex items-center justify-center gap-1.5'>200 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> (+18 Free)</div>` : '';
+            let b500HTML = !usedBonuses.includes(500) ? `<div onclick="selectDepositOffer(500)" id="pkg-btn-500" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center flex items-center justify-center gap-1.5'>500 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> (+50 Free)</div>` : '';
+
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs'>
                     <div class='bg-cyan-500/10 border border-cyan-500/30 p-3 rounded-2xl text-cyan-300 font-bold text-center flex items-center justify-center gap-2'>
@@ -750,11 +765,8 @@
                     <div class='text-center text-[10px] text-amber-400 font-bold bg-amber-500/10 py-1.5 rounded-xl border border-amber-500/20'>
                         ⚠️ Note: Free bonus is valid for ONE TIME use per package only!
                     </div>
-                    <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300'>
-                        <div onclick="selectDepositOffer(50)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center flex items-center justify-center gap-1.5'>50 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> (+3 Free)</div>
-                        <div onclick="selectDepositOffer(100)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center flex items-center justify-center gap-1.5'>100 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> (+8 Free)</div>
-                        <div onclick="selectDepositOffer(200)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center flex items-center justify-center gap-1.5'>200 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> (+18 Free)</div>
-                        <div onclick="selectDepositOffer(500)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center flex items-center justify-center gap-1.5'>500 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> (+50 Free)</div>
+                    <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300' id="deposit-packages-grid">
+                        ${b50HTML} ${b100HTML} ${b200HTML} ${b500HTML}
                     </div>
                     <div>
                         <label class='text-gray-300 font-bold block mb-1.5 uppercase text-[11px]'>Enter Diamond Amount</label>
@@ -857,6 +869,16 @@
                 deposits.push(newDep);
                 localStorage.setItem('zylobet_deposit_requests', JSON.stringify(deposits));
 
+                // Mark bonus as used so it disappears from UI
+                let baseBonus = paidRs >= 500 ? 50 : (paidRs >= 200 ? 18 : (paidRs >= 100 ? 8 : (paidRs >= 50 ? 3 : 0)));
+                if(baseBonus > 0) {
+                    let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + userId)) || [];
+                    if(!usedBonuses.includes(paidRs)) {
+                        usedBonuses.push(paidRs);
+                        localStorage.setItem('zylobet_used_bonuses_' + userId, JSON.stringify(usedBonuses));
+                    }
+                }
+
                 showCustomAlert("🎉 Payment screenshot submitted successfully! Admin will review and approve your diamonds within 24 hours.");
                 closeModal();
             };
@@ -897,7 +919,7 @@
             } else if(type === 'withdrawals') {
                 title.innerText = "PAYOUT HISTORY";
                 let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
-                let userReqs = reqs.filter(r => r.id); // Or user specific if needed
+                let userReqs = reqs.filter(r => r.userId === userId || r.username === ("@" + username));
                 
                 if(userReqs.length === 0) { 
                     content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No payout history yet.</div>`; 
@@ -909,7 +931,6 @@
                     let redeemBox = item.redeemCode ? `<div class='flex items-center gap-2 mt-1'><span class='text-xs text-sky-300 font-mono'>🔑 Redeem Code: <b>${item.redeemCode}</b></span><button onclick="copyRedeemCode('${item.redeemCode}')" class='bg-sky-500/20 hover:bg-sky-500/40 text-sky-300 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer'><i class="fa-solid fa-copy"></i> Copy</button></div>` : '';
                     let commentBox = item.adminComment ? `<p class='text-xs text-rose-400 mt-1'>💬 Reason: <b>${item.adminComment}</b></p>` : '';
                     
-                    // Success/Approved = Green, Rejected = Red, Pending = Amber
                     let statusClass = 'text-amber-300 font-bold';
                     let statusText = item.status;
                     if(item.status.includes('Success') || item.status.includes('Approved')) {
