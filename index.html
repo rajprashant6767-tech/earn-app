@@ -118,7 +118,7 @@
     <!-- MAIN APP WRAPPER -->
     <div id="main-app" class="opacity-0 transition-opacity duration-500 space-y-6">
         
-        <!-- ADMIN DASHBOARD ACCESS BAR (ONLY SHOWN TO ADMIN_ID) -->
+        <!-- ADMIN DASHBOARD ACCESS BAR (STRICTLY SECURED FOR ADMIN_ID ONLY) -->
         <div id="admin-toggle-bar" class="hidden mb-2 cyber-card p-3 rounded-2xl flex justify-between items-center text-xs shadow-xl backdrop-blur-md border-emerald-500/40">
             <span class="text-emerald-400 font-extrabold flex items-center gap-1.5">
                 <i class="fa-solid fa-shield-halved text-sm"></i> Admin Mode Enabled
@@ -480,14 +480,34 @@
             }, 1500);
         });
 
+        const ADMIN_ID = "7927224931";
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        
+        const user = tg.initDataUnsafe?.user;
+        const username = user ? (user.username || user.first_name) : "Player";
+        const userId = user?.id ? user.id.toString() : "0000";
+        const myReferralCode = "ZYL" + userId.slice(-4);
+
         function registerUserActivity() {
             let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
+            
+            // Fetch live user specific history arrays
+            let cHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + userId)) || JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
+            let gHist = JSON.parse(localStorage.getItem('zylobet_gem_history_' + userId)) || JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
+            let wReqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
+            let dReqs = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
+
             allUsers[userId] = {
                 userId: userId,
                 username: "@" + username,
                 coins: userCoins,
                 gems: userGems,
-                lastActive: Date.now()
+                lastActive: Date.now(),
+                coinHistory: cHist,
+                gemHistory: gHist,
+                withdrawHistory: wReqs.filter(w => w.userId === userId || w.username === ("@" + username)),
+                depositHistory: dReqs.filter(d => d.userId === userId || d.username === ("@" + username))
             };
             localStorage.setItem('zylobet_registered_users', JSON.stringify(allUsers));
         }
@@ -514,15 +534,6 @@
             document.getElementById('image-zoom-modal').classList.add('hidden');
         }
 
-        const ADMIN_ID = "7927224931";
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        
-        const user = tg.initDataUnsafe?.user;
-        const username = user ? (user.username || user.first_name) : "Player";
-        const userId = user?.id ? user.id.toString() : "0000";
-        const myReferralCode = "ZYL" + userId.slice(-4);
-
         document.getElementById('tg-user').innerText = "@" + username;
         document.getElementById('ref-code').innerText = myReferralCode;
 
@@ -533,7 +544,7 @@
             document.getElementById('user-avatar-text').innerText = user.first_name.charAt(0).toUpperCase();
         }
 
-        // STRICT ADMIN ACCESS CHECK: ONLY SHOWS TO ADMIN_ID
+        // STRICT ADMIN ACCESS: ONLY SHOWN TO ADMIN_ID
         if(userId === ADMIN_ID) { 
             document.getElementById('admin-toggle-bar').classList.remove('hidden');
         }
@@ -588,22 +599,30 @@
             registerUserActivity();
         }
 
-        let userCoins = parseInt(localStorage.getItem('zylobet_coins')) || 1250;
-        let userGems = parseInt(localStorage.getItem('zylobet_gems')) || 12;
+        let userCoins = parseInt(localStorage.getItem('zylobet_coins_' + userId)) || parseInt(localStorage.getItem('zylobet_coins')) || 1250;
+        let userGems = parseInt(localStorage.getItem('zylobet_gems_' + userId)) || parseInt(localStorage.getItem('zylobet_gems')) || 12;
         
         document.getElementById('user-coins').innerText = userCoins.toLocaleString();
         document.getElementById('user-gems').innerText = userGems;
 
-        if(!localStorage.getItem('zylobet_coin_history')) {
-            localStorage.setItem('zylobet_coin_history', JSON.stringify([
+        function saveUserBalances() {
+            localStorage.setItem('zylobet_coins_' + userId, userCoins);
+            localStorage.setItem('zylobet_gems_' + userId, userGems);
+            document.getElementById('user-coins').innerText = userCoins.toLocaleString();
+            document.getElementById('user-gems').innerText = userGems;
+            registerUserActivity();
+        }
+
+        if(!localStorage.getItem('zylobet_coin_history_' + userId)) {
+            localStorage.setItem('zylobet_coin_history_' + userId, JSON.stringify([
                 { title: "Welcome Bonus", amount: "+1,000 Coins", type: "earn", time: Date.now() - 3600000, status: "Success" }
             ]));
         }
         if(!localStorage.getItem('zylobet_withdraw_requests')) {
             localStorage.setItem('zylobet_withdraw_requests', JSON.stringify([]));
         }
-        if(!localStorage.getItem('zylobet_gem_history')) {
-            localStorage.setItem('zylobet_gem_history', JSON.stringify([
+        if(!localStorage.getItem('zylobet_gem_history_' + userId)) {
+            localStorage.setItem('zylobet_gem_history_' + userId, JSON.stringify([
                 { title: "Initial Diamonds", amount: `+${userGems} Diamonds`, type: "earn", time: Date.now() - 3600000, status: "Success" }
             ]));
         }
@@ -671,7 +690,7 @@
             const statusMsg = document.getElementById('ref-status-msg');
             const enteredCode = inputField.value.trim().toUpperCase();
 
-            if(localStorage.getItem('zylobet_ref_used') === 'true') {
+            if(localStorage.getItem('zylobet_ref_used_' + userId) === 'true') {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
                 statusMsg.innerText = "❌ Already redeemed a referral code!";
                 return;
@@ -684,14 +703,12 @@
             }
 
             userCoins += 300;
-            localStorage.setItem('zylobet_coins', userCoins);
-            document.getElementById('user-coins').innerText = userCoins.toLocaleString();
-            localStorage.setItem('zylobet_ref_used', 'true');
-            registerUserActivity();
+            saveUserBalances();
+            localStorage.setItem('zylobet_ref_used_' + userId, 'true');
             
-            let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
+            let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + userId)) || [];
             coinHist.unshift({ title: "Referral Bonus", amount: "+300 Coins", type: "earn", time: Date.now(), status: "Success" });
-            localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHist));
+            localStorage.setItem('zylobet_coin_history_' + userId, JSON.stringify(coinHist));
 
             statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
             statusMsg.innerText = "🎉 +300 Coins added successfully!";
@@ -728,27 +745,24 @@
 
             if(foundPromo.rewardType === 'coins') {
                 userCoins += foundPromo.rewardAmount;
-                localStorage.setItem('zylobet_coins', userCoins);
-                document.getElementById('user-coins').innerText = userCoins.toLocaleString();
+                saveUserBalances();
 
-                let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
+                let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + userId)) || [];
                 coinHist.unshift({ title: `Promo Code (${promoVal})`, amount: `+${foundPromo.rewardAmount} Coins`, type: "earn", time: Date.now(), status: "Success" });
-                localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHist));
+                localStorage.setItem('zylobet_coin_history_' + userId, JSON.stringify(coinHist));
             } else {
                 userGems += foundPromo.rewardAmount;
-                localStorage.setItem('zylobet_gems', userGems);
-                document.getElementById('user-gems').innerText = userGems;
+                saveUserBalances();
 
-                let gemHist = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
+                let gemHist = JSON.parse(localStorage.getItem('zylobet_gem_history_' + userId)) || [];
                 gemHist.unshift({ title: `Promo Code (${promoVal})`, amount: `+${foundPromo.rewardAmount} Diamonds`, type: "earn", time: Date.now(), status: "Success" });
-                localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHist));
+                localStorage.setItem('zylobet_gem_history_' + userId, JSON.stringify(gemHist));
             }
 
             foundPromo.usedCount += 1;
             userRedeemed.push(promoVal);
             localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
             localStorage.setItem('zylobet_user_redeemed_' + userId, JSON.stringify(userRedeemed));
-            registerUserActivity();
 
             statusMsg.className = "text-[11px] h-6 font-semibold text-emerald-400";
             statusMsg.innerText = `🎉 Success! +${foundPromo.rewardAmount} Added.`;
@@ -783,19 +797,15 @@
         function executeModalConversion() {
             if (!modalConvCoins || userCoins < modalConvCoins) { showCustomAlert("❌ Insufficient coins or none selected!"); return; }
             userCoins -= modalConvCoins; userGems += modalConvGems;
-            localStorage.setItem('zylobet_coins', userCoins);
-            localStorage.setItem('zylobet_gems', userGems);
-            document.getElementById('user-coins').innerText = userCoins.toLocaleString();
-            document.getElementById('user-gems').innerText = userGems;
-            registerUserActivity();
+            saveUserBalances();
 
-            let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
+            let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + userId)) || [];
             coinHist.unshift({ title: "Exchange to Diamonds", amount: `-${modalConvCoins} Coins`, type: "spend", time: Date.now(), status: "Success" });
-            localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHist));
+            localStorage.setItem('zylobet_coin_history_' + userId, JSON.stringify(coinHist));
 
-            let gemHist = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
+            let gemHist = JSON.parse(localStorage.getItem('zylobet_gem_history_' + userId)) || [];
             gemHist.unshift({ title: "Converted from Coins", amount: `+${modalConvGems} Diamonds`, type: "earn", time: Date.now(), status: "Success" });
-            localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHist));
+            localStorage.setItem('zylobet_gem_history_' + userId, JSON.stringify(gemHist));
 
             showCustomAlert(`🎉 Converted successfully!`); closeModal();
         }
@@ -954,7 +964,8 @@
             const content = document.getElementById('modal-content');
             if(type === 'gems') {
                 title.innerText = "DIAMONDS HISTORY";
-                let history = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
+                let history = JSON.parse(localStorage.getItem('zylobet_gem_history_' + userId)) || JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
+                if(history.length === 0) { content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No diamond history yet.</div>`; return; }
                 let html = "<div class='space-y-3'>";
                 history.forEach(item => {
                     let amountColor = item.amount.startsWith('+') ? 'text-emerald-400' : 'text-rose-400';
@@ -963,7 +974,8 @@
                 content.innerHTML = html + "</div>";
             } else if(type === 'coins') {
                 title.innerText = "COINS HISTORY";
-                let history = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
+                let history = JSON.parse(localStorage.getItem('zylobet_coin_history_' + userId)) || JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
+                if(history.length === 0) { content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No coin history yet.</div>`; return; }
                 let html = "<div class='space-y-3'>";
                 history.forEach(item => {
                     let amountColor = item.amount.startsWith('+') ? 'text-emerald-400' : 'text-rose-400';
@@ -973,14 +985,15 @@
             } else if(type === 'withdrawals') {
                 title.innerText = "PAYOUT HISTORY";
                 let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
+                let userReqs = reqs.filter(r => r.userId === userId || r.username === ("@" + username));
                 
-                if(reqs.length === 0) { 
+                if(userReqs.length === 0) { 
                     content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No payout history yet.</div>`; 
                     return; 
                 }
 
                 let html = "<div class='space-y-3'>";
-                reqs.slice().reverse().forEach(item => {
+                userReqs.slice().reverse().forEach(item => {
                     let redeemBox = item.redeemCode ? `<div class='flex items-center gap-2 mt-1'><span class='text-xs text-sky-300 font-mono'>🔑 Redeem Code: <b>${item.redeemCode}</b></span><button onclick="copyRedeemCode('${item.redeemCode}')" class='bg-sky-500/20 hover:bg-sky-500/40 text-sky-300 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer'><i class="fa-solid fa-copy"></i> Copy</button></div>` : '';
                     let commentBox = item.adminComment ? `<p class='text-xs text-rose-400 mt-1'>💬 Reason: <b>${item.adminComment}</b></p>` : '';
                     
@@ -1023,18 +1036,16 @@
             }
 
             userCoins -= selectedWCoins;
-            localStorage.setItem('zylobet_coins', userCoins);
-            document.getElementById('user-coins').innerText = userCoins.toLocaleString();
-            registerUserActivity();
+            saveUserBalances();
 
             let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
             let newReq = { id: Date.now(), username: "@" + username, userId: userId, method: method, amount: selectedWCoins, rupees: selectedWAmount, details: extraDetails, status: "Pending" };
             reqs.push(newReq);
             localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
 
-            let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
+            let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + userId)) || [];
             coinHist.unshift({ title: `Withdrawal Request (${method})`, amount: `-${selectedWCoins} Coins`, type: "spend", time: Date.now(), status: "Pending" });
-            localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHist));
+            localStorage.setItem('zylobet_coin_history_' + userId, JSON.stringify(coinHist));
 
             showCustomAlert(`🎉 ${method} Withdrawal Request Sent Successfully!`);
             if(method === 'UPI') document.getElementById('w-upi-id').value = '';
@@ -1106,8 +1117,8 @@
             document.getElementById('modal').classList.remove('hidden');
             document.getElementById('modal-title').innerText = `HISTORY: ${u.username}`;
 
-            let cHist = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
-            let gHist = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
+            let cHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + uId)) || [];
+            let gHist = JSON.parse(localStorage.getItem('zylobet_gem_history_' + uId)) || [];
             let wReqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
             let dReqs = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
 
@@ -1183,22 +1194,27 @@
                 dep.status = "Success";
                 localStorage.setItem('zylobet_deposit_requests', JSON.stringify(deposits));
 
-                userGems += dep.diamonds;
-                localStorage.setItem('zylobet_gems', userGems);
-                document.getElementById('user-gems').innerText = userGems;
+                let targetUserId = dep.userId || userId;
+                let targetGems = parseInt(localStorage.getItem('zylobet_gems_' + targetUserId)) || userGems;
+                targetGems += dep.diamonds;
+                localStorage.setItem('zylobet_gems_' + targetUserId, targetGems);
+                if(targetUserId === userId) {
+                    userGems = targetGems;
+                    document.getElementById('user-gems').innerText = userGems;
+                }
 
                 let baseBonus = dep.amount >= 500 ? 50 : (dep.amount >= 200 ? 18 : (dep.amount >= 100 ? 8 : (dep.amount >= 50 ? 3 : 0)));
                 if(baseBonus > 0) {
-                    let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + dep.userId)) || [];
+                    let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + targetUserId)) || [];
                     if(!usedBonuses.includes(dep.amount)) {
                         usedBonuses.push(dep.amount);
-                        localStorage.setItem('zylobet_used_bonuses_' + dep.userId, JSON.stringify(usedBonuses));
+                        localStorage.setItem('zylobet_used_bonuses_' + targetUserId, JSON.stringify(usedBonuses));
                     }
                 }
 
-                let gemHist = JSON.parse(localStorage.getItem('zylobet_gem_history')) || [];
+                let gemHist = JSON.parse(localStorage.getItem('zylobet_gem_history_' + targetUserId)) || [];
                 gemHist.unshift({ title: `Deposit Approved (₹${dep.amount})`, amount: `+${dep.diamonds} Diamonds`, type: "earn", time: Date.now(), status: "Success" });
-                localStorage.setItem('zylobet_gem_history', JSON.stringify(gemHist));
+                localStorage.setItem('zylobet_gem_history_' + targetUserId, JSON.stringify(gemHist));
 
                 showCustomAlert("🎉 Deposit Approved Successfully! Diamonds added to user.");
                 loadAdminDeposits();
@@ -1298,14 +1314,19 @@
                 req.adminComment = adminComment;
                 localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
 
-                userCoins += req.amount;
-                localStorage.setItem('zylobet_coins', userCoins);
-                document.getElementById('user-coins').innerText = userCoins.toLocaleString();
+                let targetUserId = req.userId || userId;
+                let targetCoins = parseInt(localStorage.getItem('zylobet_coins_' + targetUserId)) || userCoins;
+                targetCoins += req.amount;
+                localStorage.setItem('zylobet_coins_' + targetUserId, targetCoins);
+                if(targetUserId === userId) {
+                    userCoins = targetCoins;
+                    document.getElementById('user-coins').innerText = userCoins.toLocaleString();
+                }
                 registerUserActivity();
 
-                let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history')) || [];
+                let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + targetUserId)) || [];
                 coinHist.unshift({ title: `Withdrawal Refund (${req.method})`, amount: `+${req.amount} Coins`, type: "earn", time: Date.now(), status: "Success" });
-                localStorage.setItem('zylobet_coin_history', JSON.stringify(coinHist));
+                localStorage.setItem('zylobet_coin_history_' + targetUserId, JSON.stringify(coinHist));
 
                 showCustomAlert(`❌ Payout Rejected! ${req.amount} Coins refunded successfully.`);
                 loadAdminRequests();
