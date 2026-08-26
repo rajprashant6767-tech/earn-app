@@ -208,7 +208,7 @@
                         <i class="fa-solid fa-users"></i>
                     </div>
                     <h2 class="text-base font-black text-sky-400">Refer & Earn Rewards</h2>
-                    <p class="text-[11px] text-gray-400">Invite friends and get +300 <span class="ff-gold-coin" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> Coins instantly!</p>
+                    <p class="text-[11px] text-gray-400">Invite friends and both get +300 <span class="ff-gold-coin" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> Coins instantly!</p>
                 </div>
 
                 <div class="flex justify-between items-center cyber-card p-4 rounded-2xl border border-white/5">
@@ -464,7 +464,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT CONTROLLER ENGINE WITH ADVANCED CROSS-DEVICE CLOUD SYNC -->
+    <!-- SCRIPT CONTROLLER ENGINE WITH STRICT REFERRAL & DUAL REWARD LOGIC -->
     <script>
         const ADMIN_ID = "7927224931";
         
@@ -512,9 +512,6 @@
             }, 1000);
         });
 
-        // Advanced Universal Cloud Sync Engine using Public JSONBin API
-        const CLOUD_BIN_URL = "https://api.jsonbin.io/v3/b/66cc504ead19ca34f8953123"; // Shared Cloud Sync Gateway
-        
         function registerUserActivity() {
             let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
             
@@ -526,39 +523,10 @@
                 lastActive: Date.now()
             };
             localStorage.setItem('zylobet_registered_users', JSON.stringify(allUsers));
-
-            // Push to public cloud endpoint for real-time multi-device sync
-            fetch(CLOUD_BIN_URL, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Master-Key': '$2a$10$7XvW5K1234567890abcdef' // Public shared sync key
-                },
-                body: JSON.stringify(allUsers)
-            }).catch(err => console.log("Cloud Sync background update active"));
-        }
-
-        // Pull from cloud endpoint periodically so admin on laptop sees mobile users instantly
-        function fetchCloudUsers() {
-            fetch(CLOUD_BIN_URL + "/latest", {
-                headers: {
-                    'X-Master-Key': '$2a$10$7XvW5K1234567890abcdef'
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data && data.record) {
-                    localStorage.setItem('zylobet_registered_users', JSON.stringify(data.record));
-                }
-            })
-            .catch(err => {});
         }
 
         setInterval(() => {
             registerUserActivity();
-            if(userId === ADMIN_ID) {
-                fetchCloudUsers();
-            }
         }, 3000);
 
         function showCustomAlert(msg) {
@@ -623,7 +591,7 @@
             let now = Date.now();
             userKeys.forEach(k => {
                 let u = allUsers[k];
-                if(u.lastActive && (now - u.lastActive < 20000)) {
+                if(u.lastActive && (now - u.lastActive < 15000)) {
                     onlineCount++;
                 }
             });
@@ -724,14 +692,16 @@
             event.currentTarget.classList.add('border-emerald-400', 'bg-emerald-500/10');
         }
 
+        // STRICT ONE-TIME REFERRAL LOGIC WITH DUAL REWARD (+300 Coins to Both)
         function applyReferralCode() {
             const inputField = document.getElementById('friend-ref-input');
             const statusMsg = document.getElementById('ref-status-msg');
             const enteredCode = inputField.value.trim().toUpperCase();
 
+            // Check if current user already redeemed a referral code before
             if(localStorage.getItem('zylobet_ref_used_' + userId) === 'true') {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ Already redeemed a referral code!";
+                statusMsg.innerText = "❌ You have already redeemed a referral code!";
                 return;
             }
 
@@ -741,16 +711,44 @@
                 return;
             }
 
+            // Find the owner of the referral code among registered users
+            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
+            let referrerKey = null;
+            Object.keys(allUsers).forEach(k => {
+                if ("ZYL" + k.slice(-4) === enteredCode) {
+                    referrerKey = k;
+                }
+            });
+
+            if (!referrerKey) {
+                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
+                statusMsg.innerText = "❌ Referral code not found!";
+                return;
+            }
+
+            // 1. Reward the current user (Redeemer)
             userCoins += 300;
             saveUserBalances();
             localStorage.setItem('zylobet_ref_used_' + userId, 'true');
-            
+
             let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + userId)) || [];
-            coinHist.unshift({ title: "Referral Bonus", amount: "+300 Coins", type: "earn", time: Date.now(), status: "Success" });
+            coinHist.unshift({ title: "Referral Bonus (Redeemed)", amount: "+300 Coins", type: "earn", time: Date.now(), status: "Success" });
             localStorage.setItem('zylobet_coin_history_' + userId, JSON.stringify(coinHist));
 
+            // 2. Reward the referrer (Code Owner)
+            let referrerCoins = parseInt(localStorage.getItem('zylobet_coins_' + referrerKey)) || allUsers[referrerKey].coins || 100;
+            referrerCoins += 300;
+            localStorage.setItem('zylobet_coins_' + referrerKey, referrerCoins);
+            allUsers[referrerKey].coins = referrerCoins;
+            localStorage.setItem('zylobet_registered_users', JSON.stringify(allUsers));
+
+            let refCoinHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + referrerKey)) || [];
+            refCoinHist.unshift({ title: `Referral Reward (${username} joined)`, amount: "+300 Coins", type: "earn", time: Date.now(), status: "Success" });
+            localStorage.setItem('zylobet_coin_history_' + referrerKey, JSON.stringify(refCoinHist));
+
             statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
-            statusMsg.innerText = "🎉 +300 Coins added successfully!";
+            statusMsg.innerText = "🎉 Success! +300 Coins added to both accounts!";
+            inputField.value = "";
         }
 
         function applyPromoCode() {
