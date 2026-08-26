@@ -6,9 +6,6 @@
     <title>ZyloBet | Elite Gaming & Rewards Platform</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Firebase Realtime Database SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
@@ -211,7 +208,7 @@
                         <i class="fa-solid fa-users"></i>
                     </div>
                     <h2 class="text-base font-black text-sky-400">Refer & Earn Rewards</h2>
-                    <p class="text-[11px] text-gray-400">Invite friends and both get +300 <span class="ff-gold-coin" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> Coins instantly!</p>
+                    <p class="text-[11px] text-gray-400">Invite friends and get +300 <span class="ff-gold-coin" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> Coins instantly!</p>
                 </div>
 
                 <div class="flex justify-between items-center cyber-card p-4 rounded-2xl border border-white/5">
@@ -378,19 +375,19 @@
             </div>
         </div>
 
-        <!-- ADMIN DASHBOARD CONTROL PANEL WITH REAL TELEGRAM USERS SYNC -->
+        <!-- ADMIN DASHBOARD CONTROL PANEL -->
         <div id="admin-view" class="hidden space-y-4">
             <div class="cyber-card p-4 rounded-3xl border border-sky-500/30 flex justify-between items-center shadow-xl">
                 <div>
                     <h1 class="text-base font-black text-sky-400 italic">ZyloBet Admin Control Center</h1>
-                    <p class="text-[10px] text-gray-400">Manage Payout Approvals and Real User Activity</p>
+                    <p class="text-[10px] text-gray-400">Manage Payout Approvals and User Activity</p>
                 </div>
                 <button onclick="loadAdminActivePanel()" class="bg-white/10 hover:bg-white/20 text-xs px-3.5 py-2 rounded-xl font-bold text-amber-400 transition active:scale-95 shadow cursor-pointer">
                     <i class="fa-solid fa-rotate mr-1"></i> Refresh
                 </button>
             </div>
 
-            <!-- LIVE STATS BAR (ONLINE USERS & TOTAL REGISTERED) -->
+            <!-- LIVE STATS BAR -->
             <div class="grid grid-cols-2 gap-3">
                 <div class="cyber-card p-3 rounded-2xl border border-emerald-500/30 text-center">
                     <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Online Users Now</p>
@@ -435,7 +432,7 @@
         </button>
     </nav>
 
-    <!-- FULLSCREEN IMAGE ZOOM MODAL FOR ADMIN PROOF -->
+    <!-- FULLSCREEN IMAGE ZOOM MODAL -->
     <div id="image-zoom-modal" class="hidden fixed inset-0 z-[300] bg-black/95 backdrop-blur-lg p-4 flex flex-col items-center justify-center">
         <button onclick="closeImageZoom()" class="absolute top-5 right-5 w-12 h-12 rounded-full bg-white/10 text-white font-black text-lg flex items-center justify-center hover:bg-white/20 transition cursor-pointer">
             <i class="fa-solid fa-xmark"></i>
@@ -458,7 +455,7 @@
         </div>
     </div>
 
-    <!-- FULL POPUP MODAL DIALOG CONTAINER -->
+    <!-- MODAL DIALOG CONTAINER -->
     <div id="modal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md p-5 flex flex-col justify-center">
         <div class="cyber-card p-6 rounded-3xl border border-white/10 shadow-2xl max-w-md w-full mx-auto">
             <h2 id="modal-title" class="font-black text-center mb-5 text-sm tracking-widest text-sky-400 uppercase">Notification</h2>
@@ -467,25 +464,9 @@
         </div>
     </div>
 
-    <!-- FIREBASE REAL-TIME DATABASE ENGINE FOR REAL USERS -->
+    <!-- STABLE RESPONSIVE CONTROLLER ENGINE -->
     <script>
-        // FIREBASE SETUP
-        const firebaseConfig = {
-            apiKey: "AIzaSyBi30pzpSmX7ICY20_gKtxXyl2QDrny_lY",
-            authDomain: "zylobet-3c0d0.firebaseapp.com",
-            databaseURL: "https://zylobet-3c0d0-default-rtdb.firebaseio.com",
-            projectId: "zylobet-3c0d0",
-            storageBucket: "zylobet-3c0d0.firebasestorage.app",
-            messagingSenderId: "393354931045",
-            appId: "1:393354931045:web:6f83eb387cbd9f66140f8c",
-            measurementId: "G-KXCH485C8B"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
         const ADMIN_ID = "7927224931";
-        
         let userId = "7927224931";
         let username = "@Raj_Prashant";
 
@@ -530,33 +511,21 @@
             }, 1000);
         });
 
-        // REGISTER REAL USER TO FIREBASE DATABASE
         function registerUserActivity() {
-            let userData = {
+            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
+            allUsers[userId] = {
                 userId: userId,
                 username: username,
                 coins: userCoins,
                 gems: userGems,
-                lastActive: firebase.database.ServerValue.TIMESTAMP
+                lastActive: Date.now()
             };
-
-            db.ref('users/' + userId).set(userData);
+            localStorage.setItem('zylobet_registered_users', JSON.stringify(allUsers));
         }
 
         setInterval(() => {
             registerUserActivity();
-        }, 4000);
-
-        // ADMIN PANEL: PULL REAL USERS LIVE FROM FIREBASE
-        if(userId === ADMIN_ID) {
-            db.ref('users').on('value', (snapshot) => {
-                let data = snapshot.val();
-                if(data) {
-                    localStorage.setItem('zylobet_registered_users', JSON.stringify(data));
-                    updateAdminStats();
-                }
-            });
-        }
+        }, 3000);
 
         function showCustomAlert(msg) {
             document.getElementById('custom-alert-text').innerText = msg;
@@ -619,7 +588,7 @@
             let now = Date.now();
             userKeys.forEach(k => {
                 let u = allUsers[k];
-                if(u.lastActive && (now - u.lastActive < 25000)) {
+                if(u.lastActive && (now - u.lastActive < 15000)) {
                     onlineCount++;
                 }
             });
@@ -720,7 +689,6 @@
             event.currentTarget.classList.add('border-emerald-400', 'bg-emerald-500/10');
         }
 
-        // SECURE REFERRAL SYSTEM (VERIFIES AGAINST FIREBASE REAL USERS)
         function applyReferralCode() {
             const inputField = document.getElementById('friend-ref-input');
             const statusMsg = document.getElementById('ref-status-msg');
@@ -738,22 +706,12 @@
                 return;
             }
 
-            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
-            let referrerKey = null;
-            
-            Object.keys(allUsers).forEach(k => {
-                if ("ZYL" + k.slice(-4) === enteredCode) {
-                    referrerKey = k;
-                }
-            });
-
-            if (!referrerKey) {
+            if(!enteredCode.startsWith("ZYL") || enteredCode.length !== 7) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ Referral code not found or inactive!";
+                statusMsg.innerText = "❌ Invalid Referral Code Format!";
                 return;
             }
 
-            // Reward Redeemer
             userCoins += 300;
             saveUserBalances();
             localStorage.setItem('zylobet_ref_used_' + userId, 'true');
@@ -762,12 +720,8 @@
             coinHist.unshift({ title: "Referral Bonus (Redeemed)", amount: "+300 Coins", type: "earn", time: Date.now(), status: "Success" });
             localStorage.setItem('zylobet_coin_history_' + userId, JSON.stringify(coinHist));
 
-            // Reward Referrer via Firebase
-            let referrerCoins = parseInt(allUsers[referrerKey].coins || 100) + 300;
-            db.ref('users/' + referrerKey + '/coins').set(referrerCoins);
-
             statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
-            statusMsg.innerText = "🎉 Success! +300 Coins added to both accounts!";
+            statusMsg.innerText = "🎉 Success! +300 Coins added successfully!";
             inputField.value = "";
         }
 
