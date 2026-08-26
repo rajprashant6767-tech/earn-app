@@ -464,7 +464,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT CONTROLLER ENGINE WITH LOCAL STORAGE MULTI-USER BRIDGE -->
+    <!-- SCRIPT CONTROLLER ENGINE -->
     <script>
         const ADMIN_ID = "7927224931";
         const tg = window.Telegram.WebApp;
@@ -1405,7 +1405,7 @@
             const codeVal = codeInput.value.trim().toUpperCase();
             const rewardType = typeInput.value;
             const rewardAmount = parseInt(amtInput.value) || 100;
-            const durationMin = parseInt(timeInput.00) || 60;
+            const durationMin = parseInt(timeInput.value) || 60;
             const maxUsr = parseInt(limitInput.value) || 50;
 
             if(!codeVal) { showCustomAlert("❌ Please enter a promo code name!"); return; }
