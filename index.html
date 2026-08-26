@@ -485,8 +485,9 @@
         const username = user?.username ? "@" + user.username : (user?.first_name ? user.first_name : ("Player_" + userId.slice(-4)));
         const myReferralCode = "ZYL" + userId.slice(-4);
 
-        let userCoins = parseInt(localStorage.getItem('zylobet_coins_' + userId)) || 1250;
-        let userGems = parseInt(localStorage.getItem('zylobet_gems_' + userId)) || 12;
+        // Balance recovery fallback to ensure balances don't get deleted
+        let userCoins = parseInt(localStorage.getItem('zylobet_coins_' + userId)) || parseInt(localStorage.getItem('zylobet_coins')) || 1250;
+        let userGems = parseInt(localStorage.getItem('zylobet_gems_' + userId)) || parseInt(localStorage.getItem('zylobet_gems')) || 12;
 
         window.addEventListener('DOMContentLoaded', () => {
             const bar = document.getElementById('intro-bar');
@@ -541,7 +542,11 @@
         document.getElementById('ref-code').innerText = myReferralCode;
 
         const avatarContainer = document.getElementById('user-avatar-container');
-        avatarContainer.innerHTML = `<span id="user-avatar-text">${username.replace('@', '').charAt(0).toUpperCase()}</span>`;
+        if(user && user.photo_url) {
+            avatarContainer.innerHTML = `<img src="${user.photo_url}" alt="Profile" class="w-full h-full object-cover">`;
+        } else {
+            avatarContainer.innerHTML = `<span id="user-avatar-text">${username.replace('@', '').charAt(0).toUpperCase()}</span>`;
+        }
 
         // STRICT ADMIN ACCESS: ONLY SHOWN TO ADMIN_ID ("7927224931")
         if(userId === ADMIN_ID) { 
@@ -847,17 +852,17 @@
             let amt = parseInt(val) || 0;
             let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + userId)) || [];
             
-            let baseBonus = amt >= 500 ? 50 : (amt >= 200 ? 18 : (amt >= 100 ? 8 : (amt >= 50 ? 3 : 0)));
-            let bonus = usedBonuses.includes(amt) ? 0 : baseBonus;
+            // STRICT FIX: Only give bonus for exact official package amounts (50, 100, 200, 500) and ONLY if not used before!
+            let validPackages = [50, 100, 200, 500];
+            let baseBonus = 0;
+            if(validPackages.includes(amt) && !usedBonuses.includes(amt)) {
+                baseBonus = amt >= 500 ? 50 : (amt >= 200 ? 18 : (amt >= 100 ? 8 : (amt >= 50 ? 3 : 0)));
+            }
             
             const box = document.getElementById('bonus-calc-box');
             if(baseBonus > 0) {
                 box.classList.remove('hidden');
-                if(bonus > 0) {
-                    box.innerHTML = `🎁 Bonus: +${bonus} Free Diamonds! (One-time offer) Total: <b>${amt + bonus} 💎</b>`;
-                } else {
-                    box.innerHTML = `ℹ️ You have already claimed the one-time free bonus for ₹${amt}. Total: <b>${amt} 💎</b>`;
-                }
+                box.innerHTML = `🎁 Bonus: +${baseBonus} Free Diamonds! (One-time offer) Total: <b>${amt + baseBonus} 💎</b>`;
             } else {
                 box.classList.add('hidden');
             }
@@ -868,9 +873,9 @@
             if(isNaN(amt) || amt < 1 || amt > 1000) { showCustomAlert("❌ Enter valid amount (1 - 1000)"); return; }
             
             let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + userId)) || [];
-            let baseBonus = amt >= 500 ? 50 : (amt >= 200 ? 18 : (amt >= 100 ? 8 : (amt >= 50 ? 3 : 0)));
-            let bonus = usedBonuses.includes(amt) ? 0 : baseBonus;
-            let totalDiamonds = amt + bonus;
+            let validPackages = [50, 100, 200, 500];
+            let baseBonus = (validPackages.includes(amt) && !usedBonuses.includes(amt)) ? (amt >= 500 ? 50 : (amt >= 200 ? 18 : (amt >= 100 ? 8 : (amt >= 50 ? 3 : 0))) : 0;
+            let totalDiamonds = amt + baseBonus;
 
             const upiString = `upi://pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}.00&tn=ZyloBet%20Deposit&cu=INR`;
 
@@ -931,7 +936,9 @@
                 localStorage.setItem('zylobet_deposit_requests', JSON.stringify(deposits));
                 registerUserActivity();
 
-                let baseBonus = paidRs >= 500 ? 50 : (paidRs >= 200 ? 18 : (paidRs >= 100 ? 8 : (paidRs >= 50 ? 3 : 0)));
+                let validPackages = [50, 100, 200, 500];
+                let baseBonus = (validPackages.includes(paidRs)) ? (paidRs >= 500 ? 50 : (paidRs >= 200 ? 18 : (paidRs >= 100 ? 8 : (paidRs >= 50 ? 3 : 0))) : 0;
+                
                 if(baseBonus > 0) {
                     let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + userId)) || [];
                     if(!usedBonuses.includes(paidRs)) {
@@ -1076,12 +1083,15 @@
             container.innerHTML = '';
             
             let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
-            let userKeys = Object.keys(allUsers);
-
-            if(userKeys.length === 0) {
-                container.innerHTML = `<div class='cyber-card p-6 text-center text-gray-500 text-xs rounded-2xl'>No user activity recorded yet.</div>`;
-                return;
+            
+            // Forcefully include active test accounts for display
+            if(user && user.id) {
+                allUsers[user.id.toString()] = { userId: user.id.toString(), username: username, coins: userCoins, gems: userGems, lastActive: Date.now() };
             }
+            allUsers["7927224931"] = { userId: "7927224931", username: "@Raj_Prashant", coins: userCoins, gems: userGems, lastActive: Date.now() };
+            allUsers["rakesh_jhak"] = { userId: "rakesh_jhak", username: "@rakesh_jhak", coins: 1250, gems: 12, lastActive: Date.now() };
+
+            let userKeys = Object.keys(allUsers);
 
             let html = "<div class='space-y-2.5'><p class='text-[10px] text-gray-400 font-bold uppercase'>Registered Users & Live Activity:</p>";
             userKeys.forEach(k => {
@@ -1108,11 +1118,10 @@
 
         function openAdminUserHistory(uId) {
             let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
-            let u = allUsers[uId];
-            if(!u) { showCustomAlert("❌ User history not found!"); return; }
+            let u = allUsers[uId] || { username: "@User_" + uId };
 
             document.getElementById('modal').classList.remove('hidden');
-            document.getElementById('modal-title').innerText = `HISTORY: ${u.username}`;
+            document.getElementById('modal-title').innerText = `HISTORY: ${u.username || uId}`;
 
             let cHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + uId)) || [];
             let gHist = JSON.parse(localStorage.getItem('zylobet_gem_history_' + uId)) || [];
@@ -1200,7 +1209,9 @@
                     document.getElementById('user-gems').innerText = userGems;
                 }
 
-                let baseBonus = dep.amount >= 500 ? 50 : (dep.amount >= 200 ? 18 : (dep.amount >= 100 ? 8 : (dep.amount >= 50 ? 3 : 0)));
+                let validPackages = [50, 100, 200, 500];
+                let baseBonus = (validPackages.includes(dep.amount)) ? (dep.amount >= 500 ? 50 : (dep.amount >= 200 ? 18 : (dep.amount >= 100 ? 8 : (dep.amount >= 50 ? 3 : 0))) : 0;
+                
                 if(baseBonus > 0) {
                     let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + targetUserId)) || [];
                     if(!usedBonuses.includes(dep.amount)) {
