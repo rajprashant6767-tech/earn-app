@@ -6,9 +6,6 @@
     <title>ZyloBet | Elite Gaming & Rewards Platform</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Firebase SDKs for Realtime Cloud Sync -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
@@ -469,7 +466,6 @@
 
     <!-- SCRIPT CONTROLLER ENGINE WITH FIREBASE REALTIME SYNC -->
     <script>
-        // REPLACE WITH YOUR FREE FIREBASE CONFIG IF DESIRED
         const firebaseConfig = {
             databaseURL: "https://zylobet-default-rtdb.firebaseio.com/" 
         };
@@ -521,11 +517,6 @@
                 gems: userGems,
                 lastActive: firebase.database.ServerValue.TIMESTAMP
             });
-
-            // Also keep local fallback synced
-            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
-            allUsers[userId] = { userId, username, coins: userCoins, gems: userGems, lastActive: Date.now() };
-            localStorage.setItem('zylobet_registered_users', JSON.stringify(allUsers));
         }
 
         setInterval(() => {
