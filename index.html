@@ -6,8 +6,9 @@
     <title>ZyloBet | Elite Gaming & Rewards Platform</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Socket.io Client for Real-time Server Sync -->
-    <script src="/socket.io/socket.io.js"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
@@ -208,7 +209,7 @@
                         <i class="fa-solid fa-users"></i>
                     </div>
                     <h2 class="text-base font-black text-sky-400">Refer & Earn Rewards</h2>
-                    <p class="text-[11px] text-gray-400">Invite friends and both get +300 <span class="ff-gold-coin" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> Coins instantly!</p>
+                    <p class="text-[11px] text-gray-400">Invite friends and get +300 <span class="ff-gold-coin" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> Coins instantly!</p>
                 </div>
 
                 <div class="flex justify-between items-center cyber-card p-4 rounded-2xl border border-white/5">
@@ -382,7 +383,7 @@
                     <h1 class="text-base font-black text-sky-400 italic">ZyloBet Admin Control Center</h1>
                     <p class="text-[10px] text-gray-400">Manage Payout Approvals and Real User Activity</p>
                 </div>
-                <button onclick="loadAdminActivePanel()" class="bg-white/10 hover:bg-white/20 text-xs px-3.5 py-2 rounded-xl font-bold text-amber-400 transition active:scale-95 shadow cursor-pointer">
+                <button onclick="loadAdminActivePanel()" class="bg-white/10 hover:bg-white/20 text-xs px-3.5 py-2 rounded-xl font-black text-amber-400 transition active:scale-95 shadow cursor-pointer">
                     <i class="fa-solid fa-rotate mr-1"></i> Refresh
                 </button>
             </div>
@@ -464,9 +465,22 @@
         </div>
     </div>
 
-    <!-- SOCKET.IO REAL-TIME REAL-USER ENGINE -->
+    <!-- FIREBASE REALTIME DATABASE SYNC ENGINE -->
     <script>
-        const socket = io();
+        // FIREBASE CONFIGURATION
+        const firebaseConfig = {
+            apiKey: "AIzaSyBi30pzpSmX7ICY20_gKtxXyl2QDrny_lY",
+            authDomain: "zylobet-3c0d0.firebaseapp.com",
+            databaseURL: "https://zylobet-3c0d0-default-rtdb.firebaseio.com",
+            projectId: "zylobet-3c0d0",
+            storageBucket: "zylobet-3c0d0.firebasestorage.app",
+            messagingSenderId: "393354931045",
+            appId: "1:393354931045:web:6f83eb387cbd9f66140f8c",
+            measurementId: "G-KXCH485C8B"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
         const ADMIN_ID = "7927224931";
         let userId = "7927224931";
@@ -507,33 +521,38 @@
                     setTimeout(() => {
                         intro.remove();
                         document.getElementById('main-app').style.opacity = '1';
-                        sendUserPresence();
+                        registerUserToCloud();
                     }, 700);
                 }
             }, 1000);
         });
 
-        // SEND REAL-TIME USER DATA TO WEBSOCKET SERVER
-        function sendUserPresence() {
-            socket.emit('register_user', {
+        // LIVE CLOUD USER SYNC VIA FIREBASE
+        function registerUserToCloud() {
+            let userData = {
                 userId: userId,
                 username: username,
                 coins: userCoins,
-                gems: userGems
-            });
+                gems: userGems,
+                lastActive: firebase.database.ServerValue.TIMESTAMP
+            };
+            db.ref('users/' + userId).set(userData);
         }
 
         setInterval(() => {
-            sendUserPresence();
-        }, 3000);
+            registerUserToCloud();
+        }, 4000);
 
-        // LISTEN FOR REAL USERS ON ADMIN PANEL
-        socket.on('update_users_list', (usersList) => {
-            if(userId === ADMIN_ID) {
-                localStorage.setItem('zylobet_registered_users', JSON.stringify(usersList));
-                updateAdminStats();
-            }
-        });
+        // ADMIN PANEL: LIVE SYNC REAL USERS FROM CLOUD
+        if(userId === ADMIN_ID) {
+            db.ref('users').on('value', (snapshot) => {
+                let data = snapshot.val();
+                if(data) {
+                    localStorage.setItem('zylobet_registered_users', JSON.stringify(data));
+                    updateAdminStats();
+                }
+            });
+        }
 
         function showCustomAlert(msg) {
             document.getElementById('custom-alert-text').innerText = msg;
@@ -596,7 +615,7 @@
             let now = Date.now();
             userKeys.forEach(k => {
                 let u = allUsers[k];
-                if(u.lastActive && (now - u.lastActive < 10000)) {
+                if(u.lastActive && (now - u.lastActive < 25000)) {
                     onlineCount++;
                 }
             });
@@ -611,7 +630,7 @@
 
             document.getElementById('tab-' + tab).classList.remove('hidden');
             document.getElementById('nav-' + tab).className = "flex flex-col items-center gap-1 text-sky-400 transition py-1 px-4 rounded-2xl bg-sky-500/10 cursor-pointer";
-            sendUserPresence();
+            registerUserToCloud();
         }
         
         document.getElementById('user-coins').innerText = userCoins.toLocaleString();
@@ -622,7 +641,7 @@
             localStorage.setItem('zylobet_gems_' + userId, userGems);
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
             document.getElementById('user-gems').innerText = userGems;
-            sendUserPresence();
+            registerUserToCloud();
         }
 
         if(!localStorage.getItem('zylobet_coin_history_' + userId)) {
@@ -737,8 +756,11 @@
             coinHist.unshift({ title: "Referral Bonus (Redeemed)", amount: "+300 Coins", type: "earn", time: Date.now(), status: "Success" });
             localStorage.setItem('zylobet_coin_history_' + userId, JSON.stringify(coinHist));
 
+            let referrerCoins = parseInt(allUsers[referrerKey].coins || 100) + 300;
+            db.ref('users/' + referrerKey + '/coins').set(referrerCoins);
+
             statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
-            statusMsg.innerText = "🎉 Success! +300 Coins added successfully!";
+            statusMsg.innerText = "🎉 Success! +300 Coins added to both accounts!";
             inputField.value = "";
         }
 
@@ -959,7 +981,7 @@
 
                 deposits.push(newDep);
                 localStorage.setItem('zylobet_deposit_requests', JSON.stringify(deposits));
-                sendUserPresence();
+                registerUserToCloud();
 
                 let validPackages = [50, 100, 200, 500];
                 let baseBonus = (validPackages.includes(paidRs)) ? (paidRs >= 500 ? 50 : (paidRs >= 200 ? 18 : (paidRs >= 100 ? 8 : (paidRs >= 50 ? 3 : 0)))) : 0;
@@ -1352,7 +1374,7 @@
                     userCoins = targetCoins;
                     document.getElementById('user-coins').innerText = userCoins.toLocaleString();
                 }
-                sendUserPresence();
+                registerUserToCloud();
 
                 let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + targetUserId)) || [];
                 coinHist.unshift({ title: `Withdrawal Refund (${req.method})`, amount: `+${req.amount} Coins`, type: "earn", time: Date.now(), status: "Success" });
@@ -1446,7 +1468,7 @@
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
             let usedHistory = JSON.parse(localStorage.getItem('zylobet_global_promo_history')) || [];
             
-            if(promos.some(p => p.code === codeVal) || usedHistory.includes(codeVal)) {
+            if(promos.some(p => p.code === codeVal) || usedHistory.notes?.includes(codeVal) || usedHistory.includes(codeVal)) {
                 showCustomAlert("❌ This promo code has already been created before and cannot be reused!");
                 return;
             }
@@ -1467,7 +1489,7 @@
             localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
             localStorage.setItem('zylobet_global_promo_history', JSON.stringify(usedHistory));
 
-4            showCustomAlert(`🎉 Promo Code '${codeVal}' Created Successfully!`);
+            showCustomAlert(`🎉 Promo Code '${codeVal}' Created Successfully!`);
             loadAdminPromoManager();
         }
     </script>
