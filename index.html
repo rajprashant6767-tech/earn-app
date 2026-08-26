@@ -6,6 +6,9 @@
     <title>ZyloBet | Elite Gaming & Rewards Platform</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase Realtime Database SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
@@ -375,12 +378,12 @@
             </div>
         </div>
 
-        <!-- ADMIN DASHBOARD CONTROL PANEL WITH USER ACTIVITY & LIVE ONLINE STATS -->
+        <!-- ADMIN DASHBOARD CONTROL PANEL WITH REAL TELEGRAM USERS SYNC -->
         <div id="admin-view" class="hidden space-y-4">
             <div class="cyber-card p-4 rounded-3xl border border-sky-500/30 flex justify-between items-center shadow-xl">
                 <div>
                     <h1 class="text-base font-black text-sky-400 italic">ZyloBet Admin Control Center</h1>
-                    <p class="text-[10px] text-gray-400">Manage Payout Approvals and User Activity</p>
+                    <p class="text-[10px] text-gray-400">Manage Payout Approvals and Real User Activity</p>
                 </div>
                 <button onclick="loadAdminActivePanel()" class="bg-white/10 hover:bg-white/20 text-xs px-3.5 py-2 rounded-xl font-bold text-amber-400 transition active:scale-95 shadow cursor-pointer">
                     <i class="fa-solid fa-rotate mr-1"></i> Refresh
@@ -401,16 +404,11 @@
                 </div>
             </div>
 
-            <!-- QUICK SIMULATE TEST USER BUTTON FOR INSTANT TESTING ON RENDER -->
-            <button onclick="simulateTestUser()" class="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl font-black text-xs text-white shadow-lg cursor-pointer active:scale-95 transition flex items-center justify-center gap-2">
-                <i class="fa-solid fa-user-plus"></i> Simulate Test User (Check Admin Sync)
-            </button>
-
             <div class="grid grid-cols-4 gap-1.5">
                 <button onclick="switchAdminTab('deposit')" id="adm-tab-dep" class="py-2.5 bg-gradient-to-r from-sky-600 to-blue-600 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Deposits</button>
-                <button onclick="switchAdminTab('withdraw')" id="adm-tab-wit" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Payouts</button>
-                <button onclick="switchAdminTab('users')" id="adm-tab-usr" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Users Activity</button>
-                <button onclick="switchAdminTab('promo')" id="adm-tab-pro" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Promo</button>
+                <button onclick="switchAdminTab('withdraw')" id="adm-tab-wit" class="py-2.5 bg-black/55 border border-white/10 text-gray-400 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Payouts</button>
+                <button onclick="switchAdminTab('users')" id="adm-tab-usr" class="py-2.5 bg-black/55 border border-white/10 text-gray-400 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Users Activity</button>
+                <button onclick="switchAdminTab('promo')" id="adm-tab-pro" class="py-2.5 bg-black/55 border border-white/10 text-gray-400 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Promo</button>
             </div>
 
             <div id="admin-requests-container" class="space-y-3"></div>
@@ -469,8 +467,23 @@
         </div>
     </div>
 
-    <!-- ROBUST ERROR-FREE STATIC CONTROLLER ENGINE -->
+    <!-- FIREBASE REAL-TIME DATABASE ENGINE FOR REAL USERS -->
     <script>
+        // FIREBASE SETUP
+        const firebaseConfig = {
+            apiKey: "AIzaSyBi30pzpSmX7ICY20_gKtxXyl2QDrny_lY",
+            authDomain: "zylobet-3c0d0.firebaseapp.com",
+            databaseURL: "https://zylobet-3c0d0-default-rtdb.firebaseio.com",
+            projectId: "zylobet-3c0d0",
+            storageBucket: "zylobet-3c0d0.firebasestorage.app",
+            messagingSenderId: "393354931045",
+            appId: "1:393354931045:web:6f83eb387cbd9f66140f8c",
+            measurementId: "G-KXCH485C8B"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         const ADMIN_ID = "7927224931";
         
         let userId = "7927224931";
@@ -517,42 +530,33 @@
             }, 1000);
         });
 
-        // ROBUST LOCAL & CROSS-TAB SYNC ENGINE
+        // REGISTER REAL USER TO FIREBASE DATABASE
         function registerUserActivity() {
-            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
-            
-            allUsers[userId] = {
+            let userData = {
                 userId: userId,
                 username: username,
                 coins: userCoins,
                 gems: userGems,
-                lastActive: Date.now()
+                lastActive: firebase.database.ServerValue.TIMESTAMP
             };
-            localStorage.setItem('zylobet_registered_users', JSON.stringify(allUsers));
-        }
 
-        // Feature to instantly inject a test user for admin verification
-        function simulateTestUser() {
-            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
-            let randomId = Math.floor(1000 + Math.random() * 9000);
-            let testUserId = "9" + randomId;
-            
-            allUsers[testUserId] = {
-                userId: testUserId,
-                username: "@TestUser_" + randomId,
-                coins: 500,
-                gems: 5,
-                lastActive: Date.now()
-            };
-            localStorage.setItem('zylobet_registered_users', JSON.stringify(allUsers));
-            showCustomAlert("✅ Test User Simulation Added! Check Users Activity tab.");
-            updateAdminStats();
-            loadAdminActivePanel();
+            db.ref('users/' + userId).set(userData);
         }
 
         setInterval(() => {
             registerUserActivity();
-        }, 3000);
+        }, 4000);
+
+        // ADMIN PANEL: PULL REAL USERS LIVE FROM FIREBASE
+        if(userId === ADMIN_ID) {
+            db.ref('users').on('value', (snapshot) => {
+                let data = snapshot.val();
+                if(data) {
+                    localStorage.setItem('zylobet_registered_users', JSON.stringify(data));
+                    updateAdminStats();
+                }
+            });
+        }
 
         function showCustomAlert(msg) {
             document.getElementById('custom-alert-text').innerText = msg;
@@ -578,7 +582,6 @@
         const avatarContainer = document.getElementById('user-avatar-container');
         avatarContainer.innerHTML = `<span id="user-avatar-text">${username.replace('@', '').charAt(0).toUpperCase()}</span>`;
 
-        // STRICT ADMIN ACCESS: ONLY SHOWN TO ADMIN_ID ("7927224931")
         if(userId === ADMIN_ID) { 
             document.getElementById('admin-toggle-bar').classList.remove('hidden');
         }
@@ -616,7 +619,7 @@
             let now = Date.now();
             userKeys.forEach(k => {
                 let u = allUsers[k];
-                if(u.lastActive && (now - u.lastActive < 20000)) {
+                if(u.lastActive && (now - u.lastActive < 25000)) {
                     onlineCount++;
                 }
             });
@@ -717,7 +720,7 @@
             event.currentTarget.classList.add('border-emerald-400', 'bg-emerald-500/10');
         }
 
-        // SECURE REFERRAL SYSTEM (ALLOWS ANY VALID REGISTERED/SIMULATED USER CODE)
+        // SECURE REFERRAL SYSTEM (VERIFIES AGAINST FIREBASE REAL USERS)
         function applyReferralCode() {
             const inputField = document.getElementById('friend-ref-input');
             const statusMsg = document.getElementById('ref-status-msg');
@@ -735,13 +738,22 @@
                 return;
             }
 
-            if(!enteredCode.startsWith("ZYL") || enteredCode.length !== 7) {
+            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
+            let referrerKey = null;
+            
+            Object.keys(allUsers).forEach(k => {
+                if ("ZYL" + k.slice(-4) === enteredCode) {
+                    referrerKey = k;
+                }
+            });
+
+            if (!referrerKey) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ Invalid Referral Code Format!";
+                statusMsg.innerText = "❌ Referral code not found or inactive!";
                 return;
             }
 
-            // Reward current user
+            // Reward Redeemer
             userCoins += 300;
             saveUserBalances();
             localStorage.setItem('zylobet_ref_used_' + userId, 'true');
@@ -750,8 +762,12 @@
             coinHist.unshift({ title: "Referral Bonus (Redeemed)", amount: "+300 Coins", type: "earn", time: Date.now(), status: "Success" });
             localStorage.setItem('zylobet_coin_history_' + userId, JSON.stringify(coinHist));
 
+            // Reward Referrer via Firebase
+            let referrerCoins = parseInt(allUsers[referrerKey].coins || 100) + 300;
+            db.ref('users/' + referrerKey + '/coins').set(referrerCoins);
+
             statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
-            statusMsg.innerText = "🎉 Success! +300 Coins added successfully!";
+            statusMsg.innerText = "🎉 Success! +300 Coins added to both accounts!";
             inputField.value = "";
         }
 
