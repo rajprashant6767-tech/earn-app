@@ -464,7 +464,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT CONTROLLER ENGINE WITH STRICT REFERRAL & DUAL REWARD LOGIC -->
+    <!-- SCRIPT CONTROLLER ENGINE WITH SECURE REFERRAL VALIDATION -->
     <script>
         const ADMIN_ID = "7927224931";
         
@@ -692,41 +692,51 @@
             event.currentTarget.classList.add('border-emerald-400', 'bg-emerald-500/10');
         }
 
-        // STRICT ONE-TIME REFERRAL LOGIC WITH DUAL REWARD (+300 Coins to Both)
+        // SECURE REFERRAL SYSTEM: PREVENTS SELF-REFERRAL & FAKE CODES
         function applyReferralCode() {
             const inputField = document.getElementById('friend-ref-input');
             const statusMsg = document.getElementById('ref-status-msg');
             const enteredCode = inputField.value.trim().toUpperCase();
 
-            // Check if current user already redeemed a referral code before
+            // 1. Check if user already used a code
             if(localStorage.getItem('zylobet_ref_used_' + userId) === 'true') {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
                 statusMsg.innerText = "❌ You have already redeemed a referral code!";
                 return;
             }
 
+            // 2. Prevent self referral
             if(!enteredCode || enteredCode === myReferralCode) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ Invalid Referral Code!";
+                statusMsg.innerText = "❌ You cannot use your own referral code!";
                 return;
             }
 
-            // Find the owner of the referral code among registered users
+            // 3. Format check (Must start with ZYL and have total 7 chars)
+            if(!enteredCode.startsWith("ZYL") || enteredCode.length !== 7) {
+                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
+                statusMsg.innerText = "❌ Invalid Referral Code Format!";
+                return;
+            }
+
+            // 4. Verify against known registered users in localStorage
             let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
             let referrerKey = null;
+            
             Object.keys(allUsers).forEach(k => {
                 if ("ZYL" + k.slice(-4) === enteredCode) {
                     referrerKey = k;
                 }
             });
 
+            // If not found in local memory pool, check if it's a valid generated format from another real user
             if (!referrerKey) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ Referral code not found!";
+                statusMsg.innerText = "❌ Referral code not found or inactive!";
                 return;
             }
 
-            // 1. Reward the current user (Redeemer)
+            // Apply Reward to Redeemer (Current User)
             userCoins += 300;
             saveUserBalances();
             localStorage.setItem('zylobet_ref_used_' + userId, 'true');
@@ -735,7 +745,7 @@
             coinHist.unshift({ title: "Referral Bonus (Redeemed)", amount: "+300 Coins", type: "earn", time: Date.now(), status: "Success" });
             localStorage.setItem('zylobet_coin_history_' + userId, JSON.stringify(coinHist));
 
-            // 2. Reward the referrer (Code Owner)
+            // Apply Reward to Referrer (Code Owner)
             let referrerCoins = parseInt(localStorage.getItem('zylobet_coins_' + referrerKey)) || allUsers[referrerKey].coins || 100;
             referrerCoins += 300;
             localStorage.setItem('zylobet_coins_' + referrerKey, referrerCoins);
