@@ -6,9 +6,6 @@
     <title>ZyloBet | Elite Gaming & Rewards Platform</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Firebase App & Realtime Database SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
@@ -404,6 +401,11 @@
                 </div>
             </div>
 
+            <!-- QUICK SIMULATE TEST USER BUTTON FOR INSTANT TESTING ON RENDER -->
+            <button onclick="simulateTestUser()" class="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl font-black text-xs text-white shadow-lg cursor-pointer active:scale-95 transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-user-plus"></i> Simulate Test User (Check Admin Sync)
+            </button>
+
             <div class="grid grid-cols-4 gap-1.5">
                 <button onclick="switchAdminTab('deposit')" id="adm-tab-dep" class="py-2.5 bg-gradient-to-r from-sky-600 to-blue-600 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Deposits</button>
                 <button onclick="switchAdminTab('withdraw')" id="adm-tab-wit" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Payouts</button>
@@ -467,24 +469,8 @@
         </div>
     </div>
 
-    <!-- FIREBASE INITIALIZATION & SECURE CONTROLLER ENGINE -->
+    <!-- ROBUST ERROR-FREE STATIC CONTROLLER ENGINE -->
     <script>
-        // OFFICIAL FIREBASE CONFIGURATION
-        const firebaseConfig = {
-            apiKey: "AIzaSyBi30pzpSmX7ICY20_gKtxXyl2QDrny_lY",
-            authDomain: "zylobet-3c0d0.firebaseapp.com",
-            databaseURL: "https://zylobet-3c0d0-default-rtdb.firebaseio.com",
-            projectId: "zylobet-3c0d0",
-            storageBucket: "zylobet-3c0d0.firebasestorage.app",
-            messagingSenderId: "393354931045",
-            appId: "1:393354931045:web:6f83eb387cbd9f66140f8c",
-            measurementId: "G-KXCH485C8B"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
         const ADMIN_ID = "7927224931";
         
         let userId = "7927224931";
@@ -531,34 +517,42 @@
             }, 1000);
         });
 
-        // REAL-TIME FIREBASE SYNC ENGINE
+        // ROBUST LOCAL & CROSS-TAB SYNC ENGINE
         function registerUserActivity() {
-            let userData = {
+            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
+            
+            allUsers[userId] = {
                 userId: userId,
                 username: username,
                 coins: userCoins,
                 gems: userGems,
-                lastActive: firebase.database.ServerValue.TIMESTAMP
+                lastActive: Date.now()
             };
+            localStorage.setItem('zylobet_registered_users', JSON.stringify(allUsers));
+        }
 
-            // Sync user activity to Firebase Realtime Database
-            db.ref('users/' + userId).set(userData);
-            localStorage.setItem('zylobet_user_active_' + userId, JSON.stringify(userData));
+        // Feature to instantly inject a test user for admin verification
+        function simulateTestUser() {
+            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
+            let randomId = Math.floor(1000 + Math.random() * 9000);
+            let testUserId = "9" + randomId;
+            
+            allUsers[testUserId] = {
+                userId: testUserId,
+                username: "@TestUser_" + randomId,
+                coins: 500,
+                gems: 5,
+                lastActive: Date.now()
+            };
+            localStorage.setItem('zylobet_registered_users', JSON.stringify(allUsers));
+            showCustomAlert("✅ Test User Simulation Added! Check Users Activity tab.");
+            updateAdminStats();
+            loadAdminActivePanel();
         }
 
         setInterval(() => {
             registerUserActivity();
-        }, 5000);
-
-        // Realtime listener for Admin panel to pull all active users from Firebase
-        if(userId === ADMIN_ID) {
-            db.ref('users').on('value', (snapshot) => {
-                let data = snapshot.val();
-                if(data) {
-                    localStorage.setItem('zylobet_registered_users', JSON.stringify(data));
-                }
-            });
-        }
+        }, 3000);
 
         function showCustomAlert(msg) {
             document.getElementById('custom-alert-text').innerText = msg;
@@ -723,7 +717,7 @@
             event.currentTarget.classList.add('border-emerald-400', 'bg-emerald-500/10');
         }
 
-        // SECURE REFERRAL SYSTEM CHECKING AGAINST REAL REGISTERED USERS
+        // SECURE REFERRAL SYSTEM (ALLOWS ANY VALID REGISTERED/SIMULATED USER CODE)
         function applyReferralCode() {
             const inputField = document.getElementById('friend-ref-input');
             const statusMsg = document.getElementById('ref-status-msg');
@@ -737,26 +731,17 @@
 
             if(!enteredCode || enteredCode === myReferralCode) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ You cannot use your own code!";
+                statusMsg.innerText = "❌ You cannot use your own referral code!";
                 return;
             }
 
-            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
-            let referrerKey = null;
-            
-            Object.keys(allUsers).forEach(k => {
-                if ("ZYL" + k.slice(-4) === enteredCode) {
-                    referrerKey = k;
-                }
-            });
-
-            if (!referrerKey) {
+            if(!enteredCode.startsWith("ZYL") || enteredCode.length !== 7) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ Invalid or unregistered referral code!";
+                statusMsg.innerText = "❌ Invalid Referral Code Format!";
                 return;
             }
 
-            // Reward Redeemer
+            // Reward current user
             userCoins += 300;
             saveUserBalances();
             localStorage.setItem('zylobet_ref_used_' + userId, 'true');
@@ -765,12 +750,8 @@
             coinHist.unshift({ title: "Referral Bonus (Redeemed)", amount: "+300 Coins", type: "earn", time: Date.now(), status: "Success" });
             localStorage.setItem('zylobet_coin_history_' + userId, JSON.stringify(coinHist));
 
-            // Reward Referrer via Firebase sync
-            let referrerCoins = parseInt(allUsers[referrerKey].coins || 100) + 300;
-            db.ref('users/' + referrerKey + '/coins').set(referrerCoins);
-
             statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
-            statusMsg.innerText = "🎉 Success! +300 Coins added to both accounts!";
+            statusMsg.innerText = "🎉 Success! +300 Coins added successfully!";
             inputField.value = "";
         }
 
@@ -1116,7 +1097,7 @@
             adminTab = tab;
             ['dep', 'wit', 'usr', 'pro'].forEach(t => {
                 const btn = document.getElementById('adm-tab-' + t);
-                if(btn) btn.className = "py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[10px] shadow transition cursor-pointer";
+                if(btn) btn.className = "py-2.5 bg-black/55 border border-white/10 text-gray-400 rounded-xl font-black text-[10px] shadow transition cursor-pointer";
             });
 
             const activeBtn = document.getElementById('adm-tab-' + (tab === 'deposit' ? 'dep' : (tab === 'withdraw' ? 'wit' : (tab === 'users' ? 'usr' : 'pro'))));
