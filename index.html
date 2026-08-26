@@ -467,27 +467,25 @@
     <!-- SCRIPT CONTROLLER ENGINE -->
     <script>
         const ADMIN_ID = "7927224931";
-        const tg = window.Telegram.WebApp;
-        tg.ready();
         
-        const user = tg.initDataUnsafe?.user;
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        const userId = urlParams.get('userid') || (user?.id ? user.id.toString() : (() => {
-            let cachedId = localStorage.getItem('zylobet_fallback_uid');
-            if(!cachedId) {
-                cachedId = "user_" + Math.floor(1000 + Math.random() * 9000);
-                localStorage.setItem('zylobet_fallback_uid', cachedId);
-            }
-            return cachedId;
-        })());
+        let userId = "7927224931";
+        let username = "@Raj_Prashant";
 
-        const username = user?.username ? "@" + user.username : (user?.first_name ? user.first_name : ("Player_" + userId.slice(-4)));
+        try {
+            const tg = window.Telegram.WebApp;
+            tg.ready();
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
+                userId = tg.initDataUnsafe.user.id.toString();
+                username = "@" + (tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name);
+            }
+        } catch(e) {
+            console.log("Telegram WebApp not detected, using fallback session.");
+        }
+
         const myReferralCode = "ZYL" + userId.slice(-4);
 
-        // Balance recovery fallback to ensure balances don't get deleted
-        let userCoins = parseInt(localStorage.getItem('zylobet_coins_' + userId)) || parseInt(localStorage.getItem('zylobet_coins')) || 1250;
-        let userGems = parseInt(localStorage.getItem('zylobet_gems_' + userId)) || parseInt(localStorage.getItem('zylobet_gems')) || 12;
+        let userCoins = parseInt(localStorage.getItem('zylobet_coins_' + userId)) || 1250;
+        let userGems = parseInt(localStorage.getItem('zylobet_gems_' + userId)) || 12;
 
         window.addEventListener('DOMContentLoaded', () => {
             const bar = document.getElementById('intro-bar');
@@ -542,11 +540,7 @@
         document.getElementById('ref-code').innerText = myReferralCode;
 
         const avatarContainer = document.getElementById('user-avatar-container');
-        if(user && user.photo_url) {
-            avatarContainer.innerHTML = `<img src="${user.photo_url}" alt="Profile" class="w-full h-full object-cover">`;
-        } else {
-            avatarContainer.innerHTML = `<span id="user-avatar-text">${username.replace('@', '').charAt(0).toUpperCase()}</span>`;
-        }
+        avatarContainer.innerHTML = `<span id="user-avatar-text">${username.replace('@', '').charAt(0).toUpperCase()}</span>`;
 
         // STRICT ADMIN ACCESS: ONLY SHOWN TO ADMIN_ID ("7927224931")
         if(userId === ADMIN_ID) { 
@@ -852,7 +846,6 @@
             let amt = parseInt(val) || 0;
             let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + userId)) || [];
             
-            // STRICT FIX: Only give bonus for exact official package amounts (50, 100, 200, 500) and ONLY if not used before!
             let validPackages = [50, 100, 200, 500];
             let baseBonus = 0;
             if(validPackages.includes(amt) && !usedBonuses.includes(amt)) {
@@ -874,7 +867,7 @@
             
             let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + userId)) || [];
             let validPackages = [50, 100, 200, 500];
-            let baseBonus = (validPackages.includes(amt) && !usedBonuses.includes(amt)) ? (amt >= 500 ? 50 : (amt >= 200 ? 18 : (amt >= 100 ? 8 : (amt >= 50 ? 3 : 0))) : 0;
+            let baseBonus = (validPackages.includes(amt) && !usedBonuses.includes(amt)) ? (amt >= 500 ? 50 : (amt >= 200 ? 18 : (amt >= 100 ? 8 : (amt >= 50 ? 3 : 0)))) : 0;
             let totalDiamonds = amt + baseBonus;
 
             const upiString = `upi://pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}.00&tn=ZyloBet%20Deposit&cu=INR`;
@@ -937,7 +930,7 @@
                 registerUserActivity();
 
                 let validPackages = [50, 100, 200, 500];
-                let baseBonus = (validPackages.includes(paidRs)) ? (paidRs >= 500 ? 50 : (paidRs >= 200 ? 18 : (paidRs >= 100 ? 8 : (paidRs >= 50 ? 3 : 0))) : 0;
+                let baseBonus = (validPackages.includes(paidRs)) ? (paidRs >= 500 ? 50 : (paidRs >= 200 ? 18 : (paidRs >= 100 ? 8 : (paidRs >= 50 ? 3 : 0)))) : 0;
                 
                 if(baseBonus > 0) {
                     let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + userId)) || [];
@@ -1083,15 +1076,12 @@
             container.innerHTML = '';
             
             let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
-            
-            // Forcefully include active test accounts for display
-            if(user && user.id) {
-                allUsers[user.id.toString()] = { userId: user.id.toString(), username: username, coins: userCoins, gems: userGems, lastActive: Date.now() };
-            }
-            allUsers["7927224931"] = { userId: "7927224931", username: "@Raj_Prashant", coins: userCoins, gems: userGems, lastActive: Date.now() };
-            allUsers["rakesh_jhak"] = { userId: "rakesh_jhak", username: "@rakesh_jhak", coins: 1250, gems: 12, lastActive: Date.now() };
-
             let userKeys = Object.keys(allUsers);
+
+            if(userKeys.length === 0) {
+                container.innerHTML = `<div class='cyber-card p-6 text-center text-gray-500 text-xs rounded-2xl'>No user activity recorded yet.</div>`;
+                return;
+            }
 
             let html = "<div class='space-y-2.5'><p class='text-[10px] text-gray-400 font-bold uppercase'>Registered Users & Live Activity:</p>";
             userKeys.forEach(k => {
@@ -1210,7 +1200,7 @@
                 }
 
                 let validPackages = [50, 100, 200, 500];
-                let baseBonus = (validPackages.includes(dep.amount)) ? (dep.amount >= 500 ? 50 : (dep.amount >= 200 ? 18 : (dep.amount >= 100 ? 8 : (dep.amount >= 50 ? 3 : 0))) : 0;
+                let baseBonus = (validPackages.includes(dep.amount)) ? (dep.amount >= 500 ? 50 : (dep.amount >= 200 ? 18 : (dep.amount >= 100 ? 8 : (dep.amount >= 50 ? 3 : 0)))) : 0;
                 
                 if(baseBonus > 0) {
                     let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + targetUserId)) || [];
