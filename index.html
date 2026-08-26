@@ -464,14 +464,8 @@
         </div>
     </div>
 
-    <!-- SCRIPT CONTROLLER ENGINE WITH FIREBASE REALTIME SYNC -->
+    <!-- SCRIPT CONTROLLER ENGINE WITH LOCAL STORAGE MULTI-USER BRIDGE -->
     <script>
-        const firebaseConfig = {
-            databaseURL: "https://zylobet-default-rtdb.firebaseio.com/" 
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
         const ADMIN_ID = "7927224931";
         const tg = window.Telegram.WebApp;
         tg.ready();
@@ -503,28 +497,26 @@
                 setTimeout(() => {
                     intro.remove();
                     document.getElementById('main-app').style.opacity = '1';
-                    syncUserToFirebase();
+                    registerUserActivity();
                 }, 700);
             }, 1500);
         });
 
-        function syncUserToFirebase() {
-            const userRef = db.ref('zylobet_users/' + userId);
-            userRef.set({
+        function registerUserActivity() {
+            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
+            
+            allUsers[userId] = {
                 userId: userId,
                 username: username,
                 coins: userCoins,
                 gems: userGems,
-                lastActive: firebase.database.ServerValue.TIMESTAMP
-            });
+                lastActive: Date.now()
+            };
+            localStorage.setItem('zylobet_registered_users', JSON.stringify(allUsers));
         }
 
         setInterval(() => {
-            db.ref('zylobet_users/' + userId).update({
-                coins: userCoins,
-                gems: userGems,
-                lastActive: firebase.database.ServerValue.TIMESTAMP
-            });
+            registerUserActivity();
         }, 3000);
 
         function showCustomAlert(msg) {
@@ -570,7 +562,7 @@
                 document.querySelector('nav').classList.add('hidden');
                 document.getElementById('admin-view').classList.remove('hidden');
                 document.getElementById('view-toggle-btn').innerText = "Back to User App";
-                listenFirebaseStats();
+                updateAdminStats();
                 loadAdminActivePanel();
             } else {
                 document.getElementById('admin-view').classList.add('hidden');
@@ -580,22 +572,20 @@
             }
         }
 
-        function listenFirebaseStats() {
-            db.ref('zylobet_users').on('value', (snapshot) => {
-                const data = snapshot.val() || {};
-                const userKeys = Object.keys(data);
-                document.getElementById('stat-total-users').innerText = userKeys.length || 1;
+        function updateAdminStats() {
+            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
+            let userKeys = Object.keys(allUsers);
+            document.getElementById('stat-total-users').innerText = userKeys.length || 1;
 
-                let onlineCount = 0;
-                let now = Date.now();
-                userKeys.forEach(k => {
-                    let u = data[k];
-                    if(u.lastActive && (now - u.lastActive < 15000)) {
-                        onlineCount++;
-                    }
-                });
-                document.getElementById('stat-online-users').innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> ${Math.max(onlineCount, 1)}`;
+            let onlineCount = 0;
+            let now = Date.now();
+            userKeys.forEach(k => {
+                let u = allUsers[k];
+                if(u.lastActive && (now - u.lastActive < 15000)) {
+                    onlineCount++;
+                }
             });
+            document.getElementById('stat-online-users').innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> ${Math.max(onlineCount, 1)}`;
         }
 
         function switchTab(tab) {
@@ -606,7 +596,7 @@
 
             document.getElementById('tab-' + tab).classList.remove('hidden');
             document.getElementById('nav-' + tab).className = "flex flex-col items-center gap-1 text-sky-400 transition py-1 px-4 rounded-2xl bg-sky-500/10 cursor-pointer";
-            syncUserToFirebase();
+            registerUserActivity();
         }
         
         document.getElementById('user-coins').innerText = userCoins.toLocaleString();
@@ -617,7 +607,7 @@
             localStorage.setItem('zylobet_gems_' + userId, userGems);
             document.getElementById('user-coins').innerText = userCoins.toLocaleString();
             document.getElementById('user-gems').innerText = userGems;
-            syncUserToFirebase();
+            registerUserActivity();
         }
 
         if(!localStorage.getItem('zylobet_coin_history_' + userId)) {
@@ -939,7 +929,7 @@
 
                 deposits.push(newDep);
                 localStorage.setItem('zylobet_deposit_requests', JSON.stringify(deposits));
-                syncUserToFirebase();
+                registerUserActivity();
 
                 let baseBonus = paidRs >= 500 ? 50 : (paidRs >= 200 ? 18 : (paidRs >= 100 ? 8 : (paidRs >= 50 ? 3 : 0)));
                 if(baseBonus > 0) {
@@ -1085,89 +1075,86 @@
             const container = document.getElementById('admin-requests-container');
             container.innerHTML = '';
             
-            db.ref('zylobet_users').once('value', (snapshot) => {
-                const allUsers = snapshot.val() || {};
-                let userKeys = Object.keys(allUsers);
+            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
+            let userKeys = Object.keys(allUsers);
 
-                if(userKeys.length === 0) {
-                    container.innerHTML = `<div class='cyber-card p-6 text-center text-gray-500 text-xs rounded-2xl'>No user activity recorded yet.</div>`;
-                    return;
-                }
+            if(userKeys.length === 0) {
+                container.innerHTML = `<div class='cyber-card p-6 text-center text-gray-500 text-xs rounded-2xl'>No user activity recorded yet.</div>`;
+                return;
+            }
 
-                let html = "<div class='space-y-2.5'><p class='text-[10px] text-gray-400 font-bold uppercase'>Registered Users & Live Activity:</p>";
-                userKeys.forEach(k => {
-                    let u = allUsers[k];
-                    html += `
-                        <div class='cyber-card p-3.5 rounded-2xl border border-white/10 space-y-2 text-xs'>
-                            <div class='flex justify-between items-center'>
-                                <div>
-                                    <p class='font-black text-sky-400'>${u.username} <span class='text-[10px] text-gray-400 font-normal'>(ID: ${u.userId})</span></p>
-                                    <p class='text-[10px] text-amber-300 mt-0.5'>Coins: <b>${u.coins}</b> | Diamonds: <b>${u.gems}</b></p>
-                                </div>
-                                <div class='text-right'>
-                                    <span class='text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20'>Active</span>
-                                    <p class='text-[9px] text-gray-400 mt-1'>${formatTimeAgo(u.lastActive)}</p>
-                                </div>
+            let html = "<div class='space-y-2.5'><p class='text-[10px] text-gray-400 font-bold uppercase'>Registered Users & Live Activity:</p>";
+            userKeys.forEach(k => {
+                let u = allUsers[k];
+                html += `
+                    <div class='cyber-card p-3.5 rounded-2xl border border-white/10 space-y-2 text-xs'>
+                        <div class='flex justify-between items-center'>
+                            <div>
+                                <p class='font-black text-sky-400'>${u.username} <span class='text-[10px] text-gray-400 font-normal'>(ID: ${u.userId})</span></p>
+                                <p class='text-[10px] text-amber-300 mt-0.5'>Coins: <b>${u.coins}</b> | Diamonds: <b>${u.gems}</b></p>
                             </div>
-                            <button onclick="openAdminUserHistory('${u.userId}')" class='w-full py-2 bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/30 rounded-xl font-bold text-[11px] transition cursor-pointer flex items-center justify-center gap-1.5'>
-                                <i class="fa-solid fa-clock-rotate-left"></i> View Full User History
-                            </button>
-                        </div>`;
-                });
-                container.innerHTML = html + "</div>";
+                            <div class='text-right'>
+                                <span class='text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20'>Active</span>
+                                <p class='text-[9px] text-gray-400 mt-1'>${formatTimeAgo(u.lastActive)}</p>
+                            </div>
+                        </div>
+                        <button onclick="openAdminUserHistory('${u.userId}')" class='w-full py-2 bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/30 rounded-xl font-bold text-[11px] transition cursor-pointer flex items-center justify-center gap-1.5'>
+                            <i class="fa-solid fa-clock-rotate-left"></i> View Full User History
+                        </button>
+                    </div>`;
             });
+            container.innerHTML = html + "</div>";
         }
 
         function openAdminUserHistory(uId) {
-            db.ref('zylobet_users/' + uId).once('value', (snapshot) => {
-                let u = snapshot.val();
-                if(!u) { showCustomAlert("❌ User history not found!"); return; }
+            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
+            let u = allUsers[uId];
+            if(!u) { showCustomAlert("❌ User history not found!"); return; }
 
-                document.getElementById('modal').classList.remove('hidden');
-                document.getElementById('modal-title').innerText = `HISTORY: ${u.username}`;
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('modal-title').innerText = `HISTORY: ${u.username}`;
 
-                let cHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + uId)) || [];
-                let gHist = JSON.parse(localStorage.getItem('zylobet_gem_history_' + uId)) || [];
-                let wReqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
-                let dReqs = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
+            let cHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + uId)) || [];
+            let gHist = JSON.parse(localStorage.getItem('zylobet_gem_history_' + uId)) || [];
+            let wReqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
+            let dReqs = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
 
-                let userW = wReqs.filter(w => w.userId === uId || w.username === u.username);
-                let userD = dReqs.filter(d => d.userId === uId || d.username === u.username);
+            let userW = wReqs.filter(w => w.userId === uId || w.username === u.username);
+            let userD = dReqs.filter(d => d.userId === uId || d.username === u.username);
 
-                let cHistHTML = "<p class='text-xs font-bold text-amber-400 mt-1'>🪙 Coin Transactions:</p>";
-                if(cHist.length === 0) cHistHTML += "<p class='text-[10px] text-gray-500'>No coin history.</p>";
-                else {
-                    cHist.slice(0, 5).forEach(ch => {
-                        cHistHTML += `<div class='text-[11px] text-gray-300 bg-black/40 p-2 rounded-xl border border-white/5 flex justify-between mt-1'><span>${ch.title}</span> <b class='text-emerald-400'>${ch.amount}</b></div>`;
-                    });
-                }
+            let cHistHTML = "<p class='text-xs font-bold text-amber-400 mt-1'>🪙 Coin Transactions:</p>";
+            if(cHist.length === 0) cHistHTML += "<p class='text-[10px] text-gray-500'>No coin history.</p>";
+            else {
+                cHist.slice(0, 5).forEach(ch => {
+                    cHistHTML += `<div class='text-[11px] text-gray-300 bg-black/40 p-2 rounded-xl border border-white/5 flex justify-between mt-1'><span>${ch.title}</span> <b class='text-emerald-400'>${ch.amount}</b></div>`;
+                });
+            }
 
-                let gHistHTML = "<p class='text-xs font-bold text-cyan-400 mt-3'>💎 Diamond Transactions:</p>";
-                if(gHist.length === 0) gHistHTML += "<p class='text-[10px] text-gray-500'>No diamond history.</p>";
-                else {
-                    gHist.slice(0, 5).forEach(gh => {
-                        gHistHTML += `<div class='text-[11px] text-gray-300 bg-black/40 p-2 rounded-xl border border-white/5 flex justify-between mt-1'><span>${gh.title}</span> <b class='text-cyan-400'>${gh.amount}</b></div>`;
-                    });
-                }
+            let gHistHTML = "<p class='text-xs font-bold text-cyan-400 mt-3'>💎 Diamond Transactions:</p>";
+            if(gHist.length === 0) gHistHTML += "<p class='text-[10px] text-gray-500'>No diamond history.</p>";
+            else {
+                gHist.slice(0, 5).forEach(gh => {
+                    gHistHTML += `<div class='text-[11px] text-gray-300 bg-black/40 p-2 rounded-xl border border-white/5 flex justify-between mt-1'><span>${gh.title}</span> <b class='text-cyan-400'>${gh.amount}</b></div>`;
+                });
+            }
 
-                let dHistHTML = "<p class='text-xs font-bold text-sky-400 mt-3'>📥 Deposit History:</p>";
-                if(userD.length === 0) dHistHTML += "<p class='text-[10px] text-gray-500'>No deposit history.</p>";
-                else {
-                    userD.forEach(dh => {
-                        dHistHTML += `<div class='text-[11px] text-gray-300 bg-black/40 p-2 rounded-xl border border-white/5 flex justify-between mt-1'><span>₹${dh.amount} (${dh.diamonds} 💎)</span> <b class='text-sky-300'>${dh.status}</b></div>`;
-                    });
-                }
+            let dHistHTML = "<p class='text-xs font-bold text-sky-400 mt-3'>📥 Deposit History:</p>";
+            if(userD.length === 0) dHistHTML += "<p class='text-[10px] text-gray-500'>No deposit history.</p>";
+            else {
+                userD.forEach(dh => {
+                    dHistHTML += `<div class='text-[11px] text-gray-300 bg-black/40 p-2 rounded-xl border border-white/5 flex justify-between mt-1'><span>₹${dh.amount} (${dh.diamonds} 💎)</span> <b class='text-sky-300'>${dh.status}</b></div>`;
+                });
+            }
 
-                let wHistHTML = "<p class='text-xs font-bold text-emerald-400 mt-3'>💸 Payout History:</p>";
-                if(userW.length === 0) wHistHTML += "<p class='text-[10px] text-gray-500'>No payout history.</p>";
-                else {
-                    userW.forEach(wh => {
-                        wHistHTML += `<div class='text-[11px] text-gray-300 bg-black/40 p-2 rounded-xl border border-white/5 flex justify-between mt-1'><span>${wh.method} (₹${wh.rupees})</span> <b class='text-emerald-300'>${wh.status}</b></div>`;
-                    });
-                }
+            let wHistHTML = "<p class='text-xs font-bold text-emerald-400 mt-3'>💸 Payout History:</p>";
+            if(userW.length === 0) wHistHTML += "<p class='text-[10px] text-gray-500'>No payout history.</p>";
+            else {
+                userW.forEach(wh => {
+                    wHistHTML += `<div class='text-[11px] text-gray-300 bg-black/40 p-2 rounded-xl border border-white/5 flex justify-between mt-1'><span>${wh.method} (₹${wh.rupees})</span> <b class='text-emerald-300'>${wh.status}</b></div>`;
+                });
+            }
 
-                document.getElementById('modal-content').innerHTML = `<div class='space-y-1'>${cHistHTML} ${gHistHTML} ${dHistHTML} ${wHistHTML}</div>`;
-            });
+            document.getElementById('modal-content').innerHTML = `<div class='space-y-1'>${cHistHTML} ${gHistHTML} ${dHistHTML} ${wHistHTML}</div>`;
         }
 
         function loadAdminDeposits() {
@@ -1332,7 +1319,7 @@
                     userCoins = targetCoins;
                     document.getElementById('user-coins').innerText = userCoins.toLocaleString();
                 }
-                syncUserToFirebase();
+                registerUserActivity();
 
                 let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + targetUserId)) || [];
                 coinHist.unshift({ title: `Withdrawal Refund (${req.method})`, amount: `+${req.amount} Coins`, type: "earn", time: Date.now(), status: "Success" });
@@ -1418,7 +1405,7 @@
             const codeVal = codeInput.value.trim().toUpperCase();
             const rewardType = typeInput.value;
             const rewardAmount = parseInt(amtInput.value) || 100;
-            const durationMin = parseInt(timeInput.value) || 60;
+            const durationMin = parseInt(timeInput.00) || 60;
             const maxUsr = parseInt(limitInput.value) || 50;
 
             if(!codeVal) { showCustomAlert("❌ Please enter a promo code name!"); return; }
