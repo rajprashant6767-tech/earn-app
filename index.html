@@ -6,9 +6,6 @@
     <title>ZyloBet | Elite Gaming & Rewards Platform</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Firebase SDKs for Real-Time Cloud Sync -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
@@ -167,7 +164,7 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div onclick="openHistory('coins')" class="cyber-card p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-amber-400/40 transition group">
                         <p class="text-xl font-black text-amber-400 group-hover:scale-105 transition origin-left flex items-center gap-2.5">
-                            <span class="ff-gold-coin"><i class="fa-solid fa-coins"></i></span> <span id="user-coins">1,250</span>
+                            <span class="ff-gold-coin"><i class="fa-solid fa-coins"></i></span> <span id="user-coins">100</span>
                         </p>
                         <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-2 tracking-wider">
                             <span>COINS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-amber-400/80"></i>
@@ -175,7 +172,7 @@
                     </div>
                     <div onclick="openHistory('gems')" class="cyber-card p-4 rounded-2xl border border-white/5 cursor-pointer hover:border-cyan-400/40 transition group">
                         <p class="text-xl font-black text-cyan-400 group-hover:scale-105 transition origin-left flex items-center gap-2.5">
-                            <span class="ff-diamond"><i class="fa-solid fa-gem"></i></span> <span id="user-gems">12</span>
+                            <span class="ff-diamond"><i class="fa-solid fa-gem"></i></span> <span id="user-gems">1</span>
                         </p>
                         <p class="text-[10px] text-gray-400 font-bold flex items-center justify-between mt-2 tracking-wider">
                             <span>DIAMONDS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-cyan-400/80"></i>
@@ -408,7 +405,7 @@
                 <button onclick="switchAdminTab('deposit')" id="adm-tab-dep" class="py-2.5 bg-gradient-to-r from-sky-600 to-blue-600 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Deposits</button>
                 <button onclick="switchAdminTab('withdraw')" id="adm-tab-wit" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Payouts</button>
                 <button onclick="switchAdminTab('users')" id="adm-tab-usr" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Users Activity</button>
-                <button onclick="switchAdminTab('promo')" id="adm-tab-pro" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Promos</button>
+                <button onclick="switchAdminTab('promo')" id="adm-tab-pro" class="py-2.5 bg-black/50 border border-white/10 text-gray-400 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Promo</button>
             </div>
 
             <div id="admin-requests-container" class="space-y-3"></div>
@@ -487,8 +484,18 @@
 
         const myReferralCode = "ZYL" + userId.slice(-4);
 
-        let userCoins = parseInt(localStorage.getItem('zylobet_coins_' + userId)) || 1250;
-        let userGems = parseInt(localStorage.getItem('zylobet_gems_' + userId)) || 12;
+        // NEW USER WELCOME BONUS: 100 Coins & 1 Diamond
+        let userCoins = parseInt(localStorage.getItem('zylobet_coins_' + userId));
+        if (isNaN(userCoins)) {
+            userCoins = 100;
+            localStorage.setItem('zylobet_coins_' + userId, userCoins);
+        }
+
+        let userGems = parseInt(localStorage.getItem('zylobet_gems_' + userId));
+        if (isNaN(userGems)) {
+            userGems = 1;
+            localStorage.setItem('zylobet_gems_' + userId, userGems);
+        }
 
         window.addEventListener('DOMContentLoaded', () => {
             const bar = document.getElementById('intro-bar');
@@ -616,7 +623,7 @@
 
         if(!localStorage.getItem('zylobet_coin_history_' + userId)) {
             localStorage.setItem('zylobet_coin_history_' + userId, JSON.stringify([
-                { title: "Welcome Bonus", amount: "+1,000 Coins", type: "earn", time: Date.now() - 3600000, status: "Success" }
+                { title: "Welcome Bonus", amount: "+100 Coins", type: "earn", time: Date.now() - 3600000, status: "Success" }
             ]));
         }
         if(!localStorage.getItem('zylobet_withdraw_requests')) {
@@ -624,7 +631,7 @@
         }
         if(!localStorage.getItem('zylobet_gem_history_' + userId)) {
             localStorage.setItem('zylobet_gem_history_' + userId, JSON.stringify([
-                { title: "Initial Diamonds", amount: `+${userGems} Diamonds`, type: "earn", time: Date.now() - 3600000, status: "Success" }
+                { title: "Welcome Diamond", amount: "+1 Diamond", type: "earn", time: Date.now() - 3600000, status: "Success" }
             ]));
         }
 
@@ -1411,7 +1418,7 @@
             const codeVal = codeInput.value.trim().toUpperCase();
             const rewardType = typeInput.value;
             const rewardAmount = parseInt(amtInput.value) || 100;
-            const durationMin = parseInt(timeInput.value) || 60;
+            constdurationMin = parseInt(timeInput.value) || 60;
             const maxUsr = parseInt(limitInput.value) || 50;
 
             if(!codeVal) { showCustomAlert("❌ Please enter a promo code name!"); return; }
