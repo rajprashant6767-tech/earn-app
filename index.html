@@ -468,7 +468,7 @@
         </div>
     </div>
 
-    <!-- TELEGRAM CLOUD-POWERED APP ENGINE SCRIPT -->
+    <!-- CLEAN ENGINE SCRIPT WITHOUT MOCK TEST USERS -->
     <script>
         const ADMIN_ID = "7927224931";
         let userId = "7927224931";
@@ -494,7 +494,6 @@
 
         const myReferralCode = "ZYL" + userId.slice(-4);
 
-        // SYNC DATA FROM TELEGRAM CLOUD STORAGE ON STARTUP
         window.addEventListener('DOMContentLoaded', () => {
             const bar = document.getElementById('intro-bar');
             setTimeout(() => { bar.style.width = '100%'; }, 200);
@@ -556,16 +555,9 @@
             document.getElementById('user-gems').innerText = userGems;
         }
 
+        // REGISTER REAL USER ACTIVITY (NO MOCK TEST USERS)
         function registerUserActivity() {
             let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
-            
-            if (Object.keys(allUsers).length === 0) {
-                allUsers = {
-                    "7927224931": { userId: "7927224931", username: "@Raj_Prashant", coins: userCoins, gems: userGems, lastActive: Date.now() },
-                    "84920112": { userId: "84920112", username: "@Aman_Gamer", coins: 450, gems: 4, lastActive: Date.now() - 4000 },
-                    "93810221": { userId: "93810221", username: "@Rohit_Vip", coins: 1200, gems: 12, lastActive: Date.now() - 9000 }
-                };
-            }
 
             allUsers[userId] = {
                 userId: userId,
@@ -1179,7 +1171,7 @@
                 return;
             }
 
-            let html = "<div class='space-y-2.5'><p class='text-[10px] text-gray-400 font-bold uppercase'>Registered Users & Telegram Cloud Data:</p>";
+            let html = "<div class='space-y-2.5'><p class='text-[10px] text-gray-400 font-bold uppercase'>Registered Users & Cloud Data:</p>";
             userKeys.forEach(k => {
                 let u = allUsers[k];
                 html += `
@@ -1292,7 +1284,7 @@
                 localStorage.setItem('zylobet_gems_' + targetUserId, targetGems);
                 if(targetUserId === userId) {
                     userGems = targetGems;
-                    document.getElementById('user-gems').innerText = userGems;
+                    updateUIBalances();
                 }
 
                 let validPackages = [50, 100, 200, 500];
