@@ -692,7 +692,7 @@
                                 <div class='flex justify-between font-black'><span class='text-cyan-400 text-sm'>${d.username}</span><span class='text-emerald-400 text-sm'>+${d.diamonds} 💎 (₹${d.amount})</span></div>
                                 ${imgTag}
                                 <div class="grid grid-cols-2 gap-2 mt-3">
-                                    <button onclick="approveDeposit('${doc.id}', '${d.userId}', ${d.diamonds}, '${d.amount}')" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
+                                    <button onclick="approveDeposit('${doc.id}', '${d.userId}', '${d.username}', ${d.diamonds}, '${d.amount}')" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
                                     <button onclick="rejectDeposit('${doc.id}')" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
                                 </div>
                             </div>`;
@@ -719,7 +719,7 @@
                                 ${redeemInputHTML}
                                 <div class="grid grid-cols-2 gap-2 mt-2">
                                     <button onclick="approveWithdraw('${doc.id}', '${r.method}')" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
-                                    <button onclick="rejectWithdraw('${doc.id}', '${r.userId}', ${r.amount})" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
+                                    <button onclick="rejectWithdraw('${doc.id}', '${r.userId}', '${r.username}', ${r.amount})" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
                                 </div>
                             </div>`;
                     });
@@ -1082,31 +1082,61 @@
             loadAdminRealtimeData();
         }
 
-        function loadAdminActivePanel() { loadAdminRealtimeData(); }
+        function loadAdminRealtimeData() { loadAdminRealtimeData(); }
 
-        // FIXED DEPOSIT APPROVAL: ADDING DIAMONDS PROPERLY
-        function approveDeposit(docId, tUserId, dias, paidRs) {
+        // ULTRA SMART FALLBACK DEPOSIT APPROVAL
+        function approveDeposit(docId, tUserId, tUsername, dias, paidRs) {
             db.collection("deposits").doc(docId).update({ status: "Success" }).then(() => {
+                // Try finding user by exact ID first
                 db.collection("users").doc(tUserId).get().then((doc) => {
-                    let currentGems = 1;
-                    if(doc.exists) {
-                        currentGems = doc.data().gems !== undefined ? parseInt(doc.data().gems) : 1;
-                    }
-                    let newGems = currentGems + parseInt(dias);
-                    
-                    db.collection("users").doc(tUserId).set({
-                        gems: newGems
-                    }, { merge: true }).then(() => {
-                        db.collection("users").doc(tUserId).collection("gem_history").add({
-                            title: `Deposit Approved (₹${paidRs})`,
-                            amount: `+${dias} Diamonds`,
-                            type: "gem",
-                            time: Date.now(),
-                            status: "Success"
+                    if (doc.exists) {
+                        applyDiamondGrant(tUserId, dias, paidRs);
+                    } else {
+                        // Fallback: Search by username if ID doc doesn't exist
+                        db.collection("users").where("username", "==", tUsername).get().then((querySnap) => {
+                            if (!querySnap.empty) {
+                                let realDocId = querySnap.docs[0].id;
+                                applyDiamondGrant(realDocId, dias, paidRs);
+                            } else {
+                                // Create user doc if completely missing
+                                db.collection("users").doc(tUserId).set({
+                                    userId: tUserId,
+                                    username: tUsername,
+                                    coins: 100,
+                                    gems: parseInt(dias) + 1,
+                                    lastActive: Date.now()
+                                }).then(() => {
+                                    recordGemHistory(tUserId, dias, paidRs);
+                                });
+                            }
                         });
-                        showCustomAlert("✅ Deposit Approved & Diamonds Added to User!");
-                    });
+                    }
                 });
+            });
+        }
+
+        function applyDiamondGrant(targetDocId, dias, paidRs) {
+            db.collection("users").doc(targetDocId).get().then((doc) => {
+                let currentGems = 1;
+                if(doc.exists && doc.data().gems !== undefined) {
+                    currentGems = parseInt(doc.data().gems);
+                }
+                let newGems = currentGems + parseInt(dias);
+                db.collection("users").doc(targetDocId).update({ gems: newGems }).then(() => {
+                    recordGemHistory(targetDocId, dias, paidRs);
+                });
+            });
+        }
+
+        function recordGemHistory(targetDocId, dias, paidRs) {
+            db.collection("users").doc(targetDocId).collection("gem_history").add({
+                title: `Deposit Approved (₹${paidRs})`,
+                amount: `+${dias} Diamonds`,
+                type: "gem",
+                time: Date.now(),
+                status: "Success"
+            }).then(() => {
+                showCustomAlert("✅ Deposit Approved & Diamonds Added Successfully!");
             });
         }
 
@@ -1128,25 +1158,45 @@
             });
         }
 
-        function rejectWithdraw(docId, tUserId, coins) {
+        function rejectWithdraw(docId, tUserId, tUsername, coins) {
             db.collection("withdrawals").doc(docId).update({ status: "Rejected (Refunded)" }).then(() => {
                 db.collection("users").doc(tUserId).get().then((doc) => {
-                    let currentCoins = 100;
-                    if(doc.exists) {
-                        currentCoins = doc.data().coins !== undefined ? parseInt(doc.data().coins) : 100;
-                    }
-                    let newCoins = currentCoins + parseInt(coins);
-
-                    db.collection("users").doc(tUserId).set({
-                        coins: newCoins
-                    }, { merge: true }).then(() => {
-                        db.collection("users").doc(tUserId).collection("coin_history").add({
-                            title: `Withdrawal Refund`,
-                            amount: `+${coins} Coins`,
-                            type: "coin",
-                            time: Date.now(),
-                            status: "Success"
+                    if (doc.exists) {
+                        applyCoinRefund(tUserId, coins);
+                    } else {
+                        db.collection("users").where("username", "==", tUsername).get().then((querySnap) => {
+                            if (!querySnap.empty) {
+                                applyCoinRefund(querySnap.docs[0].id, coins);
+                            } else {
+                                db.collection("users").doc(tUserId).set({
+                                    userId: tUserId,
+                                    username: tUsername,
+                                    coins: 100 + parseInt(coins),
+                                    gems: 1,
+                                    lastActive: Date.now()
+                                });
+                            }
                         });
+                    }
+                });
+            });
+        }
+
+        function applyCoinRefund(targetDocId, coins) {
+            db.collection("users").doc(targetDocId).get().then((doc) => {
+                let currentCoins = 100;
+                if(doc.exists && doc.data().coins !== undefined) {
+                    currentCoins = parseInt(doc.data().coins);
+                }
+                let newCoins = currentCoins + parseInt(coins);
+                db.collection("users").doc(targetDocId).update({ coins: newCoins }).then(() => {
+                    db.collection("users").doc(targetDocId).collection("coin_history").add({
+                        title: `Withdrawal Refund`,
+                        amount: `+${coins} Coins`,
+                        type: "coin",
+                        time: Date.now(),
+                        status: "Success"
+                    }).then(() => {
                         showCustomAlert("❌ Payout Rejected & Coins Refunded!");
                     });
                 });
