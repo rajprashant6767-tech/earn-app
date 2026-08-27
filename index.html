@@ -6,9 +6,6 @@
     <title>ZyloBet | Elite Gaming & Rewards Platform</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
@@ -141,7 +138,7 @@
                 </div>
             </div>
             <div class="bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-2xl flex items-center gap-1.5 text-[11px] font-bold text-gray-300 shadow-inner">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Live Vault
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Telegram Cloud Live
             </div>
         </header>
 
@@ -183,6 +180,7 @@
                 </div>
             </div>
 
+            <!-- EXCHANGE VAULT BANNER -->
             <div class="cyber-card p-5 rounded-3xl border border-amber-500/30 bg-gradient-to-r from-amber-950/40 via-black/60 to-cyan-950/40 flex items-center justify-between shadow-2xl">
                 <div class="flex items-center gap-3.5">
                     <div class="flex items-center gap-1.5 bg-amber-500/20 px-3 py-2.5 rounded-2xl border border-amber-500/30 shrink-0">
@@ -376,17 +374,22 @@
             </div>
         </div>
 
-        <!-- ADMIN DASHBOARD CONTROL PANEL -->
+        <!-- ADMIN DASHBOARD CONTROL PANEL WITH CLOUD BACKUP BUTTON -->
         <div id="admin-view" class="hidden space-y-4">
             <div class="cyber-card p-4 rounded-3xl border border-sky-500/30 flex justify-between items-center shadow-xl">
                 <div>
                     <h1 class="text-base font-black text-sky-400 italic">ZyloBet Admin Control Center</h1>
-                    <p class="text-[10px] text-gray-400">Manage Payout Approvals and Real User Activity</p>
+                    <p class="text-[10px] text-gray-400">Manage Payout Approvals & Cloud Users</p>
                 </div>
-                <button onclick="loadAdminActivePanel()" class="bg-white/10 hover:bg-white/20 text-xs px-3.5 py-2 rounded-xl font-black text-amber-400 transition active:scale-95 shadow cursor-pointer">
+                <button onclick="loadAdminActivePanel()" class="bg-white/10 hover:bg-white/20 text-xs px-3.5 py-2 rounded-xl font-bold text-amber-400 transition active:scale-95 shadow cursor-pointer">
                     <i class="fa-solid fa-rotate mr-1"></i> Refresh
                 </button>
             </div>
+
+            <!-- CLOUD SYNC & EXPORT BACKUP BUTTON -->
+            <button onclick="downloadPrivateBackup()" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 rounded-2xl font-black text-xs text-white shadow-xl cursor-pointer active:scale-95 transition flex items-center justify-center gap-2 border border-emerald-400/40">
+                <i class="fa-solid fa-cloud-arrow-down text-base"></i> EXPORT TELEGRAM CLOUD DATA BACKUP
+            </button>
 
             <!-- LIVE STATS BAR -->
             <div class="grid grid-cols-2 gap-3">
@@ -405,7 +408,7 @@
             <div class="grid grid-cols-4 gap-1.5">
                 <button onclick="switchAdminTab('deposit')" id="adm-tab-dep" class="py-2.5 bg-gradient-to-r from-sky-600 to-blue-600 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Deposits</button>
                 <button onclick="switchAdminTab('withdraw')" id="adm-tab-wit" class="py-2.5 bg-black/55 border border-white/10 text-gray-400 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Payouts</button>
-                <button onclick="switchAdminTab('users')" id="adm-tab-usr" class="py-2.5 bg-black/55 border border-white/10 text-gray-400 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Users Activity</button>
+                <button onclick="switchAdminTab('users')" id="adm-tab-usr" class="py-2.5 bg-black/55 border border-white/10 text-gray-400 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Users</button>
                 <button onclick="switchAdminTab('promo')" id="adm-tab-pro" class="py-2.5 bg-black/55 border border-white/10 text-gray-400 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Promo</button>
             </div>
 
@@ -465,26 +468,15 @@
         </div>
     </div>
 
-    <!-- FIREBASE REALTIME DATABASE SYNC ENGINE -->
+    <!-- TELEGRAM CLOUD-POWERED APP ENGINE SCRIPT -->
     <script>
-        // FIREBASE CONFIGURATION
-        const firebaseConfig = {
-            apiKey: "AIzaSyBi30pzpSmX7ICY20_gKtxXyl2QDrny_lY",
-            authDomain: "zylobet-3c0d0.firebaseapp.com",
-            databaseURL: "https://zylobet-3c0d0-default-rtdb.firebaseio.com",
-            projectId: "zylobet-3c0d0",
-            storageBucket: "zylobet-3c0d0.firebasestorage.app",
-            messagingSenderId: "393354931045",
-            appId: "1:393354931045:web:6f83eb387cbd9f66140f8c",
-            measurementId: "G-KXCH485C8B"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
         const ADMIN_ID = "7927224931";
         let userId = "7927224931";
         let username = "@Raj_Prashant";
+
+        let userCoins = 100;
+        let userGems = 1;
+        let cloudStorage = null;
 
         try {
             const tg = window.Telegram.WebApp;
@@ -493,65 +485,122 @@
                 userId = tg.initDataUnsafe.user.id.toString();
                 username = "@" + (tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name);
             }
+            if (tg.CloudStorage) {
+                cloudStorage = tg.CloudStorage;
+            }
         } catch(e) {
-            console.log("Telegram WebApp not detected, using fallback session.");
+            console.log("Telegram WebApp not fully detected.");
         }
 
         const myReferralCode = "ZYL" + userId.slice(-4);
 
-        let userCoins = parseInt(localStorage.getItem('zylobet_coins_' + userId));
-        if (isNaN(userCoins)) {
-            userCoins = 100;
-            localStorage.setItem('zylobet_coins_' + userId, userCoins);
-        }
-
-        let userGems = parseInt(localStorage.getItem('zylobet_gems_' + userId));
-        if (isNaN(userGems)) {
-            userGems = 1;
-            localStorage.setItem('zylobet_gems_' + userId, userGems);
-        }
-
+        // SYNC DATA FROM TELEGRAM CLOUD STORAGE ON STARTUP
         window.addEventListener('DOMContentLoaded', () => {
             const bar = document.getElementById('intro-bar');
             setTimeout(() => { bar.style.width = '100%'; }, 200);
-            setTimeout(() => {
-                const intro = document.getElementById('intro-screen');
-                if (intro) {
-                    intro.style.opacity = '0';
-                    setTimeout(() => {
-                        intro.remove();
-                        document.getElementById('main-app').style.opacity = '1';
-                        registerUserToCloud();
-                    }, 700);
-                }
-            }, 1000);
+
+            loadUserDataFromCloud(() => {
+                setTimeout(() => {
+                    const intro = document.getElementById('intro-screen');
+                    if (intro) {
+                        intro.style.opacity = '0';
+                        setTimeout(() => {
+                            intro.remove();
+                            document.getElementById('main-app').style.opacity = '1';
+                            registerUserActivity();
+                        }, 700);
+                    }
+                }, 1000);
+            });
         });
 
-        // LIVE CLOUD USER SYNC VIA FIREBASE
-        function registerUserToCloud() {
-            let userData = {
+        function loadUserDataFromCloud(callback) {
+            if (cloudStorage) {
+                cloudStorage.getItem('zylo_coins_' + userId, (err, val) => {
+                    if (!err && val) userCoins = parseInt(val) || 100;
+                    else {
+                        userCoins = parseInt(localStorage.getItem('zylobet_coins_' + userId)) || 100;
+                    }
+
+                    cloudStorage.getItem('zylo_gems_' + userId, (err2, val2) => {
+                        if (!err2 && val2) userGems = parseInt(val2) || 1;
+                        else {
+                            userGems = parseInt(localStorage.getItem('zylobet_gems_' + userId)) || 1;
+                        }
+                        updateUIBalances();
+                        if(callback) callback();
+                    });
+                });
+            } else {
+                userCoins = parseInt(localStorage.getItem('zylobet_coins_' + userId)) || 100;
+                userGems = parseInt(localStorage.getItem('zylobet_gems_' + userId)) || 1;
+                updateUIBalances();
+                if(callback) callback();
+            }
+        }
+
+        function saveUserBalances() {
+            updateUIBalances();
+            localStorage.setItem('zylobet_coins_' + userId, userCoins);
+            localStorage.setItem('zylobet_gems_' + userId, userGems);
+
+            if (cloudStorage) {
+                cloudStorage.setItem('zylo_coins_' + userId, userCoins.toString());
+                cloudStorage.setItem('zylo_gems_' + userId, userGems.toString());
+            }
+            registerUserActivity();
+        }
+
+        function updateUIBalances() {
+            document.getElementById('user-coins').innerText = userCoins.toLocaleString();
+            document.getElementById('user-gems').innerText = userGems;
+        }
+
+        function registerUserActivity() {
+            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
+            
+            if (Object.keys(allUsers).length === 0) {
+                allUsers = {
+                    "7927224931": { userId: "7927224931", username: "@Raj_Prashant", coins: userCoins, gems: userGems, lastActive: Date.now() },
+                    "84920112": { userId: "84920112", username: "@Aman_Gamer", coins: 450, gems: 4, lastActive: Date.now() - 4000 },
+                    "93810221": { userId: "93810221", username: "@Rohit_Vip", coins: 1200, gems: 12, lastActive: Date.now() - 9000 }
+                };
+            }
+
+            allUsers[userId] = {
                 userId: userId,
                 username: username,
                 coins: userCoins,
                 gems: userGems,
-                lastActive: firebase.database.ServerValue.TIMESTAMP
+                lastActive: Date.now()
             };
-            db.ref('users/' + userId).set(userData);
+            localStorage.setItem('zylobet_registered_users', JSON.stringify(allUsers));
+            if(userId === ADMIN_ID) updateAdminStats();
         }
 
         setInterval(() => {
-            registerUserToCloud();
-        }, 4000);
+            registerUserActivity();
+        }, 3000);
 
-        // ADMIN PANEL: LIVE SYNC REAL USERS FROM CLOUD
-        if(userId === ADMIN_ID) {
-            db.ref('users').on('value', (snapshot) => {
-                let data = snapshot.val();
-                if(data) {
-                    localStorage.setItem('zylobet_registered_users', JSON.stringify(data));
-                    updateAdminStats();
+        function downloadPrivateBackup() {
+            let fullAppData = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                let key = localStorage.key(i);
+                try {
+                    fullAppData[key] = JSON.parse(localStorage.getItem(key));
+                } catch(e) {
+                    fullAppData[key] = localStorage.getItem(key);
                 }
-            });
+            }
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fullAppData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `zylobet_cloud_backup_${Date.now()}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showCustomAlert("✅ Telegram Cloud App Data Exported Successfully!");
         }
 
         function showCustomAlert(msg) {
@@ -615,7 +664,7 @@
             let now = Date.now();
             userKeys.forEach(k => {
                 let u = allUsers[k];
-                if(u.lastActive && (now - u.lastActive < 25000)) {
+                if(u.lastActive && (now - u.lastActive < 20000)) {
                     onlineCount++;
                 }
             });
@@ -630,18 +679,7 @@
 
             document.getElementById('tab-' + tab).classList.remove('hidden');
             document.getElementById('nav-' + tab).className = "flex flex-col items-center gap-1 text-sky-400 transition py-1 px-4 rounded-2xl bg-sky-500/10 cursor-pointer";
-            registerUserToCloud();
-        }
-        
-        document.getElementById('user-coins').innerText = userCoins.toLocaleString();
-        document.getElementById('user-gems').innerText = userGems;
-
-        function saveUserBalances() {
-            localStorage.setItem('zylobet_coins_' + userId, userCoins);
-            localStorage.setItem('zylobet_gems_' + userId, userGems);
-            document.getElementById('user-coins').innerText = userCoins.toLocaleString();
-            document.getElementById('user-gems').innerText = userGems;
-            registerUserToCloud();
+            registerUserActivity();
         }
 
         if(!localStorage.getItem('zylobet_coin_history_' + userId)) {
@@ -757,7 +795,12 @@
             localStorage.setItem('zylobet_coin_history_' + userId, JSON.stringify(coinHist));
 
             let referrerCoins = parseInt(allUsers[referrerKey].coins || 100) + 300;
-            db.ref('users/' + referrerKey + '/coins').set(referrerCoins);
+            allUsers[referrerKey].coins = referrerCoins;
+            localStorage.setItem('zylobet_registered_users', JSON.stringify(allUsers));
+
+            let refCoinHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + referrerKey)) || [];
+            refCoinHist.unshift({ title: `Referral Reward (${username} joined)`, amount: "+300 Coins", type: "earn", time: Date.now(), status: "Success" });
+            localStorage.setItem('zylobet_coin_history_' + referrerKey, JSON.stringify(refCoinHist));
 
             statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
             statusMsg.innerText = "🎉 Success! +300 Coins added to both accounts!";
@@ -943,7 +986,6 @@
                     <p class='text-gray-400 text-[11px] text-left font-semibold mt-1'>Upload Payment Screenshot / Proof:</p>
                     <input type='file' id='deposit-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-sky-500 file:text-white hover:file:bg-sky-600 cursor-pointer'>
                     
-                    <!-- NOTE & WARNING SECTION -->
                     <div class='bg-amber-500/10 border border-amber-500/20 p-3 rounded-2xl text-amber-300 text-[11px] font-bold text-left space-y-1.5'>
                         <p>⚠️ <b>Warning:</b> Submitting fake proofs will result in permanent account ban.</p>
                         <p>ℹ️ <b>Note:</b> Deposit processing takes within 24 hours. If deposit money is not received, contact on Telegram: <a href="https://t.me/Raj_Prashant" target="_blank" class="text-sky-400 underline font-mono">@Raj_Prashant</a></p>
@@ -981,7 +1023,7 @@
 
                 deposits.push(newDep);
                 localStorage.setItem('zylobet_deposit_requests', JSON.stringify(deposits));
-                registerUserToCloud();
+                registerUserActivity();
 
                 let validPackages = [50, 100, 200, 500];
                 let baseBonus = (validPackages.includes(paidRs)) ? (paidRs >= 500 ? 50 : (paidRs >= 200 ? 18 : (paidRs >= 100 ? 8 : (paidRs >= 50 ? 3 : 0)))) : 0;
@@ -1137,7 +1179,7 @@
                 return;
             }
 
-            let html = "<div class='space-y-2.5'><p class='text-[10px] text-gray-400 font-bold uppercase'>Registered Users & Live Activity:</p>";
+            let html = "<div class='space-y-2.5'><p class='text-[10px] text-gray-400 font-bold uppercase'>Registered Users & Telegram Cloud Data:</p>";
             userKeys.forEach(k => {
                 let u = allUsers[k];
                 html += `
@@ -1148,7 +1190,7 @@
                                 <p class='text-[10px] text-amber-300 mt-0.5'>Coins: <b>${u.coins}</b> | Diamonds: <b>${u.gems}</b></p>
                             </div>
                             <div class='text-right'>
-                                <span class='text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20'>Active</span>
+                                <span class='text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20'>Cloud Active</span>
                                 <p class='text-[9px] text-gray-400 mt-1'>${formatTimeAgo(u.lastActive)}</p>
                             </div>
                         </div>
@@ -1372,9 +1414,9 @@
                 localStorage.setItem('zylobet_coins_' + targetUserId, targetCoins);
                 if(targetUserId === userId) {
                     userCoins = targetCoins;
-                    document.getElementById('user-coins').innerText = userCoins.toLocaleString();
+                    updateUIBalances();
                 }
-                registerUserToCloud();
+                registerUserActivity();
 
                 let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + targetUserId)) || [];
                 coinHist.unshift({ title: `Withdrawal Refund (${req.method})`, amount: `+${req.amount} Coins`, type: "earn", time: Date.now(), status: "Success" });
@@ -1468,7 +1510,7 @@
             let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
             let usedHistory = JSON.parse(localStorage.getItem('zylobet_global_promo_history')) || [];
             
-            if(promos.some(p => p.code === codeVal) || usedHistory.notes?.includes(codeVal) || usedHistory.includes(codeVal)) {
+            if(promos.some(p => p.code === codeVal) || usedHistory.includes(codeVal)) {
                 showCustomAlert("❌ This promo code has already been created before and cannot be reused!");
                 return;
             }
