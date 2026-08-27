@@ -377,7 +377,7 @@
             </div>
         </div>
 
-        <!-- ADMIN DASHBOARD CONTROL PANEL WITH PROMO CODE MANAGER -->
+        <!-- ADMIN DASHBOARD CONTROL PANEL -->
         <div id="admin-view" class="hidden space-y-4">
             <div class="cyber-card p-4 rounded-3xl border border-sky-500/30 flex justify-between items-center shadow-xl">
                 <div>
@@ -466,7 +466,7 @@
         </div>
     </div>
 
-    <!-- FIREBASE REAL-TIME CLOUD ENGINE SCRIPT -->
+    <!-- ULTIMATE FIRESTORE REAL-TIME ENGINE SCRIPT -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBi30pzPsMX7ICY20_g...",
@@ -650,7 +650,7 @@
 
                 snapshot.forEach((doc) => {
                     let u = doc.data();
-                    if(u.lastActive && (now - u.lastActive < 30000)) {
+                    if(u.lastActive && (now - u.lastActive < 40000)) {
                         onlineCount++;
                     }
                     usersHTML += `
@@ -1082,61 +1082,30 @@
             loadAdminRealtimeData();
         }
 
-        function loadAdminRealtimeData() { loadAdminRealtimeData(); }
-
-        // ULTRA SMART FALLBACK DEPOSIT APPROVAL
+        // PERFECTED DEPOSIT APPROVAL WITH DIRECT FIRESTORE UPDATE
         function approveDeposit(docId, tUserId, tUsername, dias, paidRs) {
             db.collection("deposits").doc(docId).update({ status: "Success" }).then(() => {
-                // Try finding user by exact ID first
                 db.collection("users").doc(tUserId).get().then((doc) => {
-                    if (doc.exists) {
-                        applyDiamondGrant(tUserId, dias, paidRs);
-                    } else {
-                        // Fallback: Search by username if ID doc doesn't exist
-                        db.collection("users").where("username", "==", tUsername).get().then((querySnap) => {
-                            if (!querySnap.empty) {
-                                let realDocId = querySnap.docs[0].id;
-                                applyDiamondGrant(realDocId, dias, paidRs);
-                            } else {
-                                // Create user doc if completely missing
-                                db.collection("users").doc(tUserId).set({
-                                    userId: tUserId,
-                                    username: tUsername,
-                                    coins: 100,
-                                    gems: parseInt(dias) + 1,
-                                    lastActive: Date.now()
-                                }).then(() => {
-                                    recordGemHistory(tUserId, dias, paidRs);
-                                });
-                            }
-                        });
+                    let currentGems = 1;
+                    if(doc.exists && doc.data().gems !== undefined) {
+                        currentGems = parseInt(doc.data().gems);
                     }
+                    let newGems = currentGems + parseInt(dias);
+                    
+                    db.collection("users").doc(tUserId).set({
+                        gems: newGems
+                    }, { merge: true }).then(() => {
+                        db.collection("users").doc(tUserId).collection("gem_history").add({
+                            title: `Deposit Approved (₹${paidRs})`,
+                            amount: `+${dias} Diamonds`,
+                            type: "gem",
+                            time: Date.now(),
+                            status: "Success"
+                        }).then(() => {
+                            showCustomAlert("✅ Deposit Approved & Diamonds Added Successfully!");
+                        });
+                    });
                 });
-            });
-        }
-
-        function applyDiamondGrant(targetDocId, dias, paidRs) {
-            db.collection("users").doc(targetDocId).get().then((doc) => {
-                let currentGems = 1;
-                if(doc.exists && doc.data().gems !== undefined) {
-                    currentGems = parseInt(doc.data().gems);
-                }
-                let newGems = currentGems + parseInt(dias);
-                db.collection("users").doc(targetDocId).update({ gems: newGems }).then(() => {
-                    recordGemHistory(targetDocId, dias, paidRs);
-                });
-            });
-        }
-
-        function recordGemHistory(targetDocId, dias, paidRs) {
-            db.collection("users").doc(targetDocId).collection("gem_history").add({
-                title: `Deposit Approved (₹${paidRs})`,
-                amount: `+${dias} Diamonds`,
-                type: "gem",
-                time: Date.now(),
-                status: "Success"
-            }).then(() => {
-                showCustomAlert("✅ Deposit Approved & Diamonds Added Successfully!");
             });
         }
 
@@ -1161,43 +1130,24 @@
         function rejectWithdraw(docId, tUserId, tUsername, coins) {
             db.collection("withdrawals").doc(docId).update({ status: "Rejected (Refunded)" }).then(() => {
                 db.collection("users").doc(tUserId).get().then((doc) => {
-                    if (doc.exists) {
-                        applyCoinRefund(tUserId, coins);
-                    } else {
-                        db.collection("users").where("username", "==", tUsername).get().then((querySnap) => {
-                            if (!querySnap.empty) {
-                                applyCoinRefund(querySnap.docs[0].id, coins);
-                            } else {
-                                db.collection("users").doc(tUserId).set({
-                                    userId: tUserId,
-                                    username: tUsername,
-                                    coins: 100 + parseInt(coins),
-                                    gems: 1,
-                                    lastActive: Date.now()
-                                });
-                            }
-                        });
+                    let currentCoins = 100;
+                    if(doc.exists && doc.data().coins !== undefined) {
+                        currentCoins = parseInt(doc.data().coins);
                     }
-                });
-            });
-        }
+                    let newCoins = currentCoins + parseInt(coins);
 
-        function applyCoinRefund(targetDocId, coins) {
-            db.collection("users").doc(targetDocId).get().then((doc) => {
-                let currentCoins = 100;
-                if(doc.exists && doc.data().coins !== undefined) {
-                    currentCoins = parseInt(doc.data().coins);
-                }
-                let newCoins = currentCoins + parseInt(coins);
-                db.collection("users").doc(targetDocId).update({ coins: newCoins }).then(() => {
-                    db.collection("users").doc(targetDocId).collection("coin_history").add({
-                        title: `Withdrawal Refund`,
-                        amount: `+${coins} Coins`,
-                        type: "coin",
-                        time: Date.now(),
-                        status: "Success"
-                    }).then(() => {
-                        showCustomAlert("❌ Payout Rejected & Coins Refunded!");
+                    db.collection("users").doc(tUserId).set({
+                        coins: newCoins
+                    }, { merge: true }).then(() => {
+                        db.collection("users").doc(tUserId).collection("coin_history").add({
+                            title: `Withdrawal Refund`,
+                            amount: `+${coins} Coins`,
+                            type: "coin",
+                            time: Date.now(),
+                            status: "Success"
+                        }).then(() => {
+                            showCustomAlert("❌ Payout Rejected & Coins Refunded!");
+                        });
                     });
                 });
             });
