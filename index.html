@@ -73,7 +73,7 @@
         }
         .ff-diamond i { transform: rotate(-45deg); }
 
-        input, select, textarea {
+        input, select, textarea, button {
             pointer-events: auto !important;
             user-select: text !important;
             -webkit-user-select: text !important;
@@ -466,7 +466,7 @@
         </div>
     </div>
 
-    <!-- ABSOLUTE FOOLPROOF DIRECT UPDATE ENGINE -->
+    <!-- 100% UNLOCKED PROOF SUBMISSION ENGINE -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBi30pzPsMX7ICY20_g...",
@@ -1007,7 +1007,7 @@
                     </div>
                     <p class='text-gray-300 text-[11px] font-semibold'>Scan this QR using PhonePe, GPay or Paytm</p>
                     <input type='file' id='deposit-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300 cursor-pointer'>
-                    <button onclick="submitManualDeposit(${totalDiamonds}, ${amt})" class='w-full py-3.5 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>SUBMIT PROOF FOR APPROVAL</button>
+                    <button type='button' onclick='submitManualDeposit(${totalDiamonds}, ${amt})' class='w-full py-3.5 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>SUBMIT PROOF FOR APPROVAL</button>
                 </div>`;
         }
 
@@ -1028,6 +1028,8 @@
                 }).then(() => {
                     showCustomAlert("🎉 Payment screenshot submitted to admin cloud!");
                     closeModal();
+                }).catch((err) => {
+                    showCustomAlert("❌ Error: " + err.message);
                 });
             };
             reader.readAsDataURL(fileInput.files[0]);
@@ -1078,15 +1080,12 @@
             loadAdminRealtimeData();
         }
 
-        // ABSOLUTE DIRECT USER DOCUMENT PATH MATCH APPROVAL
+        // DIRECT USER BALANCE UPDATE SYNC
         function approveDeposit(docId, tUserId, tUsername, dias, paidRs) {
             db.collection("deposits").doc(docId).update({ status: "Success" }).then(() => {
                 let userRef = db.collection("users").doc(tUserId.toString());
                 userRef.get().then((doc) => {
-                    let currentGems = 1;
-                    if (doc.exists && doc.data().gems !== undefined) {
-                        currentGems = Number(doc.data().gems);
-                    }
+                    let currentGems = doc.exists && doc.data().gems !== undefined ? Number(doc.data().gems) : 1;
                     let newGems = currentGems + Number(dias);
 
                     userRef.set({
@@ -1131,10 +1130,7 @@
             db.collection("withdrawals").doc(docId).update({ status: "Rejected (Refunded)" }).then(() => {
                 let userRef = db.collection("users").doc(tUserId.toString());
                 userRef.get().then((doc) => {
-                    let currentCoins = 100;
-                    if (doc.exists && doc.data().coins !== undefined) {
-                        currentCoins = Number(doc.data().coins);
-                    }
+                    let currentCoins = doc.exists && doc.data().coins !== undefined ? Number(doc.data().coins) : 100;
                     let newCoins = currentCoins + Number(coins);
 
                     userRef.set({
