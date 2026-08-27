@@ -466,7 +466,7 @@
         </div>
     </div>
 
-    <!-- SUPER SAFE AUTO-SYNC ENGINE -->
+    <!-- BULLETPROOF USERNAME-MATCH SYNC ENGINE -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBi30pzPsMX7ICY20_g...",
@@ -1078,22 +1078,22 @@
             loadAdminRealtimeData();
         }
 
-        // ULTRA ROBUST AUTO-RESOLVE DEPOSIT APPROVAL
+        // 100% USERNAME-MATCHED FOOLPROOF APPROVE FUNCTION
         function approveDeposit(docId, tUserId, tUsername, dias, paidRs) {
             db.collection("deposits").doc(docId).update({ status: "Success" }).then(() => {
-                // Search user document by ID or Username to guarantee absolute match
-                db.collection("users").doc(tUserId).get().then((doc) => {
+                // Search specifically by username query first to prevent ID mismatch
+                db.collection("users").where("username", "==", tUsername).get().then((querySnap) => {
                     let targetRef;
-                    if (doc.exists) {
-                        targetRef = db.collection("users").doc(tUserId);
-                        applyApprovalToRef(targetRef, dias, paidRs);
+                    if (!querySnap.empty) {
+                        targetRef = querySnap.docs[0].ref;
+                        executeDiamondCredit(targetRef, dias, paidRs);
                     } else {
-                        db.collection("users").where("username", "==", tUsername).get().then((querySnap) => {
-                            if (!querySnap.empty) {
-                                targetRef = querySnap.docs[0].ref;
-                                applyApprovalToRef(targetRef, dias, paidRs);
+                        // Fallback to userId doc
+                        targetRef = db.collection("users").doc(tUserId);
+                        targetRef.get().then((doc) => {
+                            if (doc.exists) {
+                                executeDiamondCredit(targetRef, dias, paidRs);
                             } else {
-                                targetRef = db.collection("users").doc(tUserId);
                                 targetRef.set({
                                     userId: tUserId,
                                     username: tUsername,
@@ -1101,7 +1101,7 @@
                                     gems: 1,
                                     lastActive: Date.now()
                                 }, { merge: true }).then(() => {
-                                    applyApprovalToRef(targetRef, dias, paidRs);
+                                    executeDiamondCredit(targetRef, dias, paidRs);
                                 });
                             }
                         });
@@ -1110,7 +1110,7 @@
             });
         }
 
-        function applyApprovalToRef(ref, dias, paidRs) {
+        function executeDiamondCredit(ref, dias, paidRs) {
             ref.get().then((doc) => {
                 let currentGems = doc.exists && doc.data().gems !== undefined ? Number(doc.data().gems) : 1;
                 let newGems = currentGems + Number(dias);
@@ -1149,18 +1149,17 @@
 
         function rejectWithdraw(docId, tUserId, tUsername, coins) {
             db.collection("withdrawals").doc(docId).update({ status: "Rejected (Refunded)" }).then(() => {
-                db.collection("users").doc(tUserId).get().then((doc) => {
+                db.collection("users").where("username", "==", tUsername).get().then((querySnap) => {
                     let targetRef;
-                    if (doc.exists) {
-                        targetRef = db.collection("users").doc(tUserId);
-                        applyRefundToRef(targetRef, coins);
+                    if (!querySnap.empty) {
+                        targetRef = querySnap.docs[0].ref;
+                        executeCoinRefund(targetRef, coins);
                     } else {
-                        db.collection("users").where("username", "==", tUsername).get().then((querySnap) => {
-                            if (!querySnap.empty) {
-                                targetRef = querySnap.docs[0].ref;
-                                applyRefundToRef(targetRef, coins);
+                        targetRef = db.collection("users").doc(tUserId);
+                        targetRef.get().then((doc) => {
+                            if (doc.exists) {
+                                executeCoinRefund(targetRef, coins);
                             } else {
-                                targetRef = db.collection("users").doc(tUserId);
                                 targetRef.set({
                                     userId: tUserId,
                                     username: tUsername,
@@ -1168,7 +1167,7 @@
                                     gems: 1,
                                     lastActive: Date.now()
                                 }, { merge: true }).then(() => {
-                                    applyRefundToRef(targetRef, coins);
+                                    executeCoinRefund(targetRef, coins);
                                 });
                             }
                         });
@@ -1177,7 +1176,7 @@
             });
         }
 
-        function applyRefundToRef(ref, coins) {
+        function executeCoinRefund(ref, coins) {
             ref.get().then((doc) => {
                 let currentCoins = doc.exists && doc.data().coins !== undefined ? Number(doc.data().coins) : 100;
                 let newCoins = currentCoins + Number(coins);
