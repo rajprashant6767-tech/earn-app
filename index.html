@@ -377,14 +377,14 @@
             </div>
         </div>
 
-        <!-- ADMIN DASHBOARD CONTROL PANEL -->
+        <!-- ADMIN DASHBOARD CONTROL PANEL WITH PROMO CODE MANAGER -->
         <div id="admin-view" class="hidden space-y-4">
             <div class="cyber-card p-4 rounded-3xl border border-sky-500/30 flex justify-between items-center shadow-xl">
                 <div>
                     <h1 class="text-base font-black text-sky-400 italic">ZyloBet Admin Control Center</h1>
                     <p class="text-[10px] text-gray-400">Manage Payout Approvals & Cloud Users</p>
                 </div>
-                <button onclick="loadAdminActivePanel()" class="bg-white/10 hover:bg-white/20 text-xs px-3.5 py-2 rounded-xl font-bold text-amber-400 transition active:scale-95 shadow cursor-pointer">
+                <button onclick="loadAdminRealtimeData()" class="bg-white/10 hover:bg-white/20 text-xs px-3.5 py-2 rounded-xl font-bold text-amber-400 transition active:scale-95 shadow cursor-pointer">
                     <i class="fa-solid fa-rotate mr-1"></i> Refresh
                 </button>
             </div>
@@ -468,7 +468,6 @@
 
     <!-- FIREBASE REAL-TIME CLOUD ENGINE SCRIPT -->
     <script>
-        // FIREBASE CONFIGURATION (CONNECTED TO YOUR DATABASE)
         const firebaseConfig = {
             apiKey: "AIzaSyBi30pzPsMX7ICY20_g...",
             authDomain: "zylobet-3c0d0.firebaseapp.com",
@@ -547,7 +546,7 @@
             });
         }
 
-        function saveUserBalances() {
+        function saveUserBalances(actionTitle = "", amountStr = "", type = "earn") {
             updateUIBalances();
             db.collection("users").doc(userId).set({
                 coins: userCoins,
@@ -555,6 +554,17 @@
                 username: username,
                 lastActive: Date.now()
             }, { merge: true });
+
+            if(actionTitle && amountStr) {
+                let colName = type === 'coin' ? 'coin_history' : 'gem_history';
+                db.collection("users").doc(userId).collection(colName).add({
+                    title: actionTitle,
+                    amount: amountStr,
+                    type: type,
+                    time: Date.now(),
+                    status: "Success"
+                });
+            }
             registerUserActivity();
         }
 
@@ -632,7 +642,6 @@
         function loadAdminRealtimeData() {
             if(userId !== ADMIN_ID) return;
             
-            // Listen to all users
             db.collection("users").onSnapshot((snapshot) => {
                 let totalUsers = snapshot.size;
                 let onlineCount = 0;
@@ -667,7 +676,6 @@
                 }
             });
 
-            // Listen to Deposits
             if(adminTab === 'deposit') {
                 db.collection("deposits").where("status", "==", "Pending").onSnapshot((snapshot) => {
                     let container = document.getElementById('admin-requests-container');
@@ -684,7 +692,7 @@
                                 <div class='flex justify-between font-black'><span class='text-cyan-400 text-sm'>${d.username}</span><span class='text-emerald-400 text-sm'>+${d.diamonds} 💎 (₹${d.amount})</span></div>
                                 ${imgTag}
                                 <div class="grid grid-cols-2 gap-2 mt-3">
-                                    <button onclick="approveDeposit('${doc.id}', ${d.userId}, ${d.diamonds})" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
+                                    <button onclick="approveDeposit('${doc.id}', '${d.userId}', ${d.diamonds}, '${d.amount}')" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
                                     <button onclick="rejectDeposit('${doc.id}')" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
                                 </div>
                             </div>`;
@@ -692,7 +700,6 @@
                 });
             }
 
-            // Listen to Withdrawals
             if(adminTab === 'withdraw') {
                 db.collection("withdrawals").where("status", "==", "Pending").onSnapshot((snapshot) => {
                     let container = document.getElementById('admin-requests-container');
@@ -712,11 +719,15 @@
                                 ${redeemInputHTML}
                                 <div class="grid grid-cols-2 gap-2 mt-2">
                                     <button onclick="approveWithdraw('${doc.id}', '${r.method}')" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
-                                    <button onclick="rejectWithdraw('${doc.id}', ${r.userId}, ${r.amount})" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
+                                    <button onclick="rejectWithdraw('${doc.id}', '${r.userId}', ${r.amount})" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
                                 </div>
                             </div>`;
                     });
                 });
+            }
+
+            if(adminTab === 'promo') {
+                loadAdminPromoManager();
             }
         }
 
@@ -740,6 +751,60 @@
             if (diffMin < 60) return `${diffMin} min ago`;
             const diffHr = Math.floor(diffMin / 60);
             return `${diffHr} hr ago`;
+        }
+
+        function openHistory(type) {
+            document.getElementById('modal').classList.remove('hidden');
+            const title = document.getElementById('modal-title');
+            const content = document.getElementById('modal-content');
+
+            if(type === 'gems') {
+                title.innerText = "DIAMONDS HISTORY";
+                db.collection("users").doc(userId).collection("gem_history").orderBy("time", "desc").get().then((snapshot) => {
+                    if(snapshot.empty) { content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No diamond history yet.</div>`; return; }
+                    let html = "<div class='space-y-3'>";
+                    snapshot.forEach((doc) => {
+                        let item = doc.data();
+                        let amountColor = item.amount.startsWith('+') ? 'text-emerald-400' : 'text-rose-400';
+                        html += `<div class='cyber-card p-4 rounded-2xl border border-white/5 flex justify-between items-center'><div><p class='font-black ${amountColor} text-sm flex items-center gap-1.5'><span class="ff-diamond" style="width:22px;height:22px;font-size:8px;"><i class="fa-solid fa-gem"></i></span> ${item.amount}</p><p class='text-[10px] text-gray-300 font-bold'>${item.title}</p></div><span class='text-[10px] text-gray-400 font-bold'>${formatTimeAgo(item.time)}</span></div>`;
+                    });
+                    content.innerHTML = html + "</div>";
+                });
+            } else if(type === 'coins') {
+                title.innerText = "COINS HISTORY";
+                db.collection("users").doc(userId).collection("coin_history").orderBy("time", "desc").get().then((snapshot) => {
+                    if(snapshot.empty) { content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No coin history yet.</div>`; return; }
+                    let html = "<div class='space-y-3'>";
+                    snapshot.forEach((doc) => {
+                        let item = doc.data();
+                        let amountColor = item.amount.startsWith('+') ? 'text-emerald-400' : 'text-rose-400';
+                        html += `<div class='cyber-card p-4 rounded-2xl border border-white/5 flex justify-between items-center'><div><p class='font-black ${amountColor} text-sm flex items-center gap-1.5'><span class="ff-gold-coin" style="width:22px;height:22px;font-size:9px;"><i class="fa-solid fa-coins"></i></span> ${item.amount}</p><p class='text-[10px] text-gray-300 font-bold'>${item.title}</p></div><span class='text-[10px] text-gray-400 font-bold'>${formatTimeAgo(item.time)}</span></div>`;
+                    });
+                    content.innerHTML = html + "</div>";
+                });
+            } else if(type === 'withdrawals') {
+                title.innerText = "PAYOUT HISTORY";
+                db.collection("withdrawals").where("userId", "==", userId).get().then((snapshot) => {
+                    if(snapshot.empty) { content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No payout history yet.</div>`; return; }
+                    let html = "<div class='space-y-3'>";
+                    snapshot.forEach((doc) => {
+                        let item = doc.data();
+                        let redeemBox = item.redeemCode ? `<div class='flex items-center gap-2 mt-1'><span class='text-xs text-sky-300 font-mono'>🔑 Redeem Code: <b>${item.redeemCode}</b></span></div>` : '';
+                        let statusClass = item.status.includes('Success') ? 'text-emerald-400' : (item.status.includes('Rejected') ? 'text-rose-400' : 'text-amber-400');
+                        html += `<div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-1'>
+                            <div class='flex justify-between items-center'>
+                                <span class='text-amber-400 font-black flex items-center gap-1.5'>
+                                    <span class="ff-gold-coin" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> ${item.amount} Coins (₹${item.rupees})
+                                </span>
+                                <span class='text-xs ${statusClass} font-bold'>${item.status}</span>
+                            </div>
+                            <p class='text-[11px] text-gray-300'>Method: ${item.method}</p>
+                            ${redeemBox}
+                        </div>`;
+                    });
+                    content.innerHTML = html + "</div>";
+                });
+            }
         }
 
         function openDepositStatusModal() {
@@ -812,14 +877,20 @@
                 }
 
                 userCoins += 300;
-                saveUserBalances();
+                saveUserBalances("Referral Bonus", "+300 Coins", "coin");
 
-                // Reward Referrer
                 db.collection("users").doc(foundRefId).get().then((refDoc) => {
                     if(refDoc.exists) {
                         let refData = refDoc.data();
                         let newRefCoins = (refData.coins || 100) + 300;
                         db.collection("users").doc(foundRefId).update({ coins: newRefCoins });
+                        db.collection("users").doc(foundRefId).collection("coin_history").add({
+                            title: `Referral Reward (${username})`,
+                            amount: "+300 Coins",
+                            type: "coin",
+                            time: Date.now(),
+                            status: "Success"
+                        });
                     }
                 });
 
@@ -846,10 +917,11 @@
                 let p = doc.data();
                 if(p.rewardType === 'coins') {
                     userCoins += p.rewardAmount;
+                    saveUserBalances(`Promo Code (${promoVal})`, `+${p.rewardAmount} Coins`, "coin");
                 } else {
                     userGems += p.rewardAmount;
+                    saveUserBalances(`Promo Code (${promoVal})`, `+${p.rewardAmount} Diamonds`, "gem");
                 }
-                saveUserBalances();
 
                 db.collection("promos").doc(promoVal).update({ usedCount: firebase.firestore.FieldValue.increment(1) });
 
@@ -885,7 +957,12 @@
 
         function executeModalConversion() {
             if (!modalConvCoins || userCoins < modalConvCoins) { showCustomAlert("❌ Insufficient coins!"); return; }
-            userCoins -= modalConvCoins; userGems += modalConvGems;
+            userCoins -= modalConvCoins; 
+            userGems += modalConvGems;
+            
+            db.collection("users").doc(userId).collection("coin_history").add({ title: "Exchange to Diamonds", amount: `-${modalConvCoins} Coins`, type: "coin", time: Date.now(), status: "Success" });
+            db.collection("users").doc(userId).collection("gem_history").add({ title: "Converted from Coins", amount: `+${modalConvGems} Diamonds`, type: "gem", time: Date.now(), status: "Success" });
+
             saveUserBalances();
             showCustomAlert(`🎉 Converted successfully!`); closeModal();
         }
@@ -975,7 +1052,7 @@
             }
 
             userCoins -= selectedWCoins;
-            saveUserBalances();
+            saveUserBalances(`Withdrawal Request (${method})`, `-${selectedWCoins} Coins`, "coin");
 
             db.collection("withdrawals").add({
                 username: username,
@@ -1007,15 +1084,29 @@
 
         function loadAdminActivePanel() { loadAdminRealtimeData(); }
 
-        function approveDeposit(docId, tUserId, dias) {
+        // FIXED DEPOSIT APPROVAL: ADDING DIAMONDS PROPERLY
+        function approveDeposit(docId, tUserId, dias, paidRs) {
             db.collection("deposits").doc(docId).update({ status: "Success" }).then(() => {
-                db.collection("users").doc(tUserId.toString()).get().then((doc) => {
+                db.collection("users").doc(tUserId).get().then((doc) => {
+                    let currentGems = 1;
                     if(doc.exists) {
-                        let currentGems = doc.data().gems || 1;
-                        db.collection("users").doc(tUserId.toString()).update({ gems: currentGems + dias });
+                        currentGems = doc.data().gems !== undefined ? parseInt(doc.data().gems) : 1;
                     }
+                    let newGems = currentGems + parseInt(dias);
+                    
+                    db.collection("users").doc(tUserId).set({
+                        gems: newGems
+                    }, { merge: true }).then(() => {
+                        db.collection("users").doc(tUserId).collection("gem_history").add({
+                            title: `Deposit Approved (₹${paidRs})`,
+                            amount: `+${dias} Diamonds`,
+                            type: "gem",
+                            time: Date.now(),
+                            status: "Success"
+                        });
+                        showCustomAlert("✅ Deposit Approved & Diamonds Added to User!");
+                    });
                 });
-                showCustomAlert("✅ Deposit Approved!");
             });
         }
 
@@ -1032,20 +1123,129 @@
                 redeemCode = codeInput ? codeInput.value.trim() : "";
                 if(!redeemCode) { showCustomAlert("❌ Enter Redeem Code!"); return; }
             }
-            db.collection("withdrawals").doc(docId).update({ status: "Success", redeemCode: redeemCode }).then(() => {
+            db.collection("withdrawals").doc(docId).update({ status: "Success (Approved)", redeemCode: redeemCode }).then(() => {
                 showCustomAlert("✅ Payout Approved!");
             });
         }
 
         function rejectWithdraw(docId, tUserId, coins) {
             db.collection("withdrawals").doc(docId).update({ status: "Rejected (Refunded)" }).then(() => {
-                db.collection("users").doc(tUserId.toString()).get().then((doc) => {
+                db.collection("users").doc(tUserId).get().then((doc) => {
+                    let currentCoins = 100;
                     if(doc.exists) {
-                        let currentCoins = doc.data().coins || 100;
-                        db.collection("users").doc(tUserId.toString()).update({ coins: currentCoins + coins });
+                        currentCoins = doc.data().coins !== undefined ? parseInt(doc.data().coins) : 100;
                     }
+                    let newCoins = currentCoins + parseInt(coins);
+
+                    db.collection("users").doc(tUserId).set({
+                        coins: newCoins
+                    }, { merge: true }).then(() => {
+                        db.collection("users").doc(tUserId).collection("coin_history").add({
+                            title: `Withdrawal Refund`,
+                            amount: `+${coins} Coins`,
+                            type: "coin",
+                            time: Date.now(),
+                            status: "Success"
+                        });
+                        showCustomAlert("❌ Payout Rejected & Coins Refunded!");
+                    });
                 });
-                showCustomAlert("❌ Payout Rejected & Coins Refunded!");
+            });
+        }
+
+        function loadAdminPromoManager() {
+            const container = document.getElementById('admin-requests-container');
+            db.collection("promos").get().then((snapshot) => {
+                let activeListHTML = "<div class='space-y-2 mt-3'><p class='text-[10px] text-gray-400 font-bold uppercase'>Active Promos:</p>";
+                if(snapshot.empty) {
+                    activeListHTML += "<p class='text-[11px] text-gray-500'>No promo codes created yet.</p>";
+                } else {
+                    snapshot.forEach((doc) => {
+                        let p = doc.data();
+                        let pId = doc.id;
+                        let rewardIcon = p.rewardType === 'coins' ? '🪙 Coins' : '💎 Diamonds';
+                        activeListHTML += `<div class='cyber-card p-3 rounded-xl border border-white/5 flex justify-between items-center text-xs'>
+                            <div><span class='font-black text-rose-400'>${pId}</span> <span class='text-[10px] text-gray-300'>(${p.rewardAmount} ${rewardIcon})</span></div>
+                            <div class='flex gap-2 items-center'>
+                                <span class='text-[10px] text-gray-400 font-bold'>${p.usedCount || 0}/${p.maxUsers}</span>
+                                <button onclick="deletePromoCode('${pId}')" class='px-2.5 py-1 bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg text-[10px] font-bold cursor-pointer'>Delete</button>
+                            </div>
+                        </div>`;
+                    });
+                }
+                activeListHTML += "</div>";
+
+                container.innerHTML = `
+                    <div class='cyber-card p-4 rounded-3xl space-y-3 border border-rose-500/30 text-xs'>
+                        <h3 class='font-black text-rose-400 uppercase tracking-wider'>Create Advanced Promo Code</h3>
+                        <div>
+                            <label class='text-[10px] text-gray-400 font-bold block mb-1'>Promo Code Name</label>
+                            <input type='text' id='adm-code-input' placeholder='e.g. ZYLO100' class='w-full bg-black/50 border border-white/10 p-3 rounded-xl uppercase text-rose-300 font-bold'>
+                        </div>
+                        <div class='grid grid-cols-2 gap-2'>
+                            <div>
+                                <label class='text-[10px] text-gray-400 font-bold block mb-1'>Reward Type</label>
+                                <select id='adm-reward-type' class='w-full bg-black/50 border border-white/10 p-2.5 rounded-xl text-white font-bold'>
+                                    <option value='coins'>Coins 🪙</option>
+                                    <option value='gems'>Diamonds 💎</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class='text-[10px] text-gray-400 font-bold block mb-1'>Reward Amount</label>
+                                <input type='number' id='adm-reward-amt' value='100' min='1' class='w-full bg-black/50 border border-white/10 p-2.5 rounded-xl text-white font-bold'>
+                            </div>
+                        </div>
+                        <div class='grid grid-cols-2 gap-2'>
+                            <div>
+                                <label class='text-[10px] text-gray-400 font-bold block mb-1'>Validity Time (Minutes)</label>
+                                <input type='number' id='adm-time-value' value='60' min='1' class='w-full bg-black/50 border border-white/10 p-2.5 rounded-xl text-white font-bold'>
+                            </div>
+                            <div>
+                                <label class='text-[10px] text-gray-400 font-bold block mb-1'>Max Users Limit</label>
+                                <input type='number' id='adm-limit-input' value='50' min='1' class='w-full bg-black/50 border border-white/10 p-2.5 rounded-xl text-white font-bold'>
+                            </div>
+                        </div>
+                        <button onclick='createPromoCode()' class='w-full py-3 bg-gradient-to-r from-rose-600 to-purple-600 rounded-xl font-black text-white cursor-pointer shadow-lg'>CREATE & ACTIVATE CODE</button>
+                        ${activeListHTML}
+                    </div>`;
+            });
+        }
+
+        function deletePromoCode(pId) {
+            db.collection("promos").doc(pId).delete().then(() => {
+                showCustomAlert("🗑️ Promo code deleted successfully!");
+                loadAdminPromoManager();
+            });
+        }
+
+        function createPromoCode() {
+            const codeInput = document.getElementById('adm-code-input');
+            const typeInput = document.getElementById('adm-reward-type');
+            const amtInput = document.getElementById('adm-reward-amt');
+            const timeInput = document.getElementById('adm-time-value');
+            const limitInput = document.getElementById('adm-limit-input');
+
+            const codeVal = codeInput.value.trim().toUpperCase();
+            const rewardType = typeInput.value;
+            const rewardAmount = parseInt(amtInput.value) || 100;
+            const durationMin = parseInt(timeInput.value) || 60;
+            const maxUsr = parseInt(limitInput.value) || 50;
+
+            if(!codeVal) { showCustomAlert("❌ Please enter a promo code name!"); return; }
+
+            const expiryTime = Date.now() + (durationMin * 60 * 1000);
+
+            db.collection("promos").doc(codeVal).set({
+                code: codeVal,
+                rewardType: rewardType,
+                rewardAmount: rewardAmount,
+                expiryTime: expiryTime,
+                maxUsers: maxUsr,
+                usedCount: 0,
+                active: true
+            }).then(() => {
+                showCustomAlert(`🎉 Promo Code '${codeVal}' Created Successfully!`);
+                loadAdminPromoManager();
             });
         }
     </script>
