@@ -7,6 +7,9 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase SDK Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
         
@@ -138,7 +141,7 @@
                 </div>
             </div>
             <div class="bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-2xl flex items-center gap-1.5 text-[11px] font-bold text-gray-300 shadow-inner">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Telegram Cloud Live
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Firebase Cloud Live
             </div>
         </header>
 
@@ -374,7 +377,7 @@
             </div>
         </div>
 
-        <!-- ADMIN DASHBOARD CONTROL PANEL WITH CLOUD BACKUP BUTTON -->
+        <!-- ADMIN DASHBOARD CONTROL PANEL -->
         <div id="admin-view" class="hidden space-y-4">
             <div class="cyber-card p-4 rounded-3xl border border-sky-500/30 flex justify-between items-center shadow-xl">
                 <div>
@@ -385,11 +388,6 @@
                     <i class="fa-solid fa-rotate mr-1"></i> Refresh
                 </button>
             </div>
-
-            <!-- CLOUD SYNC & EXPORT BACKUP BUTTON -->
-            <button onclick="downloadPrivateBackup()" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 rounded-2xl font-black text-xs text-white shadow-xl cursor-pointer active:scale-95 transition flex items-center justify-center gap-2 border border-emerald-400/40">
-                <i class="fa-solid fa-cloud-arrow-down text-base"></i> EXPORT TELEGRAM CLOUD DATA BACKUP
-            </button>
 
             <!-- LIVE STATS BAR -->
             <div class="grid grid-cols-2 gap-3">
@@ -468,15 +466,28 @@
         </div>
     </div>
 
-    <!-- CLEAN ENGINE SCRIPT WITHOUT MOCK TEST USERS -->
+    <!-- FIREBASE REAL-TIME CLOUD ENGINE SCRIPT -->
     <script>
+        // FIREBASE CONFIGURATION (CONNECTED TO YOUR DATABASE)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBi30pzPsMX7ICY20_g...",
+            authDomain: "zylobet-3c0d0.firebaseapp.com",
+            projectId: "zylobet-3c0d0",
+            storageBucket: "zylobet-3c0d0.appspot.com",
+            messagingSenderId: "393354931045",
+            appId: "1:393354931045:web:4e916c...",
+            measurementId: "G-58J4S8VT1Y"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         const ADMIN_ID = "7927224931";
         let userId = "7927224931";
         let username = "@Raj_Prashant";
 
         let userCoins = 100;
         let userGems = 1;
-        let cloudStorage = null;
 
         try {
             const tg = window.Telegram.WebApp;
@@ -484,9 +495,6 @@
             if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
                 userId = tg.initDataUnsafe.user.id.toString();
                 username = "@" + (tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name);
-            }
-            if (tg.CloudStorage) {
-                cloudStorage = tg.CloudStorage;
             }
         } catch(e) {
             console.log("Telegram WebApp not fully detected.");
@@ -498,7 +506,7 @@
             const bar = document.getElementById('intro-bar');
             setTimeout(() => { bar.style.width = '100%'; }, 200);
 
-            loadUserDataFromCloud(() => {
+            loadUserDataFromFirestore(() => {
                 setTimeout(() => {
                     const intro = document.getElementById('intro-screen');
                     if (intro) {
@@ -513,40 +521,40 @@
             });
         });
 
-        function loadUserDataFromCloud(callback) {
-            if (cloudStorage) {
-                cloudStorage.getItem('zylo_coins_' + userId, (err, val) => {
-                    if (!err && val) userCoins = parseInt(val) || 100;
-                    else {
-                        userCoins = parseInt(localStorage.getItem('zylobet_coins_' + userId)) || 100;
-                    }
-
-                    cloudStorage.getItem('zylo_gems_' + userId, (err2, val2) => {
-                        if (!err2 && val2) userGems = parseInt(val2) || 1;
-                        else {
-                            userGems = parseInt(localStorage.getItem('zylobet_gems_' + userId)) || 1;
-                        }
-                        updateUIBalances();
-                        if(callback) callback();
-                    });
-                });
-            } else {
-                userCoins = parseInt(localStorage.getItem('zylobet_coins_' + userId)) || 100;
-                userGems = parseInt(localStorage.getItem('zylobet_gems_' + userId)) || 1;
+        function loadUserDataFromFirestore(callback) {
+            db.collection("users").doc(userId).get().then((doc) => {
+                if (doc.exists) {
+                    let data = doc.data();
+                    userCoins = data.coins !== undefined ? data.coins : 100;
+                    userGems = data.gems !== undefined ? data.gems : 1;
+                } else {
+                    userCoins = 100;
+                    userGems = 1;
+                    db.collection("users").doc(userId).set({
+                        userId: userId,
+                        username: username,
+                        coins: userCoins,
+                        gems: userGems,
+                        lastActive: Date.now()
+                    }, { merge: true });
+                }
                 updateUIBalances();
                 if(callback) callback();
-            }
+            }).catch((err) => {
+                console.log("Error loading user:", err);
+                updateUIBalances();
+                if(callback) callback();
+            });
         }
 
         function saveUserBalances() {
             updateUIBalances();
-            localStorage.setItem('zylobet_coins_' + userId, userCoins);
-            localStorage.setItem('zylobet_gems_' + userId, userGems);
-
-            if (cloudStorage) {
-                cloudStorage.setItem('zylo_coins_' + userId, userCoins.toString());
-                cloudStorage.setItem('zylo_gems_' + userId, userGems.toString());
-            }
+            db.collection("users").doc(userId).set({
+                coins: userCoins,
+                gems: userGems,
+                username: username,
+                lastActive: Date.now()
+            }, { merge: true });
             registerUserActivity();
         }
 
@@ -555,45 +563,20 @@
             document.getElementById('user-gems').innerText = userGems;
         }
 
-        // REGISTER REAL USER ACTIVITY (NO MOCK TEST USERS)
         function registerUserActivity() {
-            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
-
-            allUsers[userId] = {
+            db.collection("users").doc(userId).set({
                 userId: userId,
                 username: username,
                 coins: userCoins,
                 gems: userGems,
                 lastActive: Date.now()
-            };
-            localStorage.setItem('zylobet_registered_users', JSON.stringify(allUsers));
-            if(userId === ADMIN_ID) updateAdminStats();
+            }, { merge: true });
+            if(userId === ADMIN_ID) loadAdminRealtimeData();
         }
 
         setInterval(() => {
             registerUserActivity();
-        }, 3000);
-
-        function downloadPrivateBackup() {
-            let fullAppData = {};
-            for (let i = 0; i < localStorage.length; i++) {
-                let key = localStorage.key(i);
-                try {
-                    fullAppData[key] = JSON.parse(localStorage.getItem(key));
-                } catch(e) {
-                    fullAppData[key] = localStorage.getItem(key);
-                }
-            }
-
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fullAppData, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `zylobet_cloud_backup_${Date.now()}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-            showCustomAlert("✅ Telegram Cloud App Data Exported Successfully!");
-        }
+        }, 5000);
 
         function showCustomAlert(msg) {
             document.getElementById('custom-alert-text').innerText = msg;
@@ -637,8 +620,7 @@
                 document.querySelector('nav').classList.add('hidden');
                 document.getElementById('admin-view').classList.remove('hidden');
                 document.getElementById('view-toggle-btn').innerText = "Back to User App";
-                updateAdminStats();
-                loadAdminActivePanel();
+                loadAdminRealtimeData();
             } else {
                 document.getElementById('admin-view').classList.add('hidden');
                 document.querySelector('nav').classList.remove('hidden');
@@ -647,20 +629,95 @@
             }
         }
 
-        function updateAdminStats() {
-            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
-            let userKeys = Object.keys(allUsers);
-            document.getElementById('stat-total-users').innerText = userKeys.length || 1;
+        function loadAdminRealtimeData() {
+            if(userId !== ADMIN_ID) return;
+            
+            // Listen to all users
+            db.collection("users").onSnapshot((snapshot) => {
+                let totalUsers = snapshot.size;
+                let onlineCount = 0;
+                let now = Date.now();
+                let usersHTML = "";
 
-            let onlineCount = 0;
-            let now = Date.now();
-            userKeys.forEach(k => {
-                let u = allUsers[k];
-                if(u.lastActive && (now - u.lastActive < 20000)) {
-                    onlineCount++;
+                snapshot.forEach((doc) => {
+                    let u = doc.data();
+                    if(u.lastActive && (now - u.lastActive < 30000)) {
+                        onlineCount++;
+                    }
+                    usersHTML += `
+                        <div class='cyber-card p-3.5 rounded-2xl border border-white/10 space-y-2 text-xs'>
+                            <div class='flex justify-between items-center'>
+                                <div>
+                                    <p class='font-black text-sky-400'>${u.username} <span class='text-[10px] text-gray-400 font-normal'>(ID: ${u.userId})</span></p>
+                                    <p class='text-[10px] text-amber-300 mt-0.5'>Coins: <b>${u.coins}</b> | Diamonds: <b>${u.gems}</b></p>
+                                </div>
+                                <div class='text-right'>
+                                    <span class='text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20'>Cloud Live</span>
+                                    <p class='text-[9px] text-gray-400 mt-1'>Active</p>
+                                </div>
+                            </div>
+                        </div>`;
+                });
+
+                document.getElementById('stat-total-users').innerText = totalUsers;
+                document.getElementById('stat-online-users').innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> ${Math.max(onlineCount, 1)}`;
+                
+                if(adminTab === 'users') {
+                    document.getElementById('admin-requests-container').innerHTML = `<div class='space-y-2.5'><p class='text-[10px] text-gray-400 font-bold uppercase'>Real-Time Firestore Users:</p>${usersHTML}</div>`;
                 }
             });
-            document.getElementById('stat-online-users').innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> ${Math.max(onlineCount, 1)}`;
+
+            // Listen to Deposits
+            if(adminTab === 'deposit') {
+                db.collection("deposits").where("status", "==", "Pending").onSnapshot((snapshot) => {
+                    let container = document.getElementById('admin-requests-container');
+                    container.innerHTML = '';
+                    if(snapshot.empty) {
+                        container.innerHTML = `<div class='cyber-card p-6 text-center text-gray-500 text-xs rounded-2xl'>No pending deposit requests.</div>`;
+                        return;
+                    }
+                    snapshot.forEach((doc) => {
+                        let d = doc.data();
+                        let imgTag = d.proofImg ? `<div class="mt-2"><img src="${d.proofImg}" alt="Proof" onclick="openImageZoom('${d.proofImg}')" class="w-32 h-32 object-cover rounded-xl border border-white/20 mx-auto cursor-pointer shadow-lg"></div>` : '';
+                        container.innerHTML += `
+                            <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2 text-xs'>
+                                <div class='flex justify-between font-black'><span class='text-cyan-400 text-sm'>${d.username}</span><span class='text-emerald-400 text-sm'>+${d.diamonds} 💎 (₹${d.amount})</span></div>
+                                ${imgTag}
+                                <div class="grid grid-cols-2 gap-2 mt-3">
+                                    <button onclick="approveDeposit('${doc.id}', ${d.userId}, ${d.diamonds})" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
+                                    <button onclick="rejectDeposit('${doc.id}')" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
+                                </div>
+                            </div>`;
+                    });
+                });
+            }
+
+            // Listen to Withdrawals
+            if(adminTab === 'withdraw') {
+                db.collection("withdrawals").where("status", "==", "Pending").onSnapshot((snapshot) => {
+                    let container = document.getElementById('admin-requests-container');
+                    container.innerHTML = '';
+                    if(snapshot.empty) {
+                        container.innerHTML = `<div class='cyber-card p-6 text-center text-gray-500 text-xs rounded-2xl'>No pending payout requests.</div>`;
+                        return;
+                    }
+                    snapshot.forEach((doc) => {
+                        let r = doc.data();
+                        let redeemInputHTML = (r.method.includes('Gift Card')) ? `<input type='text' id='redeem-code-${doc.id}' placeholder='Enter Redeem Code' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-xl text-sky-400 font-bold uppercase mt-2'>` : '';
+                        container.innerHTML += `
+                            <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2 text-xs'>
+                                <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-amber-400 text-sm'>${r.amount} Coins (₹${r.rupees})</span></div>
+                                <p class='text-gray-300 font-bold'>Method: <span class="text-white">${r.method}</span></p>
+                                ${r.details ? `<p class='text-[10px] text-gray-400'>${r.details}</p>` : ''}
+                                ${redeemInputHTML}
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <button onclick="approveWithdraw('${doc.id}', '${r.method}')" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
+                                    <button onclick="rejectWithdraw('${doc.id}', ${r.userId}, ${r.amount})" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
+                                </div>
+                            </div>`;
+                    });
+                });
+            }
         }
 
         function switchTab(tab) {
@@ -672,20 +729,6 @@
             document.getElementById('tab-' + tab).classList.remove('hidden');
             document.getElementById('nav-' + tab).className = "flex flex-col items-center gap-1 text-sky-400 transition py-1 px-4 rounded-2xl bg-sky-500/10 cursor-pointer";
             registerUserActivity();
-        }
-
-        if(!localStorage.getItem('zylobet_coin_history_' + userId)) {
-            localStorage.setItem('zylobet_coin_history_' + userId, JSON.stringify([
-                { title: "Welcome Bonus", amount: "+100 Coins", type: "earn", time: Date.now() - 3600000, status: "Success" }
-            ]));
-        }
-        if(!localStorage.getItem('zylobet_withdraw_requests')) {
-            localStorage.setItem('zylobet_withdraw_requests', JSON.stringify([]));
-        }
-        if(!localStorage.getItem('zylobet_gem_history_' + userId)) {
-            localStorage.setItem('zylobet_gem_history_' + userId, JSON.stringify([
-                { title: "Welcome Diamond", amount: "+1 Diamond", type: "earn", time: Date.now() - 3600000, status: "Success" }
-            ]));
         }
 
         function formatTimeAgo(timestamp) {
@@ -702,29 +745,26 @@
         function openDepositStatusModal() {
             document.getElementById('modal').classList.remove('hidden');
             document.getElementById('modal-title').innerText = "RECENT DEPOSIT STATUS";
-            let deposits = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
-            let userDeps = deposits.filter(d => d.userId === userId);
-
-            if(userDeps.length === 0) {
-                document.getElementById('modal-content').innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No deposit requests found.</div>`;
-                return;
-            }
-
-            let html = "<div class='space-y-3'>";
-            userDeps.reverse().forEach(d => {
-                let statusColor = d.status === 'Success' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' : (d.status === 'Rejected' ? 'text-rose-400 bg-rose-500/10 border-rose-500/30' : 'text-amber-400 bg-amber-500/10 border-amber-500/30');
-                html += `
-                    <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2'>
-                        <div class='flex justify-between items-center'>
-                            <span class='font-black text-cyan-400 text-sm flex items-center gap-1.5'>
-                                <span class="ff-diamond" style="width:20px;height:20px;font-size:8px;"><i class="fa-solid fa-gem"></i></span> +${d.diamonds} Diamonds (₹${d.amount})
-                            </span>
-                            <span class='px-2.5 py-1 rounded-xl font-black text-[10px] border ${statusColor}'>${d.status}</span>
-                        </div>
-                        <p class='text-[10px] text-gray-400'>Requested: ${formatTimeAgo(d.time)}</p>
-                    </div>`;
+            db.collection("deposits").where("userId", "==", userId).get().then((snapshot) => {
+                if(snapshot.empty) {
+                    document.getElementById('modal-content').innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No deposit requests found.</div>`;
+                    return;
+                }
+                let html = "<div class='space-y-3'>";
+                snapshot.forEach((doc) => {
+                    let d = doc.data();
+                    let statusColor = d.status === 'Success' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' : (d.status === 'Rejected' ? 'text-rose-400 bg-rose-500/10 border-rose-500/30' : 'text-amber-400 bg-amber-500/10 border-amber-500/30');
+                    html += `
+                        <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2'>
+                            <div class='flex justify-between items-center'>
+                                <span class='font-black text-cyan-400 text-sm'>+${d.diamonds} Diamonds (₹${d.amount})</span>
+                                <span class='px-2.5 py-1 rounded-xl font-black text-[10px] border ${statusColor}'>${d.status}</span>
+                            </div>
+                            <p class='text-[10px] text-gray-400'>Requested: ${formatTimeAgo(d.time)}</p>
+                        </div>`;
+                });
+                document.getElementById('modal-content').innerHTML = html + "</div>";
             });
-            document.getElementById('modal-content').innerHTML = html + "</div>";
         }
 
         let selectedWCoins = 0;
@@ -751,52 +791,42 @@
             const statusMsg = document.getElementById('ref-status-msg');
             const enteredCode = inputField.value.trim().toUpperCase();
 
-            if(localStorage.getItem('zylobet_ref_used_' + userId) === 'true') {
-                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ You have already redeemed a referral code!";
-                return;
-            }
-
             if(!enteredCode || enteredCode === myReferralCode) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ You cannot use your own referral code!";
+                statusMsg.innerText = "❌ Invalid or own code!";
                 return;
             }
 
-            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
-            let referrerKey = null;
-            
-            Object.keys(allUsers).forEach(k => {
-                if ("ZYL" + k.slice(-4) === enteredCode) {
-                    referrerKey = k;
+            db.collection("users").get().then((snapshot) => {
+                let foundRefId = null;
+                snapshot.forEach((doc) => {
+                    if ("ZYL" + doc.id.slice(-4) === enteredCode) {
+                        foundRefId = doc.id;
+                    }
+                });
+
+                if(!foundRefId) {
+                    statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
+                    statusMsg.innerText = "❌ Referral code not found!";
+                    return;
                 }
+
+                userCoins += 300;
+                saveUserBalances();
+
+                // Reward Referrer
+                db.collection("users").doc(foundRefId).get().then((refDoc) => {
+                    if(refDoc.exists) {
+                        let refData = refDoc.data();
+                        let newRefCoins = (refData.coins || 100) + 300;
+                        db.collection("users").doc(foundRefId).update({ coins: newRefCoins });
+                    }
+                });
+
+                statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
+                statusMsg.innerText = "🎉 Success! +300 Coins added!";
+                inputField.value = "";
             });
-
-            if (!referrerKey) {
-                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ Referral code not found or inactive!";
-                return;
-            }
-
-            userCoins += 300;
-            saveUserBalances();
-            localStorage.setItem('zylobet_ref_used_' + userId, 'true');
-
-            let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + userId)) || [];
-            coinHist.unshift({ title: "Referral Bonus (Redeemed)", amount: "+300 Coins", type: "earn", time: Date.now(), status: "Success" });
-            localStorage.setItem('zylobet_coin_history_' + userId, JSON.stringify(coinHist));
-
-            let referrerCoins = parseInt(allUsers[referrerKey].coins || 100) + 300;
-            allUsers[referrerKey].coins = referrerCoins;
-            localStorage.setItem('zylobet_registered_users', JSON.stringify(allUsers));
-
-            let refCoinHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + referrerKey)) || [];
-            refCoinHist.unshift({ title: `Referral Reward (${username} joined)`, amount: "+300 Coins", type: "earn", time: Date.now(), status: "Success" });
-            localStorage.setItem('zylobet_coin_history_' + referrerKey, JSON.stringify(refCoinHist));
-
-            statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
-            statusMsg.innerText = "🎉 Success! +300 Coins added to both accounts!";
-            inputField.value = "";
         }
 
         function applyPromoCode() {
@@ -804,55 +834,29 @@
             const statusMsg = document.getElementById('promo-status-msg');
             const promoVal = promoInput.value.trim().toUpperCase();
             
-            if(!promoVal) { 
-                statusMsg.innerText = "❌ Enter a code."; 
-                setTimeout(() => { if(statusMsg) statusMsg.innerText = ""; }, 4000);
-                return; 
-            }
+            if(!promoVal) { statusMsg.innerText = "❌ Enter code."; return; }
 
-            let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
-            let foundPromo = promos.find(p => p.code === promoVal);
+            db.collection("promos").doc(promoVal).get().then((doc) => {
+                if(!doc.exists || !doc.data().active || Date.now() > doc.data().expiryTime) {
+                    statusMsg.className = "text-[11px] h-6 font-semibold text-rose-400";
+                    statusMsg.innerText = "❌ Invalid or expired promo code!";
+                    return;
+                }
 
-            if(!foundPromo || !foundPromo.active || Date.now() > foundPromo.expiryTime) {
-                statusMsg.className = "text-[11px] h-6 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ Invalid or expired promo code!";
-                setTimeout(() => { if(statusMsg) statusMsg.innerText = ""; }, 4000);
-                return;
-            }
-
-            let userRedeemed = JSON.parse(localStorage.getItem('zylobet_user_redeemed_' + userId)) || [];
-            if(userRedeemed.includes(promoVal)) {
-                statusMsg.className = "text-[11px] h-6 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ You already redeemed this code!";
-                setTimeout(() => { if(statusMsg) statusMsg.innerText = ""; }, 4000);
-                return;
-            }
-
-            if(foundPromo.rewardType === 'coins') {
-                userCoins += foundPromo.rewardAmount;
+                let p = doc.data();
+                if(p.rewardType === 'coins') {
+                    userCoins += p.rewardAmount;
+                } else {
+                    userGems += p.rewardAmount;
+                }
                 saveUserBalances();
 
-                let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + userId)) || [];
-                coinHist.unshift({ title: `Promo Code (${promoVal})`, amount: `+${foundPromo.rewardAmount} Coins`, type: "earn", time: Date.now(), status: "Success" });
-                localStorage.setItem('zylobet_coin_history_' + userId, JSON.stringify(coinHist));
-            } else {
-                userGems += foundPromo.rewardAmount;
-                saveUserBalances();
+                db.collection("promos").doc(promoVal).update({ usedCount: firebase.firestore.FieldValue.increment(1) });
 
-                let gemHist = JSON.parse(localStorage.getItem('zylobet_gem_history_' + userId)) || [];
-                gemHist.unshift({ title: `Promo Code (${promoVal})`, amount: `+${foundPromo.rewardAmount} Diamonds`, type: "earn", time: Date.now(), status: "Success" });
-                localStorage.setItem('zylobet_gem_history_' + userId, JSON.stringify(gemHist));
-            }
-
-            foundPromo.usedCount += 1;
-            userRedeemed.push(promoVal);
-            localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
-            localStorage.setItem('zylobet_user_redeemed_' + userId, JSON.stringify(userRedeemed));
-
-            statusMsg.className = "text-[11px] h-6 font-semibold text-emerald-400";
-            statusMsg.innerText = `🎉 Success! +${foundPromo.rewardAmount} Added.`;
-            promoInput.value = '';
-            setTimeout(() => { if(statusMsg) statusMsg.innerText = ""; }, 4000);
+                statusMsg.className = "text-[11px] h-6 font-semibold text-emerald-400";
+                statusMsg.innerText = `🎉 Success! +${p.rewardAmount} Added.`;
+                promoInput.value = '';
+            });
         }
 
         function openConvertModal() {
@@ -860,13 +864,13 @@
             document.getElementById('modal-title').innerText = "CONVERT COINS TO DIAMONDS";
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs'>
-                    <div class='bg-amber-500/10 border border-amber-500/30 p-3 rounded-2xl text-amber-300 font-bold text-center flex items-center justify-center gap-2'>
-                        <span class="ff-gold-coin" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-coins"></i></span> Select conversion package:
+                    <div class='bg-amber-500/10 border border-amber-500/30 p-3 rounded-2xl text-amber-300 font-bold text-center'>
+                        Select conversion package:
                     </div>
                     <div class='grid grid-cols-3 gap-2.5'>
-                        <div onclick="selectModalConv(120, 1)" id='m-conv-1' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>120 <span class="ff-gold-coin" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-coins"></i></span> <br><span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 1 <span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span></span></div>
-                        <div onclick="selectModalConv(510, 5)" id='m-conv-2' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>510 <span class="ff-gold-coin" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-coins"></i></span> <br><span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 5 <span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span></span></div>
-                        <div onclick="selectModalConv(1000, 10)" id='m-conv-3' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>1k <span class="ff-gold-coin" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-coins"></i></span> <br><span class="text-cyan-400 flex items-center justify-center gap-1 mt-1">➔ 10 <span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span></span></div>
+                        <div onclick="selectModalConv(120, 1)" id='m-conv-1' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>120 Coins<br><span class="text-cyan-400">➔ 1 💎</span></div>
+                        <div onclick="selectModalConv(510, 5)" id='m-conv-2' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>510 Coins<br><span class="text-cyan-400">➔ 5 💎</span></div>
+                        <div onclick="selectModalConv(1000, 10)" id='m-conv-3' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>1k Coins<br><span class="text-cyan-400">➔ 10 💎</span></div>
                     </div>
                     <button onclick="executeModalConversion()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-2xl font-black text-xs text-black cursor-pointer shadow-lg">CONVERT NOW</button>
                 </div>`;
@@ -880,234 +884,84 @@
         }
 
         function executeModalConversion() {
-            if (!modalConvCoins || userCoins < modalConvCoins) { showCustomAlert("❌ Insufficient coins or none selected!"); return; }
+            if (!modalConvCoins || userCoins < modalConvCoins) { showCustomAlert("❌ Insufficient coins!"); return; }
             userCoins -= modalConvCoins; userGems += modalConvGems;
             saveUserBalances();
-
-            let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + userId)) || [];
-            coinHist.unshift({ title: "Exchange to Diamonds", amount: `-${modalConvCoins} Coins`, type: "spend", time: Date.now(), status: "Success" });
-            localStorage.setItem('zylobet_coin_history_' + userId, JSON.stringify(coinHist));
-
-            let gemHist = JSON.parse(localStorage.getItem('zylobet_gem_history_' + userId)) || [];
-            gemHist.unshift({ title: "Converted from Coins", amount: `+${modalConvGems} Diamonds`, type: "earn", time: Date.now(), status: "Success" });
-            localStorage.setItem('zylobet_gem_history_' + userId, JSON.stringify(gemHist));
-
             showCustomAlert(`🎉 Converted successfully!`); closeModal();
         }
 
         function openDepositModal() {
             document.getElementById('modal').classList.remove('hidden');
             document.getElementById('modal-title').innerText = "DEPOSIT DIAMONDS & GET BONUS";
-            
-            let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + userId)) || [];
-
-            let b50HTML = !usedBonuses.includes(50) ? `<div onclick="selectDepositOffer(50)" id="pkg-btn-50" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center flex items-center justify-center gap-1.5'>50 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> (+3 Free)</div>` : '';
-            let b100HTML = !usedBonuses.includes(100) ? `<div onclick="selectDepositOffer(100)" id="pkg-btn-100" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center flex items-center justify-center gap-1.5'>100 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> (+8 Free)</div>` : '';
-            let b200HTML = !usedBonuses.includes(200) ? `<div onclick="selectDepositOffer(200)" id="pkg-btn-200" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center flex items-center justify-center gap-1.5'>200 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> (+18 Free)</div>` : '';
-            let b500HTML = !usedBonuses.includes(500) ? `<div onclick="selectDepositOffer(500)" id="pkg-btn-500" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center flex items-center justify-center gap-1.5'>500 <span class="ff-diamond" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> (+50 Free)</div>` : '';
-
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs'>
-                    <div class='bg-cyan-500/10 border border-cyan-500/30 p-3 rounded-2xl text-cyan-300 font-bold text-center flex items-center justify-center gap-2'>
-                        <span class="ff-diamond" style="width:20px;height:20px;font-size:9px;"><i class="fa-solid fa-gem"></i></span> 1 Diamond = ₹1 Rs
+                    <div class='bg-cyan-500/10 border border-cyan-500/30 p-3 rounded-2xl text-cyan-300 font-bold text-center'>
+                        1 Diamond = ₹1 Rs
                     </div>
-                    <div class='text-center text-[10px] text-amber-400 font-bold bg-amber-500/10 py-1.5 rounded-xl border border-amber-500/20'>
-                        ⚠️ Note: Free bonus is valid for ONE TIME use per package only!
-                    </div>
-                    <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300' id="deposit-packages-grid">
-                        ${b50HTML} ${b100HTML} ${b200HTML} ${b500HTML}
+                    <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300'>
+                        <div onclick="selectDepositOffer(50)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center'>50 💎 (+3 Free)</div>
+                        <div onclick="selectDepositOffer(100)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center'>100 💎 (+8 Free)</div>
+                        <div onclick="selectDepositOffer(200)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center'>200 💎 (+18 Free)</div>
+                        <div onclick="selectDepositOffer(500)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center'>500 💎 (+50 Free)</div>
                     </div>
                     <div>
                         <label class='text-gray-300 font-bold block mb-1.5 uppercase text-[11px]'>Enter Diamond Amount</label>
-                        <input type='number' id='deposit-amount-input' min='1' max='1000' placeholder='e.g. 50' oninput='updateBonusDisplay(this.value)' class='w-full bg-black/50 border border-white/10 p-3.5 rounded-2xl font-black text-cyan-400'>
+                        <input type='number' id='deposit-amount-input' min='1' max='1000' placeholder='e.g. 50' class='w-full bg-black/50 border border-white/10 p-3.5 rounded-2xl font-black text-cyan-400'>
                     </div>
-                    <div id='bonus-calc-box' class='hidden text-[11px] font-bold text-emerald-400 bg-emerald-500/10 p-2.5 rounded-xl text-center'></div>
                     <button onclick='proceedToPayment()' class='w-full py-4 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>NEXT</button>
                 </div>`;
         }
 
         function selectDepositOffer(amount) {
             document.getElementById('deposit-amount-input').value = amount;
-            updateBonusDisplay(amount);
-        }
-
-        function updateBonusDisplay(val) {
-            let amt = parseInt(val) || 0;
-            let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + userId)) || [];
-            
-            let validPackages = [50, 100, 200, 500];
-            let baseBonus = 0;
-            if(validPackages.includes(amt) && !usedBonuses.includes(amt)) {
-                baseBonus = amt >= 500 ? 50 : (amt >= 200 ? 18 : (amt >= 100 ? 8 : (amt >= 50 ? 3 : 0)));
-            }
-            
-            const box = document.getElementById('bonus-calc-box');
-            if(baseBonus > 0) {
-                box.classList.remove('hidden');
-                box.innerHTML = `🎁 Bonus: +${baseBonus} Free Diamonds! (One-time offer) Total: <b>${amt + baseBonus} 💎</b>`;
-            } else {
-                box.classList.add('hidden');
-            }
         }
 
         function proceedToPayment() {
             const amt = parseInt(document.getElementById('deposit-amount-input').value);
             if(isNaN(amt) || amt < 1 || amt > 1000) { showCustomAlert("❌ Enter valid amount (1 - 1000)"); return; }
             
-            let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + userId)) || [];
-            let validPackages = [50, 100, 200, 500];
-            let baseBonus = (validPackages.includes(amt) && !usedBonuses.includes(amt)) ? (amt >= 500 ? 50 : (amt >= 200 ? 18 : (amt >= 100 ? 8 : (amt >= 50 ? 3 : 0)))) : 0;
+            let baseBonus = amt >= 500 ? 50 : (amt >= 200 ? 18 : (amt >= 100 ? 8 : (amt >= 50 ? 3 : 0)));
             let totalDiamonds = amt + baseBonus;
-
             const upiString = `upi://pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}.00&tn=ZyloBet%20Deposit&cu=INR`;
 
             document.getElementById('modal-title').innerText = `PAY ₹${amt} FOR ${totalDiamonds} DIAMONDS`;
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-3 text-xs text-center'>
-                    <div class='cyber-card border border-white/10 p-3 rounded-2xl text-left'>
-                        <p class='text-gray-400 text-[10px] uppercase font-bold'>Account Name</p>
-                        <p class='text-white font-black text-sm'>Prashant Raj</p>
-                    </div>
                     <div class='flex justify-center my-1'>
                         <div class='bg-white p-2.5 rounded-2xl shadow-xl inline-block'>
                             <img src='https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(upiString)}' alt='QR' class='w-32 h-32 object-contain rounded-xl'>
                         </div>
                     </div>
-                    <p class='text-gray-300 text-[11px] font-semibold'>Scan this QR using PhonePe, GPay or Paytm (₹${amt} amount fixed)</p>
-                    
-                    <p class='text-gray-400 text-[11px] text-left font-semibold mt-1'>Upload Payment Screenshot / Proof:</p>
-                    <input type='file' id='deposit-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-sky-500 file:text-white hover:file:bg-sky-600 cursor-pointer'>
-                    
-                    <div class='bg-amber-500/10 border border-amber-500/20 p-3 rounded-2xl text-amber-300 text-[11px] font-bold text-left space-y-1.5'>
-                        <p>⚠️ <b>Warning:</b> Submitting fake proofs will result in permanent account ban.</p>
-                        <p>ℹ️ <b>Note:</b> Deposit processing takes within 24 hours. If deposit money is not received, contact on Telegram: <a href="https://t.me/Raj_Prashant" target="_blank" class="text-sky-400 underline font-mono">@Raj_Prashant</a></p>
-                    </div>
-
+                    <p class='text-gray-300 text-[11px] font-semibold'>Scan this QR using PhonePe, GPay or Paytm</p>
+                    <input type='file' id='deposit-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300 cursor-pointer'>
                     <button onclick="submitManualDeposit(${totalDiamonds}, ${amt})" class='w-full py-3.5 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>SUBMIT PROOF FOR APPROVAL</button>
                 </div>`;
         }
 
         function submitManualDeposit(totalDias, paidRs) {
             const fileInput = document.getElementById('deposit-proof-file');
+            if (!fileInput.files || fileInput.files.length === 0) { showCustomAlert("❌ Upload payment screenshot!"); return; }
 
-            if (!fileInput.files || fileInput.files.length === 0) {
-                showCustomAlert("❌ Please upload your payment screenshot/proof!");
-                return;
-            }
-
-            const file = fileInput.files[0];
             const reader = new FileReader();
-            
             reader.onload = function(e) {
-                const base64Image = e.target.result;
-                let deposits = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
-
-                let newDep = {
-                    id: Date.now(),
+                db.collection("deposits").add({
                     username: username,
                     userId: userId,
                     amount: paidRs,
                     diamonds: totalDias,
-                    proofImg: base64Image,
+                    proofImg: e.target.result,
                     status: "Pending",
                     time: Date.now()
-                };
-
-                deposits.push(newDep);
-                localStorage.setItem('zylobet_deposit_requests', JSON.stringify(deposits));
-                registerUserActivity();
-
-                let validPackages = [50, 100, 200, 500];
-                let baseBonus = (validPackages.includes(paidRs)) ? (paidRs >= 500 ? 50 : (paidRs >= 200 ? 18 : (paidRs >= 100 ? 8 : (paidRs >= 50 ? 3 : 0)))) : 0;
-                
-                if(baseBonus > 0) {
-                    let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + userId)) || [];
-                    if(!usedBonuses.includes(paidRs)) {
-                        usedBonuses.push(paidRs);
-                        localStorage.setItem('zylobet_used_bonuses_' + userId, JSON.stringify(usedBonuses));
-                    }
-                }
-
-                showCustomAlert("🎉 Payment screenshot submitted successfully! Admin will review and approve your diamonds within 24 hours.");
-                closeModal();
+                }).then(() => {
+                    showCustomAlert("🎉 Payment screenshot submitted to admin cloud!");
+                    closeModal();
+                });
             };
-
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(fileInput.files[0]);
         }
 
         function closeModal() { document.getElementById('modal').classList.add('hidden'); }
         function copyRef() { navigator.clipboard.writeText(document.getElementById('ref-code').innerText); showCustomAlert("Referral Code Copied!"); }
-
-        function copyRedeemCode(code) {
-            navigator.clipboard.writeText(code);
-            showCustomAlert("📋 Redeem Code Copied: " + code);
-        }
-
-        function openHistory(type) {
-            document.getElementById('modal').classList.remove('hidden');
-            const title = document.getElementById('modal-title');
-            const content = document.getElementById('modal-content');
-            if(type === 'gems') {
-                title.innerText = "DIAMONDS HISTORY";
-                let history = JSON.parse(localStorage.getItem('zylobet_gem_history_' + userId)) || [];
-                if(history.length === 0) { content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No diamond history yet.</div>`; return; }
-                let html = "<div class='space-y-3'>";
-                history.forEach(item => {
-                    let amountColor = item.amount.startsWith('+') ? 'text-emerald-400' : 'text-rose-400';
-                    html += `<div class='cyber-card p-4 rounded-2xl border border-white/5 flex justify-between items-center'><div><p class='font-black ${amountColor} text-sm flex items-center gap-1.5'><span class="ff-diamond" style="width:22px;height:22px;font-size:8px;"><i class="fa-solid fa-gem"></i></span> ${item.amount}</p><p class='text-[10px] text-gray-300 font-bold'>${item.title}</p></div><span class='text-[10px] text-gray-400 font-bold'>${formatTimeAgo(item.time)}</span></div>`;
-                });
-                content.innerHTML = html + "</div>";
-            } else if(type === 'coins') {
-                title.innerText = "COINS HISTORY";
-                let history = JSON.parse(localStorage.getItem('zylobet_coin_history_' + userId)) || [];
-                if(history.length === 0) { content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No coin history yet.</div>`; return; }
-                let html = "<div class='space-y-3'>";
-                history.forEach(item => {
-                    let amountColor = item.amount.startsWith('+') ? 'text-emerald-400' : 'text-rose-400';
-                    html += `<div class='cyber-card p-4 rounded-2xl border border-white/5 flex justify-between items-center'><div><p class='font-black ${amountColor} text-sm flex items-center gap-1.5'><span class="ff-gold-coin" style="width:22px;height:22px;font-size:9px;"><i class="fa-solid fa-coins"></i></span> ${item.amount}</p><p class='text-[10px] text-gray-300 font-bold'>${item.title}</p></div><span class='text-[10px] text-gray-400 font-bold'>${formatTimeAgo(item.time)}</span></div>`;
-                });
-                content.innerHTML = html + "</div>";
-            } else if(type === 'withdrawals') {
-                title.innerText = "PAYOUT HISTORY";
-                let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
-                let userReqs = reqs.filter(r => r.userId === userId || r.username === username);
-                
-                if(userReqs.length === 0) { 
-                    content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No payout history yet.</div>`; 
-                    return; 
-                }
-
-                let html = "<div class='space-y-3'>";
-                userReqs.slice().reverse().forEach(item => {
-                    let redeemBox = item.redeemCode ? `<div class='flex items-center gap-2 mt-1'><span class='text-xs text-sky-300 font-mono'>🔑 Redeem Code: <b>${item.redeemCode}</b></span><button onclick="copyRedeemCode('${item.redeemCode}')" class='bg-sky-500/20 hover:bg-sky-500/40 text-sky-300 px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer'><i class="fa-solid fa-copy"></i> Copy</button></div>` : '';
-                    let commentBox = item.adminComment ? `<p class='text-xs text-rose-400 mt-1'>💬 Reason: <b>${item.adminComment}</b></p>` : '';
-                    
-                    let statusClass = 'text-amber-300 font-bold';
-                    let statusText = item.status;
-                    if(item.status.includes('Success') || item.status.includes('Approved')) {
-                        statusClass = 'text-emerald-400 font-bold';
-                        statusText = 'Success';
-                    } else if(item.status.includes('Rejected')) {
-                        statusClass = 'text-rose-400 font-bold';
-                        statusText = 'Rejected';
-                    }
-
-                    html += `<div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-1'>
-                        <div class='flex justify-between items-center'>
-                            <span class='text-amber-400 font-black flex items-center gap-1.5'>
-                                <span class="ff-gold-coin" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> ${item.amount} Coins (₹${item.rupees})
-                            </span>
-                            <span class='text-xs ${statusClass}'>${statusText}</span>
-                        </div>
-                        <p class='text-[11px] text-gray-300'>Method: ${item.method}</p>
-                        ${item.details ? `<p class='text-[10px] text-gray-400'>${item.details}</p>` : ''}
-                        ${redeemBox}
-                        ${commentBox}
-                    </div>`;
-                });
-                content.innerHTML = html + "</div>";
-            }
-        }
 
         function submitWithdrawRequest(method) {
             if(!selectedWCoins || !selectedWAmount) { showCustomAlert("❌ Select package first!"); return; }
@@ -1123,17 +977,19 @@
             userCoins -= selectedWCoins;
             saveUserBalances();
 
-            let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
-            let newReq = { id: Date.now(), username: username, userId: userId, method: method, amount: selectedWCoins, rupees: selectedWAmount, details: extraDetails, status: "Pending" };
-            reqs.push(newReq);
-            localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
-
-            let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + userId)) || [];
-            coinHist.unshift({ title: `Withdrawal Request (${method})`, amount: `-${selectedWCoins} Coins`, type: "spend", time: Date.now(), status: "Pending" });
-            localStorage.setItem('zylobet_coin_history_' + userId, JSON.stringify(coinHist));
-
-            showCustomAlert(`🎉 ${method} Withdrawal Request Sent Successfully!`);
-            if(method === 'UPI') document.getElementById('w-upi-id').value = '';
+            db.collection("withdrawals").add({
+                username: username,
+                userId: userId,
+                method: method,
+                amount: selectedWCoins,
+                rupees: selectedWAmount,
+                details: extraDetails,
+                status: "Pending",
+                time: Date.now()
+            }).then(() => {
+                showCustomAlert(`🎉 ${method} Payout Request Sent Successfully!`);
+                if(method === 'UPI') document.getElementById('w-upi-id').value = '';
+            });
         }
 
         function switchAdminTab(tab) {
@@ -1146,385 +1002,51 @@
             const activeBtn = document.getElementById('adm-tab-' + (tab === 'deposit' ? 'dep' : (tab === 'withdraw' ? 'wit' : (tab === 'users' ? 'usr' : 'pro'))));
             if(activeBtn) activeBtn.className = "py-2.5 bg-gradient-to-r from-sky-600 to-blue-600 rounded-xl font-black text-[10px] shadow transition cursor-pointer";
 
-            if(tab === 'deposit') loadAdminDeposits();
-            else if(tab === 'withdraw') loadAdminRequests();
-            else if(tab === 'users') loadAdminUsersActivity();
-            else loadAdminPromoManager();
+            loadAdminRealtimeData();
         }
 
-        function loadAdminActivePanel() {
-            if(adminTab === 'deposit') loadAdminDeposits();
-            else if(adminTab === 'withdraw') loadAdminRequests();
-            else if(adminTab === 'users') loadAdminUsersActivity();
-            else loadAdminPromoManager();
-        }
+        function loadAdminActivePanel() { loadAdminRealtimeData(); }
 
-        function loadAdminUsersActivity() {
-            const container = document.getElementById('admin-requests-container');
-            container.innerHTML = '';
-            
-            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
-            let userKeys = Object.keys(allUsers);
-
-            if(userKeys.length === 0) {
-                container.innerHTML = `<div class='cyber-card p-6 text-center text-gray-500 text-xs rounded-2xl'>No user activity recorded yet.</div>`;
-                return;
-            }
-
-            let html = "<div class='space-y-2.5'><p class='text-[10px] text-gray-400 font-bold uppercase'>Registered Users & Cloud Data:</p>";
-            userKeys.forEach(k => {
-                let u = allUsers[k];
-                html += `
-                    <div class='cyber-card p-3.5 rounded-2xl border border-white/10 space-y-2 text-xs'>
-                        <div class='flex justify-between items-center'>
-                            <div>
-                                <p class='font-black text-sky-400'>${u.username} <span class='text-[10px] text-gray-400 font-normal'>(ID: ${u.userId})</span></p>
-                                <p class='text-[10px] text-amber-300 mt-0.5'>Coins: <b>${u.coins}</b> | Diamonds: <b>${u.gems}</b></p>
-                            </div>
-                            <div class='text-right'>
-                                <span class='text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20'>Cloud Active</span>
-                                <p class='text-[9px] text-gray-400 mt-1'>${formatTimeAgo(u.lastActive)}</p>
-                            </div>
-                        </div>
-                        <button onclick="openAdminUserHistory('${u.userId}')" class='w-full py-2 bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/30 rounded-xl font-bold text-[11px] transition cursor-pointer flex items-center justify-center gap-1.5'>
-                            <i class="fa-solid fa-clock-rotate-left"></i> View Full User History
-                        </button>
-                    </div>`;
-            });
-            container.innerHTML = html + "</div>";
-        }
-
-        function openAdminUserHistory(uId) {
-            let allUsers = JSON.parse(localStorage.getItem('zylobet_registered_users')) || {};
-            let u = allUsers[uId] || { username: "@User_" + uId };
-
-            document.getElementById('modal').classList.remove('hidden');
-            document.getElementById('modal-title').innerText = `HISTORY: ${u.username || uId}`;
-
-            let cHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + uId)) || [];
-            let gHist = JSON.parse(localStorage.getItem('zylobet_gem_history_' + uId)) || [];
-            let wReqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
-            let dReqs = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
-
-            let userW = wReqs.filter(w => w.userId === uId || w.username === u.username);
-            let userD = dReqs.filter(d => d.userId === uId || d.username === u.username);
-
-            let cHistHTML = "<p class='text-xs font-bold text-amber-400 mt-1'>🪙 Coin Transactions:</p>";
-            if(cHist.length === 0) cHistHTML += "<p class='text-[10px] text-gray-500'>No coin history.</p>";
-            else {
-                cHist.slice(0, 5).forEach(ch => {
-                    cHistHTML += `<div class='text-[11px] text-gray-300 bg-black/40 p-2 rounded-xl border border-white/5 flex justify-between mt-1'><span>${ch.title}</span> <b class='text-emerald-400'>${ch.amount}</b></div>`;
-                });
-            }
-
-            let gHistHTML = "<p class='text-xs font-bold text-cyan-400 mt-3'>💎 Diamond Transactions:</p>";
-            if(gHist.length === 0) gHistHTML += "<p class='text-[10px] text-gray-500'>No diamond history.</p>";
-            else {
-                gHist.slice(0, 5).forEach(gh => {
-                    gHistHTML += `<div class='text-[11px] text-gray-300 bg-black/40 p-2 rounded-xl border border-white/5 flex justify-between mt-1'><span>${gh.title}</span> <b class='text-cyan-400'>${gh.amount}</b></div>`;
-                });
-            }
-
-            let dHistHTML = "<p class='text-xs font-bold text-sky-400 mt-3'>📥 Deposit History:</p>";
-            if(userD.length === 0) dHistHTML += "<p class='text-[10px] text-gray-500'>No deposit history.</p>";
-            else {
-                userD.forEach(dh => {
-                    dHistHTML += `<div class='text-[11px] text-gray-300 bg-black/40 p-2 rounded-xl border border-white/5 flex justify-between mt-1'><span>₹${dh.amount} (${dh.diamonds} 💎)</span> <b class='text-sky-300'>${dh.status}</b></div>`;
-                });
-            }
-
-            let wHistHTML = "<p class='text-xs font-bold text-emerald-400 mt-3'>💸 Payout History:</p>";
-            if(userW.length === 0) wHistHTML += "<p class='text-[10px] text-gray-500'>No payout history.</p>";
-            else {
-                userW.forEach(wh => {
-                    wHistHTML += `<div class='text-[11px] text-gray-300 bg-black/40 p-2 rounded-xl border border-white/5 flex justify-between mt-1'><span>${wh.method} (₹${wh.rupees})</span> <b class='text-emerald-300'>${wh.status}</b></div>`;
-                });
-            }
-
-            document.getElementById('modal-content').innerHTML = `<div class='space-y-1'>${cHistHTML} ${gHistHTML} ${dHistHTML} ${wHistHTML}</div>`;
-        }
-
-        function loadAdminDeposits() {
-            const container = document.getElementById('admin-requests-container');
-            container.innerHTML = '';
-            let deposits = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
-            let pending = deposits.filter(d => d.status === 'Pending');
-            
-            if(pending.length === 0) {
-                container.innerHTML = `<div class='cyber-card p-6 text-center text-gray-500 text-xs rounded-2xl'>No pending deposit requests.</div>`;
-                return;
-            }
-
-            pending.forEach(d => {
-                let imgTag = d.proofImg ? `<div class="mt-2"><img src="${d.proofImg}" alt="Payment Proof" onclick="openImageZoom('${d.proofImg}')" class="w-32 h-32 object-cover rounded-xl border border-white/20 mx-auto cursor-pointer hover:opacity-90 hover:scale-[1.02] transition shadow-lg" title="Click to Zoom"></div>` : '';
-
-                container.innerHTML += `
-                    <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2 text-xs'>
-                        <div class='flex justify-between font-black'><span class='text-cyan-400 text-sm'>${d.username}</span><span class='text-emerald-400 text-sm'>+${d.diamonds} 💎 (₹${d.amount})</span></div>
-                        ${imgTag}
-                        <div class="grid grid-cols-2 gap-2 mt-3">
-                            <button onclick="approveDeposit(${d.id})" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
-                            <button onclick="rejectDeposit(${d.id})" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
-                        </div>
-                    </div>`;
-            });
-        }
-
-        function approveDeposit(id) {
-            let deposits = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
-            let dep = deposits.find(x => x.id === id);
-            
-            if(dep && dep.status === "Pending") {
-                dep.status = "Success";
-                localStorage.setItem('zylobet_deposit_requests', JSON.stringify(deposits));
-
-                let targetUserId = dep.userId || userId;
-                let targetGems = parseInt(localStorage.getItem('zylobet_gems_' + targetUserId)) || 1;
-                targetGems += dep.diamonds;
-                localStorage.setItem('zylobet_gems_' + targetUserId, targetGems);
-                if(targetUserId === userId) {
-                    userGems = targetGems;
-                    updateUIBalances();
-                }
-
-                let validPackages = [50, 100, 200, 500];
-                let baseBonus = (validPackages.includes(dep.amount)) ? (dep.amount >= 500 ? 50 : (dep.amount >= 200 ? 18 : (dep.amount >= 100 ? 8 : (dep.amount >= 50 ? 3 : 0)))) : 0;
-                
-                if(baseBonus > 0) {
-                    let usedBonuses = JSON.parse(localStorage.getItem('zylobet_used_bonuses_' + targetUserId)) || [];
-                    if(!usedBonuses.includes(dep.amount)) {
-                        usedBonuses.push(dep.amount);
-                        localStorage.setItem('zylobet_used_bonuses_' + targetUserId, JSON.stringify(usedBonuses));
+        function approveDeposit(docId, tUserId, dias) {
+            db.collection("deposits").doc(docId).update({ status: "Success" }).then(() => {
+                db.collection("users").doc(tUserId.toString()).get().then((doc) => {
+                    if(doc.exists) {
+                        let currentGems = doc.data().gems || 1;
+                        db.collection("users").doc(tUserId.toString()).update({ gems: currentGems + dias });
                     }
-                }
-
-                let gemHist = JSON.parse(localStorage.getItem('zylobet_gem_history_' + targetUserId)) || [];
-                gemHist.unshift({ title: `Deposit Approved (₹${dep.amount})`, amount: `+${dep.diamonds} Diamonds`, type: "earn", time: Date.now(), status: "Success" });
-                localStorage.setItem('zylobet_gem_history_' + targetUserId, JSON.stringify(gemHist));
-
-                showCustomAlert("🎉 Deposit Approved Successfully! Diamonds added to user.");
-                loadAdminDeposits();
-            }
+                });
+                showCustomAlert("✅ Deposit Approved!");
+            });
         }
 
-        function rejectDeposit(id) {
-            let deposits = JSON.parse(localStorage.getItem('zylobet_deposit_requests')) || [];
-            let dep = deposits.find(x => x.id === id);
-            
-            if(dep && dep.status === "Pending") {
-                dep.status = "Rejected";
-                localStorage.setItem('zylobet_deposit_requests', JSON.stringify(deposits));
-
+        function rejectDeposit(docId) {
+            db.collection("deposits").doc(docId).update({ status: "Rejected" }).then(() => {
                 showCustomAlert("❌ Deposit Rejected.");
-                loadAdminDeposits();
-            }
-        }
-
-        function copyUpiIdOnly(upiText) {
-            navigator.clipboard.writeText(upiText);
-            showCustomAlert("📋 UPI ID Copied: " + upiText);
-        }
-
-        function loadAdminRequests() {
-            const container = document.getElementById('admin-requests-container');
-            container.innerHTML = '';
-            let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
-            let pending = reqs.filter(r => r.status === 'Pending');
-            if(pending.length === 0) {
-                container.innerHTML = `<div class='cyber-card p-6 text-center text-gray-500 text-xs rounded-2xl'>No pending payout requests.</div>`;
-                return;
-            }
-            pending.forEach(r => {
-                let redeemInputHTML = (r.method === 'Amazon Gift Card' || r.method === 'Play Store Gift Card') ? 
-                    `<input type='text' id='redeem-code-${r.id}' placeholder='Enter Redeem Code' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-xl text-sky-400 font-bold uppercase mt-2'>` : '';
-
-                let upiDisplayHTML = '';
-                if(r.method === 'UPI' && r.details) {
-                    let match = r.details.match(/\(([^)]+)\)/);
-                    if(match && match[1]) {
-                        let upiOnly = match[1].replace('UPI: ', '').trim();
-                        upiDisplayHTML = `<div class='flex items-center justify-between bg-black/40 p-2 rounded-xl border border-white/5 mt-1'><span class='text-sky-300 font-mono'><b>${upiOnly}</b></span><button onclick="copyUpiIdOnly('${upiOnly}')" class='bg-sky-500/20 hover:bg-sky-500/40 text-sky-300 px-2 py-1 rounded-lg text-[10px] font-bold cursor-pointer'><i class="fa-solid fa-copy"></i> Copy UPI</button></div>`;
-                    }
-                }
-
-                container.innerHTML += `
-                    <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2 text-xs'>
-                        <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-amber-400 text-sm flex items-center gap-1'><span class="ff-gold-coin" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> ${r.amount} (₹${r.rupees})</span></div>
-                        <p class='text-gray-300 font-bold'>Method: <span class="text-white">${r.method}</span></p>
-                        ${upiDisplayHTML}
-                        ${redeemInputHTML}
-                        <input type='text' id='admin-comment-${r.id}' placeholder='Enter comment/reason (optional for approval, required for rejection)' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-xl text-gray-300 font-semibold mt-2'>
-                        <div class="grid grid-cols-2 gap-2 mt-2">
-                            <button onclick="approveWithdraw(${r.id}, '${r.method}')" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
-                            <button onclick="rejectWithdraw(${r.id})" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
-                        </div>
-                    </div>`;
             });
         }
 
-        function approveWithdraw(id, method) {
-            let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
-            let req = reqs.find(x => x.id === id);
+        function approveWithdraw(docId, method) {
             let redeemCode = "";
-            const commentInput = document.getElementById('admin-comment-' + id);
-            let adminComment = commentInput ? commentInput.value.trim() : "";
-
-            if(method === 'Amazon Gift Card' || method === 'Play Store Gift Card') {
-                const codeInput = document.getElementById('redeem-code-' + id);
+            if(method.includes('Gift Card')) {
+                const codeInput = document.getElementById('redeem-code-' + docId);
                 redeemCode = codeInput ? codeInput.value.trim() : "";
-                if(!redeemCode) {
-                    showCustomAlert("❌ Please enter the Redeem Code before approving!");
-                    return;
-                }
+                if(!redeemCode) { showCustomAlert("❌ Enter Redeem Code!"); return; }
             }
-
-            if(req) { 
-                req.status = "Success (Approved)"; 
-                req.redeemCode = redeemCode;
-                req.adminComment = adminComment;
-            }
-            localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
-
-            showCustomAlert("Payout Approved Successfully!");
-            loadAdminRequests();
-        }
-
-        function rejectWithdraw(id) {
-            let reqs = JSON.parse(localStorage.getItem('zylobet_withdraw_requests')) || [];
-            let req = reqs.find(x => x.id === id);
-            const commentInput = document.getElementById('admin-comment-' + id);
-            let adminComment = commentInput ? commentInput.value.trim() : "Rejected by Admin";
-            
-            if(req && req.status === "Pending") {
-                req.status = "Rejected (Refunded)";
-                req.adminComment = adminComment;
-                localStorage.setItem('zylobet_withdraw_requests', JSON.stringify(reqs));
-
-                let targetUserId = req.userId || userId;
-                let targetCoins = parseInt(localStorage.getItem('zylobet_coins_' + targetUserId)) || 100;
-                targetCoins += req.amount;
-                localStorage.setItem('zylobet_coins_' + targetUserId, targetCoins);
-                if(targetUserId === userId) {
-                    userCoins = targetCoins;
-                    updateUIBalances();
-                }
-                registerUserActivity();
-
-                let coinHist = JSON.parse(localStorage.getItem('zylobet_coin_history_' + targetUserId)) || [];
-                coinHist.unshift({ title: `Withdrawal Refund (${req.method})`, amount: `+${req.amount} Coins`, type: "earn", time: Date.now(), status: "Success" });
-                localStorage.setItem('zylobet_coin_history_' + targetUserId, JSON.stringify(coinHist));
-
-                showCustomAlert(`❌ Payout Rejected! ${req.amount} Coins refunded successfully.`);
-                loadAdminRequests();
-            }
-        }
-
-        function loadAdminPromoManager() {
-            const container = document.getElementById('admin-requests-container');
-            let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
-            
-            let activeListHTML = "<div class='space-y-2 mt-3'><p class='text-[10px] text-gray-400 font-bold uppercase'>Active Promos:</p>";
-            if(promos.length === 0) {
-                activeListHTML += "<p class='text-[11px] text-gray-500'>No promo codes created yet.</p>";
-            } else {
-                promos.forEach((p, index) => {
-                    let rewardIcon = p.rewardType === 'coins' ? `<span class="ff-gold-coin" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-coins"></i></span>` : `<span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span>`;
-                    activeListHTML += `<div class='cyber-card p-3 rounded-xl border border-white/5 flex justify-between items-center text-xs'>
-                        <div><span class='font-black text-rose-400'>${p.code}</span> <span class='text-[10px] text-gray-300 flex items-center gap-1 mt-0.5'>(${p.rewardAmount} ${rewardIcon})</span></div>
-                        <div class='flex gap-2 items-center'>
-                            <span class='text-[10px] text-gray-400 font-bold'>${p.usedCount}/${p.maxUsers}</span>
-                            <button onclick="deletePromoCode(${index})" class='px-2.5 py-1 bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg text-[10px] font-bold cursor-pointer'>Deactivate</button>
-                        </div>
-                    </div>`;
-                });
-            }
-            activeListHTML += "</div>";
-
-            container.innerHTML = `
-                <div class='cyber-card p-4 rounded-3xl space-y-3 border border-rose-500/30 text-xs'>
-                    <h3 class='font-black text-rose-400 uppercase tracking-wider'>Create Advanced Promo Code</h3>
-                    <div>
-                        <label class='text-[10px] text-gray-400 font-bold block mb-1'>Promo Code Name</label>
-                        <input type='text' id='adm-code-input' placeholder='e.g. ZYLO100' class='w-full bg-black/50 border border-white/10 p-3 rounded-xl uppercase text-rose-300 font-bold'>
-                    </div>
-                    <div class='grid grid-cols-2 gap-2'>
-                        <div>
-                            <label class='text-[10px] text-gray-400 font-bold block mb-1'>Reward Type</label>
-                            <select id='adm-reward-type' class='w-full bg-black/50 border border-white/10 p-2.5 rounded-xl text-white font-bold'>
-                                <option value='coins'>Coins 🪙</option>
-                                <option value='gems'>Diamonds 💎</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class='text-[10px] text-gray-400 font-bold block mb-1'>Reward Amount</label>
-                            <input type='number' id='adm-reward-amt' value='100' min='1' class='w-full bg-black/50 border border-white/10 p-2.5 rounded-xl text-white font-bold'>
-                        </div>
-                    </div>
-                    <div class='grid grid-cols-2 gap-2'>
-                        <div>
-                            <label class='text-[10px] text-gray-400 font-bold block mb-1'>Validity Time (Minutes)</label>
-                            <input type='number' id='adm-time-value' value='60' min='1' class='w-full bg-black/50 border border-white/10 p-2.5 rounded-xl text-white font-bold'>
-                        </div>
-                        <div>
-                            <label class='text-[10px] text-gray-400 font-bold block mb-1'>Max Users Limit</label>
-                            <input type='number' id='adm-limit-input' value='50' min='1' class='w-full bg-black/50 border border-white/10 p-2.5 rounded-xl text-white font-bold'>
-                        </div>
-                    </div>
-                    <button onclick='createPromoCode()' class='w-full py-3 bg-gradient-to-r from-rose-600 to-purple-600 rounded-xl font-black text-white cursor-pointer shadow-lg'>CREATE & ACTIVATE CODE</button>
-                    ${activeListHTML}
-                </div>`;
-        }
-
-        function deletePromoCode(index) {
-            let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
-            if(promos[index]) {
-                promos.splice(index, 1);
-                localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
-                loadAdminPromoManager();
-            }
-        }
-
-        function createPromoCode() {
-            const codeInput = document.getElementById('adm-code-input');
-            const typeInput = document.getElementById('adm-reward-type');
-            const amtInput = document.getElementById('adm-reward-amt');
-            const timeInput = document.getElementById('adm-time-value');
-            const limitInput = document.getElementById('adm-limit-input');
-
-            const codeVal = codeInput.value.trim().toUpperCase();
-            const rewardType = typeInput.value;
-            const rewardAmount = parseInt(amtInput.value) || 100;
-            const durationMin = parseInt(timeInput.value) || 60;
-            const maxUsr = parseInt(limitInput.value) || 50;
-
-            if(!codeVal) { showCustomAlert("❌ Please enter a promo code name!"); return; }
-
-            let promos = JSON.parse(localStorage.getItem('zylobet_active_promos')) || [];
-            let usedHistory = JSON.parse(localStorage.getItem('zylobet_global_promo_history')) || [];
-            
-            if(promos.some(p => p.code === codeVal) || usedHistory.includes(codeVal)) {
-                showCustomAlert("❌ This promo code has already been created before and cannot be reused!");
-                return;
-            }
-
-            const expiryTime = Date.now() + (durationMin * 60 * 1000);
-
-            promos.push({
-                code: codeVal,
-                rewardType: rewardType,
-                rewardAmount: rewardAmount,
-                expiryTime: expiryTime,
-                maxUsers: maxUsr,
-                usedCount: 0,
-                active: true
+            db.collection("withdrawals").doc(docId).update({ status: "Success", redeemCode: redeemCode }).then(() => {
+                showCustomAlert("✅ Payout Approved!");
             });
+        }
 
-            usedHistory.push(codeVal);
-            localStorage.setItem('zylobet_active_promos', JSON.stringify(promos));
-            localStorage.setItem('zylobet_global_promo_history', JSON.stringify(usedHistory));
-
-            showCustomAlert(`🎉 Promo Code '${codeVal}' Created Successfully!`);
-            loadAdminPromoManager();
+        function rejectWithdraw(docId, tUserId, coins) {
+            db.collection("withdrawals").doc(docId).update({ status: "Rejected (Refunded)" }).then(() => {
+                db.collection("users").doc(tUserId.toString()).get().then((doc) => {
+                    if(doc.exists) {
+                        let currentCoins = doc.data().coins || 100;
+                        db.collection("users").doc(tUserId.toString()).update({ coins: currentCoins + coins });
+                    }
+                });
+                showCustomAlert("❌ Payout Rejected & Coins Refunded!");
+            });
         }
     </script>
 </body>
