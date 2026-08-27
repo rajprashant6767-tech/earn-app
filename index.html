@@ -410,6 +410,26 @@
                 <button onclick="switchAdminTab('promo')" id="adm-tab-pro" class="py-2.5 bg-black/55 border border-white/10 text-gray-400 rounded-xl font-black text-[10px] shadow transition cursor-pointer">Promo</button>
             </div>
 
+            <!-- MANUAL BALANCE MANAGER BOX -->
+            <div class="cyber-card p-4 rounded-3xl space-y-3 border border-emerald-500/30 text-xs">
+                <h3 class="font-black text-emerald-400 uppercase tracking-wider"><i class="fa-solid fa-bolt mr-1"></i> Manual User Balance Manager</h3>
+                <div>
+                    <label class="text-[10px] text-gray-400 font-bold block mb-1">Target Username (e.g. @rahul)</label>
+                    <input type="text" id="manual-target-username" placeholder="@username" class="w-full bg-black/50 border border-white/10 p-3 rounded-xl text-emerald-300 font-bold">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[10px] text-gray-400 font-bold block mb-1">Diamonds to Add</label>
+                        <input type="number" id="manual-add-gems" value="50" min="1" class="w-full bg-black/50 border border-white/10 p-2.5 rounded-xl text-white font-bold">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-gray-400 font-bold block mb-1">Coins to Add</label>
+                        <input type="number" id="manual-add-coins" value="0" min="0" class="w-full bg-black/50 border border-white/10 p-2.5 rounded-xl text-white font-bold">
+                    </div>
+                </div>
+                <button type="button" onclick="executeManualBalanceAdd()" class="w-full py-3 shiny-green-btn rounded-xl font-black text-white cursor-pointer shadow-lg">DIRECT ADD BALANCE TO USER</button>
+            </div>
+
             <div id="admin-requests-container" class="space-y-3"></div>
         </div>
     </div>
@@ -466,7 +486,7 @@
         </div>
     </div>
 
-    <!-- FIELD-INCREMENT ATOMIC APPROVAL ENGINE -->
+    <!-- COMPLETE MASTER ENGINE SCRIPT -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBi30pzPsMX7ICY20_g...",
@@ -1080,7 +1100,57 @@
             loadAdminRealtimeData();
         }
 
-        // FIELD-INCREMENT ATOMIC APPROVAL ENGINE
+        // DIRECT MANUAL BALANCE ADDER FUNCTION
+        function executeManualBalanceAdd() {
+            const targetUsername = document.getElementById('manual-target-username').value.trim();
+            const addGems = Number(document.getElementById('manual-add-gems').value) || 0;
+            const addCoins = Number(document.getElementById('manual-add-coins').value) || 0;
+
+            if(!targetUsername) {
+                showCustomAlert("❌ Please enter a target username!");
+                return;
+            }
+
+            db.collection("users").where("username", "==", targetUsername).get().then((querySnap) => {
+                if (!querySnap.empty) {
+                    let userDoc = querySnap.docs[0];
+                    let userRef = userDoc.ref;
+                    
+                    let updates = { lastActive: Date.now() };
+                    if(addGems > 0) updates.gems = firebase.firestore.FieldValue.increment(addGems);
+                    if(addCoins > 0) updates.coins = firebase.firestore.FieldValue.increment(addCoins);
+
+                    userRef.update(updates).then(() => {
+                        if(addGems > 0) {
+                            userRef.collection("gem_history").add({
+                                title: "Manual Admin Top-up",
+                                amount: `+${addGems} Diamonds`,
+                                type: "gem",
+                                time: Date.now(),
+                                status: "Success"
+                            });
+                        }
+                        if(addCoins > 0) {
+                            userRef.collection("coin_history").add({
+                                title: "Manual Admin Top-up",
+                                amount: `+${addCoins} Coins`,
+                                type: "coin",
+                                time: Date.now(),
+                                status: "Success"
+                            });
+                        }
+                        showCustomAlert(`🎉 Success! Added ${addGems} Diamonds & ${addCoins} Coins to ${targetUsername}`);
+                        document.getElementById('manual-target-username').value = '';
+                    });
+                } else {
+                    showCustomAlert("❌ User with username " + targetUsername + " not found in database!");
+                }
+            }).catch((err) => {
+                showCustomAlert("❌ Error: " + err.message);
+            });
+        }
+
+        // DEPOSIT APPROVAL ENGINE
         function approveDeposit(docId, tUserId, tUsername, dias, paidRs) {
             db.collection("deposits").doc(docId).update({ status: "Success" }).then(() => {
                 db.collection("users").where("username", "==", tUsername).get().then((querySnap) => {
@@ -1183,7 +1253,7 @@
                 }
                 activeListHTML += "</div>";
 
-                container.innerHTML = `
+                container.innerHTML += `
                     <div class='cyber-card p-4 rounded-3xl space-y-3 border border-rose-500/30 text-xs'>
                         <h3 class='font-black text-rose-400 uppercase tracking-wider'>Create Advanced Promo Code</h3>
                         <div>
