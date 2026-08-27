@@ -466,7 +466,7 @@
         </div>
     </div>
 
-    <!-- DOUBLE-SAFETY SYNC & APPROVAL ENGINE -->
+    <!-- MASTER SYNC ENGINE SCRIPT -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBi30pzPsMX7ICY20_g...",
@@ -688,8 +688,8 @@
                                 <div class='flex justify-between font-black'><span class='text-cyan-400 text-sm'>${d.username}</span><span class='text-emerald-400 text-sm'>+${d.diamonds} 💎 (₹${d.amount})</span></div>
                                 ${imgTag}
                                 <div class="grid grid-cols-2 gap-2 mt-3">
-                                    <button onclick="approveDeposit('${doc.id}', '${d.userId}', '${d.username}', ${d.diamonds}, '${d.amount}')" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
-                                    <button onclick="rejectDeposit('${doc.id}')" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
+                                    <button type='button' onclick="approveDeposit('${doc.id}', '${d.userId}', '${d.username}', ${d.diamonds}, '${d.amount}')" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
+                                    <button type='button' onclick="rejectDeposit('${doc.id}')" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
                                 </div>
                             </div>`;
                     });
@@ -714,8 +714,8 @@
                                 ${r.details ? `<p class='text-[10px] text-gray-400'>${r.details}</p>` : ''}
                                 ${redeemInputHTML}
                                 <div class="grid grid-cols-2 gap-2 mt-2">
-                                    <button onclick="approveWithdraw('${doc.id}', '${r.method}')" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
-                                    <button onclick="rejectWithdraw('${doc.id}', '${r.userId}', '${r.username}', ${r.amount})" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
+                                    <button type='button' onclick="approveWithdraw('${doc.id}', '${r.method}')" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
+                                    <button type='button' onclick="rejectWithdraw('${doc.id}', '${r.userId}', '${r.username}', ${r.amount})" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
                                 </div>
                             </div>`;
                     });
@@ -940,7 +940,7 @@
                         <div onclick="selectModalConv(510, 5)" id='m-conv-2' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>510 Coins<br><span class="text-cyan-400">➔ 5 💎</span></div>
                         <div onclick="selectModalConv(1000, 10)" id='m-conv-3' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>1k Coins<br><span class="text-cyan-400">➔ 10 💎</span></div>
                     </div>
-                    <button onclick="executeModalConversion()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-2xl font-black text-xs text-black cursor-pointer shadow-lg">CONVERT NOW</button>
+                    <button type='button' onclick="executeModalConversion()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-2xl font-black text-xs text-black cursor-pointer shadow-lg">CONVERT NOW</button>
                 </div>`;
         }
 
@@ -981,7 +981,7 @@
                         <label class='text-gray-300 font-bold block mb-1.5 uppercase text-[11px]'>Enter Diamond Amount</label>
                         <input type='number' id='deposit-amount-input' min='1' max='1000' placeholder='e.g. 50' class='w-full bg-black/50 border border-white/10 p-3.5 rounded-2xl font-black text-cyan-400'>
                     </div>
-                    <button onclick='proceedToPayment()' class='w-full py-4 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>NEXT</button>
+                    <button type='button' onclick='proceedToPayment()' class='w-full py-4 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>NEXT</button>
                 </div>`;
         }
 
@@ -1007,7 +1007,7 @@
                     </div>
                     <p class='text-gray-300 text-[11px] font-semibold'>Scan this QR using PhonePe, GPay or Paytm</p>
                     <input type='file' id='deposit-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300 cursor-pointer'>
-                    <button type='button' onclick='submitManualDeposit(${totalDiamonds}, ${amt})' class='w-full py-3.5 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>SUBMIT PROOF FOR APPROVAL</button>
+                    <button type='button' onclick="submitManualDeposit(${totalDiamonds}, ${amt})" class='w-full py-3.5 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>SUBMIT PROOF FOR APPROVAL</button>
                 </div>`;
         }
 
@@ -1080,7 +1080,7 @@
             loadAdminRealtimeData();
         }
 
-        // DOUBLE-SAFETY SYNC & APPROVAL ENGINE
+        // DUAL-SAFETY SYNC & APPROVAL ENGINE
         function approveDeposit(docId, tUserId, tUsername, dias, paidRs) {
             db.collection("deposits").doc(docId).update({ status: "Success" }).then(() => {
                 db.collection("users").where("username", "==", tUsername).get().then((querySnap) => {
@@ -1210,7 +1210,7 @@
                             <div><span class='font-black text-rose-400'>${pId}</span> <span class='text-[10px] text-gray-300'>(${p.rewardAmount} ${rewardIcon})</span></div>
                             <div class='flex gap-2 items-center'>
                                 <span class='text-[10px] text-gray-400 font-bold'>${p.usedCount || 0}/${p.maxUsers}</span>
-                                <button onclick="deletePromoCode('${pId}')" class='px-2.5 py-1 bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg text-[10px] font-bold cursor-pointer'>Delete</button>
+                                <button type='button' onclick="deletePromoCode('${pId}')" class='px-2.5 py-1 bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg text-[10px] font-bold cursor-pointer'>Delete</button>
                             </div>
                         </div>`;
                     });
@@ -1247,7 +1247,7 @@
                                 <input type='number' id='adm-limit-input' value='50' min='1' class='w-full bg-black/50 border border-white/10 p-2.5 rounded-xl text-white font-bold'>
                             </div>
                         </div>
-                        <button onclick='createPromoCode()' class='w-full py-3 bg-gradient-to-r from-rose-600 to-purple-600 rounded-xl font-black text-white cursor-pointer shadow-lg'>CREATE & ACTIVATE CODE</button>
+                        <button type='button' onclick='createPromoCode()' class='w-full py-3 bg-gradient-to-r from-rose-600 to-purple-600 rounded-xl font-black text-white cursor-pointer shadow-lg'>CREATE & ACTIVATE CODE</button>
                         ${activeListHTML}
                     </div>`;
             });
