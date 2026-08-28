@@ -1438,27 +1438,41 @@
 
             if(!codeVal) { showCustomAlert("❌ Please enter a promo code name!"); return; }
 
-            // PREVENT DUPLICATE PROMO CREATION IF ALREADY EXISTS IN DATABASE
-            db.collection("promos").doc(codeVal).get().then((docSnapshot) => {
-                if (docSnapshot.exists) {
-                    showCustomAlert(`❌ Promo code '${codeVal}' already exists or was already used! Cannot recreate same code.`);
+            // CHECK GLOBAL HISTORY SO DELETED CODES CANNOT BE RE-CREATED
+            db.collection("used_global_promos").doc(codeVal).get().then((historyDoc) => {
+                if (historyDoc.exists) {
+                    showCustomAlert(`⚠️ Notification: Promo code '${codeVal}' has already been created and used in the past. You cannot create the same code again even if it was deleted!`);
                     return;
                 }
 
-                const expiryTime = Date.now() + (durationMin * 60 * 1000);
+                // CHECK CURRENT ACTIVE PROMOS
+                db.collection("promos").doc(codeVal).get().then((docSnapshot) => {
+                    if (docSnapshot.exists) {
+                        showCustomAlert(`❌ Promo code '${codeVal}' already exists currently!`);
+                        return;
+                    }
 
-                db.collection("promos").doc(codeVal).set({
-                    code: codeVal,
-                    rewardType: rewardType,
-                    rewardAmount: rewardAmount,
-                    expiryTime: expiryTime,
-                    maxUsers: maxUsr,
-                    usedCount: 0,
-                    active: true
-                }).then(() => {
-                    showCustomAlert(`🎉 Promo Code '${codeVal}' Created Successfully!`);
-                    codeInput.value = '';
-                    loadAdminPromoManager();
+                    const expiryTime = Date.now() + (durationMin * 60 * 1000);
+
+                    // SAVE TO BOTH ACTIVE PROMOS AND PERMANENT GLOBAL HISTORY
+                    const promoData = {
+                        code: codeVal,
+                        rewardType: rewardType,
+                        rewardAmount: rewardAmount,
+                        expiryTime: expiryTime,
+                        maxUsers: maxUsr,
+                        usedCount: 0,
+                        active: true
+                    };
+
+                    Promise.all([
+                        db.collection("promos").doc(codeVal).set(promoData),
+                        db.collection("used_global_promos").doc(codeVal).set({ code: codeVal, createdAt: Date.now() })
+                    ]).then(() => {
+                        showCustomAlert(`🎉 Promo Code '${codeVal}' Created Successfully!`);
+                        codeInput.value = '';
+                        loadAdminPromoManager();
+                    });
                 });
             });
         }
