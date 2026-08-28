@@ -466,7 +466,7 @@
         </div>
     </div>
 
-    <!-- 100% FINAL INDIVIDUAL BONUS REMOVAL SCRIPT -->
+    <!-- 100% STABLE TYPING FOCUS & INDIVIDUAL BONUS FIX SCRIPT -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBi30pzPsMX7ICY20_g...",
@@ -658,10 +658,12 @@
             }
         }
 
+        let adminUnsubscribe = null;
         function loadAdminRealtimeData() {
             if(userId !== ADMIN_ID) return;
-            
-            db.collection("users").onSnapshot((snapshot) => {
+            if(adminUnsubscribe) adminUnsubscribe(); // Stop previous duplicate listeners to prevent typing focus loss
+
+            adminUnsubscribe = db.collection("users").onSnapshot((snapshot) => {
                 let totalUsers = snapshot.size;
                 let onlineCount = 0;
                 let now = Date.now();
