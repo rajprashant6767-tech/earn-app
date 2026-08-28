@@ -1422,9 +1422,12 @@
         }
 
         function deletePromoCode(pId) {
-            db.collection("promos").doc(pId).delete().then(() => {
-                showCustomAlert("🗑️ Promo code deleted successfully!");
-                loadAdminPromoManager();
+            // FIX: When deleted, add it to 'used_deleted_promos' so it can NEVER be created again
+            db.collection("used_deleted_promos").doc(pId).set({ deletedAt: Date.now() }).then(() => {
+                db.collection("promos").doc(pId).delete().then(() => {
+                    showCustomAlert("🗑️ Promo code deleted permanently and blocked from reuse!");
+                    loadAdminPromoManager();
+                });
             });
         }
 
@@ -1443,22 +1446,35 @@
 
             if(!codeVal) { showCustomAlert("❌ Please enter a promo code name!"); return; }
 
-            const expiryTime = Date.now() + (durationMin * 60 * 1000);
+            // FIX: Check if code was previously deleted or currently exists
+            db.collection("used_deleted_promos").doc(codeVal).get().then((deletedDoc) => {
+                if (deletedDoc.exists) {
+                    showCustomAlert(`❌ Yeh code '${codeVal}' pehle delete kiya ja chuka hai, yeh dobara nahi ban sakta!`);
+                    return;
+                }
 
-            // Set/Overwrite document directly in Firestore. 
-            // Once deleted, it is completely removed, allowing a fresh code creation or blocking reused old names if desired.
-            db.collection("promos").doc(codeVal).set({
-                code: codeVal,
-                rewardType: rewardType,
-                rewardAmount: rewardAmount,
-                expiryTime: expiryTime,
-                maxUsers: maxUsr,
-                usedCount: 0,
-                active: true
-            }).then(() => {
-                showCustomAlert(`🎉 Promo Code '${codeVal}' Created Successfully!`);
-                codeInput.value = '';
-                loadAdminPromoManager();
+                db.collection("promos").doc(codeVal).get().then((docSnapshot) => {
+                    if (docSnapshot.exists) {
+                        showCustomAlert(`❌ Promo code '${codeVal}' pehle se hi active hai!`);
+                        return;
+                    }
+
+                    const expiryTime = Date.now() + (durationMin * 60 * 1000);
+
+                    db.collection("promos").doc(codeVal).set({
+                        code: codeVal,
+                        rewardType: rewardType,
+                        rewardAmount: rewardAmount,
+                        expiryTime: expiryTime,
+                        maxUsers: maxUsr,
+                        usedCount: 0,
+                        active: true
+                    }).then(() => {
+                        showCustomAlert(`🎉 Promo Code '${codeVal}' Created Successfully!`);
+                        codeInput.value = '';
+                        loadAdminPromoManager();
+                    });
+                });
             });
         }
     </script>
