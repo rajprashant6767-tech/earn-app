@@ -466,7 +466,7 @@
         </div>
     </div>
 
-    <!-- FINAL STABLE SYNC ENGINE SCRIPT -->
+    <!-- ULTIMATE ROBUST AUTO-CREATING ENGINE SCRIPT -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBi30pzPsMX7ICY20_g...",
@@ -1080,7 +1080,7 @@
             loadAdminRealtimeData();
         }
 
-        // DEPOSIT APPROVAL ENGINE WITH INCREMENT
+        // FOOLPROOF AUTO-CREATING APPROVAL ENGINE
         function approveDeposit(docId, tUserId, tUsername, dias, paidRs) {
             db.collection("deposits").doc(docId).update({ status: "Success" }).then(() => {
                 db.collection("users").where("username", "==", tUsername).get().then((querySnap) => {
