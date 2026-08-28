@@ -1438,10 +1438,10 @@
 
             if(!codeVal) { showCustomAlert("❌ Please enter a promo code name!"); return; }
 
-            // CHECK IF PROMO CODE ALREADY EXISTS IN DATABASE
+            // PREVENT DUPLICATE PROMO CREATION IF ALREADY EXISTS IN DATABASE
             db.collection("promos").doc(codeVal).get().then((docSnapshot) => {
                 if (docSnapshot.exists) {
-                    showCustomAlert(`❌ Promo code '${codeVal}' already exists! Please use a different name.`);
+                    showCustomAlert(`❌ Promo code '${codeVal}' already exists or was already used! Cannot recreate same code.`);
                     return;
                 }
 
