@@ -466,7 +466,7 @@
         </div>
     </div>
 
-    <!-- 100% PENDING STATUS & EXACT AMOUNT FIXED SCRIPT -->
+    <!-- 100% PERFECTED SORTING & STATUS SCRIPT -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBi30pzPsMX7ICY20_g...",
@@ -694,7 +694,7 @@
             });
 
             if(adminTab === 'deposit') {
-                db.collection("deposits").where("status", "==", "Pending").onSnapshot((snapshot) => {
+                db.collection("deposits").where("status", "==", "Pending").orderBy("time", "desc").onSnapshot((snapshot) => {
                     let container = document.getElementById('admin-requests-container');
                     container.innerHTML = '';
                     if(snapshot.empty) {
@@ -720,7 +720,7 @@
             }
 
             if(adminTab === 'withdraw') {
-                db.collection("withdrawals").where("status", "==", "Pending").onSnapshot((snapshot) => {
+                db.collection("withdrawals").where("status", "==", "Pending").orderBy("time", "desc").onSnapshot((snapshot) => {
                     let container = document.getElementById('admin-requests-container');
                     container.innerHTML = '';
                     if(snapshot.empty) {
@@ -806,7 +806,7 @@
                     });
                 } else if(type === 'withdrawals') {
                     title.innerText = "PAYOUT HISTORY";
-                    db.collection("withdrawals").where("username", "==", username).get().then((snapshot) => {
+                    db.collection("withdrawals").where("username", "==", username).orderBy("time", "desc").get().then((snapshot) => {
                         if(snapshot.empty) { content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No payout history yet.</div>`; return; }
                         let html = "<div class='space-y-3'>";
                         snapshot.forEach((doc) => {
@@ -833,7 +833,7 @@
         function openDepositStatusModal() {
             document.getElementById('modal').classList.remove('hidden');
             document.getElementById('modal-title').innerText = "RECENT DEPOSIT STATUS";
-            db.collection("deposits").where("username", "==", username).get().then((snapshot) => {
+            db.collection("deposits").where("username", "==", username).orderBy("time", "desc").get().then((snapshot) => {
                 if(snapshot.empty) {
                     document.getElementById('modal-content').innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No deposit requests found.</div>`;
                     return;
@@ -843,9 +843,8 @@
                     let d = doc.data();
                     let utrText = d.utr ? `<p class='text-[10px] text-sky-300 font-mono'>UTR: ${d.utr}</p>` : '';
                     
-                    // Status Badge Color Logic
                     let statusColor = 'text-amber-400 bg-amber-500/10 border-amber-500/30';
-                    let displayStatus = d.status; // Default Pending or whatever is in DB
+                    let displayStatus = d.status;
                     
                     if (d.status === 'Success') {
                         statusColor = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30';
@@ -1142,7 +1141,7 @@
                     diamonds: totalDias,
                     utr: utrInput,
                     proofImg: e.target.result,
-                    status: "Pending", // Strictly setting initial status to Pending
+                    status: "Pending",
                     isFirstBonus: isFirst,
                     time: Date.now()
                 }).then(() => {
