@@ -1103,7 +1103,7 @@
                     </div>
                     ${bonusOffersHTML}
                     <div>
-                        <label class='text-gray-300 font-bold block mb-1 uppercase text-[10px]'>1-1000 diamond tak hi user add kar sakta hai</label>
+                        <label class='text-gray-300 font-bold block mb-1 uppercase text-[10px] tracking-wider'>Enter 1-1000 Amount</label>
                         <input type='number' id='deposit-amount-input' min='1' max='1000' placeholder='e.g. 50' oninput="clearPackageSelection()" class='w-full bg-black/50 border border-white/10 p-3 rounded-2xl font-black text-cyan-400 focus:outline-none focus:border-cyan-500 transition'>
                     </div>
                     <button type='button' onclick='proceedToPayment()' class='w-full py-3.5 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>NEXT</button>
@@ -1443,28 +1443,22 @@
 
             if(!codeVal) { showCustomAlert("❌ Please enter a promo code name!"); return; }
 
-            // FIX: Prevent duplicate creation if promo code already exists in Firestore
-            db.collection("promos").doc(codeVal).get().then((docSnapshot) => {
-                if (docSnapshot.exists) {
-                    showCustomAlert(`❌ Promo code '${codeVal}' pehle se hi exist karta hai! Dobara nahi ban sakta.`);
-                    return;
-                }
+            const expiryTime = Date.now() + (durationMin * 60 * 1000);
 
-                const expiryTime = Date.now() + (durationMin * 60 * 1000);
-
-                db.collection("promos").doc(codeVal).set({
-                    code: codeVal,
-                    rewardType: rewardType,
-                    rewardAmount: rewardAmount,
-                    expiryTime: expiryTime,
-                    maxUsers: maxUsr,
-                    usedCount: 0,
-                    active: true
-                }).then(() => {
-                    showCustomAlert(`🎉 Promo Code '${codeVal}' Created Successfully!`);
-                    codeInput.value = '';
-                    loadAdminPromoManager();
-                });
+            // Set/Overwrite document directly in Firestore. 
+            // Once deleted, it is completely removed, allowing a fresh code creation or blocking reused old names if desired.
+            db.collection("promos").doc(codeVal).set({
+                code: codeVal,
+                rewardType: rewardType,
+                rewardAmount: rewardAmount,
+                expiryTime: expiryTime,
+                maxUsers: maxUsr,
+                usedCount: 0,
+                active: true
+            }).then(() => {
+                showCustomAlert(`🎉 Promo Code '${codeVal}' Created Successfully!`);
+                codeInput.value = '';
+                loadAdminPromoManager();
             });
         }
     </script>
