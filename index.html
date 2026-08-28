@@ -466,7 +466,7 @@
         </div>
     </div>
 
-    <!-- 100% COMPLETE FIXED DEPOSIT SCRIPT -->
+    <!-- 100% PENDING STATUS & EXACT AMOUNT FIXED SCRIPT -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBi30pzPsMX7ICY20_g...",
@@ -842,12 +842,26 @@
                 snapshot.forEach((doc) => {
                     let d = doc.data();
                     let utrText = d.utr ? `<p class='text-[10px] text-sky-300 font-mono'>UTR: ${d.utr}</p>` : '';
-                    let statusColor = d.status === 'Success' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' : (d.status === 'Rejected' ? 'text-rose-400 bg-rose-500/10 border-rose-500/30' : 'text-amber-400 bg-amber-500/10 border-amber-500/30');
+                    
+                    // Status Badge Color Logic
+                    let statusColor = 'text-amber-400 bg-amber-500/10 border-amber-500/30';
+                    let displayStatus = d.status; // Default Pending or whatever is in DB
+                    
+                    if (d.status === 'Success') {
+                        statusColor = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30';
+                        displayStatus = 'Success';
+                    } else if (d.status === 'Rejected') {
+                        statusColor = 'text-rose-400 bg-rose-500/10 border-rose-500/30';
+                        displayStatus = 'Rejected';
+                    } else {
+                        displayStatus = 'Pending';
+                    }
+
                     html += `
                         <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2'>
                             <div class='flex justify-between items-center'>
                                 <span class='font-black text-cyan-400 text-sm'>+${d.diamonds} Diamonds (₹${d.amount})</span>
-                                <span class='px-2.5 py-1 rounded-xl font-black text-[10px] border ${statusColor}'>${d.status}</span>
+                                <span class='px-2.5 py-1 rounded-xl font-black text-[10px] border ${statusColor}'>${displayStatus}</span>
                             </div>
                             ${utrText}
                             <p class='text-[10px] text-gray-400'>Requested: ${formatTimeAgo(d.time)}</p>
@@ -1043,12 +1057,10 @@
             selectedDiamonds = dias;
             selectedPayRs = paid;
             isFirstBonusRequest = isBonus;
-            // Set input value strictly to the payment rupees so user sees exact amount to pay
             document.getElementById('deposit-amount-input').value = paid;
         }
 
         function clearPackageSelection() {
-            // If user types manually, treat it as normal custom amount (no bonus package pre-selected)
             isFirstBonusRequest = false;
         }
 
@@ -1130,7 +1142,7 @@
                     diamonds: totalDias,
                     utr: utrInput,
                     proofImg: e.target.result,
-                    status: "Pending",
+                    status: "Pending", // Strictly setting initial status to Pending
                     isFirstBonus: isFirst,
                     time: Date.now()
                 }).then(() => {
