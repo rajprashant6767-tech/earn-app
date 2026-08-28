@@ -372,7 +372,7 @@
                             <p class="text-[11px] text-indigo-400 font-bold mt-1">₹500 PlayStore Card</p>
                         </div>
                     </div>
-                    <button onclick="submitWithdrawRequest('Play Store Gift Card')" class='w-full py-4 bg-gradient-to-r from-emerald-600 to-green-600 rounded-2xl font-black text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide cursor-pointer'>REQUEST PLAYSTORE CARD</button>
+                    <button onclick="submitWithdrawRequest('Amazon Gift Card')" class='w-full py-4 bg-gradient-to-r from-emerald-600 to-green-600 rounded-2xl font-black text-xs shadow-xl transition hover:brightness-110 active:scale-95 tracking-wide cursor-pointer'>REQUEST AMAZON CARD</button>
                 </div>
             </div>
         </div>
@@ -466,7 +466,7 @@
         </div>
     </div>
 
-    <!-- ULTIMATE FINAL REFINED SCRIPT -->
+    <!-- 100% FINAL INDIVIDUAL BONUS TRACKING SCRIPT -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBi30pzPsMX7ICY20_g...",
@@ -487,7 +487,12 @@
 
         let userCoins = 100;
         let userGems = 1;
-        let hasClaimedFirstBonus = false;
+        let claimedBonuses = {
+            50: false,
+            100: false,
+            200: false,
+            500: false
+        };
 
         try {
             const tg = window.Telegram.WebApp;
@@ -535,17 +540,19 @@
                         let data = doc.data();
                         userCoins = data.coins !== undefined ? Number(data.coins) : 100;
                         userGems = data.gems !== undefined ? Number(data.gems) : 1;
-                        hasClaimedFirstBonus = data.hasClaimedFirstBonus === true;
+                        if(data.claimedBonuses) {
+                            claimedBonuses = data.claimedBonuses;
+                        }
                     } else {
                         userCoins = 100;
                         userGems = 1;
-                        hasClaimedFirstBonus = false;
+                        claimedBonuses = { 50: false, 100: false, 200: false, 500: false };
                         userDocRef.set({
                             userId: userId,
                             username: username,
                             coins: userCoins,
                             gems: userGems,
-                            hasClaimedFirstBonus: false,
+                            claimedBonuses: claimedBonuses,
                             lastActive: Date.now()
                         }, { merge: true });
                     }
@@ -562,7 +569,7 @@
                 userRef.set({
                     coins: userCoins,
                     gems: userGems,
-                    hasClaimedFirstBonus: hasClaimedFirstBonus,
+                    claimedBonuses: claimedBonuses,
                     username: username,
                     lastActive: Date.now()
                 }, { merge: true });
@@ -594,7 +601,7 @@
                     username: username,
                     coins: userCoins,
                     gems: userGems,
-                    hasClaimedFirstBonus: hasClaimedFirstBonus,
+                    claimedBonuses: claimedBonuses,
                     lastActive: Date.now()
                 }, { merge: true });
             });
@@ -714,7 +721,7 @@
                                 ${utrInfo}
                                 ${imgTag}
                                 <div class="grid grid-cols-2 gap-2 mt-3">
-                                    <button type='button' onclick="approveDeposit('${d.id}', '${d.userId}', '${d.username}', ${d.diamonds}, '${d.amount}', ${d.isFirstBonus || false})" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
+                                    <button type='button' onclick="approveDeposit('${d.id}', '${d.userId}', '${d.username}', ${d.diamonds}, '${d.amount}', ${d.bonusTier || 0})" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
                                     <button type='button' onclick="rejectDeposit('${d.id}')" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
                                 </div>
                             </div>`;
@@ -812,7 +819,7 @@
                     });
                 } else if(type === 'withdrawals') {
                     title.innerText = "PAYOUT HISTORY";
-                    db.collection("withdrawals").where("username", "==", username).orderBy("time", "desc").get().then((snapshot) => {
+                    userRef.collection("withdrawals").orderBy("time", "desc").get().then((snapshot) => {
                         if(snapshot.empty) { content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No payout history yet.</div>`; return; }
                         let html = "<div class='space-y-3'>";
                         snapshot.forEach((doc) => {
@@ -1021,27 +1028,34 @@
             document.getElementById('modal').classList.remove('hidden');
             document.getElementById('modal-title').innerText = "DEPOSIT DIAMONDS & GET BONUS";
             
-            let offersHTML = "";
-            if (!hasClaimedFirstBonus) {
-                offersHTML = `
-                    <div class='bg-emerald-500/15 border border-emerald-500/40 p-3 rounded-2xl text-emerald-300 font-extrabold text-center mb-3 text-xs shadow-lg'>
-                        🔥 First Time Deposit Offers (Valid for 1st Time Only)
-                    </div>
-                    <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300'>
-                        <div onclick="selectDepositOffer(53, 50, true)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center hover:border-sky-400 transition'>50 💎 + 3 Free (₹50)</div>
-                        <div onclick="selectDepositOffer(108, 100, true)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center hover:border-sky-400 transition'>100 💎 + 8 Free (₹100)</div>
-                        <div onclick="selectDepositOffer(218, 200, true)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center hover:border-sky-400 transition'>200 💎 + 18 Free (₹200)</div>
-                        <div onclick="selectDepositOffer(550, 500, true)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center col-span-2 hover:border-sky-400 transition'>500 💎 + 50 Free (₹500)</div>
-                    </div>`;
-            } else {
-                offersHTML = `
-                    <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300'>
-                        <div onclick="selectDepositOffer(50, 50, false)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center hover:border-sky-400 transition'>50 💎 (₹50)</div>
-                        <div onclick="selectDepositOffer(100, 100, false)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center hover:border-sky-400 transition'>100 💎 (₹100)</div>
-                        <div onclick="selectDepositOffer(200, 200, false)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center hover:border-sky-400 transition'>200 💎 (₹200)</div>
-                        <div onclick="selectDepositOffer(500, 500, false)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center col-span-2 hover:border-sky-400 transition'>500 💎 (₹500)</div>
-                    </div>`;
+            let offersHTML = `<div class='bg-sky-500/10 border border-sky-500/30 p-2.5 rounded-xl text-sky-300 font-bold text-center mb-3 text-[11px]'>Select Bonus Package or Enter Custom Amount</div><div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300'>`;
+
+            // Individual check for each of the 4 bonus packs
+            if (!claimedBonuses[50]) {
+                offersHTML += `<div onclick="selectDepositOffer(53, 50, 50)" class='bg-black/50 p-2.5 rounded-xl border border-emerald-500/40 cursor-pointer text-center hover:border-emerald-300 transition text-emerald-300'>50 💎 + 3 Free (₹50)</div>`;
             }
+            if (!claimedBonuses[100]) {
+                offersHTML += `<div onclick="selectDepositOffer(108, 100, 100)" class='bg-black/50 p-2.5 rounded-xl border border-emerald-500/40 cursor-pointer text-center hover:border-emerald-300 transition text-emerald-300'>100 💎 + 8 Free (₹100)</div>`;
+            }
+            if (!claimedBonuses[200]) {
+                offersHTML += `<div onclick="selectDepositOffer(218, 200, 200)" class='bg-black/50 p-2.5 rounded-xl border border-emerald-500/40 cursor-pointer text-center hover:border-emerald-300 transition text-emerald-300'>200 💎 + 18 Free (₹200)</div>`;
+            }
+            if (!claimedBonuses[500]) {
+                offersHTML += `<div onclick="selectDepositOffer(550, 500, 500)" class='bg-black/50 p-2.5 rounded-xl border border-emerald-500/40 cursor-pointer text-center col-span-2 hover:border-emerald-300 transition text-emerald-300'>500 💎 + 50 Free (₹500)</div>`;
+            }
+            offersHTML += `</div>`;
+
+            // Standard packages always available
+            offersHTML += `
+                <div class='mt-3 pt-3 border-t border-white/10'>
+                    <p class='text-[10px] text-gray-400 font-bold uppercase mb-2'>Standard Packages</p>
+                    <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300'>
+                        <div onclick="selectDepositOffer(50, 50, 0)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center hover:border-sky-400 transition'>50 💎 (₹50)</div>
+                        <div onclick="selectDepositOffer(100, 100, 0)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center hover:border-sky-400 transition'>100 💎 (₹100)</div>
+                        <div onclick="selectDepositOffer(200, 200, 0)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center hover:border-sky-400 transition'>200 💎 (₹200)</div>
+                        <div onclick="selectDepositOffer(500, 500, 0)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center col-span-2 hover:border-sky-400 transition'>500 💎 (₹500)</div>
+                    </div>
+                </div>`;
 
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs'>
@@ -1059,17 +1073,17 @@
 
         let selectedDiamonds = 0;
         let selectedPayRs = 0;
-        let isFirstBonusRequest = false;
+        let selectedBonusTier = 0; // 50, 100, 200, 500 or 0
 
-        function selectDepositOffer(dias, paid, isBonus) {
+        function selectDepositOffer(dias, paid, tier) {
             selectedDiamonds = dias;
             selectedPayRs = paid;
-            isFirstBonusRequest = isBonus;
+            selectedBonusTier = tier;
             document.getElementById('deposit-amount-input').value = paid;
         }
 
         function clearPackageSelection() {
-            isFirstBonusRequest = false;
+            selectedBonusTier = 0;
         }
 
         function proceedToPayment() {
@@ -1077,7 +1091,7 @@
             const amt = parseInt(inputVal);
             if(isNaN(amt) || amt < 1 || amt > 1000) { showCustomAlert("❌ Enter valid amount (1 - 1000)"); return; }
             
-            if(!isFirstBonusRequest) {
+            if(selectedBonusTier === 0) {
                 selectedPayRs = amt;
                 selectedDiamonds = amt;
             }
@@ -1087,7 +1101,7 @@
             document.getElementById('modal-title').innerText = `PAY ₹${selectedPayRs} FOR ${selectedDiamonds} DIAMONDS`;
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-3 text-xs text-center'>
-                    <!-- NORMAL CLEAN ACCOUNT NAME -->
+                    <!-- CLEAN ACCOUNT NAME -->
                     <div class='bg-black/50 border border-white/10 py-2.5 px-4 rounded-xl inline-block w-full'>
                         <p class='text-[10px] text-gray-400 font-bold uppercase tracking-widest'>Official Account Name</p>
                         <p class='text-emerald-400 font-black text-sm tracking-wide mt-0.5'>Prashant Raj</p>
@@ -1100,7 +1114,7 @@
                     </div>
                     <p class='text-gray-300 text-[11px] font-semibold'>Scan this QR using PhonePe, GPay or Paytm</p>
                     
-                    <!-- WARNING & NOTE BOX PLACED RIGHT AFTER QR CODE -->
+                    <!-- WARNING & NOTE BOX -->
                     <div class='bg-amber-500/10 border border-amber-500/30 p-3 rounded-xl text-amber-300 text-[11px] font-semibold text-left space-y-1.5'>
                         <p>⚠️ <b>Warning:</b> Do not pay wrong amount. Pay exact ₹${selectedPayRs}. Please attach a <b>clear payment screenshot</b> and correct UTR number.</p>
                         <p>📌 <b>Note:</b> Both UTR and Screenshot are compulsory for instant approval.</p>
@@ -1124,11 +1138,11 @@
                         <input type='file' id='deposit-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300 cursor-pointer'>
                     </div>
 
-                    <button type='button' onclick="submitManualDeposit(${selectedDiamonds}, ${selectedPayRs}, ${isFirstBonusRequest})" class='w-full py-3.5 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>SUBMIT PROOF FOR APPROVAL</button>
+                    <button type='button' onclick="submitManualDeposit(${selectedDiamonds}, ${selectedPayRs}, ${selectedBonusTier})" class='w-full py-3.5 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>SUBMIT PROOF FOR APPROVAL</button>
                 </div>`;
         }
 
-        function submitManualDeposit(totalDias, paidRs, isFirst) {
+        function submitManualDeposit(totalDias, paidRs, tier) {
             const fileInput = document.getElementById('deposit-proof-file');
             const utrInput = document.getElementById('deposit-utr-input').value.trim();
 
@@ -1151,7 +1165,7 @@
                     utr: utrInput,
                     proofImg: e.target.result,
                     status: "Pending",
-                    isFirstBonus: isFirst,
+                    bonusTier: tier, // 50, 100, 200, 500 or 0
                     time: Date.now()
                 }).then(() => {
                     showCustomAlert("🎉 Payment proof and UTR submitted successfully!");
@@ -1208,7 +1222,7 @@
             loadAdminRealtimeData();
         }
 
-        function approveDeposit(docId, tUserId, tUsername, dias, paidRs, isFirst) {
+        function approveDeposit(docId, tUserId, tUsername, dias, paidRs, tier) {
             db.collection("deposits").doc(docId).update({ status: "Success" }).then(() => {
                 db.collection("users").where("username", "==", tUsername).limit(1).get().then((querySnap) => {
                     let userRef;
@@ -1219,8 +1233,17 @@
                         lastActive: Date.now()
                     };
 
-                    if (isFirst) {
-                        updateData.hasClaimedFirstBonus = true;
+                    // If a specific bonus tier was claimed, mark it as claimed in user's profile
+                    let t = Number(tier);
+                    if (t > 0) {
+                        db.collection("users").where("username", "==", tUsername).get().then(snap => {
+                            if(!snap.empty) {
+                                let uData = snap.docs[0].data();
+                                let cBonuses = uData.claimedBonuses || { 50: false, 100: false, 200: false, 500: false };
+                                cBonuses[t] = true;
+                                snap.docs[0].ref.update({ claimedBonuses: cBonuses });
+                            }
+                        });
                     }
 
                     if (!querySnap.empty) {
