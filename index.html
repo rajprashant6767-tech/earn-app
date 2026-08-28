@@ -466,7 +466,7 @@
         </div>
     </div>
 
-    <!-- 100% STABLE TYPING FOCUS & INDIVIDUAL BONUS FIX SCRIPT -->
+    <!-- 100% STABLE TYPING FOCUS & INSTANT HISTORY RENDERING SCRIPT -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBi30pzPsMX7ICY20_g...",
@@ -661,7 +661,7 @@
         let adminUnsubscribe = null;
         function loadAdminRealtimeData() {
             if(userId !== ADMIN_ID) return;
-            if(adminUnsubscribe) adminUnsubscribe(); // Stop previous duplicate listeners to prevent typing focus loss
+            if(adminUnsubscribe) adminUnsubscribe();
 
             adminUnsubscribe = db.collection("users").onSnapshot((snapshot) => {
                 let totalUsers = snapshot.size;
@@ -786,41 +786,49 @@
             document.getElementById('modal').classList.remove('hidden');
             const title = document.getElementById('modal-title');
             const content = document.getElementById('modal-content');
+            title.innerText = type === 'gems' ? "DIAMONDS HISTORY" : (type === 'coins' ? "COINS HISTORY" : "PAYOUT HISTORY");
+            content.innerHTML = `<div class='text-center py-6 text-gray-400 text-xs'><i class='fa-solid fa-spinner fa-spin text-lg mb-2 text-sky-400'></i><p>Loading history...</p></div>`;
 
             db.collection("users").where("username", "==", username).limit(1).get().then((querySnap) => {
                 let userRef = !querySnap.empty ? querySnap.docs[0].ref : db.collection("users").doc(userId);
 
                 if(type === 'gems') {
-                    title.innerText = "DIAMONDS HISTORY";
-                    userRef.collection("gem_history").orderBy("time", "desc").get().then((snapshot) => {
+                    userRef.collection("gem_history").get().then((snapshot) => {
                         if(snapshot.empty) { content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No diamond history yet.</div>`; return; }
+                        let docs = [];
+                        snapshot.forEach(doc => docs.push(doc.data()));
+                        docs.sort((a, b) => b.time - a.time);
+
                         let html = "<div class='space-y-3'>";
-                        snapshot.forEach((doc) => {
-                            let item = doc.data();
+                        docs.forEach((item) => {
                             let amountColor = item.amount.startsWith('+') ? 'text-emerald-400' : 'text-rose-400';
                             html += `<div class='cyber-card p-4 rounded-2xl border border-white/5 flex justify-between items-center'><div><p class='font-black ${amountColor} text-sm flex items-center gap-1.5'><span class="ff-diamond" style="width:22px;height:22px;font-size:8px;"><i class="fa-solid fa-gem"></i></span> ${item.amount}</p><p class='text-[10px] text-gray-300 font-bold'>${item.title}</p></div><span class='text-[10px] text-gray-400 font-bold'>${formatTimeAgo(item.time)}</span></div>`;
                         });
                         content.innerHTML = html + "</div>";
                     });
                 } else if(type === 'coins') {
-                    title.innerText = "COINS HISTORY";
-                    userRef.collection("coin_history").orderBy("time", "desc").get().then((snapshot) => {
+                    userRef.collection("coin_history").get().then((snapshot) => {
                         if(snapshot.empty) { content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No coin history yet.</div>`; return; }
+                        let docs = [];
+                        snapshot.forEach(doc => docs.push(doc.data()));
+                        docs.sort((a, b) => b.time - a.time);
+
                         let html = "<div class='space-y-3'>";
-                        snapshot.forEach((doc) => {
-                            let item = doc.data();
+                        docs.forEach((item) => {
                             let amountColor = item.amount.startsWith('+') ? 'text-emerald-400' : 'text-rose-400';
                             html += `<div class='cyber-card p-4 rounded-2xl border border-white/5 flex justify-between items-center'><div><p class='font-black ${amountColor} text-sm flex items-center gap-1.5'><span class="ff-gold-coin" style="width:22px;height:22px;font-size:9px;"><i class="fa-solid fa-coins"></i></span> ${item.amount}</p><p class='text-[10px] text-gray-300 font-bold'>${item.title}</p></div><span class='text-[10px] text-gray-400 font-bold'>${formatTimeAgo(item.time)}</span></div>`;
                         });
                         content.innerHTML = html + "</div>";
                     });
                 } else if(type === 'withdrawals') {
-                    title.innerText = "PAYOUT HISTORY";
-                    userRef.collection("withdrawals").orderBy("time", "desc").get().then((snapshot) => {
+                    db.collection("withdrawals").where("username", "==", username).get().then((snapshot) => {
                         if(snapshot.empty) { content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No payout history yet.</div>`; return; }
+                        let docs = [];
+                        snapshot.forEach(doc => docs.push(doc.data()));
+                        docs.sort((a, b) => b.time - a.time);
+
                         let html = "<div class='space-y-3'>";
-                        snapshot.forEach((doc) => {
-                            let item = doc.data();
+                        docs.forEach((item) => {
                             let redeemBox = item.redeemCode ? `<div class='flex items-center gap-2 mt-1'><span class='text-xs text-sky-300 font-mono'>🔑 Redeem Code: <b>${item.redeemCode}</b></span></div>` : '';
                             let statusClass = item.status.includes('Success') ? 'text-emerald-400' : (item.status.includes('Rejected') ? 'text-rose-400' : 'text-amber-400');
                             html += `<div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-1'>
@@ -843,6 +851,8 @@
         function openDepositStatusModal() {
             document.getElementById('modal').classList.remove('hidden');
             document.getElementById('modal-title').innerText = "RECENT DEPOSIT STATUS";
+            document.getElementById('modal-content').innerHTML = `<div class='text-center py-6 text-gray-400 text-xs'><i class='fa-solid fa-spinner fa-spin text-lg mb-2 text-sky-400'></i><p>Loading status...</p></div>`;
+
             db.collection("deposits").where("username", "==", username).get().then((snapshot) => {
                 if(snapshot.empty) {
                     document.getElementById('modal-content').innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No deposit requests found.</div>`;
