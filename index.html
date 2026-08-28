@@ -466,7 +466,7 @@
         </div>
     </div>
 
-    <!-- 100% ERROR-FREE CLEAN MASTER ENGINE SCRIPT -->
+    <!-- FULL STABLE SYSTEM SCRIPT -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBi30pzPsMX7ICY20_g...",
@@ -487,6 +487,7 @@
 
         let userCoins = 100;
         let userGems = 1;
+        let hasClaimedFirstBonus = false;
 
         try {
             const tg = window.Telegram.WebApp;
@@ -534,14 +535,17 @@
                         let data = doc.data();
                         userCoins = data.coins !== undefined ? Number(data.coins) : 100;
                         userGems = data.gems !== undefined ? Number(data.gems) : 1;
+                        hasClaimedFirstBonus = data.hasClaimedFirstBonus === true;
                     } else {
                         userCoins = 100;
                         userGems = 1;
+                        hasClaimedFirstBonus = false;
                         userDocRef.set({
                             userId: userId,
                             username: username,
                             coins: userCoins,
                             gems: userGems,
+                            hasClaimedFirstBonus: false,
                             lastActive: Date.now()
                         }, { merge: true });
                     }
@@ -558,6 +562,7 @@
                 userRef.set({
                     coins: userCoins,
                     gems: userGems,
+                    hasClaimedFirstBonus: hasClaimedFirstBonus,
                     username: username,
                     lastActive: Date.now()
                 }, { merge: true });
@@ -589,6 +594,7 @@
                     username: username,
                     coins: userCoins,
                     gems: userGems,
+                    hasClaimedFirstBonus: hasClaimedFirstBonus,
                     lastActive: Date.now()
                 }, { merge: true });
             });
@@ -703,7 +709,7 @@
                                 <div class='flex justify-between font-black'><span class='text-cyan-400 text-sm'>${d.username}</span><span class='text-emerald-400 text-sm'>+${d.diamonds} 💎 (₹${d.amount})</span></div>
                                 ${imgTag}
                                 <div class="grid grid-cols-2 gap-2 mt-3">
-                                    <button type='button' onclick="approveDeposit('${doc.id}', '${d.userId}', '${d.username}', ${d.diamonds}, '${d.amount}')" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
+                                    <button type='button' onclick="approveDeposit('${doc.id}', '${d.userId}', '${d.username}', ${d.diamonds}, '${d.amount}', ${d.isFirstBonus || false})" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
                                     <button type='button' onclick="rejectDeposit('${doc.id}')" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
                                 </div>
                             </div>`;
@@ -988,17 +994,35 @@
         function openDepositModal() {
             document.getElementById('modal').classList.remove('hidden');
             document.getElementById('modal-title').innerText = "DEPOSIT DIAMONDS & GET BONUS";
+            
+            let firstTimeOfferHTML = "";
+            if (!hasClaimedFirstBonus) {
+                firstTimeOfferHTML = `
+                    <div class='bg-emerald-500/10 border border-emerald-500/30 p-3 rounded-2xl text-emerald-300 font-bold text-center mb-2'>
+                        🔥 First Deposit Offer: Pay ₹50 get 53 Diamonds (+3 Free)! (One Time Only)
+                    </div>
+                    <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300 mb-3'>
+                        <div onclick="selectFirstDepositOffer()" class='bg-emerald-600/20 p-2.5 rounded-xl border border-emerald-400 cursor-pointer text-center text-emerald-300 col-span-2'>50 💎 + 3 Free (₹50)</div>
+                        <div onclick="selectDepositOffer(100, 108)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center'>100 💎 (+8 Free)</div>
+                        <div onclick="selectDepositOffer(200, 218)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center'>200 💎 (+18 Free)</div>
+                        <div onclick="selectDepositOffer(500, 550)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center col-span-2'>500 💎 (+50 Free)</div>
+                    </div>`;
+            } else {
+                firstTimeOfferHTML = `
+                    <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300 mb-3'>
+                        <div onclick="selectDepositOffer(50, 50)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center'>50 💎</div>
+                        <div onclick="selectDepositOffer(100, 108)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center'>100 💎 (+8 Free)</div>
+                        <div onclick="selectDepositOffer(200, 218)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center'>200 💎 (+18 Free)</div>
+                        <div onclick="selectDepositOffer(500, 550)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center col-span-2'>500 💎 (+50 Free)</div>
+                    </div>`;
+            }
+
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-4 text-xs'>
-                    <div class='bg-cyan-500/10 border border-cyan-500/30 p-3 rounded-2xl text-cyan-300 font-bold text-center'>
-                        1 Diamond = ₹1 Rs
+                    <div class='bg-cyan-500/10 border border-cyan-500/30 p-3 rounded-2xl text-cyan-300 font-bold text-center flex items-center justify-center gap-1.5'>
+                        1 <span class="ff-diamond" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> = ₹1 Rs
                     </div>
-                    <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300'>
-                        <div onclick="selectDepositOffer(50)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center'>50 💎 (+3 Free)</div>
-                        <div onclick="selectDepositOffer(100)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center'>100 💎 (+8 Free)</div>
-                        <div onclick="selectDepositOffer(200)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center'>200 💎 (+18 Free)</div>
-                        <div onclick="selectDepositOffer(500)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center'>500 💎 (+50 Free)</div>
-                    </div>
+                    ${firstTimeOfferHTML}
                     <div>
                         <label class='text-gray-300 font-bold block mb-1.5 uppercase text-[11px]'>Enter Diamond Amount</label>
                         <input type='number' id='deposit-amount-input' min='1' max='1000' placeholder='e.g. 50' class='w-full bg-black/50 border border-white/10 p-3.5 rounded-2xl font-black text-cyan-400'>
@@ -1007,33 +1031,58 @@
                 </div>`;
         }
 
-        function selectDepositOffer(amount) {
-            document.getElementById('deposit-amount-input').value = amount;
+        let selectedDiamonds = 0;
+        let selectedPayRs = 0;
+        let isFirstBonusRequest = false;
+
+        function selectFirstDepositOffer() {
+            selectedDiamonds = 53;
+            selectedPayRs = 50;
+            isFirstBonusRequest = true;
+            document.getElementById('deposit-amount-input').value = "53 (₹50)";
+        }
+
+        function selectDepositOffer(dias, paid) {
+            selectedDiamonds = dias;
+            selectedPayRs = paid;
+            isFirstBonusRequest = false;
+            document.getElementById('deposit-amount-input').value = dias;
         }
 
         function proceedToPayment() {
-            const amt = parseInt(document.getElementById('deposit-amount-input').value);
-            if(isNaN(amt) || amt < 1 || amt > 1000) { showCustomAlert("❌ Enter valid amount (1 - 1000)"); return; }
-            
-            let baseBonus = amt >= 500 ? 50 : (amt >= 200 ? 18 : (amt >= 100 ? 8 : (amt >= 50 ? 3 : 0)));
-            let totalDiamonds = amt + baseBonus;
-            const upiString = `upi://pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${amt}.00&tn=ZyloBet%20Deposit&cu=INR`;
+            const inputVal = document.getElementById('deposit-amount-input').value;
+            if(!isFirstBonusRequest) {
+                const amt = parseInt(inputVal);
+                if(isNaN(amt) || amt < 1 || amt > 1000) { showCustomAlert("❌ Enter valid amount (1 - 1000)"); return; }
+                selectedPayRs = amt;
+                selectedDiamonds = amt >= 500 ? amt + 50 : (amt >= 200 ? amt + 18 : (amt >= 100 ? amt + 8 : amt));
+            }
 
-            document.getElementById('modal-title').innerText = `PAY ₹${amt} FOR ${totalDiamonds} DIAMONDS`;
+            const upiString = `upi://pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${selectedPayRs}.00&tn=ZyloBet%20Deposit&cu=INR`;
+
+            document.getElementById('modal-title').innerText = `PAY ₹${selectedPayRs} FOR ${selectedDiamonds} DIAMONDS`;
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-3 text-xs text-center'>
+                    <p class='text-emerald-400 font-bold'>Merchant Name: <span class='text-white'>Prashant</span></p>
                     <div class='flex justify-center my-1'>
                         <div class='bg-white p-2.5 rounded-2xl shadow-xl inline-block'>
                             <img src='https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(upiString)}' alt='QR' class='w-32 h-32 object-contain rounded-xl'>
                         </div>
                     </div>
                     <p class='text-gray-300 text-[11px] font-semibold'>Scan this QR using PhonePe, GPay or Paytm</p>
+                    
+                    <!-- WARNING & NOTE ADDED -->
+                    <div class='bg-amber-500/10 border border-amber-500/30 p-3 rounded-xl text-amber-300 text-[11px] font-semibold text-left space-y-1'>
+                        <p>⚠️ <b>Warning:</b> Do not pay wrong amount. Pay exact ₹${selectedPayRs}.</p>
+                        <p>📌 <b>Note:</b> Upload valid payment screenshot after payment completion for instant approval.</p>
+                    </div>
+
                     <input type='file' id='deposit-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300 cursor-pointer'>
-                    <button type='button' onclick="submitManualDeposit(${totalDiamonds}, ${amt})" class='w-full py-3.5 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>SUBMIT PROOF FOR APPROVAL</button>
+                    <button type='button' onclick="submitManualDeposit(${selectedDiamonds}, ${selectedPayRs}, ${isFirstBonusRequest})" class='w-full py-3.5 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>SUBMIT PROOF FOR APPROVAL</button>
                 </div>`;
         }
 
-        function submitManualDeposit(totalDias, paidRs) {
+        function submitManualDeposit(totalDias, paidRs, isFirst) {
             const fileInput = document.getElementById('deposit-proof-file');
             if (!fileInput.files || fileInput.files.length === 0) { showCustomAlert("❌ Upload payment screenshot!"); return; }
 
@@ -1046,6 +1095,7 @@
                     diamonds: totalDias,
                     proofImg: e.target.result,
                     status: "Pending",
+                    isFirstBonus: isFirst,
                     time: Date.now()
                 }).then(() => {
                     showCustomAlert("🎉 Payment screenshot submitted to admin cloud!");
@@ -1102,23 +1152,29 @@
             loadAdminRealtimeData();
         }
 
-        // 100% UNFAILING USERNAME-MATCHED DEPOSIT APPROVAL ENGINE
-        function approveDeposit(docId, tUserId, tUsername, dias, paidRs) {
+        // 100% UNFAILING ONE-TIME BONUS DEPOSIT APPROVAL ENGINE
+        function approveDeposit(docId, tUserId, tUsername, dias, paidRs, isFirst) {
             db.collection("deposits").doc(docId).update({ status: "Success" }).then(() => {
                 db.collection("users").where("username", "==", tUsername).limit(1).get().then((querySnap) => {
                     let userRef;
+                    let updateData = {
+                        gems: firebase.firestore.FieldValue.increment(Number(dias)),
+                        userId: tUserId.toString(),
+                        username: tUsername,
+                        lastActive: Date.now()
+                    };
+
+                    if (isFirst) {
+                        updateData.hasClaimedFirstBonus = true;
+                    }
+
                     if (!querySnap.empty) {
                         userRef = querySnap.docs[0].ref;
                     } else {
                         userRef = db.collection("users").doc(tUserId.toString());
                     }
 
-                    userRef.set({
-                        gems: firebase.firestore.FieldValue.increment(Number(dias)),
-                        userId: tUserId.toString(),
-                        username: tUsername,
-                        lastActive: Date.now()
-                    }, { merge: true }).then(() => {
+                    userRef.set(updateData, { merge: true }).then(() => {
                         userRef.collection("gem_history").add({
                             title: `Deposit Approved (₹${paidRs})`,
                             amount: `+${dias} Diamonds`,
