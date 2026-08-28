@@ -250,7 +250,7 @@
                 </div>
 
                 <div class='text-center pt-3 border-t border-white/10 mt-2'>
-                    <a href='https://t.me/+2vDL5Gmbee0zNDFl' target='_blank' class='inline-flex items-center gap-2 text-xs text-sky-400 font-bold bg-sky-500/10 border border-sky-500/20 px-5 py-3 rounded-2xl w-full justify-center transition hover:bg-sky-500/20 active:scale-95'>
+                    <a href='https://t.me/+2vDL5Gmbee0zNDFl' target='_blank' class='inline-flex items-center gap-2 text-xs text-sky-400 font-bold bg-sky-500/10 border border-sky-500/20 px-5 py-3 rounded-2xl w-full justify-center transition bg-sky-500/20 active:scale-95'>
                         <i class='fa-brands fa-telegram text-base'></i> Join Official Telegram Channel
                     </a>
                 </div>
@@ -466,7 +466,7 @@
         </div>
     </div>
 
-    <!-- FINAL PERFECTED SCRIPT WITH MANDATORY VALIDATION -->
+    <!-- FINAL PERFECTED ONE-TIME BONUS ENGINE SCRIPT -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBi30pzPsMX7ICY20_g...",
@@ -1003,21 +1003,21 @@
             if (!hasClaimedFirstBonus) {
                 offersHTML = `
                     <div class='bg-emerald-500/15 border border-emerald-500/40 p-3 rounded-2xl text-emerald-300 font-extrabold text-center mb-3 text-xs shadow-lg'>
-                        🔥 First Deposit Offer: Pay ₹50 get 53 Diamonds <br><span class='text-[10px] text-amber-300'>(Valid for 1st Time Only)</span>
+                        🔥 First Deposit Offers: All Bonus Packs Below Valid for 1st Time Only!
                     </div>
-                    <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300'>
-                        <div onclick="selectFirstDepositOffer()" class='bg-gradient-to-r from-emerald-600/30 to-green-600/30 p-3 rounded-xl border border-emerald-400 cursor-pointer text-center text-emerald-300 col-span-2 shadow-md hover:scale-[1.02] transition'>53 💎 (₹50 - 1st Time Offer)</div>
-                        <div onclick="selectDepositOffer(100, 108)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center hover:border-sky-400 transition'>100 💎 (+8 Free)</div>
-                        <div onclick="selectDepositOffer(200, 218)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center hover:border-sky-400 transition'>200 💎 (+18 Free)</div>
-                        <div onclick="selectDepositOffer(500, 550)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center col-span-2 hover:border-sky-400 transition'>500 💎 (+50 Free)</div>
+                    <div class='grid grid-cols-2 gap-2.5 text-[11px] font-bold text-gray-300'>
+                        <div onclick="selectDepositOffer(53, 50, true)" class='bg-gradient-to-r from-emerald-600/30 to-green-600/30 p-3 rounded-xl border border-emerald-400 cursor-pointer text-center text-emerald-300 col-span-2 shadow-md hover:scale-[1.01] transition'>53 💎 (+3 Free | ₹50)</div>
+                        <div onclick="selectDepositOffer(108, 100, true)" class='bg-emerald-950/40 p-2.5 rounded-xl border border-emerald-500/40 cursor-pointer text-center text-emerald-300 hover:border-emerald-400 transition'>108 💎 (+8 Free | ₹100)</div>
+                        <div onclick="selectDepositOffer(218, 200, true)" class='bg-emerald-950/40 p-2.5 rounded-xl border border-emerald-500/40 cursor-pointer text-center text-emerald-300 hover:border-emerald-400 transition'>218 💎 (+18 Free | ₹200)</div>
+                        <div onclick="selectDepositOffer(550, 500, true)" class='bg-emerald-950/40 p-2.5 rounded-xl border border-emerald-500/40 cursor-pointer text-center text-emerald-300 col-span-2 hover:border-emerald-400 transition'>550 💎 (+50 Free | ₹500)</div>
                     </div>`;
             } else {
                 offersHTML = `
                     <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300'>
-                        <div onclick="selectDepositOffer(50, 50)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center hover:border-sky-400 transition'>50 💎</div>
-                        <div onclick="selectDepositOffer(100, 108)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center hover:border-sky-400 transition'>100 💎 (+8 Free)</div>
-                        <div onclick="selectDepositOffer(200, 218)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center hover:border-sky-400 transition'>200 💎 (+18 Free)</div>
-                        <div onclick="selectDepositOffer(500, 550)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center col-span-2 hover:border-sky-400 transition'>500 💎 (+50 Free)</div>
+                        <div onclick="selectDepositOffer(50, 50, false)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center hover:border-sky-400 transition'>50 💎</div>
+                        <div onclick="selectDepositOffer(100, 100, false)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center hover:border-sky-400 transition'>100 💎</div>
+                        <div onclick="selectDepositOffer(200, 200, false)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center hover:border-sky-400 transition'>200 💎</div>
+                        <div onclick="selectDepositOffer(500, 500, false)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center col-span-2 hover:border-sky-400 transition'>500 💎</div>
                     </div>`;
             }
 
@@ -1039,17 +1039,10 @@
         let selectedPayRs = 0;
         let isFirstBonusRequest = false;
 
-        function selectFirstDepositOffer() {
-            selectedDiamonds = 53;
-            selectedPayRs = 50;
-            isFirstBonusRequest = true;
-            document.getElementById('deposit-amount-input').value = "53";
-        }
-
-        function selectDepositOffer(dias, paid) {
+        function selectDepositOffer(dias, paid, isBonus) {
             selectedDiamonds = dias;
             selectedPayRs = paid;
-            isFirstBonusRequest = false;
+            isFirstBonusRequest = isBonus;
             document.getElementById('deposit-amount-input').value = dias;
         }
 
@@ -1059,7 +1052,7 @@
                 const amt = parseInt(inputVal);
                 if(isNaN(amt) || amt < 1 || amt > 1000) { showCustomAlert("❌ Enter valid amount (1 - 1000)"); return; }
                 selectedPayRs = amt;
-                selectedDiamonds = amt >= 500 ? amt + 50 : (amt >= 200 ? amt + 18 : (amt >= 100 ? amt + 8 : amt));
+                selectedDiamonds = amt;
             }
 
             const upiString = `upi://pay?pa=raj-prashant@fam&pn=Prashant%20Raj&am=${selectedPayRs}.00&tn=ZyloBet%20Deposit&cu=INR`;
@@ -1112,7 +1105,6 @@
             const fileInput = document.getElementById('deposit-proof-file');
             const utrInput = document.getElementById('deposit-utr-input').value.trim();
 
-            // COMPULSORY VALIDATION CHECK FOR BOTH UTR AND SCREENSHOT
             if (!fileInput.files || fileInput.files.length === 0) { 
                 showCustomAlert("❌ Please upload a clear payment screenshot!"); 
                 return; 
@@ -1189,7 +1181,6 @@
             loadAdminRealtimeData();
         }
 
-        // ONE-TIME BONUS DEPOSIT APPROVAL ENGINE
         function approveDeposit(docId, tUserId, tUsername, dias, paidRs, isFirst) {
             db.collection("deposits").doc(docId).update({ status: "Success" }).then(() => {
                 db.collection("users").where("username", "==", tUsername).limit(1).get().then((querySnap) => {
