@@ -466,7 +466,7 @@
         </div>
     </div>
 
-    <!-- 100% PERFECTED SORTING & STATUS SCRIPT -->
+    <!-- ULTIMATE FINAL REFINED SCRIPT -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBi30pzPsMX7ICY20_g...",
@@ -694,15 +694,18 @@
             });
 
             if(adminTab === 'deposit') {
-                db.collection("deposits").where("status", "==", "Pending").orderBy("time", "desc").onSnapshot((snapshot) => {
+                db.collection("deposits").where("status", "==", "Pending").onSnapshot((snapshot) => {
                     let container = document.getElementById('admin-requests-container');
                     container.innerHTML = '';
                     if(snapshot.empty) {
                         container.innerHTML = `<div class='cyber-card p-6 text-center text-gray-500 text-xs rounded-2xl'>No pending deposit requests.</div>`;
                         return;
                     }
-                    snapshot.forEach((doc) => {
-                        let d = doc.data();
+                    let docs = [];
+                    snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
+                    docs.sort((a, b) => b.time - a.time);
+
+                    docs.forEach((d) => {
                         let utrInfo = d.utr ? `<p class='text-sky-300 font-mono mt-1'>UTR: <b>${d.utr}</b></p>` : '';
                         let imgTag = d.proofImg ? `<div class="mt-2"><img src="${d.proofImg}" alt="Proof" onclick="openImageZoom('${d.proofImg}')" class="w-32 h-32 object-cover rounded-xl border border-white/20 mx-auto cursor-pointer shadow-lg"></div>` : '';
                         container.innerHTML += `
@@ -711,8 +714,8 @@
                                 ${utrInfo}
                                 ${imgTag}
                                 <div class="grid grid-cols-2 gap-2 mt-3">
-                                    <button type='button' onclick="approveDeposit('${doc.id}', '${d.userId}', '${d.username}', ${d.diamonds}, '${d.amount}', ${d.isFirstBonus || false})" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
-                                    <button type='button' onclick="rejectDeposit('${doc.id}')" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
+                                    <button type='button' onclick="approveDeposit('${d.id}', '${d.userId}', '${d.username}', ${d.diamonds}, '${d.amount}', ${d.isFirstBonus || false})" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
+                                    <button type='button' onclick="rejectDeposit('${d.id}')" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
                                 </div>
                             </div>`;
                     });
@@ -720,16 +723,19 @@
             }
 
             if(adminTab === 'withdraw') {
-                db.collection("withdrawals").where("status", "==", "Pending").orderBy("time", "desc").onSnapshot((snapshot) => {
+                db.collection("withdrawals").where("status", "==", "Pending").onSnapshot((snapshot) => {
                     let container = document.getElementById('admin-requests-container');
                     container.innerHTML = '';
                     if(snapshot.empty) {
                         container.innerHTML = `<div class='cyber-card p-6 text-center text-gray-500 text-xs rounded-2xl'>No pending payout requests.</div>`;
                         return;
                     }
-                    snapshot.forEach((doc) => {
-                        let r = doc.data();
-                        let redeemInputHTML = (r.method.includes('Gift Card')) ? `<input type='text' id='redeem-code-${doc.id}' placeholder='Enter Redeem Code' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-xl text-sky-400 font-bold uppercase mt-2'>` : '';
+                    let docs = [];
+                    snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
+                    docs.sort((a, b) => b.time - a.time);
+
+                    docs.forEach((r) => {
+                        let redeemInputHTML = (r.method.includes('Gift Card')) ? `<input type='text' id='redeem-code-${r.id}' placeholder='Enter Redeem Code' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-xl text-sky-400 font-bold uppercase mt-2'>` : '';
                         container.innerHTML += `
                             <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2 text-xs'>
                                 <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-amber-400 text-sm'>${r.amount} Coins (₹${r.rupees})</span></div>
@@ -737,8 +743,8 @@
                                 ${r.details ? `<p class='text-[10px] text-gray-400'>${r.details}</p>` : ''}
                                 ${redeemInputHTML}
                                 <div class="grid grid-cols-2 gap-2 mt-2">
-                                    <button type='button' onclick="approveWithdraw('${doc.id}', '${r.method}')" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
-                                    <button type='button' onclick="rejectWithdraw('${doc.id}', '${r.userId}', '${r.username}', ${r.amount})" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
+                                    <button type='button' onclick="approveWithdraw('${r.id}', '${r.method}')" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
+                                    <button type='button' onclick="rejectWithdraw('${r.id}', '${r.userId}', '${r.username}', ${r.amount})" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
                                 </div>
                             </div>`;
                     });
@@ -833,18 +839,21 @@
         function openDepositStatusModal() {
             document.getElementById('modal').classList.remove('hidden');
             document.getElementById('modal-title').innerText = "RECENT DEPOSIT STATUS";
-            db.collection("deposits").where("username", "==", username).orderBy("time", "desc").get().then((snapshot) => {
+            db.collection("deposits").where("username", "==", username).get().then((snapshot) => {
                 if(snapshot.empty) {
                     document.getElementById('modal-content').innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No deposit requests found.</div>`;
                     return;
                 }
+                let docs = [];
+                snapshot.forEach(doc => docs.push(doc.data()));
+                docs.sort((a, b) => b.time - a.time);
+
                 let html = "<div class='space-y-3'>";
-                snapshot.forEach((doc) => {
-                    let d = doc.data();
+                docs.forEach((d) => {
                     let utrText = d.utr ? `<p class='text-[10px] text-sky-300 font-mono'>UTR: ${d.utr}</p>` : '';
                     
                     let statusColor = 'text-amber-400 bg-amber-500/10 border-amber-500/30';
-                    let displayStatus = d.status;
+                    let displayStatus = d.status || 'Pending';
                     
                     if (d.status === 'Success') {
                         statusColor = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30';
