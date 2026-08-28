@@ -1037,9 +1037,18 @@
                         Select conversion package:
                     </div>
                     <div class='grid grid-cols-3 gap-2.5'>
-                        <div onclick="selectModalConv(120, 1)" id='m-conv-1' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>120 Coins<br><span class="text-cyan-400">➔ 1 💎</span></div>
-                        <div onclick="selectModalConv(510, 5)" id='m-conv-2' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>510 Coins<br><span class="text-cyan-400">➔ 5 💎</span></div>
-                        <div onclick="selectModalConv(1000, 10)" id='m-conv-3' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>1k Coins<br><span class="text-cyan-400">➔ 10 💎</span></div>
+                        <div onclick="selectModalConv(120, 1)" id='m-conv-1' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>
+                            <div class="flex items-center justify-center gap-1 mb-1"><span class="ff-gold-coin" style="width:20px;height:20px;font-size:8px;"><i class="fa-solid fa-coins"></i></span> 120</div>
+                            <span class="text-cyan-400 flex items-center justify-center gap-1">➔ 1 <span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span></span>
+                        </div>
+                        <div onclick="selectModalConv(510, 5)" id='m-conv-2' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>
+                            <div class="flex items-center justify-center gap-1 mb-1"><span class="ff-gold-coin" style="width:20px;height:20px;font-size:8px;"><i class="fa-solid fa-coins"></i></span> 510</div>
+                            <span class="text-cyan-400 flex items-center justify-center gap-1">➔ 5 <span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span></span>
+                        </div>
+                        <div onclick="selectModalConv(1000, 10)" id='m-conv-3' class='m-conv-card cyber-card p-3 rounded-2xl border border-white/10 cursor-pointer text-center font-bold'>
+                            <div class="flex items-center justify-center gap-1 mb-1"><span class="ff-gold-coin" style="width:20px;height:20px;font-size:8px;"><i class="fa-solid fa-coins"></i></span> 1k</div>
+                            <span class="text-cyan-400 flex items-center justify-center gap-1">➔ 10 <span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span></span>
+                        </div>
                     </div>
                     <button type='button' onclick="executeModalConversion()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-2xl font-black text-xs text-black cursor-pointer shadow-lg">CONVERT NOW</button>
                 </div>`;
@@ -1422,7 +1431,6 @@
         }
 
         function deletePromoCode(pId) {
-            // FIX: When deleted, add it to 'used_deleted_promos' so it can NEVER be created again
             db.collection("used_deleted_promos").doc(pId).set({ deletedAt: Date.now() }).then(() => {
                 db.collection("promos").doc(pId).delete().then(() => {
                     showCustomAlert("🗑️ Promo code deleted permanently and blocked from reuse!");
@@ -1446,7 +1454,6 @@
 
             if(!codeVal) { showCustomAlert("❌ Please enter a promo code name!"); return; }
 
-            // FIX: Check if code was previously deleted or currently exists
             db.collection("used_deleted_promos").doc(codeVal).get().then((deletedDoc) => {
                 if (deletedDoc.exists) {
                     showCustomAlert(`❌ Yeh code '${codeVal}' pehle delete kiya ja chuka hai, yeh dobara nahi ban sakta!`);
