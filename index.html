@@ -239,7 +239,7 @@
                     <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-rose-500/20 to-purple-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto text-xl shadow-lg">
                         <i class="fa-solid fa-gift"></i>
                     </div>
-                    <h2 class="text-base font-black text-rose-400">Promo Code Portal</h2>
+                    <h2 class="text-base font-black text-rose-400">Promo Code</h2>
                     <p class="text-[11px] text-gray-400">Enter your official voucher below. New promo codes are available daily in our Telegram channel!</p>
                 </div>
 
@@ -659,8 +659,6 @@
         }
 
         let adminUnsubscribe = null;
-        let promoListLoadedOnce = false;
-
         function loadAdminRealtimeData() {
             if(userId !== ADMIN_ID) return;
             if(adminUnsubscribe) adminUnsubscribe();
@@ -964,34 +962,62 @@
             });
         }
 
+        let promoMsgTimer = null;
         function applyPromoCode() {
             const promoInput = document.getElementById('promo-input');
             const statusMsg = document.getElementById('promo-status-msg');
             const promoVal = promoInput.value.trim().toUpperCase();
             
-            if(!promoVal) { statusMsg.innerText = "❌ Enter code."; return; }
+            if(!promoVal) { 
+                statusMsg.className = "text-[11px] h-6 font-semibold text-rose-400";
+                statusMsg.innerText = "❌ Enter code."; 
+                return; 
+            }
 
-            db.collection("promos").doc(promoVal).get().then((doc) => {
-                if(!doc.exists || !doc.data().active || Date.now() > doc.data().expiryTime) {
-                    statusMsg.className = "text-[11px] h-6 font-semibold text-rose-400";
-                    statusMsg.innerText = "❌ Invalid or expired promo code!";
-                    return;
-                }
+            db.collection("users").where("username", "==", username).limit(1).get().then((querySnap) => {
+                let userRef = !querySnap.empty ? querySnap.docs[0].ref : db.collection("users").doc(userId);
+                
+                userRef.get().then((uDoc) => {
+                    let uData = uDoc.exists ? uDoc.data() : {};
+                    let usedPromos = uData.usedPromos || [];
 
-                let p = doc.data();
-                if(p.rewardType === 'coins') {
-                    userCoins += p.rewardAmount;
-                    saveUserBalances(`Promo Code (${promoVal})`, `+${p.rewardAmount} Coins`, "coin");
-                } else {
-                    userGems += p.rewardAmount;
-                    saveUserBalances(`Promo Code (${promoVal})`, `+${p.rewardAmount} Diamonds`, "gem");
-                }
+                    if (usedPromos.includes(promoVal)) {
+                        statusMsg.className = "text-[11px] h-6 font-semibold text-rose-400";
+                        statusMsg.innerText = "❌ You have already used this promo code!";
+                        if(promoMsgTimer) clearTimeout(promoMsgTimer);
+                        promoMsgTimer = setTimeout(() => { statusMsg.innerText = ""; }, 4000);
+                        return;
+                    }
 
-                db.collection("promos").doc(promoVal).update({ usedCount: firebase.firestore.FieldValue.increment(1) });
+                    db.collection("promos").doc(promoVal).get().then((doc) => {
+                        if(!doc.exists || !doc.data().active || Date.now() > doc.data().expiryTime) {
+                            statusMsg.className = "text-[11px] h-6 font-semibold text-rose-400";
+                            statusMsg.innerText = "❌ Invalid or expired promo code!";
+                            if(promoMsgTimer) clearTimeout(promoMsgTimer);
+                            promoMsgTimer = setTimeout(() => { statusMsg.innerText = ""; }, 4000);
+                            return;
+                        }
 
-                statusMsg.className = "text-[11px] h-6 font-semibold text-emerald-400";
-                statusMsg.innerText = `🎉 Success! +${p.rewardAmount} Added.`;
-                promoInput.value = '';
+                        let p = doc.data();
+                        if(p.rewardType === 'coins') {
+                            userCoins += p.rewardAmount;
+                            saveUserBalances(`Promo Code (${promoVal})`, `+${p.rewardAmount} Coins`, "coin");
+                        } else {
+                            userGems += p.rewardAmount;
+                            saveUserBalances(`Promo Code (${promoVal})`, `+${p.rewardAmount} Diamonds`, "gem");
+                        }
+
+                        usedPromos.push(promoVal);
+                        userRef.update({ usedPromos: usedPromos });
+                        db.collection("promos").doc(promoVal).update({ usedCount: firebase.firestore.FieldValue.increment(1) });
+
+                        statusMsg.className = "text-[11px] h-6 font-semibold text-emerald-400";
+                        statusMsg.innerText = `🎉 Success! +${p.rewardAmount} Added.`;
+                        promoInput.value = '';
+                        if(promoMsgTimer) clearTimeout(promoMsgTimer);
+                        promoMsgTimer = setTimeout(() => { statusMsg.innerText = ""; }, 4000);
+                    });
+                });
             });
         }
 
@@ -1070,7 +1096,7 @@
                     </div>
                     ${bonusOffersHTML}
                     <div class='pt-1'>
-                        <label class='text-gray-300 font-bold block mb-1.5 uppercase text-[11px]'>Enter Custom Diamond Amount</label>
+                        <label class='text-gray-300 font-bold block mb-1.5 uppercase text-[11px]'>1-1000 diamond tak hi user add kar sakta hai</label>
                         <input type='number' id='deposit-amount-input' min='1' max='1000' placeholder='e.g. 50' oninput="clearPackageSelection()" class='w-full bg-black/50 border border-white/10 p-3.5 rounded-2xl font-black text-cyan-400 focus:outline-none focus:border-cyan-500 transition'>
                     </div>
                     <button type='button' onclick='proceedToPayment()' class='w-full py-4 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>NEXT</button>
@@ -1412,20 +1438,28 @@
 
             if(!codeVal) { showCustomAlert("❌ Please enter a promo code name!"); return; }
 
-            const expiryTime = Date.now() + (durationMin * 60 * 1000);
+            // CHECK IF PROMO CODE ALREADY EXISTS IN DATABASE
+            db.collection("promos").doc(codeVal).get().then((docSnapshot) => {
+                if (docSnapshot.exists) {
+                    showCustomAlert(`❌ Promo code '${codeVal}' already exists! Please use a different name.`);
+                    return;
+                }
 
-            db.collection("promos").doc(codeVal).set({
-                code: codeVal,
-                rewardType: rewardType,
-                rewardAmount: rewardAmount,
-                expiryTime: expiryTime,
-                maxUsers: maxUsr,
-                usedCount: 0,
-                active: true
-            }).then(() => {
-                showCustomAlert(`🎉 Promo Code '${codeVal}' Created Successfully!`);
-                codeInput.value = '';
-                loadAdminPromoManager();
+                const expiryTime = Date.now() + (durationMin * 60 * 1000);
+
+                db.collection("promos").doc(codeVal).set({
+                    code: codeVal,
+                    rewardType: rewardType,
+                    rewardAmount: rewardAmount,
+                    expiryTime: expiryTime,
+                    maxUsers: maxUsr,
+                    usedCount: 0,
+                    active: true
+                }).then(() => {
+                    showCustomAlert(`🎉 Promo Code '${codeVal}' Created Successfully!`);
+                    codeInput.value = '';
+                    loadAdminPromoManager();
+                });
             });
         }
     </script>
