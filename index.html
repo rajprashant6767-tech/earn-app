@@ -466,7 +466,7 @@
         </div>
     </div>
 
-    <!-- 100% FINAL REFINED ENGINE SCRIPT -->
+    <!-- FINAL PERFECTED SCRIPT WITH MANDATORY VALIDATION -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBi30pzPsMX7ICY20_g...",
@@ -999,21 +999,21 @@
             document.getElementById('modal').classList.remove('hidden');
             document.getElementById('modal-title').innerText = "DEPOSIT DIAMONDS & GET BONUS";
             
-            let firstTimeOfferHTML = "";
+            let offersHTML = "";
             if (!hasClaimedFirstBonus) {
-                firstTimeOfferHTML = `
+                offersHTML = `
                     <div class='bg-emerald-500/15 border border-emerald-500/40 p-3 rounded-2xl text-emerald-300 font-extrabold text-center mb-3 text-xs shadow-lg'>
-                        🔥 First Deposit Offer: Pay ₹50 get 53 Diamonds (Valid for 1st Time Only)
+                        🔥 First Deposit Offer: Pay ₹50 get 53 Diamonds <br><span class='text-[10px] text-amber-300'>(Valid for 1st Time Only)</span>
                     </div>
-                    <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300 mb-3'>
-                        <div onclick="selectFirstDepositOffer()" class='bg-gradient-to-r from-emerald-600/30 to-green-600/30 p-3 rounded-xl border border-emerald-400 cursor-pointer text-center text-emerald-300 col-span-2 shadow-md hover:scale-[1.02] transition'>53 💎 (₹50 - 1st Time Special Offer)</div>
+                    <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300'>
+                        <div onclick="selectFirstDepositOffer()" class='bg-gradient-to-r from-emerald-600/30 to-green-600/30 p-3 rounded-xl border border-emerald-400 cursor-pointer text-center text-emerald-300 col-span-2 shadow-md hover:scale-[1.02] transition'>53 💎 (₹50 - 1st Time Offer)</div>
                         <div onclick="selectDepositOffer(100, 108)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center hover:border-sky-400 transition'>100 💎 (+8 Free)</div>
                         <div onclick="selectDepositOffer(200, 218)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center hover:border-sky-400 transition'>200 💎 (+18 Free)</div>
                         <div onclick="selectDepositOffer(500, 550)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center col-span-2 hover:border-sky-400 transition'>500 💎 (+50 Free)</div>
                     </div>`;
             } else {
-                firstTimeOfferHTML = `
-                    <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300 mb-3'>
+                offersHTML = `
+                    <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300'>
                         <div onclick="selectDepositOffer(50, 50)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center hover:border-sky-400 transition'>50 💎</div>
                         <div onclick="selectDepositOffer(100, 108)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center hover:border-sky-400 transition'>100 💎 (+8 Free)</div>
                         <div onclick="selectDepositOffer(200, 218)" class='bg-black/50 p-2.5 rounded-xl border border-white/10 cursor-pointer text-center hover:border-sky-400 transition'>200 💎 (+18 Free)</div>
@@ -1026,9 +1026,9 @@
                     <div class='bg-cyan-500/10 border border-cyan-500/30 p-3 rounded-2xl text-cyan-300 font-bold text-center flex items-center justify-center gap-1.5 shadow-inner'>
                         1 <span class="ff-diamond" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> = ₹1 Rs
                     </div>
-                    ${firstTimeOfferHTML}
-                    <div>
-                        <label class='text-gray-300 font-bold block mb-1.5 uppercase text-[11px]'>Enter Diamond Amount</label>
+                    ${offersHTML}
+                    <div class='pt-2'>
+                        <label class='text-gray-300 font-bold block mb-1.5 uppercase text-[11px]'>Enter Custom Diamond Amount</label>
                         <input type='number' id='deposit-amount-input' min='1' max='1000' placeholder='e.g. 50' class='w-full bg-black/50 border border-white/10 p-3.5 rounded-2xl font-black text-cyan-400 focus:outline-none focus:border-cyan-500 transition'>
                     </div>
                     <button type='button' onclick='proceedToPayment()' class='w-full py-4 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>NEXT</button>
@@ -1067,9 +1067,10 @@
             document.getElementById('modal-title').innerText = `PAY ₹${selectedPayRs} FOR ${selectedDiamonds} DIAMONDS`;
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-3 text-xs text-center'>
-                    <div class='bg-gradient-to-r from-emerald-900/40 via-emerald-800/20 to-transparent border border-emerald-500/40 py-2.5 px-4 rounded-xl shadow-md inline-block w-full'>
-                        <p class='text-[10px] text-gray-400 font-bold uppercase tracking-widest'>Official Account Name</p>
-                        <p class='text-emerald-400 font-black text-sm tracking-wide mt-0.5'>Prashant Raj</p>
+                    <!-- HIGHLIGHTED ACCOUNT NAME -->
+                    <div class='bg-gradient-to-r from-emerald-950 via-emerald-900/60 to-black border-2 border-emerald-400/80 py-3 px-4 rounded-2xl shadow-xl inline-block w-full'>
+                        <p class='text-[10px] text-emerald-300 font-bold uppercase tracking-widest'>Official Account Name</p>
+                        <p class='text-white font-black text-base tracking-wide mt-0.5 drop-shadow-md'>Prashant Raj</p>
                     </div>
                     
                     <div class='flex justify-center my-1'>
@@ -1079,8 +1080,14 @@
                     </div>
                     <p class='text-gray-300 text-[11px] font-semibold'>Scan this QR using PhonePe, GPay or Paytm</p>
                     
-                    <!-- UTR NUMBER INPUT BOX (ONLY NUMBERS, EXACT 12 DIGIT VALIDATION) -->
+                    <!-- CHOOSE FILE FIRST -->
                     <div class='text-left space-y-1'>
+                        <label class='text-[10px] text-gray-300 font-bold uppercase tracking-wider block'>Upload Clear Payment Screenshot</label>
+                        <input type='file' id='deposit-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300 cursor-pointer'>
+                    </div>
+
+                    <!-- UTR NUMBER INPUT BOX BELOW CHOOSE FILE -->
+                    <div class='text-left space-y-1 pt-1'>
                         <label class='text-[10px] text-gray-300 font-bold uppercase tracking-wider block'>Enter 12-Digit UTR / Transaction ID</label>
                         <input type='text' id='deposit-utr-input' maxlength='12' oninput='this.value = this.value.replace(/[^0-9]/g, "")' placeholder='e.g. 423512345678' class='w-full bg-black/50 border border-sky-500/40 p-3 text-xs rounded-xl text-sky-300 font-mono font-bold tracking-wider focus:outline-none focus:border-sky-400'>
                     </div>
@@ -1088,7 +1095,7 @@
                     <!-- WARNING & NOTE WITH TELEGRAM CONTACT LINK -->
                     <div class='bg-amber-500/10 border border-amber-500/30 p-3 rounded-xl text-amber-300 text-[11px] font-semibold text-left space-y-1.5'>
                         <p>⚠️ <b>Warning:</b> Do not pay wrong amount. Pay exact ₹${selectedPayRs}. Please attach a <b>clear payment screenshot</b> and correct UTR number.</p>
-                        <p>📌 <b>Note:</b> Upload valid payment screenshot after payment completion for instant approval.</p>
+                        <p>📌 <b>Note:</b> Both UTR and Screenshot are compulsory for instant approval.</p>
                         <div class='pt-1.5 border-t border-amber-500/20 flex items-center justify-between'>
                             <span class='text-[10px] text-gray-300'>If you face any problem contact me:</span>
                             <a href='https://t.me/Raj_Prashant' target='_blank' class='bg-sky-500/20 text-sky-400 hover:bg-sky-500/30 px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition text-[10px]'>
@@ -1097,22 +1104,22 @@
                         </div>
                     </div>
 
-                    <input type='file' id='deposit-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300 cursor-pointer'>
                     <button type='button' onclick="submitManualDeposit(${selectedDiamonds}, ${selectedPayRs}, ${isFirstBonusRequest})" class='w-full py-3.5 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>SUBMIT PROOF FOR APPROVAL</button>
                 </div>`;
         }
 
         function submitManualDeposit(totalDias, paidRs, isFirst) {
-            const utrInput = document.getElementById('deposit-utr-input').value.trim();
             const fileInput = document.getElementById('deposit-proof-file');
+            const utrInput = document.getElementById('deposit-utr-input').value.trim();
 
-            if (!utrInput || utrInput.length < 12) {
-                showCustomAlert("❌ Please enter a valid 12-digit UTR number (numbers only)!");
-                return;
-            }
+            // COMPULSORY VALIDATION CHECK FOR BOTH UTR AND SCREENSHOT
             if (!fileInput.files || fileInput.files.length === 0) { 
                 showCustomAlert("❌ Please upload a clear payment screenshot!"); 
                 return; 
+            }
+            if (!utrInput || utrInput.length < 12) {
+                showCustomAlert("❌ Please enter a valid 12-digit UTR number (numbers only)!");
+                return;
             }
 
             const reader = new FileReader();
@@ -1128,7 +1135,7 @@
                     isFirstBonus: isFirst,
                     time: Date.now()
                 }).then(() => {
-                    showCustomAlert("🎉 Payment screenshot and UTR submitted successfully!");
+                    showCustomAlert("🎉 Payment proof and UTR submitted successfully!");
                     closeModal();
                 }).catch((err) => {
                     showCustomAlert("❌ Error: " + err.message);
