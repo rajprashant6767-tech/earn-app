@@ -466,7 +466,7 @@
         </div>
     </div>
 
-    <!-- FULL STABLE SYSTEM SCRIPT -->
+    <!-- FINAL STABLE SYSTEM SCRIPT -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBi30pzPsMX7ICY20_g...",
@@ -998,8 +998,8 @@
             let firstTimeOfferHTML = "";
             if (!hasClaimedFirstBonus) {
                 firstTimeOfferHTML = `
-                    <div class='bg-emerald-500/10 border border-emerald-500/30 p-3 rounded-2xl text-emerald-300 font-bold text-center mb-2'>
-                        🔥 First Deposit Offer: Pay ₹50 get 53 Diamonds (+3 Free)! (One Time Only)
+                    <div class='bg-emerald-500/10 border border-emerald-500/30 p-2.5 rounded-xl text-emerald-300 font-bold text-center mb-2 text-[11px]'>
+                        🔥 First Deposit Offer: Pay ₹50 get 53 Diamonds (One Time Only)
                     </div>
                     <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300 mb-3'>
                         <div onclick="selectFirstDepositOffer()" class='bg-emerald-600/20 p-2.5 rounded-xl border border-emerald-400 cursor-pointer text-center text-emerald-300 col-span-2'>50 💎 + 3 Free (₹50)</div>
@@ -1039,7 +1039,7 @@
             selectedDiamonds = 53;
             selectedPayRs = 50;
             isFirstBonusRequest = true;
-            document.getElementById('deposit-amount-input').value = "53 (₹50)";
+            document.getElementById('deposit-amount-input').value = "53";
         }
 
         function selectDepositOffer(dias, paid) {
@@ -1063,7 +1063,7 @@
             document.getElementById('modal-title').innerText = `PAY ₹${selectedPayRs} FOR ${selectedDiamonds} DIAMONDS`;
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-3 text-xs text-center'>
-                    <p class='text-emerald-400 font-bold'>Merchant Name: <span class='text-white'>Prashant</span></p>
+                    <p class='text-emerald-400 font-bold'>Account Name: <span class='text-white'>Prashant Raj</span></p>
                     <div class='flex justify-center my-1'>
                         <div class='bg-white p-2.5 rounded-2xl shadow-xl inline-block'>
                             <img src='https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(upiString)}' alt='QR' class='w-32 h-32 object-contain rounded-xl'>
@@ -1071,10 +1071,16 @@
                     </div>
                     <p class='text-gray-300 text-[11px] font-semibold'>Scan this QR using PhonePe, GPay or Paytm</p>
                     
-                    <!-- WARNING & NOTE ADDED -->
-                    <div class='bg-amber-500/10 border border-amber-500/30 p-3 rounded-xl text-amber-300 text-[11px] font-semibold text-left space-y-1'>
+                    <!-- WARNING & NOTE WITH TELEGRAM CONTACT ICON -->
+                    <div class='bg-amber-500/10 border border-amber-500/30 p-3 rounded-xl text-amber-300 text-[11px] font-semibold text-left space-y-1.5'>
                         <p>⚠️ <b>Warning:</b> Do not pay wrong amount. Pay exact ₹${selectedPayRs}.</p>
                         <p>📌 <b>Note:</b> Upload valid payment screenshot after payment completion for instant approval.</p>
+                        <div class='pt-1 border-t border-amber-500/20 flex items-center justify-between'>
+                            <span>If user face any problem then contact me:</span>
+                            <a href='https://t.me/Raj_Prashant' target='_blank' class='bg-sky-500/20 text-sky-400 hover:bg-sky-500/30 px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition'>
+                                <i class='fa-brands fa-telegram text-sm'></i> Contact
+                            </a>
+                        </div>
                     </div>
 
                     <input type='file' id='deposit-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300 cursor-pointer'>
@@ -1152,7 +1158,7 @@
             loadAdminRealtimeData();
         }
 
-        // 100% UNFAILING ONE-TIME BONUS DEPOSIT APPROVAL ENGINE
+        // ONE-TIME BONUS DEPOSIT APPROVAL ENGINE
         function approveDeposit(docId, tUserId, tUsername, dias, paidRs, isFirst) {
             db.collection("deposits").doc(docId).update({ status: "Success" }).then(() => {
                 db.collection("users").where("username", "==", tUsername).limit(1).get().then((querySnap) => {
