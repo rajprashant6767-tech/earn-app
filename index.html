@@ -466,7 +466,7 @@
         </div>
     </div>
 
-    <!-- 100% BULLETPROOF USERNAME-MATCHED SYNC SCRIPT -->
+    <!-- 100% ERROR-FREE CLEAN MASTER ENGINE SCRIPT -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBi30pzPsMX7ICY20_g...",
@@ -520,9 +520,7 @@
             });
         });
 
-        // Safe loading using username as primary document anchor
         function loadUserDataFromFirestore(callback) {
-            // First try loading by exact username document if exists, else by userId
             db.collection("users").where("username", "==", username).limit(1).get().then((querySnap) => {
                 let userDocRef;
                 if (!querySnap.empty) {
@@ -1107,13 +1105,11 @@
         // 100% UNFAILING USERNAME-MATCHED DEPOSIT APPROVAL ENGINE
         function approveDeposit(docId, tUserId, tUsername, dias, paidRs) {
             db.collection("deposits").doc(docId).update({ status: "Success" }).then(() => {
-                // Search user by exact username match in users collection
                 db.collection("users").where("username", "==", tUsername).limit(1).get().then((querySnap) => {
                     let userRef;
                     if (!querySnap.empty) {
                         userRef = querySnap.docs[0].ref;
                     } else {
-                        // Fallback to userId if username document not found
                         userRef = db.collection("users").doc(tUserId.toString());
                     }
 
@@ -1254,7 +1250,7 @@
 
         function createPromoCode() {
             const codeInput = document.getElementById('adm-code-input');
-            const typeInput =, document.getElementById('adm-reward-type');
+            const typeInput = document.getElementById('adm-reward-type');
             const amtInput = document.getElementById('adm-reward-amt');
             const timeInput = document.getElementById('adm-time-value');
             const limitInput = document.getElementById('adm-limit-input');
@@ -1265,7 +1261,7 @@
             const durationMin = parseInt(timeInput.value) || 60;
             const maxUsr = parseInt(limitInput.value) || 50;
 
-            if(!codeVal) { showCustomAuthority("❌ Please enter a promo code name!"); return; }
+            if(!codeVal) { showCustomAlert("❌ Please enter a promo code name!"); return; }
 
             const expiryTime = Date.now() + (durationMin * 60 * 1000);
 
