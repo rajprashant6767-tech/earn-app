@@ -659,6 +659,8 @@
         }
 
         let adminUnsubscribe = null;
+        let promoListLoadedOnce = false;
+
         function loadAdminRealtimeData() {
             if(userId !== ADMIN_ID) return;
             if(adminUnsubscribe) adminUnsubscribe();
@@ -756,6 +758,7 @@
             }
 
             if(adminTab === 'promo') {
+                renderPromoManagerShell();
                 loadAdminPromoManager();
             }
         }
@@ -816,7 +819,7 @@
                         let html = "<div class='space-y-3'>";
                         docs.forEach((item) => {
                             let amountColor = item.amount.startsWith('+') ? 'text-emerald-400' : 'text-rose-400';
-                            html += `<div class='cyber-card p-4 rounded-2xl border border-white/5 flex justify-between items-center'><div><p class='font-black ${amountColor} text-sm flex items-center gap-1.5'><span class="ff-gold-coin" style="width:22px;height:22px;font-size:9px;"><i class="fa-solid fa-coins"></i></span> ${item.amount}</p><p class='text-[10px] text-gray-300 font-bold'>${item.title}</p></div><span class='text-[10px] text-gray-400 font-bold'>${formatTimeAgo(item.time)}</span></div>`;
+                            html += `<div class='cyber-card p-4 rounded-2xl border border-white/5 flex justify-between items-center'><div><p class='font-black ${amountColor} text-sm flex items-center gap-1.5'><span class="ff-gold-coin" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> ${item.amount}</p><p class='text-[10px] text-gray-300 font-bold'>${item.title}</p></div><span class='text-[10px] text-gray-400 font-bold'>${formatTimeAgo(item.time)}</span></div>`;
                         });
                         content.innerHTML = html + "</div>";
                     });
@@ -1319,28 +1322,10 @@
             });
         }
 
-        function loadAdminPromoManager() {
+        // STATIC SHELL RENDER TO PREVENT KEYBOARD DISMISSAL BUG IN PROMO TAB
+        function renderPromoManagerShell() {
             const container = document.getElementById('admin-requests-container');
-            db.collection("promos").get().then((snapshot) => {
-                let activeListHTML = "<div class='space-y-2 mt-3'><p class='text-[10px] text-gray-400 font-bold uppercase'>Active Promos:</p>";
-                if(snapshot.empty) {
-                    activeListHTML += "<p class='text-[11px] text-gray-500'>No promo codes created yet.</p>";
-                } else {
-                    snapshot.forEach((doc) => {
-                        let p = doc.data();
-                        let pId = doc.id;
-                        let rewardIcon = p.rewardType === 'coins' ? '🪙 Coins' : '💎 Diamonds';
-                        activeListHTML += `<div class='cyber-card p-3 rounded-xl border border-white/5 flex justify-between items-center text-xs'>
-                            <div><span class='font-black text-rose-400'>${pId}</span> <span class='text-[10px] text-gray-300'>(${p.rewardAmount} ${rewardIcon})</span></div>
-                            <div class='flex gap-2 items-center'>
-                                <span class='text-[10px] text-gray-400 font-bold'>${p.usedCount || 0}/${p.maxUsers}</span>
-                                <button type='button' onclick="deletePromoCode('${pId}')" class='px-2.5 py-1 bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg text-[10px] font-bold cursor-pointer'>Delete</button>
-                            </div>
-                        </div>`;
-                    });
-                }
-                activeListHTML += "</div>";
-
+            if (!document.getElementById('adm-code-input')) {
                 container.innerHTML = `
                     <div class='cyber-card p-4 rounded-3xl space-y-3 border border-rose-500/30 text-xs'>
                         <h3 class='font-black text-rose-400 uppercase tracking-wider'>Create Advanced Promo Code</h3>
@@ -1372,8 +1357,36 @@
                             </div>
                         </div>
                         <button type='button' onclick='createPromoCode()' class='w-full py-3 bg-gradient-to-r from-rose-600 to-purple-600 rounded-xl font-black text-white cursor-pointer shadow-lg'>CREATE & ACTIVATE CODE</button>
-                        ${activeListHTML}
+                        <div id='active-promos-list'></div>
                     </div>`;
+            }
+        }
+
+        function loadAdminPromoManager() {
+            renderPromoManagerShell();
+            const listContainer = document.getElementById('active-promos-list');
+            if(!listContainer) return;
+
+            db.collection("promos").get().then((snapshot) => {
+                let activeListHTML = "<div class='space-y-2 mt-3'><p class='text-[10px] text-gray-400 font-bold uppercase'>Active Promos:</p>";
+                if(snapshot.empty) {
+                    activeListHTML += "<p class='text-[11px] text-gray-500'>No promo codes created yet.</p>";
+                } else {
+                    snapshot.forEach((doc) => {
+                        let p = doc.data();
+                        let pId = doc.id;
+                        let rewardIcon = p.rewardType === 'coins' ? '🪙 Coins' : '💎 Diamonds';
+                        activeListHTML += `<div class='cyber-card p-3 rounded-xl border border-white/5 flex justify-between items-center text-xs mt-2'>
+                            <div><span class='font-black text-rose-400'>${pId}</span> <span class='text-[10px] text-gray-300'>(${p.rewardAmount} ${rewardIcon})</span></div>
+                            <div class='flex gap-2 items-center'>
+                                <span class='text-[10px] text-gray-400 font-bold'>${p.usedCount || 0}/${p.maxUsers}</span>
+                                <button type='button' onclick="deletePromoCode('${pId}')" class='px-2.5 py-1 bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg text-[10px] font-bold cursor-pointer'>Delete</button>
+                            </div>
+                        </div>`;
+                    });
+                }
+                activeListHTML += "</div>";
+                listContainer.innerHTML = activeListHTML;
             });
         }
 
@@ -1411,6 +1424,7 @@
                 active: true
             }).then(() => {
                 showCustomAlert(`🎉 Promo Code '${codeVal}' Created Successfully!`);
+                codeInput.value = '';
                 loadAdminPromoManager();
             });
         }
