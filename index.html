@@ -1076,37 +1076,37 @@
 
             if (hasAnyBonus) {
                 bonusOffersHTML += `
-                    <div class='bg-emerald-500/15 border border-emerald-500/40 p-2.5 rounded-xl text-emerald-300 font-bold text-center mb-2 text-[11px]'>
+                    <div class='bg-emerald-500/15 border border-emerald-500/40 p-2 rounded-xl text-emerald-300 font-bold text-center mb-1.5 text-[10px]'>
                         🔥 First Time Offers (Valid for 1st Time Only)
                     </div>
-                    <div class='grid grid-cols-2 gap-2 text-[11px] font-bold text-gray-300 mb-2'>`;
+                    <div class='grid grid-cols-2 gap-1.5 text-[10px] font-bold text-gray-300 mb-2'>`;
                 
                 if (!claimedBonuses[50]) {
-                    bonusOffersHTML += `<div onclick="selectDepositOffer(53, 50, 50)" class='bg-black/50 p-2.5 rounded-xl border border-emerald-500/40 cursor-pointer text-center text-emerald-300 hover:border-emerald-300 transition'>50 💎 + 3 Free (₹50)</div>`;
+                    bonusOffersHTML += `<div onclick="selectDepositOffer(53, 50, 50)" class='bg-black/50 p-2 rounded-xl border border-emerald-500/40 cursor-pointer text-center text-emerald-300 hover:border-emerald-300 transition'>50 💎 + 3 Free (₹50)</div>`;
                 }
                 if (!claimedBonuses[100]) {
-                    bonusOffersHTML += `<div onclick="selectDepositOffer(108, 100, 100)" class='bg-black/50 p-2.5 rounded-xl border border-emerald-500/40 cursor-pointer text-center text-emerald-300 hover:border-emerald-300 transition'>100 💎 + 8 Free (₹100)</div>`;
+                    bonusOffersHTML += `<div onclick="selectDepositOffer(108, 100, 100)" class='bg-black/50 p-2 rounded-xl border border-emerald-500/40 cursor-pointer text-center text-emerald-300 hover:border-emerald-300 transition'>100 💎 + 8 Free (₹100)</div>`;
                 }
                 if (!claimedBonuses[200]) {
-                    bonusOffersHTML += `<div onclick="selectDepositOffer(218, 200, 200)" class='bg-black/50 p-2.5 rounded-xl border border-emerald-500/40 cursor-pointer text-center text-emerald-300 hover:border-emerald-300 transition'>200 💎 + 18 Free (₹200)</div>`;
+                    bonusOffersHTML += `<div onclick="selectDepositOffer(218, 200, 200)" class='bg-black/50 p-2 rounded-xl border border-emerald-500/40 cursor-pointer text-center text-emerald-300 hover:border-emerald-300 transition'>200 💎 + 18 Free (₹200)</div>`;
                 }
                 if (!claimedBonuses[500]) {
-                    bonusOffersHTML += `<div onclick="selectDepositOffer(550, 500, 500)" class='bg-black/50 p-2.5 rounded-xl border border-emerald-500/40 cursor-pointer text-center col-span-2 hover:border-emerald-300 transition text-emerald-300'>500 💎 + 50 Free (₹500)</div>`;
+                    bonusOffersHTML += `<div onclick="selectDepositOffer(550, 500, 500)" class='bg-black/50 p-2 rounded-xl border border-emerald-500/40 cursor-pointer text-center col-span-2 hover:border-emerald-300 transition text-emerald-300'>500 💎 + 50 Free (₹500)</div>`;
                 }
                 bonusOffersHTML += `</div>`;
             }
 
             document.getElementById('modal-content').innerHTML = `
-                <div class='space-y-4 text-xs'>
-                    <div class='bg-cyan-500/10 border border-cyan-500/30 p-3 rounded-2xl text-cyan-300 font-bold text-center flex items-center justify-center gap-1.5 shadow-inner'>
-                        1 <span class="ff-diamond" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-gem"></i></span> = ₹1 Rs
+                <div class='space-y-3 text-xs'>
+                    <div class='bg-cyan-500/10 border border-cyan-500/30 p-2.5 rounded-2xl text-cyan-300 font-bold text-center flex items-center justify-center gap-1.5 shadow-inner'>
+                        1 <span class="ff-diamond" style="width:16px;height:16px;font-size:6px;"><i class="fa-solid fa-gem"></i></span> = ₹1 Rs
                     </div>
                     ${bonusOffersHTML}
-                    <div class='pt-1'>
-                        <label class='text-gray-300 font-bold block mb-1.5 uppercase text-[11px]'>1-1000 diamond tak hi user add kar sakta hai</label>
-                        <input type='number' id='deposit-amount-input' min='1' max='1000' placeholder='e.g. 50' oninput="clearPackageSelection()" class='w-full bg-black/50 border border-white/10 p-3.5 rounded-2xl font-black text-cyan-400 focus:outline-none focus:border-cyan-500 transition'>
+                    <div>
+                        <label class='text-gray-300 font-bold block mb-1 uppercase text-[10px]'>1-1000 diamond tak hi user add kar sakta hai</label>
+                        <input type='number' id='deposit-amount-input' min='1' max='1000' placeholder='e.g. 50' oninput="clearPackageSelection()" class='w-full bg-black/50 border border-white/10 p-3 rounded-2xl font-black text-cyan-400 focus:outline-none focus:border-cyan-500 transition'>
                     </div>
-                    <button type='button' onclick='proceedToPayment()' class='w-full py-4 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>NEXT</button>
+                    <button type='button' onclick='proceedToPayment()' class='w-full py-3.5 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>NEXT</button>
                 </div>`;
         }
 
@@ -1143,40 +1143,40 @@
             document.getElementById('modal-title').innerText = `PAY ₹${selectedPayRs} FOR ${selectedDiamonds} DIAMONDS`;
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-3 text-xs text-center'>
-                    <div class='bg-black/50 border border-white/10 py-2.5 px-4 rounded-xl inline-block w-full'>
+                    <div class='bg-black/50 border border-white/10 py-2 px-4 rounded-xl inline-block w-full'>
                         <p class='text-[10px] text-gray-400 font-bold uppercase tracking-widest'>Official Account Name</p>
                         <p class='text-emerald-400 font-black text-sm tracking-wide mt-0.5'>Prashant Raj</p>
                     </div>
                     
                     <div class='flex justify-center my-1'>
-                        <div class='bg-white p-2.5 rounded-2xl shadow-xl inline-block'>
-                            <img src='https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(upiString)}' alt='QR' class='w-32 h-32 object-contain rounded-xl'>
+                        <div class='bg-white p-2 rounded-2xl shadow-xl inline-block'>
+                            <img src='https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(upiString)}' alt='QR' class='w-28 h-28 object-contain rounded-xl'>
                         </div>
                     </div>
                     <p class='text-gray-300 text-[11px] font-semibold'>Scan this QR using PhonePe, GPay or Paytm</p>
                     
-                    <div class='bg-amber-500/10 border border-amber-500/30 p-3 rounded-xl text-amber-300 text-[11px] font-semibold text-left space-y-1.5'>
+                    <div class='bg-amber-500/10 border border-amber-500/30 p-2.5 rounded-xl text-amber-300 text-[10px] font-semibold text-left space-y-1'>
                         <p>⚠️ <b>Warning:</b> Do not pay wrong amount. Pay exact ₹${selectedPayRs}. Please attach a <b>clear payment screenshot</b> and correct UTR number.</p>
                         <p>📌 <b>Note:</b> Both UTR and Screenshot are compulsory for instant approval.</p>
-                        <div class='pt-1.5 border-t border-amber-500/20 flex items-center justify-between'>
-                            <span class='text-[10px] text-gray-300'>If you face any problem contact me:</span>
-                            <a href='https://t.me/Raj_Prashant' target='_blank' class='bg-sky-500/20 text-sky-400 hover:bg-sky-500/30 px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition text-[10px]'>
-                                <i class='fa-brands fa-telegram text-sm'></i> Contact Support
+                        <div class='pt-1 border-t border-amber-500/20 flex items-center justify-between'>
+                            <span class='text-[9px] text-gray-300'>If you face any problem contact me:</span>
+                            <a href='https://t.me/Raj_Prashant' target='_blank' class='bg-sky-500/20 text-sky-400 hover:bg-sky-500/30 px-2.5 py-1 rounded-xl font-bold flex items-center gap-1 transition text-[9px]'>
+                                <i class='fa-brands fa-telegram text-xs'></i> Contact Support
                             </a>
                         </div>
                     </div>
 
-                    <div class='text-left space-y-1 pt-1'>
+                    <div class='text-left space-y-1 pt-0.5'>
                         <label class='text-[10px] text-gray-300 font-bold uppercase tracking-wider block'>Enter 12-Digit UTR / Transaction ID</label>
-                        <input type='text' id='deposit-utr-input' maxlength='12' oninput='this.value = this.value.replace(/[^0-9]/g, "")' placeholder='e.g. 423512345678' class='w-full bg-black/50 border border-sky-500/40 p-3 text-xs rounded-xl text-sky-300 font-mono font-bold tracking-wider focus:outline-none focus:border-sky-400'>
+                        <input type='text' id='deposit-utr-input' maxlength='12' oninput='this.value = this.value.replace(/[^0-9]/g, "")' placeholder='e.g. 423512345678' class='w-full bg-black/50 border border-sky-500/40 p-2.5 text-xs rounded-xl text-sky-300 font-mono font-bold tracking-wider focus:outline-none focus:border-sky-400'>
                     </div>
 
                     <div class='text-left space-y-1'>
                         <label class='text-[10px] text-gray-300 font-bold uppercase tracking-wider block'>Upload Clear Payment Screenshot</label>
-                        <input type='file' id='deposit-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300 cursor-pointer'>
+                        <input type='file' id='deposit-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2 text-xs rounded-2xl text-gray-300 cursor-pointer'>
                     </div>
 
-                    <button type='button' onclick="submitManualDeposit(${selectedDiamonds}, ${selectedPayRs}, ${selectedBonusTier})" class='w-full py-3.5 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>SUBMIT PROOF FOR APPROVAL</button>
+                    <button type='button' onclick="submitManualDeposit(${selectedDiamonds}, ${selectedPayRs}, ${selectedBonusTier})" class='w-full py-3 shiny-green-btn rounded-2xl font-black text-xs text-white cursor-pointer'>SUBMIT PROOF FOR APPROVAL</button>
                 </div>`;
         }
 
@@ -1443,9 +1443,10 @@
 
             if(!codeVal) { showCustomAlert("❌ Please enter a promo code name!"); return; }
 
+            // FIX: Prevent duplicate creation if promo code already exists in Firestore
             db.collection("promos").doc(codeVal).get().then((docSnapshot) => {
                 if (docSnapshot.exists) {
-                    showCustomAlert(`❌ Promo code '${codeVal}' already exists or was already used! Cannot recreate same code.`);
+                    showCustomAlert(`❌ Promo code '${codeVal}' pehle se hi exist karta hai! Dobara nahi ban sakta.`);
                     return;
                 }
 
