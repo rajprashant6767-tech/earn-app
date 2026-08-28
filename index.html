@@ -983,7 +983,7 @@
 
                     if (usedPromos.includes(promoVal)) {
                         statusMsg.className = "text-[11px] h-6 font-semibold text-rose-400";
-                        statusMsg.innerText = "❌ You have already used this promo code!";
+                        statusMsg.innerText = "❌ Yeh promo code aap pehle hi use kar chuke hain!";
                         if(promoMsgTimer) clearTimeout(promoMsgTimer);
                         promoMsgTimer = setTimeout(() => { statusMsg.innerText = ""; }, 4000);
                         return;
@@ -999,6 +999,13 @@
                         }
 
                         let p = doc.data();
+                        
+                        if (p.usedCount && p.usedCount >= p.maxUsers) {
+                            statusMsg.className = "text-[11px] h-6 font-semibold text-rose-400";
+                            statusMsg.innerText = "❌ Is promo code ki limit khatam ho chuki hai!";
+                            return;
+                        }
+
                         if(p.rewardType === 'coins') {
                             userCoins += p.rewardAmount;
                             saveUserBalances(`Promo Code (${promoVal})`, `+${p.rewardAmount} Coins`, "coin");
@@ -1121,7 +1128,10 @@
         function proceedToPayment() {
             const inputVal = document.getElementById('deposit-amount-input').value;
             const amt = parseInt(inputVal);
-            if(isNaN(amt) || amt < 1 || amt > 1000) { showCustomAlert("❌ Enter valid amount (1 - 1000)"); return; }
+            if(isNaN(amt) || amt < 1 || amt > 1000) { 
+                showCustomAlert("❌ Amount 1 se 1000 ke beech hi hona chahiye!"); 
+                return; 
+            }
             
             if(selectedBonusTier === 0) {
                 selectedPayRs = amt;
@@ -1133,7 +1143,6 @@
             document.getElementById('modal-title').innerText = `PAY ₹${selectedPayRs} FOR ${selectedDiamonds} DIAMONDS`;
             document.getElementById('modal-content').innerHTML = `
                 <div class='space-y-3 text-xs text-center'>
-                    <!-- NORMAL CLEAN ACCOUNT NAME -->
                     <div class='bg-black/50 border border-white/10 py-2.5 px-4 rounded-xl inline-block w-full'>
                         <p class='text-[10px] text-gray-400 font-bold uppercase tracking-widest'>Official Account Name</p>
                         <p class='text-emerald-400 font-black text-sm tracking-wide mt-0.5'>Prashant Raj</p>
@@ -1146,7 +1155,6 @@
                     </div>
                     <p class='text-gray-300 text-[11px] font-semibold'>Scan this QR using PhonePe, GPay or Paytm</p>
                     
-                    <!-- WARNING & NOTE BOX PLACED RIGHT AFTER QR CODE -->
                     <div class='bg-amber-500/10 border border-amber-500/30 p-3 rounded-xl text-amber-300 text-[11px] font-semibold text-left space-y-1.5'>
                         <p>⚠️ <b>Warning:</b> Do not pay wrong amount. Pay exact ₹${selectedPayRs}. Please attach a <b>clear payment screenshot</b> and correct UTR number.</p>
                         <p>📌 <b>Note:</b> Both UTR and Screenshot are compulsory for instant approval.</p>
@@ -1158,13 +1166,11 @@
                         </div>
                     </div>
 
-                    <!-- UTR NUMBER INPUT BOX -->
                     <div class='text-left space-y-1 pt-1'>
                         <label class='text-[10px] text-gray-300 font-bold uppercase tracking-wider block'>Enter 12-Digit UTR / Transaction ID</label>
                         <input type='text' id='deposit-utr-input' maxlength='12' oninput='this.value = this.value.replace(/[^0-9]/g, "")' placeholder='e.g. 423512345678' class='w-full bg-black/50 border border-sky-500/40 p-3 text-xs rounded-xl text-sky-300 font-mono font-bold tracking-wider focus:outline-none focus:border-sky-400'>
                     </div>
 
-                    <!-- CHOOSE FILE BELOW UTR BOX -->
                     <div class='text-left space-y-1'>
                         <label class='text-[10px] text-gray-300 font-bold uppercase tracking-wider block'>Upload Clear Payment Screenshot</label>
                         <input type='file' id='deposit-proof-file' accept='image/*' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-2xl text-gray-300 cursor-pointer'>
@@ -1348,7 +1354,6 @@
             });
         }
 
-        // STATIC SHELL RENDER TO PREVENT KEYBOARD DISMISSAL BUG IN PROMO TAB
         function renderPromoManagerShell() {
             const container = document.getElementById('admin-requests-container');
             if (!document.getElementById('adm-code-input')) {
@@ -1438,41 +1443,26 @@
 
             if(!codeVal) { showCustomAlert("❌ Please enter a promo code name!"); return; }
 
-            // CHECK GLOBAL HISTORY SO DELETED CODES CANNOT BE RE-CREATED
-            db.collection("used_global_promos").doc(codeVal).get().then((historyDoc) => {
-                if (historyDoc.exists) {
-                    showCustomAlert(`⚠️ Notification: Promo code '${codeVal}' has already been created and used in the past. You cannot create the same code again even if it was deleted!`);
+            db.collection("promos").doc(codeVal).get().then((docSnapshot) => {
+                if (docSnapshot.exists) {
+                    showCustomAlert(`❌ Promo code '${codeVal}' already exists or was already used! Cannot recreate same code.`);
                     return;
                 }
 
-                // CHECK CURRENT ACTIVE PROMOS
-                db.collection("promos").doc(codeVal).get().then((docSnapshot) => {
-                    if (docSnapshot.exists) {
-                        showCustomAlert(`❌ Promo code '${codeVal}' already exists currently!`);
-                        return;
-                    }
+                const expiryTime = Date.now() + (durationMin * 60 * 1000);
 
-                    const expiryTime = Date.now() + (durationMin * 60 * 1000);
-
-                    // SAVE TO BOTH ACTIVE PROMOS AND PERMANENT GLOBAL HISTORY
-                    const promoData = {
-                        code: codeVal,
-                        rewardType: rewardType,
-                        rewardAmount: rewardAmount,
-                        expiryTime: expiryTime,
-                        maxUsers: maxUsr,
-                        usedCount: 0,
-                        active: true
-                    };
-
-                    Promise.all([
-                        db.collection("promos").doc(codeVal).set(promoData),
-                        db.collection("used_global_promos").doc(codeVal).set({ code: codeVal, createdAt: Date.now() })
-                    ]).then(() => {
-                        showCustomAlert(`🎉 Promo Code '${codeVal}' Created Successfully!`);
-                        codeInput.value = '';
-                        loadAdminPromoManager();
-                    });
+                db.collection("promos").doc(codeVal).set({
+                    code: codeVal,
+                    rewardType: rewardType,
+                    rewardAmount: rewardAmount,
+                    expiryTime: expiryTime,
+                    maxUsers: maxUsr,
+                    usedCount: 0,
+                    active: true
+                }).then(() => {
+                    showCustomAlert(`🎉 Promo Code '${codeVal}' Created Successfully!`);
+                    codeInput.value = '';
+                    loadAdminPromoManager();
                 });
             });
         }
