@@ -785,11 +785,24 @@
                     let witHTML = "";
                     docs.forEach((r) => {
                         let redeemInputHTML = (r.method.includes('Gift Card')) ? `<input type='text' id='redeem-code-${r.id}' placeholder='Enter Redeem Code' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-xl text-sky-400 font-bold uppercase mt-2'>` : '';
+                        let detailsHTML = '';
+                        if(r.details) {
+                            const upiMatch = String(r.details).match(/\(UPI:\s*([^\)]+)\)/i);
+                            if(upiMatch) {
+                                const upiId = upiMatch[1].trim();
+                                detailsHTML = `<div class='flex items-center justify-between gap-2 mt-1 p-2 rounded-xl bg-black/30 border border-white/5'>
+                                    <p class='text-[10px] text-gray-300 break-all'>UPI: <span class='text-white font-bold'>${upiId}</span></p>
+                                    <button type='button' onclick='copyText(${JSON.stringify(upiId)})' class='shrink-0 w-8 h-8 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 border border-sky-400/20 text-sky-300 flex items-center justify-center cursor-pointer transition active:scale-90' title='Copy UPI ID'><i class='fa-solid fa-copy'></i></button>
+                                </div>`;
+                            } else {
+                                detailsHTML = `<p class='text-[10px] text-gray-400'>${r.details}</p>`;
+                            }
+                        }
                         witHTML += `
                             <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2 text-xs'>
                                 <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-amber-400 text-sm'>${r.amount} Coins (₹${r.rupees})</span></div>
                                 <p class='text-gray-300 font-bold'>Method: <span class="text-white">${r.method}</span></p>
-                                ${r.details ? `<p class='text-[10px] text-gray-400'>${r.details}</p>` : ''}
+                                ${detailsHTML}
                                 ${redeemInputHTML}
                                 <div class="grid grid-cols-2 gap-2 mt-2">
                                     <button type='button' onclick="approveWithdraw('${r.id}', '${r.method}')" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
@@ -963,7 +976,7 @@
 
                         let html = "<div class='space-y-3'>";
                         docs.forEach((item) => {
-                            let redeemBox = item.redeemCode ? `<div class='flex items-center gap-2 mt-1'><span class='text-xs text-sky-300 font-mono'>🔑 Redeem Code: <b>${item.redeemCode}</b></span></div>` : '';
+                            let redeemBox = item.redeemCode ? `<div class='flex items-center justify-between gap-2 mt-1 p-2 rounded-xl bg-black/30 border border-white/5'><span class='text-xs text-sky-300 font-mono break-all'>🔑 Redeem Code: <b>${item.redeemCode}</b></span><button type='button' onclick='copyText(${JSON.stringify(String(item.redeemCode))})' class='shrink-0 w-8 h-8 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 border border-sky-400/20 text-sky-300 flex items-center justify-center cursor-pointer transition active:scale-90' title='Copy Redeem Code'><i class='fa-solid fa-copy'></i></button></div>` : '';
                             let statusClass = item.status.includes('Success') ? 'text-emerald-400' : (item.status.includes('Rejected') ? 'text-rose-400' : 'text-amber-400');
                             html += `<div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-1'>
                                 <div class='flex justify-between items-center'>
@@ -1481,7 +1494,39 @@
         }
 
         function closeModal() { document.getElementById('modal').classList.add('hidden'); }
-        function copyRef() { navigator.clipboard.writeText(document.getElementById('ref-code').innerText); showCustomAlert("Referral Code Copied!"); }
+        function copyText(text) {
+            const value = String(text || '');
+            if(!value) return;
+
+            if(navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(value).then(() => {
+                    showCustomAlert("✅ Copied!");
+                }).catch(() => {
+                    fallbackCopyText(value);
+                });
+            } else {
+                fallbackCopyText(value);
+            }
+        }
+
+        function fallbackCopyText(text) {
+            const temp = document.createElement('textarea');
+            temp.value = text;
+            temp.style.position = 'fixed';
+            temp.style.opacity = '0';
+            document.body.appendChild(temp);
+            temp.focus();
+            temp.select();
+            try {
+                document.execCommand('copy');
+                showCustomAlert("✅ Copied!");
+            } catch(e) {
+                showCustomAlert("❌ Copy failed. Please copy manually.");
+            }
+            temp.remove();
+        }
+
+        function copyRef() { copyText(document.getElementById('ref-code').innerText); }
 
         function submitWithdrawRequest(method) {
             if(!selectedWCoins || !selectedWAmount) { showCustomAlert("❌ Select package first!"); return; }
@@ -1590,32 +1635,58 @@
         }
 
         function rejectWithdraw(docId, tUserId, tUsername, coins) {
-            db.collection("withdrawals").doc(docId).update({ status: "Rejected (Refunded)" }).then(() => {
-                db.collection("users").where("username", "==", username).limit(1).get().then((querySnap) => {
-                    let userRef;
-                    if (!querySnap.empty) {
-                        userRef = querySnap.docs[0].ref;
-                    } else {
-                        userRef = db.collection("users").doc(tUserId.toString());
-                    }
+            const withdrawalRef = db.collection("withdrawals").doc(docId);
+            const userRef = db.collection("users").doc(tUserId.toString());
+            const refundCoins = Number(coins);
 
-                    userRef.set({
-                        coins: firebase.firestore.FieldValue.increment(Number(coins)),
-                        userId: tUserId.toString(),
-                        username: tUsername,
-                        lastActive: Date.now()
-                    }, { merge: true }).then(() => {
-                        userRef.collection("coin_history").add({
-                            title: `Withdrawal Refund`,
-                            amount: `+${coins} Coins`,
-                            type: "coin",
-                            time: Date.now(),
-                            status: "Success"
-                        }).then(() => {
-                            showCustomAlert("❌ Payout Rejected & Coins Refunded!");
-                        });
-                    });
+            if (!refundCoins || refundCoins <= 0) {
+                showCustomAlert("❌ Invalid refund amount!");
+                return;
+            }
+
+            db.runTransaction(async (transaction) => {
+                const withdrawalDoc = await transaction.get(withdrawalRef);
+
+                if (!withdrawalDoc.exists) {
+                    throw new Error("WITHDRAWAL_NOT_FOUND");
+                }
+
+                const withdrawalData = withdrawalDoc.data();
+
+                // Prevent double refund / double processing
+                if (withdrawalData.status && withdrawalData.status !== "Pending") {
+                    throw new Error("ALREADY_PROCESSED");
+                }
+
+                transaction.update(withdrawalRef, {
+                    status: "Rejected (Refunded)"
                 });
+
+                transaction.set(userRef, {
+                    coins: firebase.firestore.FieldValue.increment(refundCoins),
+                    userId: tUserId.toString(),
+                    username: tUsername,
+                    lastActive: Date.now()
+                }, { merge: true });
+            }).then(() => {
+                return userRef.collection("coin_history").add({
+                    title: `Withdrawal Refund`,
+                    amount: `+${refundCoins} Coins`,
+                    type: "coin",
+                    time: Date.now(),
+                    status: "Success"
+                });
+            }).then(() => {
+                showCustomAlert(`❌ Payout Rejected & ${refundCoins} Coins Refunded!`);
+            }).catch((err) => {
+                if (err.message === "ALREADY_PROCESSED") {
+                    showCustomAlert("⚠️ This withdrawal has already been processed!");
+                } else if (err.message === "WITHDRAWAL_NOT_FOUND") {
+                    showCustomAlert("❌ Withdrawal request not found!");
+                } else {
+                    console.error("Refund Error:", err);
+                    showCustomAlert("❌ Refund failed: " + err.message);
+                }
             });
         }
 
