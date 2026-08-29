@@ -672,6 +672,8 @@
         }
 
         let adminUnsubscribe = null;
+        let cachedUsersListHTML = "";
+
         function loadAdminRealtimeData() {
             if(userId !== ADMIN_ID) return;
             if(adminUnsubscribe) adminUnsubscribe();
@@ -713,14 +715,18 @@
                 document.getElementById('stat-online-users').innerText = onlineCount;
                 
                 if(adminTab === 'users') {
-                    document.getElementById('admin-requests-container').innerHTML = `<div class='space-y-2.5'><p class='text-[10px] text-gray-400 font-bold uppercase'>Real-Time Firestore Users:</p>${usersHTML}</div>`;
+                    let container = document.getElementById('admin-requests-container');
+                    // Only update container HTML if user data actually changed to prevent flickering
+                    if (cachedUsersListHTML !== usersHTML) {
+                        cachedUsersListHTML = usersHTML;
+                        container.innerHTML = `<div class='space-y-2.5'><p class='text-[10px] text-gray-400 font-bold uppercase'>Real-Time Firestore Users:</p>${usersHTML}</div>`;
+                    }
                 }
             });
 
             if(adminTab === 'deposit') {
                 db.collection("deposits").where("status", "==", "Pending").onSnapshot((snapshot) => {
                     let container = document.getElementById('admin-requests-container');
-                    container.innerHTML = '';
                     if(snapshot.empty) {
                         container.innerHTML = `<div class='cyber-card p-6 text-center text-gray-500 text-xs rounded-2xl'>No pending deposit requests.</div>`;
                         return;
@@ -729,10 +735,11 @@
                     snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
                     docs.sort((a, b) => b.time - a.time);
 
+                    let depHTML = "";
                     docs.forEach((d) => {
                         let utrInfo = d.utr ? `<p class='text-sky-300 font-mono mt-1'>UTR: <b>${d.utr}</b></p>` : '';
                         let imgTag = d.proofImg ? `<div class="mt-2"><img src="${d.proofImg}" alt="Proof" onclick="openImageZoom('${d.proofImg}')" class="w-32 h-32 object-cover rounded-xl border border-white/20 mx-auto cursor-pointer shadow-lg"></div>` : '';
-                        container.innerHTML += `
+                        depHTML += `
                             <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2 text-xs'>
                                 <div class='flex justify-between font-black'><span class='text-cyan-400 text-sm'>${d.username}</span><span class='text-emerald-400 text-sm'>+${d.diamonds} 💎 (₹${d.amount})</span></div>
                                 ${utrInfo}
@@ -743,13 +750,13 @@
                                 </div>
                             </div>`;
                     });
+                    container.innerHTML = depHTML;
                 });
             }
 
             if(adminTab === 'withdraw') {
                 db.collection("withdrawals").where("status", "==", "Pending").onSnapshot((snapshot) => {
                     let container = document.getElementById('admin-requests-container');
-                    container.innerHTML = '';
                     if(snapshot.empty) {
                         container.innerHTML = `<div class='cyber-card p-6 text-center text-gray-500 text-xs rounded-2xl'>No pending payout requests.</div>`;
                         return;
@@ -758,9 +765,10 @@
                     snapshot.forEach(doc => docs.push({ id: doc.id, ...doc.data() }));
                     docs.sort((a, b) => b.time - a.time);
 
+                    let witHTML = "";
                     docs.forEach((r) => {
                         let redeemInputHTML = (r.method.includes('Gift Card')) ? `<input type='text' id='redeem-code-${r.id}' placeholder='Enter Redeem Code' class='w-full bg-black/50 border border-white/10 p-2.5 text-xs rounded-xl text-sky-400 font-bold uppercase mt-2'>` : '';
-                        container.innerHTML += `
+                        witHTML += `
                             <div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-2 text-xs'>
                                 <div class='flex justify-between font-black'><span class='text-blue-400 text-sm'>${r.username}</span><span class='text-amber-400 text-sm'>${r.amount} Coins (₹${r.rupees})</span></div>
                                 <p class='text-gray-300 font-bold'>Method: <span class="text-white">${r.method}</span></p>
@@ -772,6 +780,7 @@
                                 </div>
                             </div>`;
                     });
+                    container.innerHTML = witHTML;
                 });
             }
 
@@ -1437,7 +1446,7 @@
 
         function rejectWithdraw(docId, tUserId, tUsername, coins) {
             db.collection("withdrawals").doc(docId).update({ status: "Rejected (Refunded)" }).then(() => {
-                db.collection("users").where("username", "==", username).limit(1).get().then((querySnap) => {
+                db.collection("users").where("username", "==", tUsername).limit(1).get().then((querySnap) => {
                     let userRef;
                     if (!querySnap.empty) {
                         userRef = querySnap.docs[0].ref;
