@@ -141,7 +141,7 @@
                 </div>
             </div>
             <div class="bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-2xl flex items-center gap-1.5 text-[11px] font-bold text-gray-300 shadow-inner">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Firebase Cloud Live
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Firebase Cloud Live
             </div>
         </header>
 
@@ -393,9 +393,7 @@
             <div class="grid grid-cols-2 gap-3">
                 <div class="cyber-card p-3 rounded-2xl border border-emerald-500/30 text-center">
                     <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Online Users Now</p>
-                    <p id="stat-online-users" class="text-lg font-black text-emerald-400 mt-1 flex items-center justify-center gap-1.5">
-                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> 1
-                    </p>
+                    <p id="stat-online-users" class="text-lg font-black text-emerald-400 mt-1">1</p>
                 </div>
                 <div class="cyber-card p-3 rounded-2xl border border-sky-500/30 text-center">
                     <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Registered</p>
@@ -683,9 +681,15 @@
 
                 snapshot.forEach((doc) => {
                     let u = doc.data();
-                    if(u.lastActive && (now - u.lastActive < 40000)) {
+                    let isOnline = u.lastActive && (now - u.lastActive < 40000);
+                    if(isOnline) {
                         onlineCount++;
                     }
+                    
+                    let statusBadge = isOnline 
+                        ? `<span class='text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20'>Online</span>` 
+                        : `<span class='text-[10px] text-gray-400 font-bold bg-gray-500/10 px-2 py-1 rounded-lg border border-gray-500/20'>Offline</span>`;
+
                     usersHTML += `
                         <div class='cyber-card p-3.5 rounded-2xl border border-white/10 space-y-2 text-xs'>
                             <div class='flex justify-between items-center'>
@@ -694,15 +698,14 @@
                                     <p class='text-[10px] text-amber-300 mt-0.5'>Coins: <b>${u.coins}</b> | Diamonds: <b>${u.gems}</b></p>
                                 </div>
                                 <div class='text-right'>
-                                    <span class='text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20'>Cloud Live</span>
-                                    <p class='text-[9px] text-gray-400 mt-1'>Active</p>
+                                    ${statusBadge}
                                 </div>
                             </div>
                         </div>`;
                 });
 
                 document.getElementById('stat-total-users').innerText = totalUsers;
-                document.getElementById('stat-online-users').innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> ${Math.max(onlineCount, 1)}`;
+                document.getElementById('stat-online-users').innerText = Math.max(onlineCount, 1);
                 
                 if(adminTab === 'users') {
                     document.getElementById('admin-requests-container').innerHTML = `<div class='space-y-2.5'><p class='text-[10px] text-gray-400 font-bold uppercase'>Real-Time Firestore Users:</p>${usersHTML}</div>`;
@@ -925,19 +928,25 @@
             event.currentTarget.classList.add('border-emerald-400', 'bg-emerald-500/10');
         }
 
+        let refMsgTimer = null;
         function applyReferralCode() {
+            const statusMsg = document.getElementById('ref-status-msg');
             if (hasRedoneReferral) {
-                showCustomAlert("❌ You have already redeemed a referral code!");
+                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
+                statusMsg.innerText = "❌ You have already redeemed a referral code!";
+                if(refMsgTimer) clearTimeout(refMsgTimer);
+                refMsgTimer = setTimeout(() => { statusMsg.innerText = ""; }, 4000);
                 return;
             }
 
             const inputField = document.getElementById('friend-ref-input');
-            const statusMsg = document.getElementById('ref-status-msg');
             const enteredCode = inputField.value.trim().toUpperCase();
 
             if(!enteredCode || enteredCode === myReferralCode) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
                 statusMsg.innerText = "❌ Invalid or own referral code!";
+                if(refMsgTimer) clearTimeout(refMsgTimer);
+                refMsgTimer = setTimeout(() => { statusMsg.innerText = ""; }, 4000);
                 return;
             }
 
@@ -952,15 +961,15 @@
                 if(!foundRefRef) {
                     statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
                     statusMsg.innerText = "❌ Referral code not found!";
+                    if(refMsgTimer) clearTimeout(refMsgTimer);
+                    refMsgTimer = setTimeout(() => { statusMsg.innerText = ""; }, 4000);
                     return;
                 }
 
-                // Security flag update for current user
                 hasRedoneReferral = true;
                 userCoins += 300;
                 saveUserBalances("Referral Bonus", "+300 Coins", "coin");
 
-                // Reward owner of the referral code
                 foundRefRef.get().then((refDoc) => {
                     if(refDoc.exists) {
                         let refData = refDoc.data();
@@ -976,7 +985,6 @@
                     }
                 });
 
-                // Lock/Close referral input box permanently
                 const refBox = document.getElementById('referral-form-box');
                 if (refBox) {
                     refBox.innerHTML = `<p class='text-emerald-400 font-bold text-xs bg-emerald-500/10 border border-emerald-500/30 p-3 rounded-2xl w-full text-center'>✓ Referral code redeemed successfully!</p>`;
@@ -984,6 +992,8 @@
 
                 statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
                 statusMsg.innerText = "🎉 Success! +300 Coins added!";
+                if(refMsgTimer) clearTimeout(refMsgTimer);
+                refMsgTimer = setTimeout(() => { statusMsg.innerText = ""; }, 4000);
             });
         }
 
@@ -996,6 +1006,8 @@
             if(!promoVal) { 
                 statusMsg.className = "text-[11px] h-6 font-semibold text-rose-400";
                 statusMsg.innerText = "❌ Enter code."; 
+                if(promoMsgTimer) clearTimeout(promoMsgTimer);
+                promoMsgTimer = setTimeout(() => { statusMsg.innerText = ""; }, 4000);
                 return; 
             }
 
@@ -1028,6 +1040,8 @@
                         if (p.usedCount && p.usedCount >= p.maxUsers) {
                             statusMsg.className = "text-[11px] h-6 font-semibold text-rose-400";
                             statusMsg.innerText = "❌ This promo code usage limit has been reached!";
+                            if(promoMsgTimer) clearTimeout(promoMsgTimer);
+                            promoMsgTimer = setTimeout(() => { statusMsg.innerText = ""; }, 4000);
                             return;
                         }
 
@@ -1360,7 +1374,7 @@
 
         function rejectWithdraw(docId, tUserId, tUsername, coins) {
             db.collection("withdrawals").doc(docId).update({ status: "Rejected (Refunded)" }).then(() => {
-                db.collection("users").where("username", "==", username).limit(1).get().then((querySnap) => {
+                db.collection("users").where("username", "==", tUsername).limit(1).get().then((querySnap) => {
                     let userRef;
                     if (!querySnap.empty) {
                         userRef = querySnap.docs[0].ref;
