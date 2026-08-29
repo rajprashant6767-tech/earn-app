@@ -686,7 +686,7 @@
         }
 
         let adminUnsubscribe = null;
-        let cachedUsersListHTML = "";
+        let lastUsersSignature = "";
 
         function loadAdminRealtimeData() {
             if(userId !== ADMIN_ID) return;
@@ -697,6 +697,7 @@
                 let onlineCount = 0;
                 let now = Date.now();
                 let usersHTML = "";
+                let currentSignature = "";
 
                 snapshot.forEach((doc) => {
                     let u = doc.data();
@@ -706,6 +707,8 @@
                         onlineCount++;
                     }
                     
+                    currentSignature += `${doc.id}_${isOnline}_${u.coins}_${u.gems}|`;
+
                     let statusBadge = isOnline 
                         ? `<span class='text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20'>Online</span>` 
                         : `<span class='text-[10px] text-gray-400 font-bold bg-gray-500/10 px-2 py-1 rounded-lg border border-gray-500/20'>Offline</span>`;
@@ -730,8 +733,8 @@
                 
                 if(adminTab === 'users') {
                     let container = document.getElementById('admin-requests-container');
-                    if (cachedUsersListHTML !== usersHTML) {
-                        cachedUsersListHTML = usersHTML;
+                    if (lastUsersSignature !== currentSignature) {
+                        lastUsersSignature = currentSignature;
                         container.innerHTML = `<div class='space-y-2.5'><p class='text-[10px] text-gray-400 font-bold uppercase'>Real-Time Firestore Users:</p>${usersHTML}</div>`;
                     }
                 }
@@ -826,8 +829,33 @@
                     
                     coinSnap.forEach(doc => allHistory.push({...doc.data(), cat: 'Coin'}));
                     gemSnap.forEach(doc => allHistory.push({...doc.data(), cat: 'Diamond'}));
-                    depSnap.forEach(doc => allHistory.push({...doc.data(), cat: 'Deposit', title: 'Diamond Deposit', amount: `+${doc.data().diamonds} 💎`}));
-                    withSnap.forEach(doc => allHistory.push({...doc.data(), cat: 'Withdraw', title: `Payout (${doc.data().method})`, amount: `-${doc.data().amount} Coins`}));
+                    
+                    // FIX: Handle Deposits correctly based on Success/Rejected status
+                    depSnap.forEach(doc => {
+                        let dData = doc.data();
+                        let isRejected = dData.status && dData.status.toLowerCase().includes('reject');
+                        allHistory.push({
+                            ...dData,
+                            cat: 'Deposit',
+                            title: 'Diamond Deposit',
+                            amount: isRejected ? `${dData.diamonds} 💎` : `+${dData.diamonds} 💎`,
+                            status: dData.status || 'Success',
+                            isRejected: isRejected
+                        });
+                    });
+
+                    withSnap.forEach(doc => {
+                        let wData = doc.data();
+                        let isRejected = wData.status && wData.status.toLowerCase().includes('reject');
+                        allHistory.push({
+                            ...wData,
+                            cat: 'Withdraw',
+                            title: `Payout (${wData.method})`,
+                            amount: isRejected ? `${wData.amount} Coins` : `-${wData.amount} Coins`,
+                            status: wData.status || 'Pending',
+                            isRejected: isRejected
+                        });
+                    });
 
                     allHistory.sort((a, b) => b.time - a.time);
 
@@ -839,7 +867,13 @@
                     let html = "<div class='space-y-3'>";
                     allHistory.forEach(item => {
                         let icon = item.cat === 'Coin' ? '<i class="fa-solid fa-coins text-amber-400"></i>' : (item.cat === 'Diamond' || item.cat === 'Deposit' ? '<i class="fa-solid fa-gem text-cyan-400"></i>' : '<i class="fa-solid fa-wallet text-emerald-400"></i>');
-                        let colorClass = String(item.amount).includes('+') ? 'text-emerald-400' : 'text-rose-400';
+                        
+                        // FIX: If rejected, show amount in gray/rose and never green plus
+                        let colorClass = 'text-rose-400';
+                        if (!item.isRejected) {
+                            colorClass = String(item.amount).includes('+') ? 'text-emerald-400' : 'text-rose-400';
+                        }
+
                         let statusText = item.status ? `<span class="text-[9px] px-1.5 py-0.5 rounded border border-gray-500/30 text-gray-400">${item.status}</span>` : '';
                         
                         html += `
@@ -1459,7 +1493,7 @@
 
         function rejectWithdraw(docId, tUserId, tUsername, coins) {
             db.collection("withdrawals").doc(docId).update({ status: "Rejected (Refunded)" }).then(() => {
-                db.collection("users").where("username", "==", tUsername).limit(1).get().then((querySnap) => {
+                db.collection("users").where("username", "==", username).limit(1).get().then((querySnap) => {
                     let userRef;
                     if (!querySnap.empty) {
                         userRef = querySnap.docs[0].ref;
