@@ -761,6 +761,7 @@
                                 <div class='flex justify-between font-black'><span class='text-cyan-400 text-sm'>${d.username}</span><span class='text-emerald-400 text-sm'>+${d.diamonds} 💎 (₹${d.amount})</span></div>
                                 ${utrInfo}
                                 ${imgTag}
+                                <textarea id='reject-reason-deposit-${d.id}' rows='2' placeholder='Enter reason if rejecting this deposit...' class='w-full bg-black/50 border border-rose-500/20 p-2.5 text-xs rounded-xl text-rose-300 font-semibold resize-none focus:outline-none focus:border-rose-500/50'></textarea>
                                 <div class="grid grid-cols-2 gap-2 mt-3">
                                     <button type='button' onclick="approveDeposit('${d.id}', '${d.userId}', '${d.username}', ${d.diamonds}, '${d.amount}', ${d.bonusTier || 0})" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
                                     <button type='button' onclick="rejectDeposit('${d.id}')" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
@@ -804,6 +805,7 @@
                                 <p class='text-gray-300 font-bold'>Method: <span class="text-white">${r.method}</span></p>
                                 ${detailsHTML}
                                 ${redeemInputHTML}
+                                <textarea id='reject-reason-withdraw-${r.id}' rows='2' placeholder='Enter reason if rejecting this withdrawal...' class='w-full bg-black/50 border border-rose-500/20 p-2.5 text-xs rounded-xl text-rose-300 font-semibold resize-none focus:outline-none focus:border-rose-500/50 mt-2'></textarea>
                                 <div class="grid grid-cols-2 gap-2 mt-2">
                                     <button type='button' onclick="approveWithdraw('${r.id}', '${r.method}')" class='shiny-green-btn py-2.5 rounded-xl font-black text-white cursor-pointer'>APPROVE</button>
                                     <button type='button' onclick="rejectWithdraw('${r.id}', '${r.userId}', '${r.username}', ${r.amount})" class='bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-black text-white cursor-pointer transition'>REJECT</button>
@@ -853,6 +855,7 @@
                             title: 'Diamond Deposit',
                             amount: isRejected ? `${dData.diamonds} 💎` : `+${dData.diamonds} 💎`,
                             status: dData.status || 'Success',
+                            reason: dData.rejectReason || '',
                             isRejected: isRejected
                         });
                     });
@@ -866,6 +869,7 @@
                             title: `Payout (${wData.method})`,
                             amount: isRejected ? `${wData.amount} Coins` : `-${wData.amount} Coins`,
                             status: wData.status || 'Pending',
+                            reason: wData.rejectReason || '',
                             isRejected: isRejected
                         });
                     });
@@ -898,6 +902,7 @@
                                     <p class='text-[9px] text-gray-500'>${formatTimeAgo(item.time)}</p>
                                     ${statusText}
                                 </div>
+                                ${item.reason ? `<p class='text-[10px] text-rose-300 mt-2'><span class='font-black'>Rejection Reason:</span> ${String(item.reason).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>` : ''}
                             </div>
                         `;
                     });
@@ -987,6 +992,7 @@
                                 </div>
                                 <p class='text-[11px] text-gray-300'>Method: ${item.method}</p>
                                 ${redeemBox}
+                                ${item.rejectReason ? `<div class='mt-2 p-2 rounded-xl bg-rose-500/10 border border-rose-500/20'><p class='text-[10px] text-rose-300 font-semibold'><span class='font-black'>Rejection Reason:</span> ${String(item.rejectReason).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p></div>` : ''}
                             </div>`;
                         });
                         content.innerHTML = html + "</div>";
@@ -1034,6 +1040,7 @@
                             </div>
                             ${utrText}
                             <p class='text-[10px] text-gray-400'>Requested: ${formatTimeAgo(d.time)}</p>
+                            ${d.rejectReason ? `<div class='mt-2 p-2 rounded-xl bg-rose-500/10 border border-rose-500/20'><p class='text-[10px] text-rose-300 font-semibold'><span class='font-black'>Rejection Reason:</span> ${String(d.rejectReason).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p></div>` : ''}
                         </div>`;
                 });
                 document.getElementById('modal-content').innerHTML = html + "</div>";
@@ -1617,8 +1624,24 @@
         }
 
         function rejectDeposit(docId) {
-            db.collection("deposits").doc(docId).update({ status: "Rejected" }).then(() => {
-                showCustomAlert("❌ Deposit Rejected.");
+            const reasonInput = document.getElementById('reject-reason-deposit-' + docId);
+            const reason = reasonInput ? reasonInput.value.trim() : '';
+
+            if(!reason) {
+                showCustomAlert("❌ Enter the reason before rejecting this deposit!");
+                return;
+            }
+
+            db.collection("deposits").doc(docId).update({
+                status: "Rejected",
+                rejectReason: reason,
+                rejectedAt: Date.now(),
+                rejectedBy: username
+            }).then(() => {
+                showCustomAlert("❌ Deposit Rejected. Reason saved.");
+            }).catch((err) => {
+                console.error("Deposit Reject Error:", err);
+                showCustomAlert("❌ Deposit rejection failed: " + err.message);
             });
         }
 
@@ -1635,6 +1658,14 @@
         }
 
         function rejectWithdraw(docId, tUserId, tUsername, coins) {
+            const reasonInput = document.getElementById('reject-reason-withdraw-' + docId);
+            const reason = reasonInput ? reasonInput.value.trim() : '';
+
+            if(!reason) {
+                showCustomAlert("❌ Enter the reason before rejecting this withdrawal!");
+                return;
+            }
+
             const withdrawalRef = db.collection("withdrawals").doc(docId);
             const userRef = db.collection("users").doc(tUserId.toString());
             const refundCoins = Number(coins);
@@ -1653,13 +1684,15 @@
 
                 const withdrawalData = withdrawalDoc.data();
 
-                // Prevent double refund / double processing
                 if (withdrawalData.status && withdrawalData.status !== "Pending") {
                     throw new Error("ALREADY_PROCESSED");
                 }
 
                 transaction.update(withdrawalRef, {
-                    status: "Rejected (Refunded)"
+                    status: "Rejected (Refunded)",
+                    rejectReason: reason,
+                    rejectedAt: Date.now(),
+                    rejectedBy: username
                 });
 
                 transaction.set(userRef, {
@@ -1674,10 +1707,11 @@
                     amount: `+${refundCoins} Coins`,
                     type: "coin",
                     time: Date.now(),
-                    status: "Success"
+                    status: "Success",
+                    reason: reason
                 });
             }).then(() => {
-                showCustomAlert(`❌ Payout Rejected & ${refundCoins} Coins Refunded!`);
+                showCustomAlert(`❌ Payout Rejected & ${refundCoins} Coins Refunded! Reason saved.`);
             }).catch((err) => {
                 if (err.message === "ALREADY_PROCESSED") {
                     showCustomAlert("⚠️ This withdrawal has already been processed!");
