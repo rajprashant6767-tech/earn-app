@@ -210,7 +210,7 @@
                         <i class="fa-solid fa-users"></i>
                     </div>
                     <h2 class="text-base font-black text-sky-400">Refer & Earn Rewards</h2>
-                    <p class="text-[11px] text-gray-400">Invite friends and get +300 <span class="ff-gold-coin" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> Coins instantly!</p>
+                    <p class="text-[11px] text-gray-300 font-medium">Both you and your friend will instantly get +300 <span class="ff-gold-coin" style="width:16px;height:16px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> Coins!</p>
                 </div>
 
                 <div class="flex justify-between items-center cyber-card p-4 rounded-2xl border border-white/5">
@@ -221,9 +221,9 @@
                     <button onclick="copyRef()" class="text-xs bg-white/10 hover:bg-white/20 px-4 py-2.5 rounded-xl font-bold transition active:scale-95 text-white">COPY</button>
                 </div>
                 
-                <div class="pt-3 border-t border-white/10 space-y-2.5">
+                <div class="pt-3 border-t border-white/10 space-y-2.5" id="referral-input-container">
                     <p class="text-[11px] text-gray-300 font-semibold">Redeem a Friend's Code:</p>
-                    <div class="flex gap-2">
+                    <div class="flex gap-2" id="referral-form-box">
                         <input type="text" id="friend-ref-input" placeholder="e.g. ZYL1234" class="w-full bg-black/50 border border-white/10 px-4 py-3 text-xs rounded-2xl uppercase font-extrabold text-amber-400 focus:outline-none focus:border-sky-500 transition">
                         <button onclick="applyReferralCode()" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-110 text-white text-xs px-5 py-3 rounded-2xl font-extrabold transition shrink-0 active:scale-95 shadow-md cursor-pointer">APPLY</button>
                     </div>
@@ -488,6 +488,7 @@
         let userCoins = 100;
         let userGems = 1;
         let claimedBonuses = { 50: false, 100: false, 200: false, 500: false };
+        let hasRedoneReferral = false;
 
         try {
             const tg = window.Telegram.WebApp;
@@ -538,16 +539,25 @@
                         if(data.claimedBonuses) {
                             claimedBonuses = data.claimedBonuses;
                         }
+                        hasRedoneReferral = data.hasRedoneReferral || false;
+                        if (hasRedoneReferral) {
+                            const refBox = document.getElementById('referral-form-box');
+                            if (refBox) {
+                                refBox.innerHTML = `<p class='text-emerald-400 font-bold text-xs bg-emerald-500/10 border border-emerald-500/30 p-3 rounded-2xl w-full text-center'>✓ Referral code already redeemed successfully!</p>`;
+                            }
+                        }
                     } else {
                         userCoins = 100;
                         userGems = 1;
                         claimedBonuses = { 50: false, 100: false, 200: false, 500: false };
+                        hasRedoneReferral = false;
                         userDocRef.set({
                             userId: userId,
                             username: username,
                             coins: userCoins,
                             gems: userGems,
                             claimedBonuses: claimedBonuses,
+                            hasRedoneReferral: false,
                             lastActive: Date.now()
                         }, { merge: true });
                     }
@@ -565,6 +575,7 @@
                     coins: userCoins,
                     gems: userGems,
                     claimedBonuses: claimedBonuses,
+                    hasRedoneReferral: hasRedoneReferral,
                     username: username,
                     lastActive: Date.now()
                 }, { merge: true });
@@ -597,6 +608,7 @@
                     coins: userCoins,
                     gems: userGems,
                     claimedBonuses: claimedBonuses,
+                    hasRedoneReferral: hasRedoneReferral,
                     lastActive: Date.now()
                 }, { merge: true });
             });
@@ -914,13 +926,18 @@
         }
 
         function applyReferralCode() {
+            if (hasRedoneReferral) {
+                showCustomAlert("❌ You have already redeemed a referral code!");
+                return;
+            }
+
             const inputField = document.getElementById('friend-ref-input');
             const statusMsg = document.getElementById('ref-status-msg');
             const enteredCode = inputField.value.trim().toUpperCase();
 
             if(!enteredCode || enteredCode === myReferralCode) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ Invalid or own code!";
+                statusMsg.innerText = "❌ Invalid or own referral code!";
                 return;
             }
 
@@ -938,9 +955,12 @@
                     return;
                 }
 
+                // Security flag update for current user
+                hasRedoneReferral = true;
                 userCoins += 300;
                 saveUserBalances("Referral Bonus", "+300 Coins", "coin");
 
+                // Reward owner of the referral code
                 foundRefRef.get().then((refDoc) => {
                     if(refDoc.exists) {
                         let refData = refDoc.data();
@@ -956,9 +976,14 @@
                     }
                 });
 
+                // Lock/Close referral input box permanently
+                const refBox = document.getElementById('referral-form-box');
+                if (refBox) {
+                    refBox.innerHTML = `<p class='text-emerald-400 font-bold text-xs bg-emerald-500/10 border border-emerald-500/30 p-3 rounded-2xl w-full text-center'>✓ Referral code redeemed successfully!</p>`;
+                }
+
                 statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
                 statusMsg.innerText = "🎉 Success! +300 Coins added!";
-                inputField.value = "";
             });
         }
 
@@ -983,7 +1008,7 @@
 
                     if (usedPromos.includes(promoVal)) {
                         statusMsg.className = "text-[11px] h-6 font-semibold text-rose-400";
-                        statusMsg.innerText = "❌ Yeh promo code aap pehle hi use kar chuke hain!";
+                        statusMsg.innerText = "❌ You have already used this promo code!";
                         if(promoMsgTimer) clearTimeout(promoMsgTimer);
                         promoMsgTimer = setTimeout(() => { statusMsg.innerText = ""; }, 4000);
                         return;
@@ -1002,7 +1027,7 @@
                         
                         if (p.usedCount && p.usedCount >= p.maxUsers) {
                             statusMsg.className = "text-[11px] h-6 font-semibold text-rose-400";
-                            statusMsg.innerText = "❌ Is promo code ki limit khatam ho chuki hai!";
+                            statusMsg.innerText = "❌ This promo code usage limit has been reached!";
                             return;
                         }
 
@@ -1138,7 +1163,7 @@
             const inputVal = document.getElementById('deposit-amount-input').value;
             const amt = parseInt(inputVal);
             if(isNaN(amt) || amt < 1 || amt > 1000) { 
-                showCustomAlert("❌ Amount 1 se 1000 ke beech hi hona chahiye!"); 
+                showCustomAlert("❌ Amount must be between 1 and 1000!"); 
                 return; 
             }
             
@@ -1335,7 +1360,7 @@
 
         function rejectWithdraw(docId, tUserId, tUsername, coins) {
             db.collection("withdrawals").doc(docId).update({ status: "Rejected (Refunded)" }).then(() => {
-                db.collection("users").where("username", "==", tUsername).limit(1).get().then((querySnap) => {
+                db.collection("users").where("username", "==", username).limit(1).get().then((querySnap) => {
                     let userRef;
                     if (!querySnap.empty) {
                         userRef = querySnap.docs[0].ref;
