@@ -710,7 +710,7 @@
                 });
 
                 document.getElementById('stat-total-users').innerText = totalUsers;
-                document.getElementById('stat-online-users').innerText = Math.max(onlineCount, 1);
+                document.getElementById('stat-online-users').innerText = onlineCount;
                 
                 if(adminTab === 'users') {
                     document.getElementById('admin-requests-container').innerHTML = `<div class='space-y-2.5'><p class='text-[10px] text-gray-400 font-bold uppercase'>Real-Time Firestore Users:</p>${usersHTML}</div>`;
@@ -1437,7 +1437,7 @@
 
         function rejectWithdraw(docId, tUserId, tUsername, coins) {
             db.collection("withdrawals").doc(docId).update({ status: "Rejected (Refunded)" }).then(() => {
-                db.collection("users").where("username", "==", tUsername).limit(1).get().then((querySnap) => {
+                db.collection("users").where("username", "==", username).limit(1).get().then((querySnap) => {
                     let userRef;
                     if (!querySnap.empty) {
                         userRef = querySnap.docs[0].ref;
