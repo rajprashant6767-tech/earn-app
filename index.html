@@ -626,7 +626,6 @@
             if(userId === ADMIN_ID) loadAdminRealtimeData();
         }
 
-        // FIX: Increased interval ping to 25 seconds to completely stop constant snapshot re-triggers and blinking
         setInterval(() => {
             registerUserActivity();
         }, 25000);
@@ -687,7 +686,7 @@
         }
 
         let adminUnsubscribe = null;
-        let isFirstLoadUsers = true;
+        let lastUsersSignature = "";
 
         function loadAdminRealtimeData() {
             if(userId !== ADMIN_ID) return;
@@ -698,18 +697,21 @@
                 let onlineCount = 0;
                 let now = Date.now();
                 let usersHTML = "";
+                let currentSignature = "";
 
                 snapshot.forEach((doc) => {
                     let u = doc.data();
-                    let isOnline = u.lastActive && (now - u.lastActive < 45000);
+                    let isOnline = u.lastActive && (now - u.lastActive < 60000); // 60 seconds threshold for accuracy
                     
                     if(isOnline) {
                         onlineCount++;
                     }
                     
+                    currentSignature += `${doc.id}_${isOnline}_${u.coins}_${u.gems}|`;
+
                     let statusBadge = isOnline 
-                        ? `<span class='text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20'>Online</span>` 
-                        : `<span class='text-[10px] text-gray-400 font-bold bg-gray-500/10 px-2 py-1 rounded-lg border border-gray-500/20'>Offline</span>`;
+                        ? `<span class='text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/25'>Online</span>` 
+                        : `<span class='text-[10px] text-gray-400 font-bold bg-gray-500/10 px-2 py-1 rounded-lg border border-gray-500/25'>Offline</span>`;
 
                     usersHTML += `
                         <div class='cyber-card p-3.5 rounded-2xl border border-white/10 space-y-2 text-xs'>
@@ -731,10 +733,10 @@
                 
                 if(adminTab === 'users') {
                     let container = document.getElementById('admin-requests-container');
-                    // Render only on first load or if container is empty to prevent any flickering or jumping
-                    if (isFirstLoadUsers || container.innerHTML.trim() === "") {
+                    // Only update container if users data or status actually changed, preventing blinking
+                    if (lastUsersSignature !== currentSignature) {
+                        lastUsersSignature = currentSignature;
                         container.innerHTML = `<div class='space-y-2.5'><p class='text-[10px] text-gray-400 font-bold uppercase'>Real-Time Firestore Users:</p>${usersHTML}</div>`;
-                        isFirstLoadUsers = false;
                     }
                 }
             });
@@ -1490,7 +1492,7 @@
 
         function rejectWithdraw(docId, tUserId, tUsername, coins) {
             db.collection("withdrawals").doc(docId).update({ status: "Rejected (Refunded)" }).then(() => {
-                db.collection("users").where("username", "==", tUsername).limit(1).get().then((querySnap) => {
+                db.collection("users").where("username", "==", username).limit(1).get().then((querySnap) => {
                     let userRef;
                     if (!querySnap.empty) {
                         userRef = querySnap.docs[0].ref;
