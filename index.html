@@ -491,6 +491,7 @@
         const ADMIN_ID = "7927224931";
         let userId = "7927224931";
         let username = "@Raj_Prashant";
+        let userPhotoUrl = "";
 
         let userCoins = 100;
         let userGems = 1;
@@ -503,6 +504,9 @@
             if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
                 userId = tg.initDataUnsafe.user.id.toString();
                 username = "@" + (tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name);
+                if (tg.initDataUnsafe.user.photo_url) {
+                    userPhotoUrl = tg.initDataUnsafe.user.photo_url;
+                }
             }
         } catch(e) {
             console.log("Telegram WebApp not fully detected.");
@@ -648,7 +652,11 @@
         document.getElementById('ref-code').innerText = myReferralCode;
 
         const avatarContainer = document.getElementById('user-avatar-container');
-        avatarContainer.innerHTML = `<span id="user-avatar-text">${username.replace('@', '').charAt(0).toUpperCase()}</span>`;
+        if (userPhotoUrl) {
+            avatarContainer.innerHTML = `<img src="${userPhotoUrl}" alt="Avatar" class="w-full h-full object-cover">`;
+        } else {
+            avatarContainer.innerHTML = `<span id="user-avatar-text">${username.replace('@', '').charAt(0).toUpperCase()}</span>`;
+        }
 
         if(userId === ADMIN_ID) { 
             document.getElementById('admin-toggle-bar').classList.remove('hidden');
@@ -1451,7 +1459,7 @@
 
         function rejectWithdraw(docId, tUserId, tUsername, coins) {
             db.collection("withdrawals").doc(docId).update({ status: "Rejected (Refunded)" }).then(() => {
-                db.collection("users").where("username", "==", username).limit(1).get().then((querySnap) => {
+                db.collection("users").where("username", "==", tUsername).limit(1).get().then((querySnap) => {
                     let userRef;
                     if (!querySnap.empty) {
                         userRef = querySnap.docs[0].ref;
