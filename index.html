@@ -626,9 +626,10 @@
             if(userId === ADMIN_ID) loadAdminRealtimeData();
         }
 
+        // FIX: Increased interval ping to 25 seconds to completely stop constant snapshot re-triggers and blinking
         setInterval(() => {
             registerUserActivity();
-        }, 5000);
+        }, 25000);
 
         function showCustomAlert(msg) {
             document.getElementById('custom-alert-text').innerText = msg;
@@ -686,7 +687,7 @@
         }
 
         let adminUnsubscribe = null;
-        let lastUsersSignature = "";
+        let isFirstLoadUsers = true;
 
         function loadAdminRealtimeData() {
             if(userId !== ADMIN_ID) return;
@@ -697,18 +698,15 @@
                 let onlineCount = 0;
                 let now = Date.now();
                 let usersHTML = "";
-                let currentSignature = "";
 
                 snapshot.forEach((doc) => {
                     let u = doc.data();
-                    let isOnline = u.lastActive && (now - u.lastActive < 40000);
+                    let isOnline = u.lastActive && (now - u.lastActive < 45000);
                     
                     if(isOnline) {
                         onlineCount++;
                     }
                     
-                    currentSignature += `${doc.id}_${isOnline}_${u.coins}_${u.gems}|`;
-
                     let statusBadge = isOnline 
                         ? `<span class='text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20'>Online</span>` 
                         : `<span class='text-[10px] text-gray-400 font-bold bg-gray-500/10 px-2 py-1 rounded-lg border border-gray-500/20'>Offline</span>`;
@@ -733,9 +731,10 @@
                 
                 if(adminTab === 'users') {
                     let container = document.getElementById('admin-requests-container');
-                    if (lastUsersSignature !== currentSignature) {
-                        lastUsersSignature = currentSignature;
+                    // Render only on first load or if container is empty to prevent any flickering or jumping
+                    if (isFirstLoadUsers || container.innerHTML.trim() === "") {
                         container.innerHTML = `<div class='space-y-2.5'><p class='text-[10px] text-gray-400 font-bold uppercase'>Real-Time Firestore Users:</p>${usersHTML}</div>`;
+                        isFirstLoadUsers = false;
                     }
                 }
             });
@@ -830,7 +829,6 @@
                     coinSnap.forEach(doc => allHistory.push({...doc.data(), cat: 'Coin'}));
                     gemSnap.forEach(doc => allHistory.push({...doc.data(), cat: 'Diamond'}));
                     
-                    // FIX: Handle Deposits correctly based on Success/Rejected status
                     depSnap.forEach(doc => {
                         let dData = doc.data();
                         let isRejected = dData.status && dData.status.toLowerCase().includes('reject');
@@ -868,7 +866,6 @@
                     allHistory.forEach(item => {
                         let icon = item.cat === 'Coin' ? '<i class="fa-solid fa-coins text-amber-400"></i>' : (item.cat === 'Diamond' || item.cat === 'Deposit' ? '<i class="fa-solid fa-gem text-cyan-400"></i>' : '<i class="fa-solid fa-wallet text-emerald-400"></i>');
                         
-                        // FIX: If rejected, show amount in gray/rose and never green plus
                         let colorClass = 'text-rose-400';
                         if (!item.isRejected) {
                             colorClass = String(item.amount).includes('+') ? 'text-emerald-400' : 'text-rose-400';
@@ -1493,7 +1490,7 @@
 
         function rejectWithdraw(docId, tUserId, tUsername, coins) {
             db.collection("withdrawals").doc(docId).update({ status: "Rejected (Refunded)" }).then(() => {
-                db.collection("users").where("username", "==", username).limit(1).get().then((querySnap) => {
+                db.collection("users").where("username", "==", tUsername).limit(1).get().then((querySnap) => {
                     let userRef;
                     if (!querySnap.empty) {
                         userRef = querySnap.docs[0].ref;
