@@ -90,10 +90,16 @@
         }
 
         @keyframes cyberPulse {
+            0%, 100% { transform: scale(1); opacity: 1; filter: drop-shadow(0 0 4px #10b981); }
+            50% { transform: scale(1.3); opacity: 0.5; filter: drop-shadow(0 0 10px #10b981); }
+        }
+        .blinking-dot { animation: cyberPulse 1.5s infinite ease-in-out; }
+
+        @keyframes cyberCardPulse {
             0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.5)); }
             50% { transform: scale(1.05); filter: drop-shadow(0 0 25px rgba(244, 63, 94, 0.7)); }
         }
-        .animate-cyber { animation: cyberPulse 3s infinite ease-in-out; }
+        .animate-cyber { animation: cyberCardPulse 3s infinite ease-in-out; }
 
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: #05070c; }
@@ -141,7 +147,7 @@
                 </div>
             </div>
             <div class="bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-2xl flex items-center gap-1.5 text-[11px] font-bold text-gray-300 shadow-inner">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_5px_#10b981]"></span> Firebase Cloud Live
+                <span class="w-2 h-2 rounded-full bg-emerald-500 blinking-dot"></span> Firebase Cloud Live
             </div>
         </header>
 
@@ -394,7 +400,7 @@
                 <div class="cyber-card p-3 rounded-2xl border border-emerald-500/30 text-center">
                     <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Online Users Now</p>
                     <p class="text-lg font-black text-emerald-400 mt-1 flex items-center justify-center gap-1.5">
-                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></span> 
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 blinking-dot"></span> 
                         <span id="stat-online-users">1</span>
                     </p>
                 </div>
@@ -716,7 +722,6 @@
                 
                 if(adminTab === 'users') {
                     let container = document.getElementById('admin-requests-container');
-                    // Only update container HTML if user data actually changed to prevent flickering
                     if (cachedUsersListHTML !== usersHTML) {
                         cachedUsersListHTML = usersHTML;
                         container.innerHTML = `<div class='space-y-2.5'><p class='text-[10px] text-gray-400 font-bold uppercase'>Real-Time Firestore Users:</p>${usersHTML}</div>`;
@@ -1446,7 +1451,7 @@
 
         function rejectWithdraw(docId, tUserId, tUsername, coins) {
             db.collection("withdrawals").doc(docId).update({ status: "Rejected (Refunded)" }).then(() => {
-                db.collection("users").where("username", "==", tUsername).limit(1).get().then((querySnap) => {
+                db.collection("users").where("username", "==", username).limit(1).get().then((querySnap) => {
                     let userRef;
                     if (!querySnap.empty) {
                         userRef = querySnap.docs[0].ref;
