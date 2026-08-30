@@ -104,6 +104,483 @@
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: #05070c; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+
+        /* Pro-level section polish */
+        #tab-home > .cyber-card, #tab-refer > .cyber-card, #tab-promo > .cyber-card, #tab-withdraw > .cyber-card {
+            border-width: 1px;
+            box-shadow: 0 18px 45px rgba(0,0,0,.72), inset 0 1px 0 rgba(255,255,255,.04);
+        }
+        #tab-refer > .cyber-card { background: linear-gradient(145deg, rgba(7,25,48,.96), rgba(9,13,28,.98) 55%, rgba(17,12,35,.96)); border-color: rgba(56,189,248,.34); }
+        #tab-promo > .cyber-card { background: linear-gradient(145deg, rgba(45,10,31,.96), rgba(13,10,28,.98) 55%, rgba(23,10,48,.96)); border-color: rgba(244,63,94,.34); }
+        #tab-withdraw > .cyber-card { background: linear-gradient(145deg, rgba(5,34,30,.96), rgba(7,16,24,.98) 55%, rgba(6,31,28,.96)); border-color: rgba(16,185,129,.34); }
+        #tab-home > .cyber-card { background: linear-gradient(145deg, rgba(8,27,47,.96), rgba(7,13,25,.98) 52%, rgba(29,10,32,.94)); }
+        .daily-streak-card { background: linear-gradient(145deg, rgba(34,20,6,.98), rgba(13,14,25,.98) 55%, rgba(31,9,28,.98)); border: 1px solid rgba(251,191,36,.35); box-shadow: 0 18px 45px rgba(0,0,0,.72), inset 0 1px 0 rgba(255,255,255,.04); }
+        .streak-day { min-width: 56px; }
+        .streak-day.active { border-color: rgba(251,191,36,.9) !important; box-shadow: 0 0 18px rgba(251,191,36,.18); }
+        .streak-day.claimed { opacity: .72; }
+        .streak-day.locked { opacity: .48; }
+
+        /* ===== PREMIUM PRO UI OVERHAUL ===== */
+        :root {
+            --pro-bg: #03050a;
+            --pro-panel: rgba(10, 15, 27, .88);
+            --pro-line: rgba(148, 163, 184, .14);
+            --pro-cyan: #22d3ee;
+            --pro-blue: #60a5fa;
+            --pro-purple: #a78bfa;
+            --pro-pink: #f472b6;
+            --pro-green: #34d399;
+            --pro-gold: #fbbf24;
+        }
+
+        body {
+            background-color: var(--pro-bg) !important;
+            background-image:
+                radial-gradient(600px 320px at -10% -5%, rgba(34,211,238,.18), transparent 65%),
+                radial-gradient(520px 360px at 110% 12%, rgba(124,58,237,.20), transparent 65%),
+                radial-gradient(520px 360px at 50% 115%, rgba(16,185,129,.12), transparent 65%),
+                linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px),
+                linear-gradient(180deg, #03050a 0%, #07101d 52%, #04070d 100%) !important;
+            background-size: auto, auto, auto, 28px 28px, 28px 28px, auto !important;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -1;
+            background:
+                radial-gradient(circle at 50% 20%, transparent 0, rgba(3,5,10,.12) 45%, rgba(3,5,10,.72) 100%);
+        }
+
+        #main-app {
+            position: relative;
+        }
+
+        #main-app::before {
+            content: "ZYLOBET • REWARDS • PLAY • EARN";
+            display: block;
+            text-align: center;
+            color: rgba(148,163,184,.28);
+            font-size: 7px;
+            font-weight: 900;
+            letter-spacing: .32em;
+            margin: -4px 0 2px;
+        }
+
+        .cyber-card {
+            background:
+                linear-gradient(145deg, rgba(18,27,46,.94), rgba(6,10,19,.96) 52%, rgba(14,10,30,.94)) !important;
+            border: 1px solid rgba(148,163,184,.16) !important;
+            box-shadow:
+                0 22px 55px rgba(0,0,0,.58),
+                inset 0 1px 0 rgba(255,255,255,.055),
+                inset 0 -1px 0 rgba(0,0,0,.35) !important;
+            backdrop-filter: blur(22px);
+        }
+
+        .cyber-card::before {
+            height: 2px !important;
+            background: linear-gradient(90deg, transparent, rgba(34,211,238,.75), rgba(167,139,250,.55), transparent) !important;
+            opacity: .75;
+        }
+
+        #admin-toggle-bar {
+            background: linear-gradient(135deg, rgba(6,30,30,.96), rgba(8,14,25,.96)) !important;
+            border-color: rgba(52,211,153,.28) !important;
+        }
+
+        header.cyber-card {
+            padding: 15px !important;
+            border-radius: 26px !important;
+            background:
+                linear-gradient(135deg, rgba(8,23,43,.98), rgba(8,10,20,.97) 58%, rgba(25,10,37,.94)) !important;
+            border-color: rgba(96,165,250,.22) !important;
+            box-shadow: 0 25px 60px rgba(0,0,0,.65), 0 0 40px rgba(59,130,246,.06) !important;
+        }
+
+        header .w-12 {
+            box-shadow: 0 0 28px rgba(56,189,248,.24), 0 0 55px rgba(244,63,94,.10) !important;
+        }
+
+        /* Home dashboard */
+        #tab-home {
+            gap: 16px !important;
+        }
+
+        #tab-home > .cyber-card:first-child {
+            border-color: rgba(56,189,248,.28) !important;
+            background:
+                radial-gradient(circle at 100% 0%, rgba(59,130,246,.14), transparent 35%),
+                radial-gradient(circle at 0% 100%, rgba(168,85,247,.10), transparent 32%),
+                linear-gradient(145deg, rgba(8,26,48,.98), rgba(6,10,20,.98) 55%, rgba(19,10,36,.96)) !important;
+        }
+
+        #tab-home .daily-streak-card {
+            border-color: rgba(251,191,36,.42) !important;
+            background:
+                radial-gradient(circle at 90% 0%, rgba(251,191,36,.18), transparent 32%),
+                radial-gradient(circle at 0% 100%, rgba(249,115,22,.12), transparent 35%),
+                linear-gradient(145deg, rgba(35,22,7,.98), rgba(9,12,22,.98) 55%, rgba(30,9,29,.98)) !important;
+            box-shadow: 0 24px 55px rgba(0,0,0,.65), 0 0 30px rgba(251,191,36,.05), inset 0 1px 0 rgba(255,255,255,.06) !important;
+        }
+
+        .streak-day {
+            min-height: 72px !important;
+            border-radius: 16px !important;
+            background: linear-gradient(145deg, rgba(255,255,255,.065), rgba(0,0,0,.24)) !important;
+            border-color: rgba(255,255,255,.10) !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.05) !important;
+        }
+
+        .streak-day.active {
+            background: linear-gradient(145deg, rgba(251,191,36,.22), rgba(245,158,11,.06)) !important;
+            border-color: rgba(251,191,36,.9) !important;
+            box-shadow: 0 0 24px rgba(251,191,36,.14), inset 0 1px 0 rgba(255,255,255,.10) !important;
+        }
+
+        /* Premium section headers/cards */
+        #tab-refer > .cyber-card,
+        #tab-promo > .cyber-card,
+        #tab-withdraw > .cyber-card {
+            position: relative;
+            border-radius: 30px !important;
+            overflow: hidden;
+        }
+
+        #tab-refer > .cyber-card {
+            background:
+                radial-gradient(circle at 0% 0%, rgba(14,165,233,.18), transparent 35%),
+                radial-gradient(circle at 100% 100%, rgba(99,102,241,.14), transparent 38%),
+                linear-gradient(145deg, rgba(6,27,48,.98), rgba(6,10,20,.98) 58%, rgba(20,11,39,.96)) !important;
+            border-color: rgba(56,189,248,.34) !important;
+        }
+
+        #tab-promo > .cyber-card {
+            background:
+                radial-gradient(circle at 100% 0%, rgba(244,63,94,.18), transparent 34%),
+                radial-gradient(circle at 0% 100%, rgba(168,85,247,.16), transparent 38%),
+                linear-gradient(145deg, rgba(40,8,30,.98), rgba(8,9,19,.98) 55%, rgba(25,8,42,.96)) !important;
+            border-color: rgba(244,63,94,.36) !important;
+        }
+
+        #tab-withdraw > .cyber-card {
+            background:
+                radial-gradient(circle at 100% 0%, rgba(16,185,129,.18), transparent 35%),
+                radial-gradient(circle at 0% 100%, rgba(20,184,166,.12), transparent 38%),
+                linear-gradient(145deg, rgba(5,31,29,.98), rgba(6,11,19,.98) 55%, rgba(7,27,27,.96)) !important;
+            border-color: rgba(52,211,153,.34) !important;
+        }
+
+        #tab-refer input,
+        #tab-promo input,
+        #tab-withdraw input,
+        #tab-withdraw select,
+        #tab-promo select {
+            background: rgba(1,5,12,.72) !important;
+            border-color: rgba(148,163,184,.17) !important;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,.35), 0 1px 0 rgba(255,255,255,.03) !important;
+        }
+
+        #tab-refer input:focus,
+        #tab-promo input:focus,
+        #tab-withdraw input:focus,
+        #tab-withdraw select:focus {
+            box-shadow: 0 0 0 2px rgba(56,189,248,.08), 0 0 24px rgba(56,189,248,.08), inset 0 2px 10px rgba(0,0,0,.4) !important;
+        }
+
+        #tab-refer button,
+        #tab-promo button,
+        #tab-withdraw button {
+            min-height: 44px;
+            border: 1px solid rgba(255,255,255,.08);
+            box-shadow: 0 10px 24px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.12);
+        }
+
+        #tab-refer button:hover,
+        #tab-promo button:hover,
+        #tab-withdraw button:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.08);
+        }
+
+        /* Bottom navigation becomes a premium glass dock */
+        nav.fixed.bottom-3 {
+            padding: 7px !important;
+            background: linear-gradient(180deg, rgba(10,15,28,.94), rgba(4,7,14,.96)) !important;
+            border: 1px solid rgba(148,163,184,.18) !important;
+            box-shadow: 0 20px 55px rgba(0,0,0,.72), 0 0 30px rgba(59,130,246,.06), inset 0 1px 0 rgba(255,255,255,.07) !important;
+        }
+
+        nav.fixed.bottom-3 button {
+            min-width: 64px;
+            min-height: 48px;
+            position: relative;
+            border: 1px solid transparent;
+        }
+
+        nav.fixed.bottom-3 button:hover {
+            background: rgba(255,255,255,.055);
+            border-color: rgba(255,255,255,.08);
+        }
+
+        #nav-home {
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 0 20px rgba(14,165,233,.10);
+        }
+
+        /* Admin dashboard */
+        #admin-view {
+            background:
+                radial-gradient(circle at 50% 0%, rgba(59,130,246,.06), transparent 38%);
+            padding-top: 2px;
+        }
+
+        #admin-view > .cyber-card:first-child {
+            background:
+                radial-gradient(circle at 0% 0%, rgba(14,165,233,.14), transparent 32%),
+                linear-gradient(145deg, rgba(8,25,46,.98), rgba(5,9,17,.98)) !important;
+            border-color: rgba(56,189,248,.30) !important;
+            box-shadow: 0 25px 60px rgba(0,0,0,.68), inset 0 1px 0 rgba(255,255,255,.06) !important;
+        }
+
+        #admin-view .grid.grid-cols-2 > .cyber-card {
+            background: linear-gradient(145deg, rgba(12,23,39,.96), rgba(6,10,18,.98)) !important;
+        }
+
+        #admin-view .grid.grid-cols-4 {
+            padding: 5px;
+            gap: 5px !important;
+            background: rgba(2,6,14,.72);
+            border: 1px solid rgba(148,163,184,.13);
+            border-radius: 18px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,.35);
+        }
+
+        #admin-view .grid.grid-cols-4 button {
+            min-height: 42px;
+            border-radius: 13px !important;
+            border: 1px solid rgba(255,255,255,.07) !important;
+            font-size: 9px !important;
+            letter-spacing: .04em;
+            transition: .2s ease;
+        }
+
+        #admin-view .grid.grid-cols-4 button:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.12);
+        }
+
+        #admin-requests-container > .cyber-card,
+        #admin-requests-container .cyber-card {
+            border-radius: 20px !important;
+            box-shadow: 0 16px 36px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.04) !important;
+        }
+
+        /* Buttons feel like one premium design system */
+        .shiny-green-btn,
+        #tab-promo button,
+        #tab-withdraw button[type="button"],
+        #tab-withdraw button[type="submit"] {
+            border-radius: 16px !important;
+        }
+
+        /* Small screen polish */
+        @media (max-width: 390px) {
+            body { padding-left: 10px !important; padding-right: 10px !important; }
+            .streak-day { min-width: 0 !important; min-height: 66px !important; }
+            nav.fixed.bottom-3 { left: 10px !important; right: 10px !important; }
+            nav.fixed.bottom-3 button { min-width: 58px; padding-left: 8px !important; padding-right: 8px !important; }
+        }
+
+
+        /* ===== ULTRA PREMIUM BACKGROUND + INTERACTIVE GLOW BUTTONS ===== */
+        html {
+            background: #07111f !important;
+        }
+
+        body {
+            background:
+                radial-gradient(900px 520px at 8% -8%, rgba(34,211,238,.24), transparent 62%),
+                radial-gradient(850px 520px at 105% 4%, rgba(99,102,241,.25), transparent 60%),
+                radial-gradient(760px 540px at 50% 52%, rgba(59,130,246,.10), transparent 64%),
+                radial-gradient(700px 500px at 12% 108%, rgba(168,85,247,.18), transparent 62%),
+                radial-gradient(720px 520px at 105% 108%, rgba(20,184,166,.15), transparent 62%),
+                linear-gradient(135deg, #07111f 0%, #0a1730 38%, #10162e 68%, #0a1222 100%) !important;
+            background-attachment: fixed !important;
+            background-size: auto !important;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: -25%;
+            z-index: -1;
+            pointer-events: none;
+            background:
+                conic-gradient(from 210deg at 50% 45%,
+                    rgba(34,211,238,.07),
+                    rgba(99,102,241,.05),
+                    rgba(244,114,182,.06),
+                    rgba(52,211,153,.05),
+                    rgba(34,211,238,.07));
+            filter: blur(70px);
+            animation: proAmbient 16s ease-in-out infinite alternate;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
+            background-size: 34px 34px;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,.7), transparent 92%);
+            opacity: .55;
+        }
+
+        @keyframes proAmbient {
+            0% { transform: translate3d(-2%, -1%, 0) scale(1); }
+            100% { transform: translate3d(2%, 2%, 0) scale(1.06); }
+        }
+
+        /* Universal premium button system */
+        button {
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+            transition:
+                transform .16s cubic-bezier(.2,.8,.2,1),
+                box-shadow .18s ease,
+                filter .18s ease,
+                border-color .18s ease !important;
+        }
+
+        button::before {
+            content: "";
+            position: absolute;
+            inset: -70%;
+            z-index: -2;
+            background: radial-gradient(circle, rgba(255,255,255,.30) 0%, rgba(96,165,250,.13) 22%, transparent 58%);
+            opacity: 0;
+            transform: scale(.65);
+            transition: opacity .18s ease, transform .28s ease;
+            pointer-events: none;
+        }
+
+        button::after {
+            content: "";
+            position: absolute;
+            top: -30%;
+            left: -90%;
+            width: 55%;
+            height: 160%;
+            z-index: -1;
+            transform: skewX(-20deg);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent);
+            transition: left .48s ease;
+            pointer-events: none;
+        }
+
+        button:hover {
+            transform: translateY(-2px) scale(1.015);
+            filter: brightness(1.10) saturate(1.08);
+            box-shadow:
+                0 10px 28px rgba(0,0,0,.35),
+                0 0 18px rgba(56,189,248,.12) !important;
+        }
+
+        button:hover::before {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        button:hover::after {
+            left: 135%;
+        }
+
+        button:active {
+            transform: translateY(1px) scale(.965) !important;
+            filter: brightness(1.22) saturate(1.14);
+            box-shadow:
+                0 3px 12px rgba(0,0,0,.42),
+                0 0 30px rgba(56,189,248,.30) !important;
+        }
+
+        button:active::before {
+            opacity: 1;
+            transform: scale(1.35);
+            transition-duration: .08s;
+        }
+
+        /* Colored glow variants based on common utility classes */
+        .bg-cyan-500, .bg-cyan-600 {
+            box-shadow: 0 7px 22px rgba(6,182,212,.22), 0 0 15px rgba(34,211,238,.10) !important;
+        }
+
+        .bg-blue-500, .bg-blue-600 {
+            box-shadow: 0 7px 22px rgba(37,99,235,.24), 0 0 15px rgba(96,165,250,.10) !important;
+        }
+
+        .bg-emerald-500, .bg-emerald-600, .shiny-green-btn {
+            box-shadow: 0 7px 22px rgba(16,185,129,.24), 0 0 18px rgba(52,211,153,.12) !important;
+        }
+
+        .bg-red-500, .bg-red-600, .bg-rose-500, .bg-rose-600 {
+            box-shadow: 0 7px 22px rgba(244,63,94,.22), 0 0 16px rgba(251,113,133,.10) !important;
+        }
+
+        .bg-purple-500, .bg-purple-600, .bg-violet-500, .bg-violet-600 {
+            box-shadow: 0 7px 22px rgba(139,92,246,.24), 0 0 18px rgba(167,139,250,.11) !important;
+        }
+
+        /* Main action buttons get a stronger premium halo */
+        #tab-home button,
+        #tab-refer button,
+        #tab-promo button,
+        #tab-withdraw button,
+        #admin-view button {
+            border: 1px solid rgba(255,255,255,.10) !important;
+        }
+
+        /* Touch feedback for Android/mobile */
+        @media (hover: none) and (pointer: coarse) {
+            button:active {
+                transform: scale(.94) !important;
+            }
+
+            button:active::after {
+                left: 135%;
+                transition: left .32s ease;
+            }
+        }
+
+        /* Glass cards stand out from the new blue/purple environment */
+        .cyber-card {
+            background:
+                linear-gradient(145deg, rgba(17,31,55,.88), rgba(7,15,29,.91) 55%, rgba(25,18,49,.88)) !important;
+            border-color: rgba(148,163,184,.19) !important;
+            box-shadow:
+                0 24px 60px rgba(0,0,0,.40),
+                0 0 34px rgba(59,130,246,.055),
+                inset 0 1px 0 rgba(255,255,255,.075) !important;
+        }
+
+        /* Make important dashboard cards visibly premium */
+        #tab-home > .cyber-card:first-child,
+        #tab-refer > .cyber-card,
+        #tab-promo > .cyber-card,
+        #tab-withdraw > .cyber-card {
+            box-shadow:
+                0 28px 70px rgba(0,0,0,.48),
+                0 0 38px rgba(56,189,248,.065),
+                inset 0 1px 0 rgba(255,255,255,.08) !important;
+        }
+
     </style>
 </head>
 <body class="p-4 pb-36 max-w-lg mx-auto">
@@ -186,6 +663,30 @@
                             <span>DIAMONDS</span> <i class="fa-solid fa-clock-rotate-left text-xs text-cyan-400/80"></i>
                         </p>
                     </div>
+                </div>
+            </div>
+
+            <!-- DAILY STREAK REWARD -->
+            <div class="daily-streak-card p-5 rounded-3xl space-y-4 overflow-hidden relative">
+                <div class="absolute -top-16 -right-16 w-36 h-36 rounded-full bg-amber-400/10 blur-2xl"></div>
+                <div class="flex items-center justify-between gap-3 relative z-10">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500/30 to-rose-500/20 border border-amber-400/40 flex items-center justify-center text-amber-300 text-xl shadow-lg">
+                            <i class="fa-solid fa-fire-flame-curved"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-amber-300 font-black uppercase tracking-[.18em]">Daily Streak</p>
+                            <h3 class="text-sm font-black text-white mt-0.5">7 Day Coin Rewards</h3>
+                        </div>
+                    </div>
+                    <div id="streak-countdown" class="text-[9px] text-gray-300 font-bold bg-black/30 border border-white/10 px-3 py-2 rounded-xl text-center">Next day
+                        <span class="block text-amber-300 font-black text-[10px] mt-0.5">at 12:00 AM</span>
+                    </div>
+                </div>
+                <div id="daily-streak-days" class="grid grid-cols-7 gap-1.5 relative z-10"></div>
+                <div class="flex items-center justify-between gap-3 relative z-10">
+                    <p id="streak-status" class="text-[10px] text-gray-400 font-semibold">Your next reward is waiting.</p>
+                    <button id="daily-streak-claim" onclick="claimDailyStreak()" class="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-black px-4 py-2.5 rounded-xl font-black text-[10px] shadow-lg active:scale-95 transition cursor-pointer">CLAIM</button>
                 </div>
             </div>
 
@@ -497,6 +998,9 @@
         let userGems = 1;
         let claimedBonuses = { 50: false, 100: false, 200: false, 500: false };
         let hasRedoneReferral = false;
+        let dailyStreakDay = 0;
+        let dailyStreakLastClaimDate = "";
+        const DAILY_STREAK_REWARDS = [10, 20, 30, 40, 50, 60, 100];
 
         try {
             const tg = window.Telegram.WebApp;
@@ -551,6 +1055,9 @@
                             claimedBonuses = data.claimedBonuses;
                         }
                         hasRedoneReferral = data.hasRedoneReferral || false;
+                        dailyStreakDay = Number(data.dailyStreakDay || 0);
+                        dailyStreakLastClaimDate = data.dailyStreakLastClaimDate || "";
+                        updateDailyStreakUI();
                         if (hasRedoneReferral) {
                             const refBox = document.getElementById('referral-form-box');
                             if (refBox) {
@@ -562,6 +1069,9 @@
                         userGems = 1;
                         claimedBonuses = { 50: false, 100: false, 200: false, 500: false };
                         hasRedoneReferral = false;
+                        dailyStreakDay = 0;
+                        dailyStreakLastClaimDate = "";
+                        updateDailyStreakUI();
                         userDocRef.set({
                             userId: userId,
                             username: username,
@@ -577,6 +1087,103 @@
                 });
             });
         }
+
+        function getIndiaDateKey(date = new Date()) {
+            return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).format(date);
+        }
+
+        function getIndiaDateNumber(dateKey) {
+            const parts = String(dateKey || '').split('-').map(Number);
+            return parts.length === 3 ? Date.UTC(parts[0], parts[1] - 1, parts[2]) / 86400000 : NaN;
+        }
+
+        function getDailyStreakState() {
+            const today = getIndiaDateKey();
+            if (!dailyStreakLastClaimDate) return { today, canClaim: true, day: Math.min(dailyStreakDay + 1, 7) || 1 };
+            const diff = getIndiaDateNumber(today) - getIndiaDateNumber(dailyStreakLastClaimDate);
+            if (diff <= 0) return { today, canClaim: false, day: dailyStreakDay || 1 };
+            if (diff === 1) return { today, canClaim: true, day: dailyStreakDay >= 7 ? 1 : Math.max(1, dailyStreakDay + 1) };
+            return { today, canClaim: true, day: 1 };
+        }
+
+        function updateDailyStreakUI() {
+            const box = document.getElementById('daily-streak-days');
+            const btn = document.getElementById('daily-streak-claim');
+            const status = document.getElementById('streak-status');
+            if (!box || !btn || !status) return;
+
+            const state = getDailyStreakState();
+            box.innerHTML = DAILY_STREAK_REWARDS.map((reward, i) => {
+                const day = i + 1;
+                const claimed = dailyStreakDay >= day && dailyStreakLastClaimDate && getIndiaDateNumber(state.today) > getIndiaDateNumber(dailyStreakLastClaimDate);
+                const isActive = state.canClaim && state.day === day;
+                const cls = claimed ? 'claimed border-emerald-400/30 bg-emerald-500/10' : (isActive ? 'active border-amber-400 bg-amber-500/10' : 'locked border-white/10 bg-black/20');
+                return `<div class="streak-day ${cls} border rounded-xl p-2 text-center transition">\n                    <p class="text-[8px] text-gray-400 font-black">DAY ${day}</p>\n                    <p class="text-[11px] text-amber-300 font-black mt-1">${reward}</p>\n                    <p class="text-[8px] text-gray-500 font-bold">COINS</p>\n                    <span class="text-[9px] mt-1 inline-block">${claimed ? '✓' : (isActive ? '🎁' : '🔒')}</span>\n                </div>`;
+            }).join('');
+
+            if (state.canClaim) {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50','cursor-not-allowed');
+                btn.innerText = `CLAIM ${DAILY_STREAK_REWARDS[state.day - 1]}`;
+                status.innerText = `Day ${state.day} reward is ready: +${DAILY_STREAK_REWARDS[state.day - 1]} Coins`;
+            } else {
+                btn.disabled = true;
+                btn.classList.add('opacity-50','cursor-not-allowed');
+                btn.innerText = 'CLAIMED';
+                status.innerText = 'Claimed today. Day ' + (dailyStreakDay >= 7 ? '1' : (dailyStreakDay + 1)) + ' unlocks after 12:00 AM.';
+            }
+        }
+
+        function claimDailyStreak() {
+            const state = getDailyStreakState();
+            if (!state.canClaim) {
+                showCustomAlert('✅ Daily reward already claimed today. Come back after 12:00 AM!');
+                return;
+            }
+            const reward = DAILY_STREAK_REWARDS[state.day - 1];
+            const userRefPromise = db.collection('users').where('username', '==', username).limit(1).get();
+            userRefPromise.then((snap) => {
+                const userRef = !snap.empty ? snap.docs[0].ref : db.collection('users').doc(String(userId));
+                return db.runTransaction(async (transaction) => {
+                    const doc = await transaction.get(userRef);
+                    const data = doc.exists ? doc.data() : {};
+                    const last = data.dailyStreakLastClaimDate || '';
+                    const currentDay = Number(data.dailyStreakDay || 0);
+                    const nowKey = getIndiaDateKey();
+                    const lastNum = getIndiaDateNumber(last);
+                    const nowNum = getIndiaDateNumber(nowKey);
+                    if (last && nowNum <= lastNum) throw new Error('ALREADY_CLAIMED');
+                    const diff = last ? nowNum - lastNum : 999;
+                    const nextDay = !last ? 1 : (diff === 1 ? (currentDay >= 7 ? 1 : currentDay + 1) : 1);
+                    const finalReward = DAILY_STREAK_REWARDS[nextDay - 1];
+                    transaction.set(userRef, {
+                        coins: firebase.firestore.FieldValue.increment(finalReward),
+                        dailyStreakDay: nextDay,
+                        dailyStreakLastClaimDate: nowKey,
+                        userId: String(userId),
+                        username: username,
+                        lastActive: Date.now()
+                    }, { merge: true });
+                    return { day: nextDay, reward: finalReward };
+                });
+            }).then((result) => {
+                dailyStreakDay = result.day;
+                dailyStreakLastClaimDate = getIndiaDateKey();
+                userCoins = Number(userCoins || 0) + result.reward;
+                updateUIBalances();
+                updateDailyStreakUI();
+                db.collection('users').where('username', '==', username).limit(1).get().then(snap => {
+                    const ref = !snap.empty ? snap.docs[0].ref : db.collection('users').doc(String(userId));
+                    return ref.collection('coin_history').add({ title: `Daily Streak Day ${result.day}`, amount: `+${result.reward} Coins`, type: 'coin', time: Date.now(), status: 'Success' });
+                });
+                showCustomAlert(`🔥 Day ${result.day} Reward Claimed! +${result.reward} Coins`);
+            }).catch((err) => {
+                if (err.message === 'ALREADY_CLAIMED') showCustomAlert('✅ Daily reward already claimed today!');
+                else { console.error('Daily Streak Error:', err); showCustomAlert('❌ Daily reward failed: ' + err.message); }
+            });
+        }
+
+        setInterval(updateDailyStreakUI, 30000);
 
         function saveUserBalances(actionTitle = "", amountStr = "", type = "earn") {
             updateUIBalances();
@@ -824,91 +1431,47 @@
 
         function viewAdminUserHistory(targetUsername) {
             document.getElementById('modal').classList.remove('hidden');
-            document.getElementById('modal-title').innerText = `${targetUsername.toUpperCase()} FULL HISTORY`;
+            document.getElementById('modal-title').innerText = `${targetUsername.toUpperCase()} COIN & DIAMOND HISTORY`;
             const content = document.getElementById('modal-content');
-            content.innerHTML = `<div class='text-center py-6 text-gray-400 text-xs'><i class='fa-solid fa-spinner fa-spin text-lg mb-2 text-sky-400'></i><p>Loading full history...</p></div>`;
+            content.innerHTML = `<div class='text-center py-6 text-gray-400 text-xs'><i class='fa-solid fa-spinner fa-spin text-lg mb-2 text-sky-400'></i><p>Loading coin & diamond history...</p></div>`;
 
-            db.collection("users").where("username", "==", targetUsername).limit(1).get().then((querySnap) => {
+            db.collection('users').where('username', '==', targetUsername).limit(1).get().then((querySnap) => {
                 if(querySnap.empty) {
                     content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>User data not found.</div>`;
                     return;
                 }
-                let userRef = querySnap.docs[0].ref;
-                
-                Promise.all([
-                    userRef.collection("coin_history").get(),
-                    userRef.collection("gem_history").get(),
-                    db.collection("deposits").where("username", "==", targetUsername).get(),
-                    db.collection("withdrawals").where("username", "==", targetUsername).get()
-                ]).then(([coinSnap, gemSnap, depSnap, withSnap]) => {
+                const userRef = querySnap.docs[0].ref;
+                Promise.all([userRef.collection('coin_history').get(), userRef.collection('gem_history').get()]).then(([coinSnap, gemSnap]) => {
                     let allHistory = [];
-                    
                     coinSnap.forEach(doc => allHistory.push({...doc.data(), cat: 'Coin'}));
                     gemSnap.forEach(doc => allHistory.push({...doc.data(), cat: 'Diamond'}));
-                    
-                    depSnap.forEach(doc => {
-                        let dData = doc.data();
-                        let isRejected = dData.status && dData.status.toLowerCase().includes('reject');
-                        allHistory.push({
-                            ...dData,
-                            cat: 'Deposit',
-                            title: 'Diamond Deposit',
-                            amount: isRejected ? `${dData.diamonds} 💎` : `+${dData.diamonds} 💎`,
-                            status: dData.status || 'Success',
-                            reason: dData.rejectReason || '',
-                            isRejected: isRejected
-                        });
-                    });
-
-                    withSnap.forEach(doc => {
-                        let wData = doc.data();
-                        let isRejected = wData.status && wData.status.toLowerCase().includes('reject');
-                        allHistory.push({
-                            ...wData,
-                            cat: 'Withdraw',
-                            title: `Payout (${wData.method})`,
-                            amount: isRejected ? `${wData.amount} Coins` : `-${wData.amount} Coins`,
-                            status: wData.status || 'Pending',
-                            reason: wData.rejectReason || '',
-                            isRejected: isRejected
-                        });
-                    });
-
-                    allHistory.sort((a, b) => b.time - a.time);
-
-                    if(allHistory.length === 0) {
-                        content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No history found for this user.</div>`;
+                    allHistory.sort((a,b) => Number(b.time || 0) - Number(a.time || 0));
+                    if(!allHistory.length) {
+                        content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No coin or diamond history found for this user.</div>`;
                         return;
                     }
-
-                    let html = "<div class='space-y-3'>";
+                    let html = `<div class='space-y-3'>`;
                     allHistory.forEach(item => {
-                        let icon = item.cat === 'Coin' ? '<i class="fa-solid fa-coins text-amber-400"></i>' : (item.cat === 'Diamond' || item.cat === 'Deposit' ? '<i class="fa-solid fa-gem text-cyan-400"></i>' : '<i class="fa-solid fa-wallet text-emerald-400"></i>');
-                        
-                        let colorClass = 'text-rose-400';
-                        if (!item.isRejected) {
-                            colorClass = String(item.amount).includes('+') ? 'text-emerald-400' : 'text-rose-400';
-                        }
-
-                        let statusText = item.status ? `<span class="text-[9px] px-1.5 py-0.5 rounded border border-gray-500/30 text-gray-400">${item.status}</span>` : '';
-                        
-                        html += `
-                            <div class='cyber-card p-3 rounded-xl border border-white/5'>
-                                <div class='flex justify-between items-center mb-1'>
-                                    <p class='font-bold text-xs text-gray-200 flex items-center gap-1.5'>${icon} ${item.title}</p>
-                                    <p class='font-black ${colorClass} text-xs'>${item.amount}</p>
-                                </div>
-                                <div class='flex justify-between items-center'>
-                                    <p class='text-[9px] text-gray-500'>${formatTimeAgo(item.time)}</p>
-                                    ${statusText}
-                                </div>
-                                ${item.reason ? `<p class='text-[10px] text-rose-300 mt-2'><span class='font-black'>Rejection Reason:</span> ${String(item.reason).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>` : ''}
+                        const isCoin = item.cat === 'Coin';
+                        const icon = isCoin ? '<i class="fa-solid fa-coins text-amber-400"></i>' : '<i class="fa-solid fa-gem text-cyan-400"></i>';
+                        const color = String(item.amount || '').includes('+') ? 'text-emerald-400' : 'text-rose-400';
+                        html += `<div class='cyber-card p-3.5 rounded-2xl border border-white/10'>
+                            <div class='flex justify-between items-start gap-2'>
+                                <p class='font-black text-xs text-gray-200 flex items-center gap-1.5'>${icon} ${item.title || (isCoin ? 'Coin Transaction' : 'Diamond Transaction')}</p>
+                                <p class='font-black ${color} text-xs whitespace-nowrap'>${item.amount || '-'}</p>
                             </div>
-                        `;
+                            <div class='flex justify-between items-center mt-2'>
+                                <p class='text-[9px] text-gray-500'>${formatTimeAgo(item.time)}</p>
+                                <span class='text-[9px] px-2 py-0.5 rounded-lg border ${isCoin ? 'border-amber-500/20 text-amber-300' : 'border-cyan-500/20 text-cyan-300'}'>${item.cat}</span>
+                            </div>
+                        </div>`;
                     });
-                    html += "</div>";
+                    html += '</div>';
                     content.innerHTML = html;
                 });
+            }).catch(err => {
+                console.error('Admin history error:', err);
+                content.innerHTML = `<div class='text-center py-5 text-rose-400 text-xs'>Unable to load history.</div>`;
             });
         }
 
@@ -932,6 +1495,20 @@
             if (diffMin < 60) return `${diffMin} min ago`;
             const diffHr = Math.floor(diffMin / 60);
             return `${diffHr} hr ago`;
+        }
+
+        function escapeHTML(value) {
+            return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        function getRejectReason(item) {
+            return item?.rejectReason || item?.rejectionReason || item?.reason || '';
+        }
+
+        function getRejectReasonHTML(item) {
+            const reason = getRejectReason(item);
+            if (!reason) return '';
+            return `<div class='mt-2 p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/25'><p class='text-[10px] text-rose-300 font-semibold'><span class='font-black'>Rejection Reason:</span> ${escapeHTML(reason)}</p></div>`;
         }
 
         function openHistory(type) {
@@ -973,7 +1550,7 @@
                         content.innerHTML = html + "</div>";
                     });
                 } else if(type === 'withdrawals') {
-                    db.collection("withdrawals").where("username", "==", username).get().then((snapshot) => {
+                    const loadWithdrawals = (snapshot) => {
                         if(snapshot.empty) { content.innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No payout history yet.</div>`; return; }
                         let docs = [];
                         snapshot.forEach(doc => docs.push(doc.data()));
@@ -992,10 +1569,18 @@
                                 </div>
                                 <p class='text-[11px] text-gray-300'>Method: ${item.method}</p>
                                 ${redeemBox}
-                                ${item.rejectReason ? `<div class='mt-2 p-2 rounded-xl bg-rose-500/10 border border-rose-500/20'><p class='text-[10px] text-rose-300 font-semibold'><span class='font-black'>Rejection Reason:</span> ${String(item.rejectReason).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p></div>` : ''}
+                                ${getRejectReasonHTML(item)}
                             </div>`;
                         });
                         content.innerHTML = html + "</div>";
+                    };
+
+                    db.collection("withdrawals").where("username", "==", username).get().then((snapshot) => {
+                        if (!snapshot.empty) {
+                            loadWithdrawals(snapshot);
+                            return;
+                        }
+                        db.collection("withdrawals").where("userId", "==", String(userId)).get().then(loadWithdrawals);
                     });
                 }
             });
@@ -1006,7 +1591,7 @@
             document.getElementById('modal-title').innerText = "RECENT DEPOSIT STATUS";
             document.getElementById('modal-content').innerHTML = `<div class='text-center py-6 text-gray-400 text-xs'><i class='fa-solid fa-spinner fa-spin text-lg mb-2 text-sky-400'></i><p>Loading status...</p></div>`;
 
-            db.collection("deposits").where("username", "==", username).get().then((snapshot) => {
+            const loadDeposits = (snapshot) => {
                 if(snapshot.empty) {
                     document.getElementById('modal-content').innerHTML = `<div class='text-center py-5 text-gray-500 text-xs'>No deposit requests found.</div>`;
                     return;
@@ -1040,10 +1625,18 @@
                             </div>
                             ${utrText}
                             <p class='text-[10px] text-gray-400'>Requested: ${formatTimeAgo(d.time)}</p>
-                            ${d.rejectReason ? `<div class='mt-2 p-2 rounded-xl bg-rose-500/10 border border-rose-500/20'><p class='text-[10px] text-rose-300 font-semibold'><span class='font-black'>Rejection Reason:</span> ${String(d.rejectReason).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p></div>` : ''}
+                            ${getRejectReasonHTML(d)}
                         </div>`;
                 });
                 document.getElementById('modal-content').innerHTML = html + "</div>";
+            };
+
+            db.collection("deposits").where("username", "==", username).get().then((snapshot) => {
+                if (!snapshot.empty) {
+                    loadDeposits(snapshot);
+                    return;
+                }
+                db.collection("deposits").where("userId", "==", String(userId)).get().then(loadDeposits);
             });
         }
 
@@ -1635,6 +2228,7 @@
             db.collection("deposits").doc(docId).update({
                 status: "Rejected",
                 rejectReason: reason,
+                rejectionReason: reason,
                 rejectedAt: Date.now(),
                 rejectedBy: username
             }).then(() => {
@@ -1691,6 +2285,7 @@
                 transaction.update(withdrawalRef, {
                     status: "Rejected (Refunded)",
                     rejectReason: reason,
+                    rejectionReason: reason,
                     rejectedAt: Date.now(),
                     rejectedBy: username
                 });
