@@ -1010,15 +1010,15 @@
                         <span class="text-2xl">🎮</span>
                         <div>
                             <p class="text-[10px] text-fuchsia-300 font-black uppercase tracking-[.18em]">Play & Win</p>
-                            <h3 class="text-lg font-black text-white">Games</h3>
+                            <h3 class="text-lg font-black text-white">Free Games</h3>
                         </div>
                     </div>
-                    <span class="text-[10px] text-gray-400 font-bold">PLAY NOW</span>
+                    <span class="text-[10px] text-gray-400 font-bold">FREE TO PLAY</span>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <button type="button" onclick="openZyloGame('Ludo')" class="zylo-game-card">
-                        <div class="zylo-game-art zylo-ludo-art"><div class="zylo-ludo-logo" aria-label="Professional Ludo logo"><div class="zylo-ludo-board"><span class="ludo-dot ludo-red"></span><span class="ludo-dot ludo-yellow"></span><span class="ludo-dot ludo-green"></span><span class="ludo-dot ludo-blue"></span><span class="ludo-center"></span></div></div></div>
+                        <div class="zylo-game-art zylo-ludo-art">🎲</div>
                         <div class="zylo-game-title">LUDO</div>
                         <div class="zylo-game-cta">PLAY NOW</div>
                     </button>
@@ -1271,7 +1271,7 @@
             <i class="fa-solid fa-gift text-base"></i>
             <span class="text-[10px] font-extrabold tracking-wide">Promo</span>
         </button>
-        <button onclick="switchTab('withdraw')" id="nav-withdraw" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition py-1 px-3 rounded-2xl cursor-pointer">
+        <button onclick="switchTab('withdraw')" id="nav-withdraw" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition py-1 px-4 rounded-2xl cursor-pointer">
             <i class="fa-solid fa-wallet text-base"></i>
             <span class="text-[10px] font-extrabold tracking-wide">Withdraw</span>
         </button>
@@ -1311,37 +1311,26 @@
 
     <!-- 100% COMPLETE FIXED APP ENGINE SCRIPT -->
     <script>
-        
         const firebaseConfig = {
-            apiKey: "AIzaSyBi30pzpSmX7ICY20_gKtxXyl2QDrny_lY",
+            apiKey: "AIzaSyBi30pzPsMX7ICY20_g...",
             authDomain: "zylobet-3c0d0.firebaseapp.com",
             projectId: "zylobet-3c0d0",
-            storageBucket: "zylobet-3c0d0.firebasestorage.app",
+            storageBucket: "zylobet-3c0d0.appspot.com",
             messagingSenderId: "393354931045",
-            appId: "1:393354931045:web:4e916c31b8c5589f140f8c",
+            appId: "1:393354931045:web:4e916c...",
             measurementId: "G-58J4S8VT1Y"
         };
-        
-        firebase.initializeApp(firebaseConfig);
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         const db = firebase.firestore();
-        
+
         const ADMIN_ID = "7927224931";
         let userId = "";
-        let username = "";
-        let displayName = "";
+        let username = "Telegram User";
+        let telegramName = "Telegram User";
         let userPhotoUrl = "";
-
-        try {
-            const tg = window.Telegram.WebApp;
-            tg.ready();
-            const tgUser = tg.initDataUnsafe && tg.initDataUnsafe.user;
-            if (tgUser && tgUser.id) {
-                userId = String(tgUser.id);
-                username = tgUser.username ? "@" + tgUser.username : "";
-                displayName = [tgUser.first_name || "", tgUser.last_name || ""].filter(Boolean).join(" ").trim() || username || "User";
-                userPhotoUrl = tgUser.photo_url || "";
-            } else { console.error("Telegram User ID unavailable"); }
-        } catch(e) { console.error("Telegram WebApp error:", e); }
 
         let userCoins = 100;
         let userGems = 1;
@@ -1351,7 +1340,21 @@
         let dailyStreakLastClaimDate = "";
         const DAILY_STREAK_REWARDS = [10, 20, 30, 40, 50, 60, 100];
 
-        const myReferralCode = userId ? "ZYL" + userId.slice(-4) : "";
+        try {
+            const tg = window.Telegram.WebApp;
+            tg.ready();
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
+                userId = tg.initDataUnsafe.user.id.toString();
+                username = "@" + (tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name);
+                if (tg.initDataUnsafe.user.photo_url) {
+                    userPhotoUrl = tg.initDataUnsafe.user.photo_url;
+                }
+            }
+        } catch(e) {
+            console.log("Telegram WebApp not fully detected.");
+        }
+
+        const myReferralCode = "ZYL" + userId.slice(-4);
 
         window.addEventListener('DOMContentLoaded', () => {
             const bar = document.getElementById('intro-bar');
@@ -1373,40 +1376,53 @@
         });
 
         function loadUserDataFromFirestore(callback) {
-            if (!userId) { console.error("No Telegram User ID; Firestore load blocked."); if(callback) callback(); return; }
-            const userDocRef = db.collection("users").doc(String(userId));
-
-            userDocRef.onSnapshot((doc) => {
-                if (doc.exists) {
-                    let data = doc.data();
-                    userCoins = data.coins !== undefined ? Number(data.coins) : 100;
-                    userGems = data.gems !== undefined ? Number(data.gems) : 1;
-                    claimedBonuses = data.claimedBonuses || { 50: false, 100: false, 200: false, 500: false };
-                    hasRedoneReferral = data.hasRedoneReferral || false;
-                    dailyStreakDay = Number(data.dailyStreakDay || 0);
-                    dailyStreakLastClaimDate = data.dailyStreakLastClaimDate || "";
-                    updateDailyStreakUI();
+            db.collection("users").where("username", "==", username).limit(1).get().then((querySnap) => {
+                let userDocRef;
+                if (!querySnap.empty) {
+                    userDocRef = querySnap.docs[0].ref;
                 } else {
-                    userDocRef.set({
-                        userId: userId,
-                        username: username,
-                        displayName: displayName,
-                        userId: String(userId),
-                        coins: 100,
-                        gems: 1,
-                        claimedBonuses: { 50: false, 100: false, 200: false, 500: false },
-                        hasRedoneReferral: false,
-                        dailyStreakDay: 0,
-                        dailyStreakLastClaimDate: "",
-                        lastActive: Date.now()
-                    }, { merge: true });
+                    userDocRef = db.collection("users").doc(userId);
                 }
-                updateUIBalances();
-                if(callback) callback();
-            }, (error) => {
-                console.error("Firestore load error:", error);
-                updateUIBalances();
-                if(callback) callback();
+
+                userDocRef.onSnapshot((doc) => {
+                    if (doc.exists) {
+                        let data = doc.data();
+                        userCoins = data.coins !== undefined ? Number(data.coins) : 100;
+                        userGems = data.gems !== undefined ? Number(data.gems) : 1;
+                        if(data.claimedBonuses) {
+                            claimedBonuses = data.claimedBonuses;
+                        }
+                        hasRedoneReferral = data.hasRedoneReferral || false;
+                        dailyStreakDay = Number(data.dailyStreakDay || 0);
+                        dailyStreakLastClaimDate = data.dailyStreakLastClaimDate || "";
+                        updateDailyStreakUI();
+                        if (hasRedoneReferral) {
+                            const refBox = document.getElementById('referral-form-box');
+                            if (refBox) {
+                                refBox.innerHTML = `<p class='text-emerald-400 font-bold text-xs bg-emerald-500/10 border border-emerald-500/30 p-3 rounded-2xl w-full text-center'>✓ Referral code already redeemed successfully!</p>`;
+                            }
+                        }
+                    } else {
+                        userCoins = 100;
+                        userGems = 1;
+                        claimedBonuses = { 50: false, 100: false, 200: false, 500: false };
+                        hasRedoneReferral = false;
+                        dailyStreakDay = 0;
+                        dailyStreakLastClaimDate = "";
+                        updateDailyStreakUI();
+                        userDocRef.set({
+                            userId: userId,
+                            username: username,
+                            coins: userCoins,
+                            gems: userGems,
+                            claimedBonuses: claimedBonuses,
+                            hasRedoneReferral: false,
+                            lastActive: Date.now()
+                        }, { merge: true });
+                    }
+                    updateUIBalances();
+                    if(callback) callback();
+                });
             });
         }
 
@@ -1507,25 +1523,19 @@
 
         setInterval(updateDailyStreakUI, 30000);
 
-        function saveUserBalances(actionTitle = "", amountStr = "", type = "coin") {
-            if (!userId) return;
+function saveUserBalances(actionTitle = "", amountStr = "", type = "coin") {
             const userRef = db.collection("users").doc(String(userId));
-
             userRef.set({
+                userId: String(userId),
+                username: telegramName,
+                telegramName: telegramName,
                 coins: userCoins,
                 gems: userGems,
-                username: username,
-                displayName: displayName,
-                userId: String(userId),
-                claimedBonuses: claimedBonuses,
-                hasRedoneReferral: hasRedoneReferral,
-                dailyStreakDay: dailyStreakDay,
-                dailyStreakLastClaimDate: dailyStreakLastClaimDate,
                 lastActive: Date.now()
             }, { merge: true });
 
-            if(actionTitle && amountStr) {
-                let colName = (type === 'coin' || type === 'earn') ? 'coin_history' : 'gem_history';
+            if (actionTitle && amountStr) {
+                const colName = (type === "coin" || type === "earn") ? "coin_history" : "gem_history";
                 userRef.collection(colName).add({
                     title: actionTitle,
                     amount: amountStr,
@@ -1533,7 +1543,6 @@
                     status: "Success"
                 });
             }
-            updateUIBalances();
         }
 
         function updateUIBalances() {
@@ -1542,9 +1551,8 @@
         }
 
         function registerUserActivity() {
-            if (!userId) return;
-            const userRef = db.collection("users").doc(String(userId));
-            Promise.resolve().then(() => {
+            db.collection("users").where("username", "==", username).limit(1).get().then((querySnap) => {
+                let userRef = !querySnap.empty ? querySnap.docs[0].ref : db.collection("users").doc(userId);
                 userRef.set({
                     userId: userId,
                     username: username,
@@ -1554,7 +1562,7 @@
                     hasRedoneReferral: hasRedoneReferral,
                     lastActive: Date.now()
                 }, { merge: true });
-            }).catch(err => console.error("Activity save error:", err));
+            });
             if(userId === ADMIN_ID) loadAdminRealtimeData();
         }
 
@@ -1580,7 +1588,7 @@
             document.getElementById('image-zoom-modal').classList.add('hidden');
         }
 
-        document.getElementById('tg-user').innerText = displayName || username || 'User';
+        document.getElementById('tg-user').innerText = username;
         document.getElementById('ref-code').innerText = myReferralCode;
 
         const avatarContainer = document.getElementById('user-avatar-container');
@@ -1843,7 +1851,8 @@
             title.innerText = type === 'gems' ? "DIAMONDS HISTORY" : (type === 'coins' ? "COINS HISTORY" : "PAYOUT HISTORY");
             content.innerHTML = `<div class='text-center py-6 text-gray-400 text-xs'><i class='fa-solid fa-spinner fa-spin text-lg mb-2 text-sky-400'></i><p>Loading history...</p></div>`;
 
-            const userRef = db.collection("users").doc(String(userId));
+            db.collection("users").where("username", "==", username).limit(1).get().then((querySnap) => {
+                let userRef = !querySnap.empty ? querySnap.docs[0].ref : db.collection("users").doc(userId);
 
                 if(type === 'gems') {
                     userRef.collection("gem_history").get().then((snapshot) => {
@@ -1883,19 +1892,13 @@
                         let html = "<div class='space-y-3'>";
                         docs.forEach((item) => {
                             let redeemBox = item.redeemCode ? `<div class='flex items-center justify-between gap-2 mt-1 p-2 rounded-xl bg-black/30 border border-white/5'><span class='text-xs text-sky-300 font-mono break-all'>🔑 Redeem Code: <b>${item.redeemCode}</b></span><button type='button' onclick='copyText(${JSON.stringify(String(item.redeemCode))})' class='shrink-0 w-8 h-8 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 border border-sky-400/20 text-sky-300 flex items-center justify-center cursor-pointer transition active:scale-90' title='Copy Redeem Code'><i class='fa-solid fa-copy'></i></button></div>` : '';
-                            let statusText = String(item.status || 'Pending');
-                            let statusClass = 'withdraw-history-pending';
-                            if (statusText.toLowerCase().includes('success') || statusText.toLowerCase().includes('approved')) {
-                                statusClass = 'withdraw-history-success';
-                            } else if (statusText.toLowerCase().includes('rejected') || statusText.toLowerCase().includes('refund')) {
-                                statusClass = 'withdraw-history-rejected';
-                            }
-                            html += `<div class='cyber-card withdrawal-history-card ${statusClass}-card p-4 rounded-2xl border border-white/10 space-y-1'>
-                                <div class='flex justify-between items-center gap-3'>
+                            let statusClass = item.status.includes('Success') ? 'text-emerald-400' : (item.status.includes('Rejected') ? 'text-rose-400' : 'text-amber-400');
+                            html += `<div class='cyber-card p-4 rounded-2xl border border-white/10 space-y-1'>
+                                <div class='flex justify-between items-center'>
                                     <span class='text-amber-400 font-black flex items-center gap-1.5'>
                                         <span class="ff-gold-coin" style="width:18px;height:18px;font-size:7px;"><i class="fa-solid fa-coins"></i></span> ${item.amount} Coins (₹${item.rupees})
                                     </span>
-                                    <span class='withdraw-history-status ${statusClass}'>${statusText}</span>
+                                    <span class='text-xs ${statusClass} font-bold'>${item.status}</span>
                                 </div>
                                 <p class='text-[11px] text-gray-300'>Method: ${item.method}</p>
                                 ${redeemBox}
@@ -1905,8 +1908,15 @@
                         content.innerHTML = html + "</div>";
                     };
 
-                    db.collection("withdrawals").where("userId", "==", String(userId)).get().then(loadWithdrawals);
+                    db.collection("withdrawals").where("username", "==", username).get().then((snapshot) => {
+                        if (!snapshot.empty) {
+                            loadWithdrawals(snapshot);
+                            return;
+                        }
+                        db.collection("withdrawals").where("userId", "==", String(userId)).get().then(loadWithdrawals);
+                    });
                 }
+            });
         }
 
         function openDepositStatusModal() {
@@ -1954,7 +1964,13 @@
                 document.getElementById('modal-content').innerHTML = html + "</div>";
             };
 
-            db.collection("deposits").where("userId", "==", String(userId)).get().then(loadDeposits);
+            db.collection("deposits").where("username", "==", username).get().then((snapshot) => {
+                if (!snapshot.empty) {
+                    loadDeposits(snapshot);
+                    return;
+                }
+                db.collection("deposits").where("userId", "==", String(userId)).get().then(loadDeposits);
+            });
         }
 
         let selectedWCoins = 0;
@@ -1977,71 +1993,75 @@
         }
 
         let refMsgTimer = null;
-        function applyReferralCode() {
-            const statusMsg = document.getElementById('ref-status-msg');
+function applyReferralCode() {
+            const statusMsg = document.getElementById("ref-status-msg");
+            const refBox = document.getElementById("referral-form-box");
+
             if (hasRedoneReferral) {
-                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ You have already redeemed a referral code!";
-                if(refMsgTimer) clearTimeout(refMsgTimer);
-                refMsgTimer = setTimeout(() => { statusMsg.innerText = ""; }, 4000);
+                if (refBox) refBox.style.display = "none";
                 return;
             }
 
-            const inputField = document.getElementById('friend-ref-input');
-            const enteredCode = inputField.value.trim().toUpperCase();
+            const input = document.getElementById("friend-ref-input");
+            const code = input ? input.value.trim().toUpperCase() : "";
 
-            if(!enteredCode || enteredCode === myReferralCode) {
-                statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                statusMsg.innerText = "❌ Invalid or own referral code!";
-                if(refMsgTimer) clearTimeout(refMsgTimer);
-                refMsgTimer = setTimeout(() => { statusMsg.innerText = ""; }, 4000);
+            if (!code || code === myReferralCode) {
+                if (statusMsg) statusMsg.innerText = "❌ Invalid or own referral code!";
                 return;
             }
 
-            db.collection("users").get().then((snapshot) => {
-                let foundRefRef = null;
-                snapshot.forEach((doc) => {
-                    if ("ZYL" + doc.id.slice(-4) === enteredCode) {
-                        foundRefRef = doc.ref;
-                    }
+            db.collection("users").get().then(snapshot => {
+                let ref = null;
+                snapshot.forEach(doc => {
+                    if ("ZYL" + doc.id.slice(-4) === code) ref = doc.ref;
                 });
+                if (!ref || String(ref.id) === String(userId)) throw new Error("INVALID");
 
-                if(!foundRefRef) {
-                    statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
-                    statusMsg.innerText = "❌ Referral code not found!";
-                    if(refMsgTimer) clearTimeout(refMsgTimer);
-                    refMsgTimer = setTimeout(() => { statusMsg.innerText = ""; }, 4000);
-                    return;
-                }
+                const mine = db.collection("users").doc(String(userId));
+                return db.runTransaction(async tx => {
+                    const me = await tx.get(mine);
+                    const rd = await tx.get(ref);
+                    if (me.exists && me.data().hasRedoneReferral === true) throw new Error("USED");
+                    if (!rd.exists) throw new Error("INVALID");
 
+                    tx.set(mine, {
+                        userId: String(userId),
+                        username: telegramName,
+                        telegramName: telegramName,
+                        hasRedoneReferral: true,
+                        coins: firebase.firestore.FieldValue.increment(300),
+                        lastActive: Date.now()
+                    }, {merge:true});
+                    tx.set(ref, {coins: firebase.firestore.FieldValue.increment(300)}, {merge:true});
+                    return ref;
+                });
+            }).then(ref => {
+                if (!ref) return;
                 hasRedoneReferral = true;
                 userCoins += 300;
-                saveUserBalances("Referral Bonus", "+300 Coins", "coin");
+                updateUIBalances();
+                if (refBox) refBox.style.display = "none";
 
-                foundRefRef.get().then((refDoc) => {
-                    if(refDoc.exists) {
-                        let refData = refDoc.data();
-                        let newRefCoins = (refData.coins || 100) + 300;
-                        foundRefRef.update({ coins: newRefCoins });
-                        foundRefRef.collection("coin_history").add({
-                            title: `Referral Reward (${username})`,
-                            amount: "+300 Coins",
-                            type: "coin",
-                            time: Date.now(),
-                            status: "Success"
-                        });
-                    }
-                });
-
-                const refBox = document.getElementById('referral-form-box');
-                if (refBox) {
-                    refBox.innerHTML = `<p class='text-emerald-400 font-bold text-xs bg-emerald-500/10 border border-emerald-500/30 p-3 rounded-2xl w-full text-center'>✓ Referral code redeemed successfully!</p>`;
+                const mine = db.collection("users").doc(String(userId));
+                return Promise.all([
+                    mine.collection("coin_history").add({
+                        title:"Referral Bonus", amount:"+300 Coins",
+                        time:Date.now(), status:"Success"
+                    }),
+                    ref.collection("coin_history").add({
+                        title:"Referral Reward", amount:"+300 Coins",
+                        time:Date.now(), status:"Success"
+                    })
+                ]);
+            }).then(() => {
+                if (statusMsg) statusMsg.innerText = "🎉 Success! +300 Coins added!";
+            }).catch(err => {
+                if (err.message === "USED") {
+                    hasRedoneReferral = true;
+                    if (refBox) refBox.style.display = "none";
+                } else if (statusMsg) {
+                    statusMsg.innerText = "❌ Invalid referral code!";
                 }
-
-                statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
-                statusMsg.innerText = "🎉 Success! +300 Coins added!";
-                if(refMsgTimer) clearTimeout(refMsgTimer);
-                refMsgTimer = setTimeout(() => { statusMsg.innerText = ""; }, 4000);
             });
         }
 
@@ -2059,7 +2079,8 @@
                 return;
             }
 
-            const userRef = db.collection("users").doc(String(userId));
+            db.collection("users").where("username", "==", username).limit(1).get().then((querySnap) => {
+                let userRef = !querySnap.empty ? querySnap.docs[0].ref : db.collection("users").doc(userId);
 
                 Promise.all([
                     userRef.get(),
@@ -2203,7 +2224,8 @@
 
                         console.error("Promo Code Error:", err);
                     });
-                }).catch((err) => {
+                });
+            }).catch((err) => {
                 statusMsg.className = "text-[11px] h-6 font-semibold text-rose-400";
                 statusMsg.innerText = "❌ Unable to check promo code!";
                 if(promoMsgTimer) clearTimeout(promoMsgTimer);
@@ -2250,9 +2272,11 @@
             userCoins -= modalConvCoins; 
             userGems += modalConvGems;
             
-            const userRef = db.collection("users").doc(String(userId));
+            db.collection("users").where("username", "==", username).limit(1).get().then((querySnap) => {
+                let userRef = !querySnap.empty ? querySnap.docs[0].ref : db.collection("users").doc(userId);
                 userRef.collection("coin_history").add({ title: "Exchange to Diamonds", amount: `-${modalConvCoins} Coins`, type: "coin", time: Date.now(), status: "Success" });
                 userRef.collection("gem_history").add({ title: "Converted from Coins", amount: `+${modalConvGems} Diamonds`, type: "gem", time: Date.now(), status: "Success" });
+            });
 
             saveUserBalances();
             showCustomAlert(`🎉 Converted successfully!`); closeModal();
@@ -2483,28 +2507,64 @@
             loadAdminRealtimeData();
         }
 
-        function approveDeposit(docId, tUserId, tUsername, dias, paidRs, tier) {
-            const targetId = String(tUserId || userId);
-            const diamonds = Number(dias || 0);
+function approveDeposit(docId, tUserId, tUsername, dias, paidRs, tier) {
+            const dr = db.collection("deposits").doc(docId);
 
-            db.collection("deposits").doc(docId).update({ status: "Success" }).then(() => {
-                const targetRef = db.collection("users").doc(targetId);
-                return targetRef.update({
-                    gems: firebase.firestore.FieldValue.increment(diamonds)
-                }).then(() => {
-                    return targetRef.collection("gem_history").add({
-                        title: "Deposit Approved",
-                        amount: "+" + diamonds + " Diamonds",
-                        time: Date.now(),
-                        status: "Success"
-                    });
-                });
-            }).then(() => {
-                showCustomAlert("✅ Approved for User ID: " + targetId);
-                loadAdminRealtimeData();
-            }).catch((err) => {
-                console.error("Deposit approval error:", err);
-                showCustomAlert("❌ Approval failed: " + err.message);
+            db.runTransaction(async tx => {
+                const snap = await tx.get(dr);
+                if (!snap.exists) throw new Error("NOT_FOUND");
+                const d = snap.data();
+
+                if (d.status && d.status !== "Pending") throw new Error("PROCESSED");
+
+                const uid = String(d.userId || tUserId || "");
+                const diamonds = Number(d.diamonds || d.dias || dias || 0);
+                const amount = Number(d.amount || d.paidRs || paidRs || 0);
+                const offer = Number(d.bonusTier || d.tier || tier || 0);
+
+                if (!uid) throw new Error("USER");
+                if (!(diamonds > 0)) throw new Error("AMOUNT");
+
+                const ur = db.collection("users").doc(uid);
+                const us = await tx.get(ur);
+                const ud = us.exists ? us.data() : {};
+                const claimed = ud.claimedBonuses || {50:false,100:false,200:false,500:false};
+
+                if (offer > 0 && claimed[offer] === true) throw new Error("BONUS");
+
+                const update = {
+                    userId:uid,
+                    username:String(d.username || tUsername || "Telegram User"),
+                    telegramName:String(d.telegramName || d.username || tUsername || "Telegram User"),
+                    gems:firebase.firestore.FieldValue.increment(diamonds),
+                    lastActive:Date.now()
+                };
+                if (offer > 0) {
+                    claimed[offer] = true;
+                    update.claimedBonuses = claimed;
+                }
+
+                tx.update(dr, {status:"Success", approvedAt:Date.now(), approvedBy:tUsername});
+                tx.set(ur, update, {merge:true});
+
+                return {ur:ur, diamonds:diamonds, amount:amount};
+            }).then(r => r.ur.collection("gem_history").add({
+                title:"Deposit Approved (₹" + r.amount + ")",
+                amount:"+" + r.diamonds + " Diamonds",
+                time:Date.now(),
+                status:"Success"
+            })).then(() => {
+                showCustomAlert("✅ Deposit Approved & Diamonds Added!");
+                if (typeof loadAdminRealtimeData === "function") loadAdminRealtimeData();
+            }).catch(err => {
+                const msg = {
+                    PROCESSED:"⚠️ This deposit has already been processed!",
+                    BONUS:"⚠️ This first-time offer has already been used!",
+                    NOT_FOUND:"❌ Deposit request not found!",
+                    USER:"❌ User ID missing!",
+                    AMOUNT:"❌ Invalid deposit amount!"
+                };
+                showCustomAlert(msg[err.message] || "❌ Deposit approval failed!");
             });
         }
 
@@ -2543,41 +2603,59 @@
             });
         }
 
-        function rejectWithdraw(docId, tUserId, tUsername, coins) {
-            const reasonInput = document.getElementById('reject-reason-withdraw-' + docId);
-            const reason = reasonInput ? reasonInput.value.trim() : '';
-            const refundCoins = Number(coins || 0);
-            const targetId = String(tUserId || userId);
-
-            if(!reason) {
+function rejectWithdraw(docId, tUserId, tUsername, coins) {
+            const reasonInput = document.getElementById("reject-reason-withdraw-" + docId);
+            const reason = reasonInput ? reasonInput.value.trim() : "";
+            if (!reason) {
                 showCustomAlert("❌ Enter the reason before rejecting this withdrawal!");
                 return;
             }
 
-            const targetRef = db.collection("users").doc(targetId);
+            const wr = db.collection("withdrawals").doc(docId);
+            let ur = null, refund = 0;
 
-            db.collection("withdrawals").doc(docId).update({
-                status: "Rejected",
-                rejectReason: reason
-            }).then(() => {
-                return targetRef.update({
-                    coins: firebase.firestore.FieldValue.increment(refundCoins)
+            db.runTransaction(async tx => {
+                const snap = await tx.get(wr);
+                if (!snap.exists) throw new Error("NOT_FOUND");
+                const d = snap.data();
+
+                if (d.status && d.status !== "Pending") throw new Error("PROCESSED");
+
+                const uid = String(d.userId || tUserId || "");
+                refund = Number(d.amount || d.coins || coins || 0);
+                if (!uid) throw new Error("USER");
+                if (!(refund > 0)) throw new Error("AMOUNT");
+
+                ur = db.collection("users").doc(uid);
+                tx.update(wr, {
+                    status:"Rejected (Refunded)",
+                    rejectReason:reason,
+                    rejectionReason:reason,
+                    rejectedAt:Date.now(),
+                    rejectedBy:tUsername
                 });
-            }).then(() => {
-                return targetRef.collection("coin_history").add({
-                    title: "Withdrawal Refund",
-                    amount: "+" + refundCoins + " Coins",
-                    type: "coin",
-                    time: Date.now(),
-                    status: "Success",
-                    reason: reason
-                });
-            }).then(() => {
-                showCustomAlert("❌ Payout Rejected & " + refundCoins + " Coins Refunded!");
-                loadAdminRealtimeData();
-            }).catch((err) => {
-                console.error("Refund Error:", err);
-                showCustomAlert("❌ Refund failed: " + err.message);
+                tx.set(ur, {
+                    userId:uid,
+                    coins:firebase.firestore.FieldValue.increment(refund),
+                    lastActive:Date.now()
+                }, {merge:true});
+            }).then(() => ur.collection("coin_history").add({
+                title:"Withdrawal Refund",
+                amount:"+" + refund + " Coins",
+                time:Date.now(),
+                status:"Success",
+                reason:reason
+            })).then(() => {
+                showCustomAlert("❌ Payout Rejected & " + refund + " Coins Refunded!");
+                if (typeof loadAdminRealtimeData === "function") loadAdminRealtimeData();
+            }).catch(err => {
+                const msg = {
+                    PROCESSED:"⚠️ This withdrawal has already been processed!",
+                    NOT_FOUND:"❌ Withdrawal request not found!",
+                    USER:"❌ User ID missing!",
+                    AMOUNT:"❌ Invalid refund amount!"
+                };
+                showCustomAlert(msg[err.message] || "❌ Refund failed!");
             });
         }
 
@@ -2974,208 +3052,23 @@ nav.fixed.bottom-3 #nav-withdraw:active {
 }
 .zylo-demo-big { font-size:62px; filter:drop-shadow(0 0 14px rgba(236,72,153,.65)); }
 
-
-/* ===== CHECK DEPOSIT STATUS — PINK NEON GLOW ===== */
-button[onclick*="depositStatus"],
-button[onclick*="DepositStatus"],
-button[onclick*="checkDeposit"],
-button[onclick*="CheckDeposit"],
-#check-deposit-status,
-.check-deposit-status {
-    position:relative !important;
-    overflow:hidden !important;
-    isolation:isolate !important;
-    border-radius:18px !important;
-    color:#fff !important;
-    font-weight:900 !important;
-    border:1px solid rgba(255,255,255,.58) !important;
-    background:linear-gradient(105deg,#ff1493 0%,#ec4899 42%,#d946ef 72%,#9333ea 100%) !important;
-    box-shadow:
-        0 8px 28px rgba(236,72,153,.48),
-        0 0 28px rgba(255,20,147,.42),
-        0 0 55px rgba(217,70,239,.30),
-        inset 0 1px 0 rgba(255,255,255,.48) !important;
-    animation:depositPinkPulse 2s ease-in-out infinite !important;
-}
-
-button[onclick*="depositStatus"]::after,
-button[onclick*="DepositStatus"]::after,
-button[onclick*="checkDeposit"]::after,
-button[onclick*="CheckDeposit"]::after,
-#check-deposit-status::after,
-.check-deposit-status::after {
-    content:"" !important;
-    position:absolute !important;
-    top:-90% !important;
-    left:-90% !important;
-    width:34% !important;
-    height:280% !important;
-    transform:skewX(-23deg) !important;
-    background:linear-gradient(90deg,transparent,rgba(255,255,255,.9),transparent) !important;
-    animation:depositPinkShine 3s ease-in-out infinite !important;
-    pointer-events:none !important;
-    z-index:5 !important;
-}
-
-@keyframes depositPinkPulse {
-    0%,100% {
-        filter:brightness(1) saturate(1);
-        box-shadow:
-            0 8px 28px rgba(236,72,153,.42),
-            0 0 26px rgba(255,20,147,.35),
-            0 0 50px rgba(217,70,239,.25),
-            inset 0 1px 0 rgba(255,255,255,.42);
-    }
-    50% {
-        filter:brightness(1.15) saturate(1.18);
-        box-shadow:
-            0 10px 32px rgba(236,72,153,.62),
-            0 0 40px rgba(255,20,147,.55),
-            0 0 72px rgba(217,70,239,.38),
-            inset 0 1px 0 rgba(255,255,255,.55);
-    }
-}
-
-@keyframes depositPinkShine {
-    0%,25% { left:-90%; opacity:0; }
-    35% { opacity:1; }
-    62% { left:150%; opacity:1; }
-    72%,100% { left:150%; opacity:0; }
-}
-
-button[onclick*="depositStatus"]:active,
-button[onclick*="DepositStatus"]:active,
-button[onclick*="checkDeposit"]:active,
-button[onclick*="CheckDeposit"]:active,
-#check-deposit-status:active,
-.check-deposit-status:active {
-    transform:scale(.93) !important;
-    filter:brightness(1.3) saturate(1.25) !important;
-    box-shadow:
-        0 3px 12px rgba(0,0,0,.45),
-        0 0 45px rgba(255,20,147,.72),
-        0 0 85px rgba(217,70,239,.42),
-        inset 0 0 24px rgba(255,255,255,.18) !important;
-}
-
-
-
-}
-
-
-/* ===== WITHDRAWAL HISTORY: EXACT STATUS GLOW ===== */
-.withdrawal-history-status {
-    position:relative !important;
-    display:inline-flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    min-width:92px !important;
-    padding:8px 12px !important;
-    border-radius:12px !important;
-    font-size:10px !important;
-    font-weight:1000 !important;
-    letter-spacing:.03em !important;
-    overflow:hidden !important;
-    isolation:isolate !important;
-    border:1px solid !important;
-    transition:transform .15s ease, filter .2s ease !important;
-}
-.withdraw-history-success {
-    color:#39ff88 !important;
-    background:linear-gradient(105deg,rgba(0,100,45,.35),rgba(0,25,12,.9)) !important;
-    border-color:#39ff88 !important;
-    box-shadow:0 0 10px rgba(57,255,136,.75),0 0 26px rgba(57,255,136,.45),inset 0 0 16px rgba(57,255,136,.12) !important;
-    text-shadow:0 0 9px rgba(57,255,136,.9) !important;
-    animation:whGreenPulse 1.7s ease-in-out infinite !important;
-}
-.withdraw-history-rejected {
-    color:#ff405d !important;
-    background:linear-gradient(105deg,rgba(115,0,25,.38),rgba(35,0,8,.9)) !important;
-    border-color:#ff405d !important;
-    box-shadow:0 0 10px rgba(255,64,93,.78),0 0 26px rgba(255,64,93,.48),inset 0 0 16px rgba(255,64,93,.12) !important;
-    text-shadow:0 0 9px rgba(255,64,93,.9) !important;
-    animation:whRedPulse 1.7s ease-in-out infinite !important;
-}
-.withdraw-history-pending {
-    color:#ffc44d !important;
-    background:rgba(120,75,0,.25) !important;
-    border-color:#ffc44d !important;
-    box-shadow:0 0 12px rgba(255,196,77,.35) !important;
-}
-.withdraw-history-status:active {
-    transform:scale(.92) !important;
-    filter:brightness(1.3) !important;
-}
-.withdraw-history-success-card {
-    border-color:rgba(57,255,136,.38) !important;
-    box-shadow:0 0 16px rgba(57,255,136,.12),inset 0 0 18px rgba(57,255,136,.04) !important;
-}
-.withdraw-history-rejected-card {
-    border-color:rgba(255,64,93,.38) !important;
-    box-shadow:0 0 16px rgba(255,64,93,.12),inset 0 0 18px rgba(255,64,93,.04) !important;
-}
-@keyframes whGreenPulse {
-    0%,100% { filter:brightness(1); }
-    50% { filter:brightness(1.22) saturate(1.2); }
-}
-@keyframes whRedPulse {
-    0%,100% { filter:brightness(1); }
-    50% { filter:brightness(1.22) saturate(1.2); }
-}
-35% { opacity:1; }
-    62% { left:150%; opacity:1; }
-    72%,100% { left:150%; opacity:0; }
-}
-
-
-/* FINAL FIX: REMOVE WITHDRAWAL HISTORY WHITE BLINK */
-.withdraw-history-status::after { content:none !important; display:none !important; animation:none !important; background:none !important; }
-
-/* ===== PRO LEVEL LUDO LOGO ===== */
-.zylo-ludo-logo{width:78px;height:78px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 0 16px rgba(236,72,153,.55))}.zylo-ludo-board{position:relative;width:64px;height:64px;border-radius:15px;background:conic-gradient(from 0deg,#ff315b 0 25%,#ffd43b 25% 50%,#21d889 50% 75%,#4c8dff 75% 100%);border:3px solid rgba(255,255,255,.92);box-shadow:0 0 14px rgba(255,255,255,.25),0 0 28px rgba(236,72,153,.45),inset 0 0 15px rgba(0,0,0,.38)}.zylo-ludo-board:before{content:"";position:absolute;inset:12px;border-radius:5px;background:linear-gradient(90deg,transparent 29%,rgba(255,255,255,.9) 29% 34%,transparent 34% 66%,rgba(255,255,255,.9) 66% 71%,transparent 71%),linear-gradient(0deg,transparent 29%,rgba(255,255,255,.9) 29% 34%,transparent 34% 66%,rgba(255,255,255,.9) 66% 71%,transparent 71%)}.ludo-dot{position:absolute;width:12px;height:12px;border-radius:50%;z-index:2;border:2px solid rgba(255,255,255,.95);box-shadow:0 0 8px rgba(0,0,0,.45),inset 0 1px 2px rgba(255,255,255,.65)}.ludo-red{top:6px;left:6px;background:#ff315b}.ludo-yellow{top:6px;right:6px;background:#ffd43b}.ludo-green{bottom:6px;left:6px;background:#21d889}.ludo-blue{bottom:6px;right:6px;background:#4c8dff}.ludo-center{position:absolute;left:50%;top:50%;width:20px;height:20px;z-index:3;transform:translate(-50%,-50%) rotate(45deg);background:linear-gradient(135deg,#fff,#f0abfc 45%,#9333ea);border:2px solid rgba(255,255,255,.95);box-shadow:0 0 14px rgba(255,255,255,.55)}.zylo-ludo-art{background:radial-gradient(circle at 50% 45%,rgba(236,72,153,.25),transparent 45%),linear-gradient(145deg,rgba(27,8,42,.98),rgba(5,8,22,.98)) !important}
-
-/* ===== ZOLOBET USERNAME - PREMIUM BRIGHT SHINY ===== */
-.zolobet-user-name,.username-display,.user-name,.profile-username,[id*="username" i],[id*="user-name" i],[class*="username" i],[class*="user-name" i]{position:relative!important;display:inline-block!important;font-weight:1000!important;letter-spacing:.025em!important;color:transparent!important;background:linear-gradient(100deg,#fff 0%,#ff65bd 18%,#e879f9 36%,#a78bfa 54%,#67e8f9 72%,#fff 88%,#ff65bd 100%)!important;background-size:240% auto!important;-webkit-background-clip:text!important;background-clip:text!important;text-shadow:0 0 8px rgba(236,72,153,.9),0 0 18px rgba(168,85,247,.62),0 0 30px rgba(34,211,238,.34)!important;animation:zolobetUsernameShine 3s linear infinite!important}
-.zolobet-user-name:after,.username-display:after,.user-name:after,.profile-username:after{content:""!important;position:absolute!important;left:0!important;right:0!important;bottom:-4px!important;height:2px!important;border-radius:99px!important;background:linear-gradient(90deg,#ec4899,#a855f7,#22d3ee,#ec4899)!important;background-size:220% 100%!important;box-shadow:0 0 8px rgba(236,72,153,.85),0 0 16px rgba(168,85,247,.5)!important;animation:zolobetUsernameLine 2.2s linear infinite!important}
-@keyframes zolobetUsernameShine{0%{background-position:240% center;filter:brightness(1)}50%{filter:brightness(1.42) saturate(1.22)}100%{background-position:-20% center;filter:brightness(1)}}
-@keyframes zolobetUsernameLine{0%{background-position:220% center;opacity:.65}50%{opacity:1}100%{background-position:-20% center;opacity:.65}}
-
-/* FINAL USERNAME STYLE */
-#tg-user{
-position:relative!important;display:inline-flex!important;align-items:center!important;
-padding:4px 12px!important;min-height:24px!important;border-radius:999px!important;
-font-size:12px!important;font-weight:900!important;letter-spacing:.03em!important;
-color:#fff!important;-webkit-text-fill-color:#fff!important;
-background:linear-gradient(135deg,rgba(236,72,153,.22),rgba(124,58,237,.22),rgba(34,211,238,.14))!important;
-border:1px solid rgba(255,255,255,.24)!important;
-box-shadow:0 0 9px rgba(236,72,153,.42),0 0 18px rgba(124,58,237,.28),inset 0 1px 0 rgba(255,255,255,.24)!important;
-text-shadow:0 0 6px #fff,0 0 12px rgba(236,72,153,.7)!important;
-overflow:hidden!important;animation:zyloUserPulse 3s ease-in-out infinite!important}
-#tg-user::before{content:""!important;position:absolute!important;top:-20%!important;bottom:-20%!important;
-left:-35%!important;width:22%!important;transform:skewX(-20deg)!important;
-background:linear-gradient(90deg,transparent,rgba(255,255,255,.7),transparent)!important;
-animation:zyloUserSweep 3.2s ease-in-out infinite!important}
-@keyframes zyloUserPulse{0%,100%{filter:brightness(1)}
-50%{filter:brightness(1.2)}}
-@keyframes zyloUserSweep{0%,18%{left:-35%;opacity:0}30%{opacity:.85}52%{left:120%;opacity:.65}100%{left:120%;opacity:0}}
-
 </style>
 
     <div id="zylo-game-modal" onclick="if(event.target===this) closeZyloGame()">
         <div class="zylo-game-modal-box">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-[9px] text-fuchsia-300 font-black uppercase tracking-[.2em]">Play & Win</p>
+                    <p class="text-[9px] text-fuchsia-300 font-black uppercase tracking-[.2em]">Free Game</p>
                     <h3 id="zylo-game-name" class="text-xl text-white font-black mt-1">Ludo</h3>
                 </div>
                 <button type="button" onclick="closeZyloGame()" class="text-gray-300 text-xl px-2">✕</button>
             </div>
             <div class="zylo-demo-board">
                 <div id="zylo-game-emoji" class="zylo-demo-big">🎲</div>
-                <p class="text-sm text-white font-black">Play Mode</p>
-                <p class="text-[10px] text-gray-400 text-center">Play & Win game.</p>
+                <p class="text-sm text-white font-black">Demo Mode</p>
+                <p class="text-[10px] text-gray-400 text-center">Free-to-play preview — no money wagering.</p>
                 <button type="button" onclick="zyloDemoAction()" class="px-6 py-3 rounded-2xl font-black text-xs text-white bg-gradient-to-r from-fuchsia-600 to-violet-600 shadow-lg active:scale-95">
-                    PLAY NOW
+                    START DEMO
                 </button>
             </div>
             <p id="zylo-game-status" class="text-[10px] text-fuchsia-300 font-bold text-center">Ready to play.</p>
@@ -3197,13 +3090,10 @@ animation:zyloUserSweep 3.2s ease-in-out infinite!important}
         document.getElementById("zylo-game-modal").classList.remove("show");
     };
     window.zyloDemoAction = function(){
-        document.getElementById("zylo-game-status").textContent = "Game started — enjoy Play & Win!";
+        document.getElementById("zylo-game-status").textContent = "Demo started — enjoy the free game preview!";
     };
 })();
 </script>
-
-
-
 
 </body>
 </html>
