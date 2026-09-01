@@ -1326,9 +1326,22 @@
         const db = firebase.firestore();
         
         const ADMIN_ID = "7927224931";
-        let userId = "7927224931";
-        let username = "@Raj_Prashant";
+        let userId = "";
+        let username = "";
+        let displayName = "";
         let userPhotoUrl = "";
+
+        try {
+            const tg = window.Telegram.WebApp;
+            tg.ready();
+            const tgUser = tg.initDataUnsafe && tg.initDataUnsafe.user;
+            if (tgUser && tgUser.id) {
+                userId = String(tgUser.id);
+                username = tgUser.username ? "@" + tgUser.username : "";
+                displayName = [tgUser.first_name || "", tgUser.last_name || ""].filter(Boolean).join(" ").trim() || username || "User";
+                userPhotoUrl = tgUser.photo_url || "";
+            } else { console.error("Telegram User ID unavailable"); }
+        } catch(e) { console.error("Telegram WebApp error:", e); }
 
         let userCoins = 100;
         let userGems = 1;
@@ -1338,7 +1351,7 @@
         let dailyStreakLastClaimDate = "";
         const DAILY_STREAK_REWARDS = [10, 20, 30, 40, 50, 60, 100];
 
-        const myReferralCode = "ZYL" + userId.slice(-4);
+        const myReferralCode = userId ? "ZYL" + userId.slice(-4) : "";
 
         window.addEventListener('DOMContentLoaded', () => {
             const bar = document.getElementById('intro-bar');
@@ -1360,7 +1373,8 @@
         });
 
         function loadUserDataFromFirestore(callback) {
-            const userDocRef = db.collection("users").doc(userId);
+            if (!userId) { console.error("No Telegram User ID; Firestore load blocked."); if(callback) callback(); return; }
+            const userDocRef = db.collection("users").doc(String(userId));
 
             userDocRef.onSnapshot((doc) => {
                 if (doc.exists) {
@@ -1376,6 +1390,8 @@
                     userDocRef.set({
                         userId: userId,
                         username: username,
+                        displayName: displayName,
+                        userId: String(userId),
                         coins: 100,
                         gems: 1,
                         claimedBonuses: { 50: false, 100: false, 200: false, 500: false },
@@ -1492,12 +1508,15 @@
         setInterval(updateDailyStreakUI, 30000);
 
         function saveUserBalances(actionTitle = "", amountStr = "", type = "coin") {
-            const userRef = db.collection("users").doc(userId);
+            if (!userId) return;
+            const userRef = db.collection("users").doc(String(userId));
 
             userRef.set({
                 coins: userCoins,
                 gems: userGems,
                 username: username,
+                displayName: displayName,
+                userId: String(userId),
                 claimedBonuses: claimedBonuses,
                 hasRedoneReferral: hasRedoneReferral,
                 dailyStreakDay: dailyStreakDay,
@@ -1523,8 +1542,9 @@
         }
 
         function registerUserActivity() {
-            db.collection("users").where("username", "==", username).limit(1).get().then((querySnap) => {
-                let userRef = !querySnap.empty ? querySnap.docs[0].ref : db.collection("users").doc(userId);
+            if (!userId) return;
+            const userRef = db.collection("users").doc(String(userId));
+            Promise.resolve().then(() => {
                 userRef.set({
                     userId: userId,
                     username: username,
@@ -1534,7 +1554,7 @@
                     hasRedoneReferral: hasRedoneReferral,
                     lastActive: Date.now()
                 }, { merge: true });
-            });
+            }).catch(err => console.error("Activity save error:", err));
             if(userId === ADMIN_ID) loadAdminRealtimeData();
         }
 
@@ -1560,7 +1580,7 @@
             document.getElementById('image-zoom-modal').classList.add('hidden');
         }
 
-        document.getElementById('tg-user').innerText = username;
+        document.getElementById('tg-user').innerText = displayName || username || 'User';
         document.getElementById('ref-code').innerText = myReferralCode;
 
         const avatarContainer = document.getElementById('user-avatar-container');
@@ -1823,8 +1843,7 @@
             title.innerText = type === 'gems' ? "DIAMONDS HISTORY" : (type === 'coins' ? "COINS HISTORY" : "PAYOUT HISTORY");
             content.innerHTML = `<div class='text-center py-6 text-gray-400 text-xs'><i class='fa-solid fa-spinner fa-spin text-lg mb-2 text-sky-400'></i><p>Loading history...</p></div>`;
 
-            db.collection("users").where("username", "==", username).limit(1).get().then((querySnap) => {
-                let userRef = !querySnap.empty ? querySnap.docs[0].ref : db.collection("users").doc(userId);
+            const userRef = db.collection("users").doc(String(userId));
 
                 if(type === 'gems') {
                     userRef.collection("gem_history").get().then((snapshot) => {
@@ -1886,15 +1905,8 @@
                         content.innerHTML = html + "</div>";
                     };
 
-                    db.collection("withdrawals").where("username", "==", username).get().then((snapshot) => {
-                        if (!snapshot.empty) {
-                            loadWithdrawals(snapshot);
-                            return;
-                        }
-                        db.collection("withdrawals").where("userId", "==", String(userId)).get().then(loadWithdrawals);
-                    });
+                    db.collection("withdrawals").where("userId", "==", String(userId)).get().then(loadWithdrawals);
                 }
-            });
         }
 
         function openDepositStatusModal() {
@@ -1942,13 +1954,7 @@
                 document.getElementById('modal-content').innerHTML = html + "</div>";
             };
 
-            db.collection("deposits").where("username", "==", username).get().then((snapshot) => {
-                if (!snapshot.empty) {
-                    loadDeposits(snapshot);
-                    return;
-                }
-                db.collection("deposits").where("userId", "==", String(userId)).get().then(loadDeposits);
-            });
+            db.collection("deposits").where("userId", "==", String(userId)).get().then(loadDeposits);
         }
 
         let selectedWCoins = 0;
@@ -2053,8 +2059,7 @@
                 return;
             }
 
-            db.collection("users").where("username", "==", username).limit(1).get().then((querySnap) => {
-                let userRef = !querySnap.empty ? querySnap.docs[0].ref : db.collection("users").doc(userId);
+            const userRef = db.collection("users").doc(String(userId));
 
                 Promise.all([
                     userRef.get(),
@@ -2198,8 +2203,7 @@
 
                         console.error("Promo Code Error:", err);
                     });
-                });
-            }).catch((err) => {
+                }).catch((err) => {
                 statusMsg.className = "text-[11px] h-6 font-semibold text-rose-400";
                 statusMsg.innerText = "❌ Unable to check promo code!";
                 if(promoMsgTimer) clearTimeout(promoMsgTimer);
@@ -2246,11 +2250,9 @@
             userCoins -= modalConvCoins; 
             userGems += modalConvGems;
             
-            db.collection("users").where("username", "==", username).limit(1).get().then((querySnap) => {
-                let userRef = !querySnap.empty ? querySnap.docs[0].ref : db.collection("users").doc(userId);
+            const userRef = db.collection("users").doc(String(userId));
                 userRef.collection("coin_history").add({ title: "Exchange to Diamonds", amount: `-${modalConvCoins} Coins`, type: "coin", time: Date.now(), status: "Success" });
                 userRef.collection("gem_history").add({ title: "Converted from Coins", amount: `+${modalConvGems} Diamonds`, type: "gem", time: Date.now(), status: "Success" });
-            });
 
             saveUserBalances();
             showCustomAlert(`🎉 Converted successfully!`); closeModal();
