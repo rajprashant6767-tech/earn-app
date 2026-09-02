@@ -2320,13 +2320,86 @@
                 </div>`;
         }
 
+        function compressPaymentProof(file, maxSize = 850000) {
+            return new Promise((resolve, reject) => {
+                if (!file || !file.type || !file.type.startsWith('image/')) {
+                    reject(new Error('INVALID_IMAGE'));
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const maxSide = 1000;
+                        const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+                        const canvas = document.createElement('canvas');
+                        canvas.width = Math.max(1, Math.round(img.width * scale));
+                        canvas.height = Math.max(1, Math.round(img.height * scale));
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        let quality = 0.78;
+                        let dataUrl = canvas.toDataURL('image/jpeg', quality);
+                        while (dataUrl.length > maxSize && quality > 0.45) {
+                            quality -= 0.08;
+                            dataUrl = canvas.toDataURL('image/jpeg', quality);
+                        }
+                        if (dataUrl.length > maxSize) {
+                            const smaller = document.createElement('canvas');
+                            const scale2 = 700 / Math.max(img.width, img.height);
+                            smaller.width = Math.max(1, Math.round(img.width * scale2));
+                            smaller.height = Math.max(1, Math.round(img.height * scale2));
+                            smaller.getContext('2d').drawImage(img, 0, 0, smaller.width, smaller.height);
+                            dataUrl = smaller.toDataURL('image/jpeg', 0.62);
+                        }
+                        resolve(dataUrl);
+                    };
+                    img.onerror = () => reject(new Error('IMAGE_READ_FAILED'));
+                    img.src = reader.result;
+                };
+                reader.onerror = () => reject(new Error('FILE_READ_FAILED'));
+                reader.readAsDataURL(file);
+            });
+        }
+
         function submitManualDeposit(totalDias, paidRs, tier) {
             const utrInput = document.getElementById('deposit-utr-input');
-            const demoRef = utrInput ? utrInput.value.trim() : '';
-            db.collection("deposits").add({username:telegramDisplayName, displayName:telegramDisplayName, userId:String(userId), amount:Number(paidRs), diamonds:Number(totalDias), utr:demoRef || "DEMO-" + Date.now(), proofImg:"", status:"Pending", bonusTier:Number(tier || 0), time:Date.now(), demo:true}).then(() => {
-                showCustomAlert("✅ Deposit request submitted successfully.");
+            const fileInput = document.getElementById('deposit-proof-file');
+            const utr = utrInput ? utrInput.value.trim() : '';
+
+            if (!utr || !/^[0-9]{12}$/.test(utr)) {
+                showCustomAlert("❌ Please send a valid 12-digit UTR number!");
+                return;
+            }
+            if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+                showCustomAlert("❌ Please send payment proof screenshot!");
+                return;
+            }
+
+            const submitBtn = document.querySelector('#modal-content button[onclick*="submitManualDeposit"]');
+            if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = 'UPLOADING PROOF...'; }
+
+            compressPaymentProof(fileInput.files[0]).then((proofImg) => {
+                return db.collection("deposits").add({
+                    username: telegramDisplayName,
+                    displayName: telegramDisplayName,
+                    userId: String(userId),
+                    amount: Number(paidRs),
+                    diamonds: Number(totalDias),
+                    utr: utr,
+                    proofImg: proofImg,
+                    status: "Pending",
+                    bonusTier: Number(tier || 0),
+                    time: Date.now(),
+                    demo: true
+                });
+            }).then(() => {
+                showCustomAlert("🎉 Payment proof and UTR submitted successfully!");
                 closeModal();
-            }).catch(err => showCustomAlert("❌ Error: " + err.message));
+            }).catch(err => {
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = 'SUBMIT PROOF FOR APPROVAL'; }
+                const msg = err.message === 'INVALID_IMAGE' ? 'Please upload a valid payment screenshot!' : 'Error: ' + err.message;
+                showCustomAlert('❌ ' + msg);
+            });
         }
 
         function closeModal() { document.getElementById('modal').classList.add('hidden'); }
@@ -2366,7 +2439,7 @@
 
         function submitWithdrawRequest(method) {
             if(!selectedWCoins || !selectedWAmount) { showCustomAlert("❌ Select package first!"); return; }
-            if(selectedWCoins > userCoins) { showCustomAlert("❌ Insufficient Coins!"); return; }
+            if(Number(selectedWCoins) > Number(userCoins)) { showCustomAlert("❌ Insufficient Coins!"); return; }
             
             let extraDetails = "";
             if(method === 'UPI') {
@@ -2375,21 +2448,52 @@
                 extraDetails = ` (UPI: ${adminUpiInput})`;
             }
 
-            userCoins -= selectedWCoins;
-            saveUserBalances(`Withdrawal Request (${method})`, `-${selectedWCoins} Coins`, "coin");
+            const userRef = db.collection("users").doc(String(userId));
+            const withdrawalRef = db.collection("withdrawals").doc();
+            const coinsToDeduct = Number(selectedWCoins);
+            const rupees = Number(selectedWAmount);
+            const currentUserId = String(userId);
+            const displayName = String(telegramDisplayName || username || 'Telegram User');
 
-            db.collection("withdrawals").add({
-                username: username,
-                userId: userId,
-                method: method,
-                amount: selectedWCoins,
-                rupees: selectedWAmount,
-                details: extraDetails,
-                status: "Pending",
-                time: Date.now()
+            db.runTransaction(async (tx) => {
+                const userDoc = await tx.get(userRef);
+                const data = userDoc.exists ? userDoc.data() : {};
+                const serverCoins = Number(data.coins || 0);
+                if (serverCoins < coinsToDeduct) throw new Error('INSUFFICIENT_COINS');
+
+                tx.set(userRef, {
+                    userId: currentUserId,
+                    coins: firebase.firestore.FieldValue.increment(-coinsToDeduct),
+                    lastActive: Date.now()
+                }, {merge:true});
+
+                tx.set(withdrawalRef, {
+                    username: displayName,
+                    displayName: displayName,
+                    userId: currentUserId,
+                    method: method,
+                    amount: coinsToDeduct,
+                    rupees: rupees,
+                    details: extraDetails,
+                    status: "Pending",
+                    time: Date.now()
+                });
+            }).then(() => {
+                userCoins = Math.max(0, Number(userCoins) - coinsToDeduct);
+                updateUIBalances();
+                return userRef.collection('coin_history').add({
+                    title: `Withdrawal Request (${method})`,
+                    amount: `-${coinsToDeduct} Coins`,
+                    type: 'coin',
+                    time: Date.now(),
+                    status: 'Success'
+                });
             }).then(() => {
                 showCustomAlert(`🎉 ${method} Payout Request Sent Successfully!`);
                 if(method === 'UPI') document.getElementById('w-upi-id').value = '';
+            }).catch((err) => {
+                if(err.message === 'INSUFFICIENT_COINS') showCustomAlert('❌ Insufficient Coins!');
+                else { console.error('Withdrawal Request Error:', err); showCustomAlert('❌ Withdrawal request failed: ' + err.message); }
             });
         }
 
@@ -2468,22 +2572,57 @@
             const reasonInput = document.getElementById('reject-reason-withdraw-' + docId);
             const reason = reasonInput ? reasonInput.value.trim() : '';
             if(!reason) { showCustomAlert("❌ Enter the reason before rejecting this withdrawal!"); return; }
-            const withdrawalRef = db.collection("withdrawals").doc(docId);
+            const withdrawalRef = db.collection("withdrawals").doc(String(docId));
+
             db.runTransaction(async (tx) => {
                 const wd = await tx.get(withdrawalRef);
                 if (!wd.exists) throw new Error("WITHDRAWAL_NOT_FOUND");
-                const data = wd.data();
-                if (data.status && data.status !== "Pending") throw new Error("ALREADY_PROCESSED");
-                const realUserId = String(data.userId || tUserId);
-                const refundCoins = Number(data.amount || data.coins || coins);
-                if (!refundCoins || refundCoins <= 0) throw new Error("INVALID_REFUND");
+                const data = wd.data() || {};
+                if (String(data.status || 'Pending') !== "Pending") throw new Error("ALREADY_PROCESSED");
+
+                const realUserId = String(data.userId || tUserId || '');
+                const refundCoins = Number(data.amount);
+                if (!realUserId) throw new Error("USER_NOT_FOUND");
+                if (!Number.isFinite(refundCoins) || refundCoins <= 0) throw new Error("INVALID_REFUND");
+
                 const userRef = db.collection("users").doc(realUserId);
-                tx.update(withdrawalRef, {status:"Rejected (Refunded)", rejectReason:reason, rejectionReason:reason, rejectedAt:Date.now(), rejectedBy:username, refundCoins:refundCoins});
-                tx.set(userRef, {userId:realUserId, coins:firebase.firestore.FieldValue.increment(refundCoins), lastActive:Date.now()}, {merge:true});
+                tx.get(userRef);
+                tx.update(withdrawalRef, {
+                    status:"Rejected (Refunded)",
+                    rejectReason:reason,
+                    rejectionReason:reason,
+                    rejectedAt:Date.now(),
+                    rejectedBy:username || 'Admin',
+                    refundCoins:refundCoins
+                });
+                tx.set(userRef, {
+                    userId:realUserId,
+                    coins:firebase.firestore.FieldValue.increment(refundCoins),
+                    lastActive:Date.now()
+                }, {merge:true});
                 return {realUserId, refundCoins};
-            }).then(result => db.collection("users").doc(result.realUserId).collection("coin_history").add({title:"Withdrawal Refund", amount:`+${result.refundCoins} Coins`, type:"coin", time:Date.now(), status:"Success", reason:reason, demo:true}).then(() => result))
-            .then(result => showCustomAlert(`❌ Withdrawal rejected & ${result.refundCoins} Coins refunded!`))
-            .catch(err => showCustomAlert(err.message === "ALREADY_PROCESSED" ? "⚠️ This withdrawal has already been processed!" : err.message === "WITHDRAWAL_NOT_FOUND" ? "❌ Withdrawal request not found!" : "❌ Refund failed: " + err.message));
+            }).then(result => db.collection("users").doc(result.realUserId).collection("coin_history").add({
+                title:"Withdrawal Refund",
+                amount:`+${result.refundCoins} Coins`,
+                type:"coin",
+                time:Date.now(),
+                status:"Success",
+                reason:reason,
+                demo:true
+            }).then(() => result))
+            .then(result => {
+                if(String(result.realUserId) === String(userId)) {
+                    userCoins = Number(userCoins || 0) + Number(result.refundCoins);
+                    updateUIBalances();
+                }
+                showCustomAlert(`❌ Withdrawal rejected & ${result.refundCoins} Coins refunded!`);
+            })
+            .catch(err => showCustomAlert(
+                err.message === "ALREADY_PROCESSED" ? "⚠️ This withdrawal has already been processed!" :
+                err.message === "WITHDRAWAL_NOT_FOUND" ? "❌ Withdrawal request not found!" :
+                err.message === "USER_NOT_FOUND" ? "❌ Target user not found!" :
+                "❌ Refund failed: " + err.message
+            ));
         }
 
         function renderPromoManagerShell() {
