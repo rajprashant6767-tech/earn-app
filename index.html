@@ -1525,7 +1525,15 @@
         }
 
         function registerUserActivity() {
-            db.collection("users").doc(String(userId)).set({userId:String(userId), username:telegramDisplayName, displayName:telegramDisplayName, coins:userCoins, gems:userGems, claimedBonuses:claimedBonuses, hasRedoneReferral:hasRedoneReferral, lastActive:Date.now()}, {merge:true});
+            // Keep activity/identity separate from balances.
+            // Admin approvals/refunds update coins/diamonds atomically in Firestore;
+            // writing local cached balances here could overwrite those server-side updates.
+            db.collection("users").doc(String(userId)).set({
+                userId:String(userId),
+                username:telegramDisplayName,
+                displayName:telegramDisplayName,
+                lastActive:Date.now()
+            }, {merge:true});
             if(userId === ADMIN_ID) loadAdminRealtimeData();
         }
 
@@ -2586,7 +2594,7 @@
                 if (!Number.isFinite(refundCoins) || refundCoins <= 0) throw new Error("INVALID_REFUND");
 
                 const userRef = db.collection("users").doc(realUserId);
-                tx.get(userRef);
+                await tx.get(userRef);
                 tx.update(withdrawalRef, {
                     status:"Rejected (Refunded)",
                     rejectReason:reason,
