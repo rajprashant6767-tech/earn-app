@@ -1396,7 +1396,11 @@
                     userCoins = 100; userGems = 1;
                     claimedBonuses = {50:false,100:false,200:false,500:false};
                     hasRedoneReferral = false; dailyStreakDay = 0; dailyStreakLastClaimDate = "";
-                    userDocRef.set({ userId:String(userId), username:telegramDisplayName, displayName:telegramDisplayName, coins:userCoins, gems:userGems, claimedBonuses:claimedBonuses, hasRedoneReferral:false, lastActive:Date.now() }, {merge:true});
+                    const welcomeBatch = db.batch();
+                    welcomeBatch.set(userDocRef, { userId:String(userId), username:telegramDisplayName, displayName:telegramDisplayName, coins:userCoins, gems:userGems, claimedBonuses:claimedBonuses, hasRedoneReferral:false, welcomeBonusHistoryAdded:true, lastActive:Date.now() }, {merge:true});
+                    welcomeBatch.set(userDocRef.collection('coin_history').doc(), { title:'Welcome Bonus', amount:'+100 Coins', type:'coin', time:Date.now(), status:'Success' });
+                    welcomeBatch.set(userDocRef.collection('gem_history').doc(), { title:'Welcome Bonus', amount:'+1 Diamond', type:'gem', time:Date.now(), status:'Success' });
+                    welcomeBatch.commit().catch(err => console.error('Welcome history save error:', err));
                 }
                 updateDailyStreakUI();
                 const refBox = document.getElementById('referral-form-box');
@@ -1970,10 +1974,12 @@
             if (!enteredCode || enteredCode === myReferralCode) {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
                 statusMsg.innerText = "❌ Invalid or own referral code!";
+                if (refMsgTimer) clearTimeout(refMsgTimer);
+                refMsgTimer = setTimeout(() => { statusMsg.innerText = ""; }, 4000);
                 return;
             }
+            let foundRefRef = null;
             db.collection("users").get().then((snapshot) => {
-                let foundRefRef = null;
                 snapshot.forEach((doc) => { if ("ZYL" + doc.id.slice(-4) === enteredCode && doc.id !== String(userId)) foundRefRef = doc.ref; });
                 if (!foundRefRef) throw new Error("REFERRAL_NOT_FOUND");
                 const myRef = db.collection("users").doc(String(userId));
@@ -1992,13 +1998,25 @@
                 const box = document.getElementById('referral-form-box'); if (box) box.style.display = 'none';
                 statusMsg.className = "text-[11px] h-4 font-semibold text-emerald-400";
                 statusMsg.innerText = "🎉 Success! +300 Coins added!";
+                if (refMsgTimer) clearTimeout(refMsgTimer);
+                refMsgTimer = setTimeout(() => { statusMsg.innerText = ""; }, 4000);
                 saveUserBalances("Referral Bonus", "+300 Coins", "coin");
+                foundRefRef.collection('coin_history').add({
+                    title: `Referral Bonus (${telegramDisplayName})`,
+                    amount: "+300 Coins",
+                    type: "coin",
+                    time: Date.now(),
+                    status: "Success"
+                }).catch(err => console.error('Referrer history save error:', err));
             }).catch((err) => {
                 statusMsg.className = "text-[11px] h-4 font-semibold text-rose-400";
                 statusMsg.innerText = err.message === "ALREADY_REDEEMED" ? "❌ You have already redeemed a referral code!" : "❌ Referral code not found!";
+                if (refMsgTimer) clearTimeout(refMsgTimer);
+                refMsgTimer = setTimeout(() => { statusMsg.innerText = ""; }, 4000);
             });
         }
 
+        let promoMsgTimer = null;
         function applyPromoCode() {
             const promoInput = document.getElementById('promo-input');
             const statusMsg = document.getElementById('promo-status-msg');
