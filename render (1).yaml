@@ -1,9 +1,0 @@
-services:
-  - type: web
-    runtime: static
-    name: zylobet
-    staticPublishPath: .
-    headers:
-      - path: /*
-        name: Cross-Origin-Opener-Policy
-        value: same-origin-allow-popups
