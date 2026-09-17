@@ -897,7 +897,8 @@
 
 
 /* ===== FREE FIRE ROOM DETAILS: SHOW ONLY ON ROOM CODE CLICK ===== */
-#ff-joined-list-modal{position:fixed;inset:0;z-index:2147483646;background:rgba(0,0,0,.78);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:18px}#ff-joined-list-modal.show{display:flex!important}#ff-room-modal{
+#ff-joined-list-modal{position:fixed;inset:0;z-index:2147483646;background:rgba(0,0,0,.78);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:18px}#ff-joined-list-modal.show{display:flex!important}#ff-join-confirm-modal{position:fixed;inset:0;z-index:2147483645;background:rgba(0,0,0,.82);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);display:none;align-items:center;justify-content:center;padding:18px}#ff-join-confirm-modal.show{display:flex!important}.ff-join-confirm-box{width:min(94vw,430px);max-height:88vh;overflow:auto;padding:18px;border-radius:22px;background:linear-gradient(145deg,#07172b,#020914);border:1px solid rgba(250,204,21,.35);box-shadow:0 24px 70px rgba(0,0,0,.65);color:#e2e8f0}.ff-join-confirm-box h3{font-size:17px;color:#fff;font-weight:1000;text-align:center;margin-bottom:5px}.ff-join-confirm-sub{font-size:9px;color:#94a3b8;text-align:center;margin-bottom:13px}.ff-join-confirm-card{padding:12px;border-radius:14px;background:rgba(255,255,255,.045);border:1px solid rgba(148,163,184,.15)}.ff-join-confirm-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 0;border-bottom:1px solid rgba(148,163,184,.10);font-size:9px}.ff-join-confirm-row:last-child{border-bottom:0}.ff-join-confirm-row span{color:#94a3b8}.ff-join-confirm-row b{color:#facc15;text-align:right}.ff-confirm-rules{margin-top:12px;padding:12px;border-radius:14px;background:rgba(3,7,18,.72);border:1px solid rgba(148,163,184,.14)}.ff-confirm-rules h4{font-size:10px;color:#facc15;font-weight:1000;margin-bottom:7px}.ff-confirm-rules ol{margin:0;padding-left:18px}.ff-confirm-rules li{font-size:8.5px;line-height:1.5;color:#cbd5e1;margin-bottom:5px}.ff-confirm-rules li:last-child{margin-bottom:0}.ff-join-confirm-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.ff-join-confirm-actions button{min-height:44px;border-radius:14px!important;font-size:10px!important;font-weight:1000!important}.ff-join-confirm-cancel{background:#1e293b!important;color:#fff!important;border:1px solid rgba(148,163,184,.28)!important}.ff-join-confirm-now{background:#facc15!important;color:#111827!important;border:0!important;box-shadow:0 0 16px rgba(250,204,21,.18)}
+#ff-room-modal{
     display:none !important;
     position:fixed !important;
     inset:0 !important;
@@ -980,7 +981,7 @@
 /* ===== FREE FIRE TOURNAMENT MODE PAGES (UI ONLY) ===== */
 .ff-mode-page{display:none}.ff-mode-page.active{display:block}.ff-mode-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:14px}.ff-mode-card{position:relative;overflow:hidden;width:100%;min-height:0;border-radius:22px;border:1px solid rgba(255,255,255,.18);background:#071426;box-shadow:0 18px 42px rgba(0,0,0,.45);cursor:pointer;padding:0!important;text-align:left}.ff-mode-card::after{display:none}.ff-mode-card img{display:block;width:100%;height:145px;object-fit:cover;object-position:center}.ff-mode-card-content{position:relative;left:auto;right:auto;bottom:auto;z-index:2;padding:12px 58px 13px 15px;background:#071426;min-height:58px}.ff-mode-card-title{font-size:16px;font-weight:1000;color:#fff;letter-spacing:.06em;text-shadow:none;line-height:1.15}.ff-mode-card-sub{font-size:9px;color:#cbd5e1;font-weight:800;margin-top:4px;line-height:1.3}.ff-mode-card-arrow{position:absolute;right:14px;bottom:12px;z-index:3;width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:rgba(250,204,21,.95);color:#111827;font-weight:1000;box-shadow:0 0 18px rgba(250,204,21,.38)}
 .ff-mode-page-header{display:flex;align-items:center;gap:10px;margin-top:14px;padding:10px 12px;border-radius:18px;background:rgba(3,10,24,.72);border:1px solid rgba(255,255,255,.12)}.ff-mode-page-header .ff-mode-page-title{flex:1}.ff-mode-page-title h3{font-size:15px;color:#fff;font-weight:1000}.ff-mode-page-title p{font-size:9px;color:#94a3b8;margin-top:2px;font-weight:800}.ff-small-back{width:38px;height:38px;border-radius:12px!important;display:flex;align-items:center;justify-content:center;color:#fff;background:rgba(255,255,255,.07)!important;border:1px solid rgba(255,255,255,.14)!important}
-.ff-status-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:12px;padding:5px;border-radius:17px;background:rgba(3,7,18,.76);border:1px solid rgba(148,163,184,.15)}.ff-status-tab{min-height:42px;border-radius:12px!important;background:rgba(255,255,255,.045)!important;color:#aeb8ca!important;border:1px solid rgba(255,255,255,.06)!important;font-size:8px;font-weight:1000}.ff-status-tab.active{color:#fff!important;background:linear-gradient(105deg,#f59e0b,#facc15)!important;border-color:rgba(255,255,255,.35)!important;box-shadow:0 0 16px rgba(250,204,21,.22)!important}.ff-status-panel{display:none;margin-top:10px}.ff-status-panel.active{display:block}.ff-tournament-card{position:relative!important;z-index:10!important;display:flex;gap:12px;align-items:center;padding:13px;border-radius:18px;background:linear-gradient(145deg,rgba(12,27,48,.96),rgba(6,15,29,.98));border:1px solid rgba(148,163,184,.18);margin-bottom:9px;box-shadow:0 12px 28px rgba(0,0,0,.3)}.ff-tournament-thumb{width:92px;height:92px;flex:0 0 92px;border-radius:13px;object-fit:cover;border:1px solid rgba(255,255,255,.18)}.ff-tournament-info{min-width:0;flex:1}.ff-tournament-name{font-size:14px;font-weight:1000;color:#fff;line-height:1.2}.ff-tournament-meta{font-size:10px;color:#94a3b8;margin-top:4px}.ff-tournament-prize{font-size:13px;font-weight:1000;color:#fbbf24;margin-top:5px;white-space:nowrap;display:inline-block;max-width:none;min-width:max-content;overflow:visible}.ff-seats{font-size:9px;color:#94a3b8;margin-top:4px;font-weight:800}.ff-seat-progress{display:block;height:4px;margin-top:3px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}.ff-seat-progress span{display:block;height:100%;border-radius:999px;background:#facc15}.ff-tournament-status{display:inline-flex;padding:3px 7px;border-radius:999px;font-size:7px;font-weight:1000;color:#111827;background:#facc15;margin-bottom:4px}.ff-tournament-action{margin-left:auto;flex:0 0 auto;padding:8px 10px;border-radius:10px!important;font-size:8px;font-weight:1000;color:#111827;background:#facc15!important;border:0!important}.ff-insufficient-balance{display:none!important;margin-top:4px;color:#fb7185;font-size:7px;font-weight:1000;line-height:1.1;text-align:center;white-space:nowrap}.ff-insufficient-balance.show{display:block}.ff-entry-fee-wrap{margin-left:auto;flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:auto!important;position:relative!important;z-index:2147483647!important}.ff-notification-open .ff-entry-fee-wrap{visibility:hidden!important}.ff-player-edit{font-size:5px;font-weight:1000;line-height:1;color:#facc15;letter-spacing:.08em;opacity:.95}.ff-entry-fee-label{font-size:7px;font-weight:1000;color:#facc15;line-height:1}.ff-entry-fee-wrap .ff-tournament-action{position:relative!important;z-index:2147483647!important;margin-left:0;padding:8px 10px;pointer-events:auto!important;font-size:18px;line-height:18px;display:inline-flex;align-items:center;justify-content:center;gap:4px}.ff-entry-fee-wrap .ff-tournament-action .ff-diamond{width:18px!important;height:18px!important;line-height:18px!important;display:inline-flex!important;align-items:center;justify-content:center;vertical-align:middle}
+.ff-status-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:12px;padding:5px;border-radius:17px;background:rgba(3,7,18,.76);border:1px solid rgba(148,163,184,.15)}.ff-status-tab{min-height:42px;border-radius:12px!important;background:rgba(255,255,255,.045)!important;color:#aeb8ca!important;border:1px solid rgba(255,255,255,.06)!important;font-size:8px;font-weight:1000}.ff-status-tab.active{color:#fff!important;background:linear-gradient(105deg,#f59e0b,#facc15)!important;border-color:rgba(255,255,255,.35)!important;box-shadow:0 0 16px rgba(250,204,21,.22)!important}.ff-status-panel{display:none;margin-top:10px}.ff-status-panel.active{display:block}.ff-tournament-card{position:relative!important;z-index:10!important;display:flex;gap:12px;align-items:center;padding:13px;border-radius:18px;background:linear-gradient(145deg,rgba(12,27,48,.96),rgba(6,15,29,.98));border:1px solid rgba(148,163,184,.18);margin-bottom:9px;box-shadow:0 12px 28px rgba(0,0,0,.3)}.ff-tournament-thumb{width:92px;height:92px;flex:0 0 92px;border-radius:13px;object-fit:cover;border:1px solid rgba(255,255,255,.18)}.ff-tournament-info{min-width:0;flex:1}.ff-tournament-name{font-size:14px;font-weight:1000;color:#fff;line-height:1.2}.ff-tournament-meta{font-size:10px;color:#94a3b8;margin-top:4px}.ff-tournament-prize{font-size:13px;font-weight:1000;color:#fbbf24;margin-top:5px;white-space:nowrap;display:inline-block;max-width:none;min-width:max-content;overflow:visible}.ff-seats{font-size:9px;color:#94a3b8;margin-top:4px;font-weight:800}.ff-seat-progress{display:block;height:4px;margin-top:3px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}.ff-seat-progress span{display:block;height:100%;border-radius:999px;background:#facc15}.ff-tournament-status{display:inline-flex;padding:3px 7px;border-radius:999px;font-size:7px;font-weight:1000;color:#111827;background:#facc15;margin-bottom:4px}.ff-tournament-action{margin-left:auto;flex:0 0 auto;padding:8px 10px;border-radius:10px!important;font-size:8px;font-weight:1000;color:#111827;background:#facc15!important;border:0!important}.ff-insufficient-balance{display:none!important;margin-top:4px;color:#fb7185;font-size:7px;font-weight:1000;line-height:1.1;text-align:center;white-space:nowrap}.ff-insufficient-balance.show{display:block}.ff-entry-fee-wrap{margin-left:24px!important;flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:auto!important;position:relative!important;z-index:2147483647!important}.ff-notification-open .ff-entry-fee-wrap{visibility:hidden!important}.ff-player-edit{font-size:5px;font-weight:1000;line-height:1;color:#facc15;letter-spacing:.08em;opacity:.95}.ff-entry-fee-label{font-size:7px;font-weight:1000;color:#facc15;line-height:1}.ff-entry-fee-wrap .ff-tournament-action{position:relative!important;z-index:2147483647!important;margin-left:0;padding:8px 10px;pointer-events:auto!important;font-size:11px;line-height:14px;display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:86px;min-height:38px}.ff-entry-fee-wrap .ff-joined-action{font-size:11px!important;line-height:14px!important;min-width:86px!important;min-height:38px!important;padding:8px 10px!important}.ff-seats{margin-top:8px!important;line-height:1.35!important;display:block!important}.ff-seat-progress{height:4px!important;margin-top:5px!important;display:block!important;width:100%!important}.ff-entry-fee-wrap .ff-tournament-action .ff-diamond{width:18px!important;height:18px!important;line-height:18px!important;display:inline-flex!important;align-items:center;justify-content:center;vertical-align:middle}.ff-entry-fee-wrap .ff-entry-fee-box{min-width:62px!important;min-height:34px!important;padding:5px 9px!important;border:1px solid rgba(250,204,21,.42)!important;border-radius:10px!important;background:rgba(250,204,21,.07)!important;box-shadow:0 0 12px rgba(250,204,21,.10)!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:5px!important;color:#facc15!important;font-size:11px!important;font-weight:1000!important;line-height:1!important}.ff-entry-fee-wrap .ff-entry-fee-box .ff-diamond{width:20px!important;height:20px!important;line-height:20px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;font-size:8px!important;flex:0 0 20px!important}.ff-entry-fee-wrap .ff-entry-fee-box .ff-diamond i{transform:rotate(-45deg)!important}.ff-entry-fee-wrap{gap:5px!important}.ff-entry-fee-wrap .ff-entry-fee-label{margin-top:1px!important}
 .ff-entry-fee-wrap .ff-tournament-action .ff-diamond,.ff-entry-fee-wrap .ff-tournament-action .ff-diamond i{pointer-events:none!important;}.ff-joined-list-btn{margin-top:6px!important;width:100%;padding:7px 8px!important;border-radius:9px!important;font-size:8px!important;font-weight:1000!important;color:#111827!important;background:#facc15!important;border:0!important}.ff-joined-list-box{width:min(94vw,480px);max-height:86vh;overflow:auto;padding:18px;border-radius:22px;background:linear-gradient(145deg,#07172b,#020914);border:1px solid rgba(250,204,21,.3);box-shadow:0 20px 60px rgba(0,0,0,.55)}.ff-joined-list-box h3{font-size:15px;color:#fff;font-weight:1000;text-align:center;margin-bottom:4px}.ff-joined-list-sub{font-size:8px;color:#94a3b8;text-align:center;margin-bottom:12px}.ff-joined-player{padding:11px 12px;margin-top:8px;border-radius:13px;background:rgba(255,255,255,.045);border:1px solid rgba(148,163,184,.16)}.ff-joined-player b{display:block;font-size:11px;color:#facc15}.ff-joined-player span{display:block;margin-top:4px;font-size:8px;color:#cbd5e1;line-height:1.45}.ff-joined-empty{padding:18px;text-align:center;font-size:9px;color:#94a3b8;border:1px dashed rgba(148,163,184,.18);border-radius:13px}.ff-room-box{width:min(92vw,430px);max-height:86vh;overflow:auto;padding:18px;border-radius:22px;background:linear-gradient(145deg,#07172b,#020914);border:1px solid rgba(250,204,21,.3);box-shadow:0 20px 60px rgba(0,0,0,.55)}.ff-room-box h3{font-size:15px;color:#fff;font-weight:1000;text-align:center;margin-bottom:12px}.ff-room-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 11px;margin-top:8px;border-radius:13px;background:rgba(255,255,255,.045);border:1px solid rgba(148,163,184,.16)}.ff-room-row div{min-width:0}.ff-room-row span{display:block;font-size:7px;color:#94a3b8;font-weight:900}.ff-room-row b{display:block;margin-top:3px;font-size:12px;color:#facc15;letter-spacing:.04em}.ff-room-row button{flex:0 0 auto;padding:7px 9px;border-radius:9px!important;background:#facc15!important;color:#111827!important;border:0!important;font-size:8px;font-weight:1000}.ff-room-rules{margin-top:12px;padding:11px;border-radius:14px;background:rgba(3,7,18,.7);border:1px solid rgba(148,163,184,.13)}.ff-room-rules h4{font-size:9px;color:#facc15;font-weight:1000;margin-bottom:6px}.ff-room-rules ol{margin:0;padding-left:17px}.ff-room-rules li{font-size:8px;line-height:1.45;color:#cbd5e1;margin-bottom:5px}.ff-room-rules li:last-child{margin-bottom:0}.ff-room-modal{display:flex!important}
 .ff-empty-panel{padding:30px 14px;text-align:center;border-radius:18px;background:rgba(3,10,24,.68);border:1px solid rgba(148,163,184,.14)}.ff-empty-panel .icon{font-size:30px}.ff-empty-panel h4{font-size:13px;color:#fff;font-weight:1000;margin-top:7px}.ff-empty-panel p{font-size:9px;color:#94a3b8;margin-top:4px}
 @media(min-width:480px){.ff-mode-grid{grid-template-columns:repeat(3,1fr)}.ff-mode-card{min-height:0}.ff-mode-card img{height:145px}.ff-mode-card-content{padding:12px 52px 12px 12px;min-height:54px}.ff-mode-card-title{font-size:12px}.ff-mode-card-sub{font-size:7px}.ff-mode-card-arrow{width:30px;height:30px;bottom:11px}}
@@ -995,6 +996,7 @@
 #ff-player-profile-modal.show,#ff-prize-modal.show{display:flex}
 .ff-player-profile-box,.ff-prize-box{width:min(410px,100%);border-radius:24px;padding:20px;background:radial-gradient(circle at 50% 0%,rgba(250,204,21,.14),transparent 42%),linear-gradient(145deg,#090714,#05050c);border:1px solid rgba(250,204,21,.55);box-shadow:0 0 42px rgba(250,204,21,.22),0 20px 60px rgba(0,0,0,.6)}
 .ff-player-profile-box h3,.ff-prize-box h3{margin:0;color:#fff;font-size:18px;font-weight:1000}.ff-player-profile-box p,.ff-prize-box p{margin-top:5px;color:#94a3b8;font-size:9px;line-height:1.4}
+.ff-profile-title-row{display:flex;align-items:center;gap:12px;margin-bottom:6px}.ff-profile-title-row h3{margin:0!important;text-align:left!important;font-size:17px!important}.ff-profile-title-row p{margin:3px 0 0!important;text-align:left!important;font-size:9px!important;color:#94a3b8!important}.ff-profile-back{width:42px!important;height:42px!important;border-radius:13px!important;background:rgba(255,255,255,.06)!important;color:#fff!important;border:1px solid rgba(148,163,184,.2)!important;font-size:24px!important;line-height:1!important}.ff-profile-avatar{width:62px;height:62px;border-radius:50%;margin:12px auto 14px;display:flex;align-items:center;justify-content:center;font-size:28px;background:radial-gradient(circle,rgba(59,130,246,.25),rgba(15,23,42,.9));border:1px solid rgba(59,130,246,.35);box-shadow:0 0 20px rgba(59,130,246,.16)}
 .ff-profile-field{margin-top:12px}.ff-profile-field label{display:block;color:#cbd5e1;font-size:9px;font-weight:900;margin-bottom:5px}.ff-profile-field input{width:100%;height:44px;border-radius:13px!important;padding:0 13px!important;background:rgba(255,255,255,.06)!important;color:#fff!important;border:1px solid rgba(255,255,255,.13)!important;outline:none!important;font-size:12px!important}
 .ff-profile-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}.ff-profile-actions button{min-height:42px;border-radius:13px!important;font-weight:1000!important;font-size:10px!important}.ff-profile-cancel{background:rgba(255,255,255,.07)!important;color:#cbd5e1!important;border:1px solid rgba(255,255,255,.12)!important}.ff-profile-save{background:linear-gradient(105deg,#f59e0b,#facc15)!important;color:#111827!important;border:0!important}
 .ff-prize-big{margin-top:14px;padding:14px;border-radius:16px;text-align:center;color:#facc15;font-size:25px;font-weight:1000;background:rgba(250,204,21,.08);border:1px solid rgba(250,204,21,.3);box-shadow:0 0 22px rgba(250,204,21,.12)}
@@ -1002,6 +1004,157 @@
 
 
 @keyframes ffSpin{to{transform:rotate(360deg)}}
+
+/* V41: confirmation-only rules presentation */
+#ff-join-confirm-modal{z-index:2147483647!important;align-items:center!important;justify-content:center!important}
+#ff-join-confirm-modal.show{display:flex!important}
+.ff-join-confirm-box{width:min(94vw,430px)!important;max-height:88vh!important;overflow:auto!important;padding:18px!important}
+.ff-confirm-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.ff-confirm-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#22c55e;color:#fff;font-size:19px;font-weight:1000;box-shadow:0 0 18px rgba(34,197,94,.25)}
+.ff-confirm-head h3{margin:0!important;text-align:left!important;font-size:17px!important}
+.ff-confirm-head .ff-join-confirm-sub{margin:2px 0 0!important;text-align:left!important}
+.ff-confirm-rules{display:block!important;visibility:visible!important;opacity:1!important;margin-top:12px!important;padding:13px!important;border-radius:14px!important;background:rgba(3,7,18,.9)!important;border:1px solid rgba(250,204,21,.28)!important}
+.ff-confirm-rules h4{display:block!important;color:#facc15!important;font-size:10px!important;font-weight:1000!important;margin:0 0 8px!important}
+.ff-confirm-rules ol{display:block!important;margin:0!important;padding-left:22px!important;list-style-type:decimal!important;list-style-position:outside!important}.ff-confirm-rules li::marker{color:#facc15!important;font-weight:1000!important}
+.ff-confirm-rules li{display:list-item!important;color:#e2e8f0!important;font-size:9px!important;line-height:1.55!important;margin:0 0 6px!important}
+.ff-confirm-rules li:last-child{margin-bottom:0!important}
+.ff-confirm-note{margin-top:9px;padding:8px 10px;border-radius:10px;background:rgba(250,204,21,.07);color:#facc15;font-size:8px;font-weight:800;text-align:center}
+</style>
+<style id="ff-v39-layout-fix">
+/* V39: only Free Fire tournament card layout/button sizing. */
+.ff-tournament-card{display:grid!important;grid-template-columns:92px minmax(0,1fr) 96px!important;align-items:start!important;column-gap:12px!important;row-gap:0!important}
+.ff-tournament-card>.ff-tournament-info{min-width:0!important;width:100%!important}
+.ff-tournament-card>.ff-entry-fee-wrap{margin-left:0!important;width:96px!important;flex:0 0 96px!important;align-self:start!important}
+.ff-entry-fee-wrap .ff-joined-action{min-width:76px!important;width:76px!important;max-width:76px!important;min-height:32px!important;height:32px!important;padding:6px 8px!important;font-size:9px!important;line-height:12px!important;font-weight:1000!important;border-radius:9px!important}
+.ff-entry-fee-wrap .ff-joined-action span{font-size:9px!important;line-height:12px!important;gap:2px!important}
+.ff-tournament-prize{margin-top:7px!important}
+.ff-seats{clear:both!important;width:100%!important;margin-top:8px!important}
+.ff-seat-progress{width:100%!important}
+.ff-joined-list-btn{width:100%!important;max-width:260px!important;margin-top:8px!important}
+.ff-my-upcoming .ff-tournament-card,.ff-my-ongoing .ff-tournament-card,.ff-my-previous .ff-tournament-card{grid-template-columns:minmax(0,1fr) 96px!important}
+.ff-my-upcoming .ff-tournament-card>.ff-entry-fee-wrap,.ff-my-ongoing .ff-tournament-card>.ff-entry-fee-wrap,.ff-my-previous .ff-tournament-card>.ff-entry-fee-wrap{width:96px!important;flex:0 0 96px!important}
+@media (max-width:430px){
+  .ff-tournament-card{grid-template-columns:78px minmax(0,1fr) 86px!important;column-gap:9px!important;padding:11px!important}
+  .ff-tournament-thumb{width:78px!important;height:78px!important;flex-basis:78px!important}
+  .ff-tournament-card>.ff-entry-fee-wrap{width:86px!important;flex-basis:86px!important}
+  .ff-entry-fee-wrap .ff-joined-action{width:72px!important;max-width:72px!important;min-width:72px!important;height:31px!important;min-height:31px!important}
+  .ff-entry-fee-wrap .ff-tournament-action{min-width:72px!important}
+}
+</style>
+
+<style id="ff-v44-card-profile-polish">
+/* V44: only Free Fire card arrangement + Telegram profile photo. */
+.ff-tournament-card{display:grid!important;grid-template-columns:92px minmax(0,1fr) 96px!important;align-items:start!important;column-gap:12px!important;padding:13px!important;min-height:118px!important}
+.ff-tournament-card>.ff-tournament-thumb{grid-column:1!important;grid-row:1!important;align-self:start!important;width:92px!important;height:92px!important}
+.ff-tournament-card>.ff-tournament-info{grid-column:2!important;grid-row:1!important;min-width:0!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important}
+.ff-tournament-card>.ff-entry-fee-wrap{grid-column:3!important;grid-row:1!important;align-self:start!important;justify-self:end!important;width:96px!important;flex:0 0 96px!important;margin:0!important}
+.ff-tournament-info .ff-tournament-prize{align-self:flex-start!important;margin-top:8px!important}
+.ff-tournament-info .ff-seats{align-self:stretch!important;width:100%!important;margin-top:8px!important}
+.ff-tournament-info .ff-seat-progress{align-self:stretch!important;width:100%!important;margin-top:5px!important}
+.ff-tournament-info .ff-joined-list-btn{align-self:flex-start!important;width:min(100%,260px)!important;margin-top:9px!important}
+.ff-profile-avatar{overflow:hidden!important}
+.ff-profile-avatar img{width:100%!important;height:100%!important;display:block!important;object-fit:cover!important;border-radius:50%!important}
+@media (max-width:430px){
+  .ff-tournament-card{grid-template-columns:78px minmax(0,1fr) 86px!important;column-gap:9px!important;padding:11px!important;min-height:104px!important}
+  .ff-tournament-card>.ff-tournament-thumb{width:78px!important;height:78px!important}
+  .ff-tournament-card>.ff-entry-fee-wrap{width:86px!important;flex-basis:86px!important}
+  .ff-entry-fee-wrap .ff-joined-action{width:72px!important;max-width:72px!important;min-width:72px!important;height:31px!important;min-height:31px!important;padding:6px 8px!important;font-size:9px!important;line-height:12px!important}
+  .ff-entry-fee-wrap .ff-tournament-action{min-width:72px!important}
+}
+</style>
+
+<style id="ff-v46-reference-card-layout">
+/* V46: only Free Fire tournament-card arrangement, matching the provided reference image. */
+.ff-tournament-card{display:grid!important;grid-template-columns:92px minmax(0,1fr) 100px!important;grid-template-rows:auto auto auto auto auto auto!important;grid-template-areas:
+  "thumb status entry"
+  "thumb name entry"
+  "thumb meta entry"
+  "thumb prize entry"
+  "thumb seats seats"
+  "thumb progress progress"
+  "thumb joined joined"!important;align-items:center!important;column-gap:12px!important;row-gap:6px!important;padding:13px!important;min-height:0!important}
+.ff-tournament-card>.ff-tournament-thumb{grid-area:thumb!important;width:92px!important;height:92px!important;align-self:start!important;justify-self:start!important;object-fit:cover!important}
+.ff-tournament-card>.ff-tournament-info{display:contents!important}
+.ff-tournament-card .ff-tournament-status{grid-area:status!important;justify-self:start!important;margin:0!important}
+.ff-tournament-card .ff-tournament-name{grid-area:name!important;min-width:0!important;width:100%!important;margin:0!important}
+.ff-tournament-card .ff-tournament-meta{grid-area:meta!important;min-width:0!important;width:100%!important;margin:0!important}
+.ff-tournament-card .ff-tournament-prize{grid-area:prize!important;justify-self:start!important;align-self:center!important;max-width:100%!important;margin:0!important;white-space:nowrap!important}
+.ff-tournament-card .ff-seats{grid-area:seats!important;width:100%!important;margin:2px 0 0!important;line-height:1.3!important}
+.ff-tournament-card .ff-seat-progress{grid-area:progress!important;width:100%!important;margin:0!important}
+.ff-tournament-card .ff-joined-list-btn{grid-area:joined!important;justify-self:start!important;width:min(100%,270px)!important;max-width:100%!important;margin:3px 0 0!important}
+.ff-tournament-card>.ff-entry-fee-wrap{grid-area:entry!important;width:100px!important;height:100%!important;display:flex!important;flex-direction:column!important;align-items:flex-end!important;justify-content:flex-start!important;gap:5px!important;flex:none!important;margin:0!important;align-self:stretch!important;justify-self:end!important}
+.ff-entry-fee-wrap .ff-entry-fee-label{display:block!important;text-align:right!important;margin:0!important;line-height:1.1!important}
+.ff-entry-fee-wrap .ff-tournament-action{margin-top:18px!important}
+.ff-entry-fee-wrap .ff-joined-action{width:82px!important;min-width:82px!important;max-width:82px!important;height:36px!important;min-height:36px!important;padding:7px 8px!important;font-size:10px!important;line-height:12px!important;border-radius:10px!important;white-space:nowrap!important;margin-top:5px!important}
+@media(max-width:430px){
+ .ff-tournament-card{grid-template-columns:78px minmax(0,1fr) 82px!important;column-gap:9px!important;row-gap:5px!important;padding:11px!important;grid-template-areas:
+  "thumb status entry"
+  "thumb name entry"
+  "thumb meta entry"
+  "thumb prize entry"
+  "thumb seats seats"
+  "thumb progress progress"
+  "thumb joined joined"!important}
+ .ff-tournament-card>.ff-tournament-thumb{width:78px!important;height:78px!important}
+ .ff-tournament-card>.ff-entry-fee-wrap{width:82px!important}
+ .ff-entry-fee-wrap .ff-tournament-action{margin-top:16px!important}
+ .ff-entry-fee-wrap .ff-joined-action{width:76px!important;min-width:76px!important;max-width:76px!important;height:34px!important;min-height:34px!important;padding:6px 7px!important;font-size:9px!important;line-height:11px!important}
+ .ff-tournament-card .ff-tournament-name{font-size:14px!important;line-height:1.15!important}
+ .ff-tournament-card .ff-tournament-meta{font-size:10px!important;line-height:1.35!important}
+ .ff-tournament-card .ff-tournament-prize{font-size:12px!important;max-width:100%!important}
+ .ff-tournament-card .ff-joined-list-btn{width:100%!important}
+}
+</style>
+<style id="ff-v48-card-reference-layout">
+/* V48: card arrangement only, matching the user's reference card. */
+.ff-tournament-card{display:grid!important;grid-template-columns:92px minmax(0,1fr) 100px!important;grid-template-rows:auto auto auto auto auto auto auto!important;grid-template-areas:
+"thumb status entry"
+"thumb name entry"
+"thumb meta entry"
+"thumb prize entry"
+"seats seats seats"
+"progress progress progress"
+"joined joined joined"!important;align-items:start!important;column-gap:12px!important;row-gap:6px!important;padding:13px!important;min-height:0!important}
+.ff-tournament-card>.ff-tournament-thumb{grid-area:thumb!important;width:92px!important;height:92px!important;align-self:start!important;justify-self:start!important;object-fit:cover!important}
+.ff-tournament-card>.ff-tournament-info{display:contents!important}
+.ff-tournament-card .ff-tournament-status{grid-area:status!important;justify-self:start!important;margin:0!important}
+.ff-tournament-card .ff-tournament-name{grid-area:name!important;min-width:0!important;width:100%!important;margin:0!important}
+.ff-tournament-card .ff-tournament-meta{grid-area:meta!important;min-width:0!important;width:100%!important;margin:0!important}
+.ff-tournament-card .ff-tournament-prize{grid-area:prize!important;justify-self:start!important;align-self:center!important;max-width:100%!important;margin:0!important;white-space:nowrap!important}
+.ff-tournament-card .ff-seats{grid-area:seats!important;width:100%!important;margin:2px 0 0!important;line-height:1.3!important}
+.ff-tournament-card .ff-seat-progress{grid-area:progress!important;width:100%!important;margin:0!important}
+.ff-tournament-card .ff-joined-list-btn{grid-area:joined!important;justify-self:stretch!important;width:100%!important;max-width:100%!important;margin:3px 0 0!important}
+.ff-tournament-card>.ff-entry-fee-wrap{grid-area:entry!important;width:100px!important;height:auto!important;display:flex!important;flex-direction:column!important;align-items:flex-end!important;justify-content:flex-start!important;gap:5px!important;flex:none!important;margin:0!important;align-self:start!important;justify-self:end!important}
+.ff-entry-fee-wrap .ff-entry-fee-label{display:block!important;text-align:right!important;margin:0!important;line-height:1.1!important}
+.ff-entry-fee-wrap .ff-joined-entry-fee{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:3px!important;margin:0!important;color:#facc15!important;font-size:11px!important;font-weight:1000!important;line-height:1.1!important;white-space:nowrap!important}
+.ff-entry-fee-wrap .ff-tournament-action{margin-top:10px!important}
+.ff-entry-fee-wrap .ff-joined-action{width:82px!important;min-width:82px!important;max-width:82px!important;height:36px!important;min-height:36px!important;padding:7px 8px!important;font-size:10px!important;line-height:12px!important;border-radius:10px!important;white-space:nowrap!important}
+@media(max-width:430px){
+ .ff-tournament-card{grid-template-columns:78px minmax(0,1fr) 82px!important;column-gap:9px!important;row-gap:5px!important;padding:11px!important;grid-template-areas:
+ "thumb status entry"
+ "thumb name entry"
+ "thumb meta entry"
+ "thumb prize entry"
+ "seats seats seats"
+ "progress progress progress"
+ "joined joined joined"!important}
+ .ff-tournament-card>.ff-tournament-thumb{width:78px!important;height:78px!important}
+ .ff-tournament-card>.ff-entry-fee-wrap{width:82px!important}
+ .ff-entry-fee-wrap .ff-tournament-action{margin-top:10px!important}
+ .ff-entry-fee-wrap .ff-joined-action{width:76px!important;min-width:76px!important;max-width:76px!important;height:34px!important;min-height:34px!important;padding:6px 7px!important;font-size:9px!important;line-height:11px!important}
+ .ff-tournament-card .ff-tournament-name{font-size:14px!important;line-height:1.15!important}
+ .ff-tournament-card .ff-tournament-meta{font-size:10px!important;line-height:1.35!important}
+ .ff-tournament-card .ff-tournament-prize{font-size:12px!important;max-width:100%!important}
+ .ff-tournament-card .ff-joined-list-btn{width:100%!important}
+}
+</style>
+
+<style id="ff-v53-meta-spacing-fix">
+/* V53: only keep tournament date/meta text clear of the entry-fee column. */
+.ff-tournament-card .ff-tournament-meta{padding-right:12px!important;box-sizing:border-box!important;overflow-wrap:break-word!important;word-break:normal!important;position:relative!important;z-index:1!important}
+@media(max-width:430px){
+ .ff-tournament-card .ff-tournament-meta{padding-right:10px!important;font-size:10px!important;line-height:1.35!important}
+}
 </style>
 </head>
 <body class="p-4 pb-36 max-w-lg mx-auto">
@@ -3404,6 +3557,8 @@ animation:zyloUserSweep 3.2s ease-in-out infinite!important}
 </div>
 </div></div>
 
+<div id="ff-join-confirm-modal" aria-hidden="true"><div class="ff-join-confirm-box" role="dialog" aria-modal="true" aria-labelledby="ff-confirm-title"><div class="ff-confirm-head"><span class="ff-confirm-icon">✓</span><div><h3 id="ff-confirm-title">Confirm Join</h3><div id="ff-join-confirm-sub" class="ff-join-confirm-sub">Free Fire Tournament</div></div></div><div class="ff-join-confirm-card"><div class="ff-join-confirm-row"><span>Entry Fee</span><b id="ff-confirm-entry-fee">0 Diamond</b></div><div class="ff-join-confirm-row"><span>Prize Pool</span><b id="ff-confirm-prize">0</b></div><div class="ff-join-confirm-row"><span>Mode</span><b id="ff-confirm-mode">Free Fire</b></div><div class="ff-join-confirm-row"><span>Map</span><b id="ff-confirm-map">—</b></div></div><div class="ff-confirm-rules"><h4>GAME RULES</h4><ol><li>Users' IDs must be level 40+.</li><li>Room ID and Password will be shared 10–15 minutes before the match.</li><li>The game will start at the scheduled time.</li><li>Grand and Double Vector are not allowed.</li><li>Hacking or cheating will result in prize disqualification and ZyloBet ID ban.</li></ol></div><div class="ff-confirm-note">Please read the rules before joining this tournament.</div><div class="ff-join-confirm-actions"><button type="button" class="ff-join-confirm-cancel" onclick="closeFFJoinConfirm()">CANCEL</button><button type="button" class="ff-join-confirm-now" onclick="confirmFFJoin()">JOIN NOW</button></div></div></div>
+
 <div id="ff-room-modal" aria-hidden="true">
   <div class="ff-room-box">
     <h3>🎮 Tournament Room Details</h3>
@@ -3433,11 +3588,12 @@ animation:zyloUserSweep 3.2s ease-in-out infinite!important}
 
 <div id="ff-player-profile-modal" aria-hidden="true">
   <div class="ff-player-profile-box">
-    <h3>Free Fire Player Details</h3>
-    <p>Please enter your game nickname and UID.</p>
-    <div class="ff-profile-field"><label for="ff-player-nickname">Nickname</label><input id="ff-player-nickname" type="text" maxlength="24" autocomplete="off" placeholder="Enter your Free Fire nickname"></div>
-    <div class="ff-profile-field"><label for="ff-player-uid">UID</label><input id="ff-player-uid" type="text" inputmode="numeric" maxlength="20" autocomplete="off" placeholder="Enter your Free Fire UID"></div>
-    <div class="ff-profile-actions"><button type="button" class="ff-profile-cancel" onclick="closeFFPlayerProfile()">CANCEL</button><button type="button" class="ff-profile-save" onclick="saveFFPlayerProfile()">SAVE</button></div>
+    <div class="ff-profile-title-row"><button type="button" class="ff-profile-back" onclick="closeFFPlayerProfile()" aria-label="Close profile">←</button><div><h3>Profile Edit</h3><p>Update your Free Fire player details.</p></div></div>
+    <div class="ff-profile-avatar" id="ff-profile-avatar">👤</div>
+    <div class="ff-profile-field"><label for="ff-player-nickname">Free Fire Nickname</label><input id="ff-player-nickname" type="text" maxlength="24" autocomplete="off" placeholder="Enter your Free Fire nickname"></div>
+    <div class="ff-profile-field"><label for="ff-player-uid">Free Fire ID</label><input id="ff-player-uid" type="text" inputmode="numeric" maxlength="20" autocomplete="off" placeholder="Enter your Free Fire ID"></div>
+    <div class="ff-profile-field"><label for="ff-player-telegram">Telegram ID</label><input id="ff-player-telegram" type="text" maxlength="64" autocomplete="off" placeholder="Telegram ID" readonly aria-readonly="true" style="opacity:.8;cursor:not-allowed"></div>
+    <div class="ff-profile-actions"><button type="button" class="ff-profile-save" onclick="saveFFPlayerProfile()">SAVE</button></div>
   </div>
 </div>
 
@@ -3460,7 +3616,7 @@ animation:zyloUserSweep 3.2s ease-in-out infinite!important}
 const FF_PLAYER_PROFILE_KEY='zylobet_ff_player_profile_v1';
 window.getFFPlayerProfile=function(){try{return JSON.parse(localStorage.getItem(FF_PLAYER_PROFILE_KEY)||'null')}catch(e){return null}};
 window.updateFFPlayerPill=function(){const pill=document.getElementById('ff-player-pill');const profile=getFFPlayerProfile();if(!pill)return;if(profile&&profile.nickname&&profile.uid){pill.querySelector('.ff-player-name').textContent=profile.nickname;pill.querySelector('.ff-player-uid').textContent='UID '+profile.uid}else{pill.querySelector('.ff-player-name').textContent='PLAYER';pill.querySelector('.ff-player-uid').textContent='SET UID'}};
-window.openFFPlayerProfile=function(forceFirst){const modal=document.getElementById('ff-player-profile-modal');if(!modal)return;const profile=getFFPlayerProfile();const ni=document.getElementById('ff-player-nickname');const ui=document.getElementById('ff-player-uid');if(ni)ni.value=profile&&profile.nickname?profile.nickname:'';if(ui)ui.value=profile&&profile.uid?profile.uid:'';modal.classList.add('show');modal.setAttribute('aria-hidden','false');setTimeout(function(){if(ni)ni.focus()},80)};
+window.openFFPlayerProfile=function(forceFirst){const modal=document.getElementById('ff-player-profile-modal');if(!modal)return;const profile=getFFPlayerProfile();const ni=document.getElementById('ff-player-nickname');const ui=document.getElementById('ff-player-uid');const ti=document.getElementById('ff-player-telegram');const av=document.getElementById('ff-profile-avatar');if(ni)ni.value=profile&&profile.nickname?profile.nickname:'';if(ui)ui.value=profile&&profile.uid?profile.uid:'';if(ti){ti.value=String(userId||'');ti.readOnly=true;ti.setAttribute('aria-readonly','true');}try{const tg=window.Telegram&&window.Telegram.WebApp&&window.Telegram.WebApp.initDataUnsafe&&window.Telegram.WebApp.initDataUnsafe.user;const photo=tg&&tg.photo_url?String(tg.photo_url):'';if(av){if(photo){av.innerHTML='<img src="'+photo.replace(/"/g,'&quot;')+'" alt="Telegram profile photo">';}else{av.textContent='👤';}}}catch(e){if(av)av.textContent='👤';}modal.classList.add('show');modal.setAttribute('aria-hidden','false');setTimeout(function(){if(ni)ni.focus()},80)};
 window.editFFPlayerProfile=function(){openFFPlayerProfile(false)};
 window.closeFFPlayerProfile=function(){const modal=document.getElementById('ff-player-profile-modal');if(!modal)return;const profile=getFFPlayerProfile();if(!profile||!profile.nickname||!profile.uid)return;modal.classList.remove('show');modal.setAttribute('aria-hidden','true')};
 window.saveFFPlayerProfile=function(){
@@ -3468,13 +3624,16 @@ window.saveFFPlayerProfile=function(){
   const ui=document.getElementById('ff-player-uid');
   const nickname=(ni?ni.value:'').trim();
   const uid=(ui?ui.value:'').trim();
-  if(!nickname||!uid){if(ni&&!nickname)ni.focus();else if(ui)ui.focus();return}
+  const ti=document.getElementById('ff-player-telegram');
+  const telegramId=String(userId||'').trim();
+  if(ti){ti.value=telegramId;ti.readOnly=true;ti.setAttribute('aria-readonly','true');}
+  if(!nickname||!uid||!telegramId){if(ni&&!nickname)ni.focus();else if(ui)ui.focus();return}
   const showLock=function(){
     if(typeof ffModeNotification==='function') ffModeNotification(null,'<b>You are currently joined in a tournament.</b><br>You cannot change your Free Fire Nickname or ID until all your joined tournaments are in Previous.','error');
     else alert('You are currently joined in a tournament. You cannot change your Free Fire Nickname or ID until all your joined tournaments are in Previous.');
   };
   const save=function(){
-    localStorage.setItem(FF_PLAYER_PROFILE_KEY,JSON.stringify({nickname:nickname,uid:uid,savedAt:Date.now()}));
+    localStorage.setItem(FF_PLAYER_PROFILE_KEY,JSON.stringify({nickname:nickname,uid:uid,telegramId:telegramId,savedAt:Date.now()}));
     updateFFPlayerPill();
     const modal=document.getElementById('ff-player-profile-modal');
     if(modal){modal.classList.remove('show');modal.setAttribute('aria-hidden','true')}
@@ -3506,17 +3665,67 @@ window.openFFRoom=function(){const modal=document.getElementById('ff-room-modal'
 window.closeFFRoom=function(){const modal=document.getElementById('ff-room-modal');if(!modal)return;modal.classList.remove('show');modal.setAttribute('aria-hidden','true')};
 window.closeFFJoinedList=function(){const modal=document.getElementById('ff-joined-list-modal');if(!modal)return;modal.classList.remove('show');modal.setAttribute('aria-hidden','true')};
 window.openFFJoinedList=function(id,name){
-  const modal=document.getElementById('ff-joined-list-modal'), content=document.getElementById('ff-joined-list-content'), sub=document.getElementById('ff-joined-list-sub');
-  if(!modal||!content||typeof db==='undefined')return;
-  sub.textContent=(name||'Tournament')+' • Joined Players'; content.innerHTML='<div class="ff-joined-empty">Loading joined players...</div>';
-  modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
-  db.collectionGroup('ff_joined_tournaments').where('id','==',String(id)).get().then(function(snap){
-    const list=[]; snap.forEach(function(doc){const r=doc.data()||{}; list.push({uid:String(r.freeFireId||r.ffUid||r.uid||''),nick:String(r.freeFireNickname||r.ffNickname||r.nickname||''),tg:String(r.telegramId||r.userId||doc.ref.parent.parent.id||''),name:String(r.displayName||r.username||'Telegram User'),joinedAt:Number(r.joinedAt||0)});});
-    list.sort(function(a,b){return b.joinedAt-a.joinedAt;});
+  const modal=document.getElementById('ff-joined-list-modal'),content=document.getElementById('ff-joined-list-content'),sub=document.getElementById('ff-joined-list-sub');
+  if(!modal||!content)return;
+  const tid=String(id||'');
+  if(sub)sub.textContent=(name||'Tournament')+' • Joined Players';
+  modal.classList.add('show');modal.setAttribute('aria-hidden','false');
+  content.innerHTML='<div class="ff-joined-empty">Loading joined players...</div>';
+  const players={};
+  const add=function(r,fallbackTg){
+    r=r||{};
+    const uid=String(r.freeFireId||r.ffUid||r.uid||r.freefireId||r.free_fire_id||'');
+    const nick=String(r.freeFireNickname||r.ffNickname||r.nickname||r.freefireNickname||r.free_fire_nickname||'');
+    const tg=String(r.telegramId||r.userId||r.telegramID||fallbackTg||'');
+    const dn=String(r.displayName||r.username||r.telegramName||'Telegram User');
+    const at=Number(r.joinedAt||r.joined_at||0);
+    const key=tg||uid||nick||('row-'+Object.keys(players).length);
+    if(!players[key] || at>=players[key].joinedAt){players[key]={uid:uid,nick:nick,tg:tg,name:dn,joinedAt:at};}
+  };
+  const draw=function(){
+    const list=Object.keys(players).map(function(k){return players[k]}).sort(function(a,b){return b.joinedAt-a.joinedAt});
     if(!list.length){content.innerHTML='<div class="ff-joined-empty">No players have joined yet.</div>';return;}
-    content.innerHTML=list.map(function(r,i){return '<div class="ff-joined-player"><b>#'+(i+1)+' '+esc(r.nick||'Not provided')+'</b><span>Free Fire Nickname: '+esc(r.nick||'Not provided')+'<br>Free Fire ID: '+esc(r.uid||'Not provided')+'<br>Telegram ID: '+esc(r.tg||'Not available')+'</span></div>';}).join('');
-  }).catch(function(err){content.innerHTML='<div class="ff-joined-empty">Unable to load joined players.</div>';console.warn('FF joined players:',err)});
+    content.innerHTML=list.map(function(r,i){
+      return '<div class="ff-joined-player"><b>#'+(i+1)+' '+esc(r.nick||r.name||'Player')+'</b><span>Free Fire Nickname: '+esc(r.nick||'Not provided')+'<br>Free Fire ID: '+esc(r.uid||'Not provided')+'<br>Telegram ID: '+esc(r.tg||'Not available')+'</span></div>';
+    }).join('');
+  };
+  // Always show the current user's saved join immediately as a local fallback.
+  try{
+    const profile=(typeof getFFPlayerProfile==='function'&&getFFPlayerProfile())||{};
+    const tg=(typeof userId!=='undefined'&&userId)?String(userId):'';
+    const cached=JSON.parse(localStorage.getItem('zylobet_ff_joined_player_'+tid)||'null');
+    if(cached)add(cached,tg);
+    if(profile.nickname||profile.uid)add({id:tid,freeFireNickname:String(profile.nickname||''),freeFireId:String(profile.uid||''),telegramId:tg,displayName:String((typeof telegramDisplayName!=='undefined'&&telegramDisplayName)||((typeof username!=='undefined'&&username)||'Telegram User')),joinedAt:Date.now()},tg);
+  }catch(e){}
+  draw();
+  if(typeof db==='undefined'||!tid)return;
+  const tg=(typeof userId!=='undefined'&&userId)?String(userId):'';
+  const reads=[];
+  // Primary source: tournament's joined_players mirror (one record per player).
+  try{
+    reads.push(db.collection(FF_COLLECTION).doc(tid).collection('joined_players').get().then(function(snap){
+      snap.forEach(function(doc){add(doc.data()||{},doc.id);});
+    }).catch(function(e){console.warn('FF joined_players read:',e)}));
+  }catch(e){}
+  // Secondary source: each user's ff_joined_tournaments record. This recovers the list
+  // even when the tournament subcollection has restrictive read rules.
+  try{
+    reads.push(db.collectionGroup('ff_joined_tournaments').where('id','==',tid).get().then(function(snap){
+      snap.forEach(function(doc){
+        const parent=doc.ref&&doc.ref.parent&&doc.ref.parent.parent;
+        add(doc.data()||{},parent&&parent.id?String(parent.id):'');
+      });
+    }).catch(function(e){console.warn('FF joined tournament group read:',e)}));
+  }catch(e){}
+  // Refresh the current user's own record as another direct fallback.
+  if(tg){
+    try{
+      reads.push(db.collection('users').doc(tg).collection('ff_joined_tournaments').doc(tid).get().then(function(doc){if(doc.exists)add(doc.data()||{},tg);}).catch(function(){}));
+    }catch(e){}
+  }
+  Promise.all(reads).then(function(){draw();}).catch(function(){draw();});
 };
+
 function ffModeNotification(el, message, type){
   let box=document.getElementById('ff-mode-notification-global');
   if(!box){
@@ -3566,6 +3775,7 @@ function ffFinishBalanceNotification(el,message,type){
   window.__ffBalanceCheckActive=false;
   window.__ffBalanceCheckBox=null;
 }
+let __ffJoinConfirmButton=null;window.closeFFJoinConfirm=function(){const modal=document.getElementById('ff-join-confirm-modal');if(!modal)return;modal.classList.remove('show');modal.setAttribute('aria-hidden','true');__ffJoinConfirmButton=null};window.openFFJoinConfirm=function(btn,event){if(event){event.preventDefault();event.stopPropagation();}if(!btn||btn.disabled||btn.dataset.joining==='1'||btn.dataset.joined==='1')return false;const modal=document.getElementById('ff-join-confirm-modal');if(!modal)return joinFFTournament(btn);__ffJoinConfirmButton=btn;const card=btn.closest('.ff-tournament-card');const fee=Math.max(1,parseInt(btn.getAttribute('data-entry-fee'),10)||1);const name=String(card&&card.querySelector('.ff-tournament-name')&&card.querySelector('.ff-tournament-name').textContent||'Free Fire Tournament').trim();const meta=String(card&&card.querySelector('.ff-tournament-meta')&&card.querySelector('.ff-tournament-meta').textContent||'').trim();const prizeEl=card&&card.querySelector('.ff-tournament-prize');const prize=String(prizeEl&&prizeEl.getAttribute('data-prize')||prizeEl&&prizeEl.textContent||'0').replace(/\s*Prize Pool\s*$/i,'').trim();const parts=meta.split('•').map(function(x){return x.trim()}).filter(Boolean);const modeEl=card&&card.closest('.ff-mode-page');const modeId=modeEl?String(modeEl.id||'').replace('ff-mode-',''):'';const mode=modeId==='battle'?'Battle Royale':modeId==='clash'?'Clash Squad':modeId==='lone'?'Lone Wolf 1 VS 1':'Free Fire';const map=(parts[1]||'').trim()||'—';const sub=document.getElementById('ff-join-confirm-sub'),ef=document.getElementById('ff-confirm-entry-fee'),pv=document.getElementById('ff-confirm-prize'),md=document.getElementById('ff-confirm-mode'),mp=document.getElementById('ff-confirm-map');if(sub)sub.textContent=name;if(ef)ef.textContent=fee+' Diamond'+(fee===1?'':'s');if(pv)pv.textContent=prize||'0';if(md)md.textContent=mode;if(mp)mp.textContent=map;modal.classList.add('show');modal.setAttribute('aria-hidden','false');return false};window.confirmFFJoin=function(){const btn=__ffJoinConfirmButton;if(!btn){closeFFJoinConfirm();return false}closeFFJoinConfirm();return joinFFTournament(btn)};
 window.joinFFTournament=function(el,event){
   const btn=el;
   if(!btn)return false;
@@ -3610,14 +3820,59 @@ window.joinFFTournament=function(el,event){
     // Existing bookkeeping only; it cannot delay the notification.
     try{userRef.collection('gem_history').add({title:'Free Fire Tournament Entry Fee',amount:'-'+fee+' Diamond'+(fee===1?'':'s'),type:'gem',time:Date.now(),status:'Success'}).catch(function(){});}catch(e){}
     if(tournamentId){
+      // Keep the joined state visible immediately, even if a background Firestore write is delayed.
       try{
-        const modePage=btn.closest('.ff-mode-page');
-        const modeId=modePage?modePage.id.replace('ff-mode-',''):'';
-        const modeName=modeId==='battle'?'Battle Royale':modeId==='clash'?'Clash Squad':modeId==='lone'?'Lone Wolf 1 VS 1':modeId;
-        const rec={id:tournamentId,mode:modeName,status:(card&&card.querySelector('.ff-tournament-status')?card.querySelector('.ff-tournament-status').textContent.trim().toLowerCase():'upcoming'),name:(card&&card.querySelector('.ff-tournament-name')?card.querySelector('.ff-tournament-name').textContent.trim():'Tournament'),meta:(card&&card.querySelector('.ff-tournament-meta')?card.querySelector('.ff-tournament-meta').textContent.trim():''),prize:(card&&card.querySelector('.ff-tournament-prize')?card.querySelector('.ff-tournament-prize').innerHTML:''),entryFee:fee,joinedAt:Date.now()};
-        userRef.collection('ff_joined_tournaments').doc(tournamentId).set(rec,{merge:true}).catch(function(){});
+        const ffNow=(typeof getFFPlayerProfile==='function'&&getFFPlayerProfile())||{};
+        const modePage0=btn.closest('.ff-mode-page');
+        const modeId0=modePage0?modePage0.id.replace('ff-mode-',''):'';
+        const modeName0=modeId0==='battle'?'Battle Royale':modeId0==='clash'?'Clash Squad':modeId0==='lone'?'Lone Wolf 1 VS 1':(modeId0||'Free Fire');
+        const statusEl0=card&&card.querySelector('.ff-tournament-status');
+        const nameEl0=card&&card.querySelector('.ff-tournament-name');
+        const prizeEl0=card&&card.querySelector('.ff-tournament-prize');
+        const localPlayer={id:tournamentId,mode:modeName0,status:String(statusEl0&&statusEl0.textContent||'UPCOMING').toLowerCase(),name:String(nameEl0&&nameEl0.textContent||'Free Fire Tournament'),meta:String(card&&card.querySelector('.ff-tournament-meta')&&card.querySelector('.ff-tournament-meta').textContent||''),prize:String(prizeEl0&&prizeEl0.getAttribute('data-prize')||'0').replace(/\s*Prize Pool\s*$/i,''),entryFee:fee,joinedCount:1,slotLimit:50,freeFireId:String(ffNow.uid||''),freeFireNickname:String(ffNow.nickname||''),telegramId:String(ffProfile.telegramId||userId||''),displayName:String((typeof telegramDisplayName!=='undefined'&&telegramDisplayName)||((typeof username!=='undefined'&&username)||'Telegram User')),joinedAt:Date.now()};
+        localStorage.setItem('zylobet_ff_joined_player_'+tournamentId,JSON.stringify(localPlayer));
+        try{const my=JSON.parse(localStorage.getItem('zylobet_ff_my_tournaments_v1')||'[]');const ix=my.findIndex(function(x){return String(x.id)===tournamentId});if(ix>=0)my[ix]=localPlayer;else my.push(localPlayer);localStorage.setItem('zylobet_ff_my_tournaments_v1',JSON.stringify(my));}catch(e){}
         localStorage.setItem('zylobet_ff_admin_joined_'+tournamentId,'1');
       }catch(e){}
+      try{
+        const visibleSeats=card&&card.querySelector('.ff-seats'),visibleProgress=card&&card.querySelector('.ff-seat-progress span');
+        if(visibleSeats)visibleSeats.innerHTML='👥 Seats: 1/50 • <span style="color:#22c55e">JOINED</span>';
+        if(visibleProgress)visibleProgress.style.width='2%';
+      }catch(e){}
+      // Background tournament bookkeeping: never delay the balance result.
+      (async function(){
+        try{
+          const tref=db.collection(FF_COLLECTION).doc(tournamentId);
+          const ts=await tref.get();
+          if(!ts.exists)return;
+          const td=ts.data()||{};
+          const slots=Math.max(1,parseInt(td.slotLimit||td.slots,10)||50);
+          let joined=Math.max(0,parseInt(td.joinedCount,10)||0);
+          joined=Math.min(slots,joined+1);
+          await tref.set({joinedCount:joined,updatedAt:Date.now()},{merge:true});
+          try{
+            const seatEl0=card&&card.querySelector('.ff-seats'),progressEl0=card&&card.querySelector('.ff-seat-progress span');
+            if(seatEl0)seatEl0.innerHTML='👥 Seats: '+joined+'/'+slots+' • <span style="color:#22c55e">JOINED</span>';
+            if(progressEl0)progressEl0.style.width=Math.min(100,(joined/slots)*100)+'%';
+          }catch(e){}
+          const ffProfile=(typeof getFFPlayerProfile==='function'&&getFFPlayerProfile())||{};
+          const modePage=btn.closest('.ff-mode-page');
+          const modeId=modePage?modePage.id.replace('ff-mode-',''):'';
+          const modeName=modeId==='battle'?'Battle Royale':modeId==='clash'?'Clash Squad':modeId==='lone'?'Lone Wolf 1 VS 1':(modeId||'Free Fire');
+          const rec={id:tournamentId,mode:modeName,status:effectiveStatus(td),name:String(td.name||'Free Fire Tournament'),meta:dateTimeText({id:tournamentId,...td}),prize:String(td.prize||'0'),entryFee:fee,firstPrize:String(td.firstPrize||'0'),secondPrize:String(td.secondPrize||'0'),thirdPrize:String(td.thirdPrize||'0'),perKill:String(td.perKill||'0'),roomId:String(td.roomId||''),roomPassword:String(td.roomPassword||''),joinedCount:joined,slotLimit:slots,joinedAt:Date.now(),freeFireId:String(ffProfile.uid||''),freeFireNickname:String(ffProfile.nickname||''),telegramId:String(ffProfile.telegramId||userId||''),displayName:String((typeof telegramDisplayName!=='undefined'&&telegramDisplayName)||((typeof username!=='undefined'&&username)||'Telegram User'))};
+          try{localStorage.setItem('zylobet_ff_joined_player_'+tournamentId,JSON.stringify(rec));}catch(e){}
+          await userRef.collection('ff_joined_tournaments').doc(tournamentId).set(rec,{merge:true});
+          try{await db.collection(FF_COLLECTION).doc(tournamentId).collection('joined_players').doc(String(userId)).set(rec,{merge:true});}catch(playerWriteErr){console.warn('FF joined player mirror:',playerWriteErr)}
+          try{localStorage.setItem('zylobet_ff_admin_joined_'+tournamentId,'1');}catch(e){}
+          // Update the visible seat line only after the user's joined record is saved.
+          // Do not depend on a tournament subcollection write, so security rules cannot block the UI update.
+          const seatEl=card&&card.querySelector('.ff-seats'),progressEl=card&&card.querySelector('.ff-seat-progress span');
+          if(seatEl)seatEl.innerHTML='👥 Seats: '+joined+'/'+slots+' • <span style="color:#22c55e">JOINED</span>';
+          if(progressEl)progressEl.style.width=Math.min(100,(joined/slots)*100)+'%';
+          try{renderFFMyTournaments();}catch(e){}
+
+        }catch(e){console.warn('FF tournament bookkeeping:',e)}
+      })();
     }
     try{renderFFMyTournaments();}catch(e){}
   }).catch(function(err){
@@ -3638,33 +3893,56 @@ window.closeFreeFireTournamentDashboard=function(){const d=document.getElementBy
 window.openFFModes=function(){document.querySelectorAll('.ff-mode-page').forEach(function(p){p.classList.remove('active');p.style.display='none'});const p=document.getElementById('ff-mode-selection');if(p){p.classList.add('active');p.style.display='block'}};
 window.backToFFModes=function(){openFFModes();window.scrollTo(0,0)};
 window.renderFFMyTournaments=function(){
-  const localRecords=JSON.parse(localStorage.getItem('zylobet_ff_my_tournaments_v1')||'[]');
-  function paint(records){
-    ['upcoming','ongoing','previous'].forEach(function(status){
-      const box=document.getElementById('ff-my-'+status); if(!box)return;
-      const list=records.filter(function(r){return r.status===status});
-      if(!list.length){box.innerHTML='<div class="freefire-tab-panel" style="padding:22px 14px"><div class="ff-panel-icon">🏆</div><h3>No '+status.charAt(0).toUpperCase()+status.slice(1)+' Tournaments</h3><p>Your participated tournaments will appear here.</p></div>';return}
-      box.innerHTML=list.map(function(r){return '<div class="ff-tournament-card"><div class="ff-tournament-info"><span class="ff-tournament-status">'+r.status.toUpperCase()+'</span><div class="ff-tournament-name">'+r.name+'</div><div class="ff-tournament-meta">'+r.mode+' • '+r.meta+'</div><div class="ff-tournament-prize">'+r.prize+'</div><div style="margin-top:7px;color:#22c55e;font-size:9px;font-weight:1000">✓ JOINED</div></div></div>'}).join('');
-    });
-  }
-  paint(localRecords);
-  if(typeof userId!=='undefined' && userId && typeof db!=='undefined'){
-    db.collection('users').doc(String(userId)).collection('ff_joined_tournaments').get().then(function(snap){
-      const merged=localRecords.slice();
-      snap.forEach(function(doc){
-        const r=doc.data()||{};
-        if(!merged.some(function(x){return x.id===r.id})){merged.push(r)}
+  if(typeof db==='undefined'||!userId)return;
+  const uref=db.collection('users').doc(String(userId));
+  uref.collection('ff_joined_tournaments').get().then(function(joinedSnap){
+    const joinedRecords=[];
+    joinedSnap.forEach(function(doc){const r=doc.data()||{};if(r.id)joinedRecords.push({...r,id:String(r.id)});});
+    Promise.all(joinedRecords.map(function(r){
+      return db.collection(FF_COLLECTION).doc(String(r.id)).get().then(function(s){
+        if(!s.exists)return null;
+        const d={id:s.id,...s.data()};
+        const rawMode=String(d.mode||'').toLowerCase();
+        if(['battle','clash','lone'].indexOf(rawMode)===-1)return null;
+        return {
+          ...r,
+          id:String(d.id),
+          mode:modeLabel(d.mode)||r.mode||'Free Fire',
+          status:effectiveStatus(d),
+          name:r.name||((modeLabel(d.mode)||'Free Fire')+' Tournament'),
+          meta:r.meta||dateTimeText(d),
+          prize:String(d.prize||r.prize||'0'),
+          roomId:String(d.roomId||r.roomId||''),
+          roomPassword:String(d.roomPassword||r.roomPassword||''),
+          joinedCount:Number(d.joinedCount||r.joinedCount||0),
+          slotLimit:Number(d.slotLimit||d.slots||r.slotLimit||r.slots||50)
+        };
+      }).catch(function(){return null;});
+    })).then(function(records){
+      records=records.filter(function(r){return !!r;});
+      localStorage.setItem('zylobet_ff_my_tournaments_v1',JSON.stringify(records));
+      ['upcoming','ongoing','previous'].forEach(function(status){
+        const box=document.getElementById('ff-my-'+status);if(!box)return;
+        const list=records.filter(function(r){return r.status===status});
+        if(!list.length){box.innerHTML='<div class="freefire-tab-panel" style="padding:22px 14px"><div class="ff-panel-icon">🏆</div><h3>No '+status.charAt(0).toUpperCase()+status.slice(1)+' Tournaments</h3><p>Your participated tournaments will appear here.</p></div>';return;}
+        box.innerHTML=list.map(function(r){
+          const room=r.status==='ongoing'&&r.roomId?`<button type="button" class="ff-tournament-action ff-my-room" data-room-id="${esc(r.roomId)}" data-room-pass="${esc(r.roomPassword)}">ROOM CODE</button>`:'';
+          const cleanPrize=String(r.prize||'0').replace(/<[^>]*>/g,'').replace(/\s*Prize Pool\s*$/i,'').trim()||'0';
+          const joinedCount=Math.max(0,Number(r.joinedCount||0));
+          const slotLimit=Math.max(1,parseInt(r.slotLimit||r.slots,10)||50);
+          const seatProgress=Math.min(100,(joinedCount/slotLimit)*100);
+          return `<div class="ff-tournament-card"><div class="ff-tournament-info"><span class="ff-tournament-status">${r.status.toUpperCase()}</span><div class="ff-tournament-name">${esc(r.name)}</div><div class="ff-tournament-meta">${esc(r.mode)} • ${esc(r.meta)}</div><button type="button" class="ff-tournament-prize ff-prize-click" data-prize="${esc(cleanPrize+' Prize Pool')}" data-first-prize="${esc(r.firstPrize||'0')}" data-second-prize="${esc(r.secondPrize||'0')}" data-third-prize="${esc(r.thirdPrize||'0')}" data-per-kill="${esc(r.perKill||'0')}" onclick="showFFPrize(this)">${esc(cleanPrize)} <span class="ff-gold-coin" style="width:16px;height:16px;font-size:7px;display:inline-flex;vertical-align:middle;"><i class="fa-solid fa-coins"></i></span> Prize Pool</button><div class="ff-seats">👥 Seats: ${joinedCount}/${slotLimit} • <span style="color:#22c55e">JOINED</span></div><span class="ff-seat-progress"><span style="width:${seatProgress}%"></span></span>${room}</div><div class="ff-entry-fee-wrap"><span class="ff-entry-fee-label">ENTRY FEE</span><button type="button" class="ff-tournament-action ff-joined-action" disabled style="pointer-events:none!important;opacity:1!important;background:#22c55e!important;color:#fff!important;box-shadow:0 0 14px rgba(34,197,94,.28)!important;">✓ JOINED</button></div></div>`;
+        }).join('');
       });
-      localStorage.setItem('zylobet_ff_my_tournaments_v1',JSON.stringify(merged));
-      paint(merged);
-    }).catch(function(err){console.warn('Free Fire joined tournaments sync skipped:',err)});
-  }
+      document.querySelectorAll('.ff-my-room').forEach(function(btn){btn.addEventListener('click',function(){document.getElementById('ff-room-id').textContent=btn.getAttribute('data-room-id')||'';document.getElementById('ff-room-password').textContent=btn.getAttribute('data-room-pass')||'';openFFRoom();});});
+    });
+  }).catch(function(err){console.warn('Free Fire My Tournament load failed:',err);});
 };
 window.openFFMode=function(mode){document.querySelectorAll('.ff-mode-page').forEach(function(p){p.classList.remove('active');p.style.display='none'});const p=document.getElementById('ff-mode-'+mode);if(p){p.classList.add('active');p.style.display='block'}if(mode==='my')renderFFMyTournaments();showFFStatus(mode,'upcoming');window.scrollTo(0,0)};
 window.showFFStatus=function(mode,status){const page=document.getElementById('ff-mode-'+mode);if(!page)return;page.querySelectorAll('.ff-status-panel').forEach(function(p){const active=p.id==='ff-'+mode+'-'+status;p.classList.toggle('active',active);p.style.display=active?'block':'none'});page.querySelectorAll('.ff-status-tab').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-status')===status)})};
 
 window.addEventListener('keydown',function(e){if(e.key==='Escape'){closeFFPrize();closeFFPlayerProfile();closeFFRoom();closeFFJoinedList()}});
-['ff-prize-modal','ff-player-profile-modal','ff-room-modal','ff-joined-list-modal'].forEach(function(id){const m=document.getElementById(id);if(m)m.addEventListener('click',function(e){if(e.target===m){if(id==='ff-prize-modal')closeFFPrize();else if(id==='ff-room-modal')closeFFRoom();else if(id==='ff-joined-list-modal')closeFFJoinedList();else closeFFPlayerProfile()}})});
+['ff-prize-modal','ff-player-profile-modal','ff-room-modal','ff-joined-list-modal','ff-join-confirm-modal'].forEach(function(id){const m=document.getElementById(id);if(m)m.addEventListener('click',function(e){if(e.target===m){if(id==='ff-prize-modal')closeFFPrize();else if(id==='ff-room-modal')closeFFRoom();else if(id==='ff-joined-list-modal')closeFFJoinedList();else if(id==='ff-join-confirm-modal')closeFFJoinConfirm();else closeFFPlayerProfile()}})});
 })();</script>
 <script>
 /* Free Fire Play Now fallback: only ensures the mode-selection page opens. */
@@ -3787,6 +4065,17 @@ body.ff-notification-open .ff-entry-fee-wrap{visibility:hidden!important;}
   border:0!important;
   box-shadow:0 0 14px rgba(34,197,94,.28)!important;
 }
+/* FF entry fee stack: label on top, diamond box in the middle, action underneath. */
+.ff-entry-fee-wrap{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:6px!important;}
+/* Keep the whole fee stack centered in its own card column; do not pin it to the corner. */
+.ff-tournament-card .ff-entry-fee-wrap{width:108px!important;min-width:108px!important;margin-left:8px!important;margin-right:0!important;align-items:center!important;text-align:center!important;}
+.ff-tournament-card .ff-entry-fee-wrap .ff-entry-fee-label{display:block!important;width:100%!important;text-align:center!important;margin:0!important;}
+.ff-tournament-card .ff-entry-fee-wrap .ff-entry-fee-box{width:76px!important;min-width:76px!important;height:34px!important;min-height:34px!important;box-sizing:border-box!important;margin:0 auto!important;}
+.ff-tournament-card .ff-entry-fee-wrap .ff-tournament-action.ff-joined-action{width:86px!important;min-width:86px!important;max-width:86px!important;height:38px!important;min-height:38px!important;box-sizing:border-box!important;margin:0 auto!important;}
+.ff-entry-fee-wrap .ff-entry-fee-label{order:1!important;margin:0!important;text-align:center!important;}
+.ff-entry-fee-wrap .ff-entry-fee-box{order:2!important;margin:0!important;}
+.ff-entry-fee-wrap .ff-tournament-action{order:3!important;margin:0!important;}
+.ff-entry-fee-wrap .ff-insufficient-balance{order:4!important;margin-top:1px!important;}
 </style>
 <script>
 /* ===== FREE FIRE ADMIN + FIRESTORE TOURNAMENT SYNC ===== */
@@ -4024,12 +4313,15 @@ body.ff-notification-open .ff-entry-fee-wrap{visibility:hidden!important;}
     const full=slots>0 && joined>=slots;
     let localJoined=false;
     try{localJoined=localStorage.getItem('zylobet_ff_admin_joined_'+String(d.id))==='1';}catch(e){}
-    const alreadyJoined=!!joinedByUser || localJoined;
+    const joinedRecord=(joinedByUser&&typeof joinedByUser==='object')?joinedByUser:null;
+    const alreadyJoined=!!joinedRecord || !!joinedByUser || localJoined;
+    const recordJoined=joinedRecord?Math.max(0,parseInt(joinedRecord.joinedCount,10)||0):0;
+    const shownJoined=alreadyJoined?Math.max(joined,recordJoined,1):joined;
     const thumb=ffTournamentThumb(d.mode);
     const entryFee=Math.max(1,parseInt(d.entryFee,10)||1);
     const action=alreadyJoined
-      ? `<button type="button" class="ff-tournament-action ff-joined-action" data-tournament-id="${esc(d.id)}" disabled aria-disabled="true" style="pointer-events:none!important;opacity:1!important;cursor:not-allowed!important;background:#22c55e!important;color:#fff!important;border:0!important;box-shadow:0 0 14px rgba(34,197,94,.28)!important;">✓ JOINED</button>`
-      : `<button type="button" class="ff-tournament-action" data-tournament-id="${esc(d.id)}" data-entry-fee="${entryFee}" ${full?'disabled':''} aria-label="Entry fee ${entryFee} diamond${entryFee===1?'':'s'}" onclick="joinFFTournament(this)" style="pointer-events:auto!important;cursor:pointer!important;position:relative;z-index:2147483647;touch-action:manipulation;">${full?'FULL':entryFee+' <span class="ff-diamond" style="width:18px;height:18px;font-size:8px;vertical-align:middle;display:inline-flex;"><i class="fa-solid fa-gem"></i></span>'}</button>`;
+      ? `<span class="ff-entry-fee-label">ENTRY FEE</span><span class="ff-entry-fee-box"><span>${entryFee}</span><span class="ff-diamond"><i class="fa-solid fa-gem"></i></span></span><button type="button" class="ff-tournament-action ff-joined-action" data-tournament-id="${esc(d.id)}" disabled aria-disabled="true" style="pointer-events:none!important;opacity:1!important;cursor:not-allowed!important;background:#22c55e!important;color:#fff!important;border:0!important;box-shadow:0 0 14px rgba(34,197,94,.28)!important;">✓ JOINED</button>`
+      : `<span class="ff-entry-fee-label">ENTRY FEE</span><span class="ff-entry-fee-box"><span>${entryFee}</span><span class="ff-diamond"><i class="fa-solid fa-gem"></i></span></span><button type="button" class="ff-tournament-action" data-tournament-id="${esc(d.id)}" data-entry-fee="${entryFee}" ${full?'disabled':''} aria-label="Entry fee ${entryFee} diamond${entryFee===1?'':'s'}" onclick="return openFFJoinConfirm(this,event)" style="pointer-events:auto!important;cursor:pointer!important;position:relative;z-index:2147483647;touch-action:manipulation;">${full?'FULL':'JOIN'}</button>`;
     const progress=slots>0?Math.min(100,Math.max(0,(joined/slots)*100)):0;
     const prizeText=String(d.prize==null?'':d.prize).replace(/\s*Prize Pool$/i,'').trim()||'Prize Pool';
     const displayName=d.mode==='battle'?'BATTLE ROYALE TOURNAMENT':((modeLabel(d.mode)||'Free Fire')+' Tournament');
@@ -4040,12 +4332,11 @@ body.ff-notification-open .ff-entry-fee-wrap{visibility:hidden!important;}
         <div class="ff-tournament-name">${esc(displayName)}</div>
         <div class="ff-tournament-meta">${d.mode==='battle'?'Solo • Bermuda • ':esc(modeLabel(d.mode)+' • ')}${esc(dateTimeText(d))}</div>
         <button type="button" class="ff-tournament-prize ff-prize-click" data-prize="${esc(prizeText+' Prize Pool')}" data-first-prize="${esc(d.firstPrize||'0')}" data-second-prize="${esc(d.secondPrize||'0')}" data-third-prize="${esc(d.thirdPrize||'0')}" data-per-kill="${esc(d.perKill||'0')}" onclick="showFFPrize(this)">${esc(prizeText)} <span class="ff-gold-coin" style="width:16px;height:16px;font-size:7px;display:inline-flex;vertical-align:middle;"><i class="fa-solid fa-coins"></i></span> Prize Pool</button>
-        <div class="ff-seats">👥 Seats: ${joined}/${slots||'∞'}${alreadyJoined?' • <span style="color:#22c55e">JOINED</span>':''}</div>
+        <div class="ff-seats">👥 Seats: ${shownJoined}/${slots||'∞'}${alreadyJoined?' • <span style="color:#22c55e">JOINED</span>':''}</div>
         <span class="ff-seat-progress"><span style="width:${progress}%"></span></span>
         <button type="button" class="ff-joined-list-btn" onclick="openFFJoinedList('${esc(d.id)}','${esc(displayName)}')">VIEW JOINED PLAYERS</button>
       </div>
       <div class="ff-entry-fee-wrap" style="position:relative!important;z-index:2147483646!important;pointer-events:auto!important;isolation:isolate;">
-        <span class="ff-entry-fee-label">ENTRY FEE</span>
         ${action}
         <span class="ff-insufficient-balance" aria-live="polite">❌ Insufficient Balance</span>
       </div>
@@ -4064,7 +4355,7 @@ body.ff-notification-open .ff-entry-fee-wrap{visibility:hidden!important;}
     Promise.all([db.collection(FF_COLLECTION).get(),joinedPromise]).then(function(results){
       const snap=results[0], joinedSnap=results[1];
       const joinedIds={};
-      if(joinedSnap)joinedSnap.forEach(function(doc){joinedIds[String(doc.id)]=true;});
+      if(joinedSnap)joinedSnap.forEach(function(doc){joinedIds[String(doc.id)]=doc.data()||{};});
       snap.forEach(function(doc){
         const d={id:doc.id,...doc.data()}; const st=effectiveStatus(d);
         const panel=document.getElementById('ff-'+d.mode+'-'+st);
@@ -4118,25 +4409,31 @@ body.ff-notification-open .ff-entry-fee-wrap{visibility:hidden!important;}
     const tref=db.collection(FF_COLLECTION).doc(id);
     const card=btn.closest('.ff-tournament-card');
     let tdata=null,record=null,result=null,joinCommitted=false;
-    Promise.resolve().then(function(){return tref.get().then(function(tdoc){
+    Promise.resolve().then(function(){return db.runTransaction(async function(tx){
+      const userDoc=await tx.get(uref);
+      const tdoc=await tx.get(tref);
       if(!tdoc.exists)throw new Error('TOURNAMENT_NOT_FOUND');
       tdata=tdoc.data()||{};
-      const slots=Math.max(1,parseInt(tdata.slotLimit||tdata.slots,10)||50),joined=Math.max(0,parseInt(tdata.joinedCount,10)||0);
+      const slots=Math.max(1,parseInt(tdata.slotLimit||tdata.slots,10)||50);
+      const joined=Math.max(0,parseInt(tdata.joinedCount,10)||0);
       if(tdata.ended===true||effectiveStatus(tdata)==='previous')throw new Error('TOURNAMENT_CLOSED');
       if(joined>=slots)throw new Error('TOURNAMENT_FULL');
       const fee=Math.max(1,parseInt(tdata.entryFee,10)||1);
-      return db.runTransaction(async function(tx){
-        const userDoc=await tx.get(uref),data=userDoc.exists?userDoc.data():{},currentGems=Number(data.gems||0);
-        if(!Number.isFinite(currentGems)||currentGems<fee)throw new Error('INSUFFICIENT_DIAMONDS');
-        result={remaining:currentGems-fee,joined:joined+1,slots:slots,fee:fee};
-        tx.set(uref,{userId:String(userId),gems:result.remaining,lastActive:Date.now()},{merge:true});
-      });
+      const data=userDoc.exists?userDoc.data():{};
+      const currentGems=Number(data.gems||0);
+      if(!Number.isFinite(currentGems)||currentGems<fee)throw new Error('INSUFFICIENT_DIAMONDS');
+      result={remaining:currentGems-fee,joined:joined+1,slots:slots,fee:fee};
+      tx.set(uref,{userId:String(userId),gems:result.remaining,lastActive:Date.now()},{merge:true});
+      tx.set(tref,{joinedCount:result.joined,updatedAt:Date.now()},{merge:true});
     });}).then(function(){
       joinCommitted=true;
       try{userGems=Math.max(0,Number(result.remaining));updateUIBalances();}catch(e){}
       const ffProfile=(typeof getFFPlayerProfile==='function'&&getFFPlayerProfile())||{};
-      try{record={id:id,mode:modeLabel(tdata.mode)||'Free Fire',status:effectiveStatus(tdata),name:tdata.mode==='battle'?'Solo Bermuda':((modeLabel(tdata.mode)||'Free Fire')+' Tournament'),meta:dateTimeText({id:id,...tdata}),prize:String(tdata.prize||'0'),entryFee:result.fee,firstPrize:String(tdata.firstPrize||'0'),secondPrize:String(tdata.secondPrize||'0'),thirdPrize:String(tdata.thirdPrize||'0'),perKill:String(tdata.perKill||'0'),roomId:String(tdata.roomId||''),roomPassword:String(tdata.roomPassword||''),joinedCount:result.joined,slotLimit:result.slots,joinedAt:Date.now(),freeFireId:String(ffProfile.uid||''),freeFireNickname:String(ffProfile.nickname||''),telegramId:String(userId||''),displayName:String((typeof telegramDisplayName!=='undefined'&&telegramDisplayName)||((typeof username!=='undefined'&&username)||'Telegram User'))};}catch(e){record={id:id,mode:modeLabel(tdata.mode)||'Free Fire',status:effectiveStatus(tdata),name:'Free Fire Tournament',meta:dateTimeText({id:id,...tdata}),prize:String(tdata.prize||'0'),entryFee:result.fee,joinedCount:result.joined,slotLimit:result.slots,joinedAt:Date.now()};}
-      try{jref.set(record,{merge:true}).catch(function(){});}catch(e){}
+      try{record={id:id,mode:modeLabel(tdata.mode)||'Free Fire',status:effectiveStatus(tdata),name:tdata.mode==='battle'?'Solo Bermuda':((modeLabel(tdata.mode)||'Free Fire')+' Tournament'),meta:dateTimeText({id:id,...tdata}),prize:String(tdata.prize||'0'),entryFee:result.fee,firstPrize:String(tdata.firstPrize||'0'),secondPrize:String(tdata.secondPrize||'0'),thirdPrize:String(tdata.thirdPrize||'0'),perKill:String(tdata.perKill||'0'),roomId:String(tdata.roomId||''),roomPassword:String(tdata.roomPassword||''),joinedCount:result.joined,slotLimit:result.slots,joinedAt:Date.now(),freeFireId:String(ffProfile.uid||''),freeFireNickname:String(ffProfile.nickname||''),telegramId:String(ffProfile.telegramId||userId||''),displayName:String((typeof telegramDisplayName!=='undefined'&&telegramDisplayName)||((typeof username!=='undefined'&&username)||'Telegram User'))};}catch(e){record={id:id,mode:modeLabel(tdata.mode)||'Free Fire',status:effectiveStatus(tdata),name:'Free Fire Tournament',meta:dateTimeText({id:id,...tdata}),prize:String(tdata.prize||'0'),entryFee:result.fee,joinedCount:result.joined,slotLimit:result.slots,joinedAt:Date.now()};}
+      return jref.set(record,{merge:true}).then(function(){
+        return db.collection(FF_COLLECTION).doc(id).collection('joined_players').doc(String(userId)).set(record,{merge:true}).catch(function(playerWriteErr){console.warn('FF joined player mirror:',playerWriteErr)});
+      });
+    }).then(function(){
       try{uref.collection('gem_history').add({title:'Free Fire Tournament Entry Fee',amount:'-'+result.fee+' Diamond'+(result.fee===1?'':'s'),type:'gem',time:Date.now(),status:'Success'}).catch(function(){});}catch(e){}
       try{localStorage.setItem('zylobet_ff_admin_joined_'+id,'1');}catch(e){}
       btn.dataset.joined='1';btn.classList.add('ff-joined-action');btn.disabled=true;
@@ -4147,7 +4444,7 @@ body.ff-notification-open .ff-entry-fee-wrap{visibility:hidden!important;}
       try{renderFFMyTournaments();}catch(e){}
       ffFinishBalanceNotification(btn,'🎉 <b>Joined successfully!</b><br>'+result.fee+' Diamond'+(result.fee===1?'':'s')+' deducted.','success');
       if(card&&card.querySelector('.ff-tournament-status')&&card.querySelector('.ff-tournament-status').textContent.trim().toLowerCase()==='ongoing')openFFRoom();
-    }).then(function(){try{tref.set({joinedCount:result.joined,updatedAt:Date.now()},{merge:true}).catch(function(){});}catch(e){}}).catch(function(err){
+    }).catch(function(err){
       if(joinCommitted){try{ffFinishBalanceNotification(btn,'🎉 <b>Joined successfully!</b><br>'+((result&&result.fee)||1)+' Diamond'+(((result&&result.fee)||1)===1?'':'s')+' deducted.','success');}catch(e){}}
       else if(err&&err.message==='INSUFFICIENT_DIAMONDS'){const fee=(tdata&&Math.max(1,parseInt(tdata.entryFee,10)||1))||1;ffFinishBalanceNotification(btn,'❌ <b>Insufficient Diamonds!</b><br>You need '+fee+' Diamond'+(fee===1?'':'s')+' to join.','error');}
       else if(err&&err.message==='TOURNAMENT_FULL')ffFinishBalanceNotification(btn,'❌ <b>Tournament slots are full!</b>','error');
@@ -4170,44 +4467,63 @@ body.ff-notification-open .ff-entry-fee-wrap{visibility:hidden!important;}
 
   // Repaint My Tournament from the user's joined tournament records.
   window.renderFFMyTournaments=function(){
-    if(typeof db==='undefined'||!userId)return;
-    const uref=db.collection('users').doc(String(userId));
-    uref.collection('ff_joined_tournaments').get().then(function(joinedSnap){
-      const joinedRecords=[];
-      joinedSnap.forEach(function(doc){const r=doc.data()||{};if(r.id)joinedRecords.push({...r,id:String(r.id)});});
-      Promise.all(joinedRecords.map(function(r){
-        return db.collection(FF_COLLECTION).doc(String(r.id)).get().then(function(s){
-          /* Show only tournaments that still exist in the admin-connected collection.
-             Stale local/user records must never appear as My Tournament cards. */
-          if(!s.exists)return null;
-          const d={id:s.id,...s.data()};
-          const rawMode=String(d.mode||'').toLowerCase();
-          if(['battle','clash','lone'].indexOf(rawMode)===-1)return null;
-          const mode=modeLabel(d.mode)||r.mode||'Free Fire';
-          return {id:String(d.id),mode:mode,status:effectiveStatus(d),name:mode+' Tournament',meta:dateTimeText(d),prize:String(d.prize||r.prize||'0'),roomId:String(d.roomId||r.roomId||''),roomPassword:String(d.roomPassword||r.roomPassword||''),joinedCount:Number(d.joinedCount||r.joinedCount||0),slotLimit:Number(d.slotLimit||d.slots||r.slotLimit||r.slots||50),joinedAt:r.joinedAt||Date.now()};
-        }).catch(function(){return null;});
-      })).then(function(records){
-        records=records.filter(function(r){return !!r;});
-        localStorage.setItem('zylobet_ff_my_tournaments_v1',JSON.stringify(records));
-        ['upcoming','ongoing','previous'].forEach(function(status){
-          const box=document.getElementById('ff-my-'+status);if(!box)return;
-          const list=records.filter(function(r){return r.status===status});
-          if(!list.length){box.innerHTML='<div class="freefire-tab-panel" style="padding:22px 14px"><div class="ff-panel-icon">🏆</div><h3>No '+status.charAt(0).toUpperCase()+status.slice(1)+' Tournaments</h3><p>Your participated tournaments will appear here.</p></div>';return;}
-          box.innerHTML=list.map(function(r){
-            const room=r.status==='ongoing'&&r.roomId?`<button type="button" class="ff-tournament-action ff-my-room" data-room-id="${esc(r.roomId)}" data-room-pass="${esc(r.roomPassword)}">ROOM CODE</button>`:'';
-            const cleanPrize=String(r.prize||'0').replace(/<[^>]*>/g,'').replace(/\s*Prize Pool\s*$/i,'').trim()||'0';
-            const joinedCount=Math.max(0,Number(r.joinedCount||0));
-            const slotLimit=Math.max(1,parseInt(r.slotLimit||r.slots,10)||50);
-            const seatTotal=String(slotLimit);
-            const seatProgress=slotLimit>0?Math.min(100,(joinedCount/slotLimit)*100):0;
-            return `<div class="ff-tournament-card"><div class="ff-tournament-info"><span class="ff-tournament-status">${r.status.toUpperCase()}</span><div class="ff-tournament-name">${esc(r.name)}</div><div class="ff-tournament-meta">${esc(r.mode)} • ${esc(r.meta)}</div><button type="button" class="ff-tournament-prize ff-prize-click" data-prize="${esc(cleanPrize+' Prize Pool')}" data-first-prize="${esc(r.firstPrize||'0')}" data-second-prize="${esc(r.secondPrize||'0')}" data-third-prize="${esc(r.thirdPrize||'0')}" data-per-kill="${esc(r.perKill||'0')}" onclick="showFFPrize(this)">${esc(cleanPrize)} <span class="ff-gold-coin" style="width:16px;height:16px;font-size:7px;display:inline-flex;vertical-align:middle;"><i class="fa-solid fa-coins"></i></span> Prize Pool</button><div class="ff-seats">👥 Seats: ${joinedCount}/${seatTotal} • <span style="color:#22c55e">JOINED</span></div><span class="ff-seat-progress"><span style="width:${seatProgress}%"></span></span>${room}</div><div class="ff-entry-fee-wrap"><span class="ff-entry-fee-label">ENTRY FEE</span><button type="button" class="ff-tournament-action ff-joined-action" disabled style="pointer-events:none!important;opacity:1!important;background:#22c55e!important;color:#fff!important;box-shadow:0 0 14px rgba(34,197,94,.28)!important;">✓ JOINED</button></div></div>`;
-          }).join('');
-        });
-        document.querySelectorAll('.ff-my-room').forEach(function(btn){btn.addEventListener('click',function(){document.getElementById('ff-room-id').textContent=btn.getAttribute('data-room-id')||'';document.getElementById('ff-room-password').textContent=btn.getAttribute('data-room-pass')||'';openFFRoom();});});
+    if(typeof userId==='undefined'||!userId)return;
+    const uid=String(userId);
+    const localRecords=[]; const seen={};
+    function addLocal(r){
+      if(!r||!r.id)return;
+      const id=String(r.id); if(seen[id])return;
+      seen[id]=true; localRecords.push({...r,id:id});
+    }
+    // Local joined records are available immediately and are the fallback if Firestore rules/network fail.
+    try{
+      for(let i=0;i<localStorage.length;i++){
+        const key=localStorage.key(i)||'';
+        if(key.indexOf('zylobet_ff_joined_player_')!==0)continue;
+        const r=JSON.parse(localStorage.getItem(key)||'null'); addLocal(r);
+      }
+      const cached=JSON.parse(localStorage.getItem('zylobet_ff_my_tournaments_v1')||'[]');
+      if(Array.isArray(cached))cached.forEach(addLocal);
+    }catch(e){}
+    function paint(records){
+      records=(records||[]).filter(function(r){return r&&r.id;});
+      try{localStorage.setItem('zylobet_ff_my_tournaments_v1',JSON.stringify(records));}catch(e){}
+      ['upcoming','ongoing','previous'].forEach(function(status){
+        const box=document.getElementById('ff-my-'+status);if(!box)return;
+        const list=records.filter(function(r){return String(r.status||'upcoming')===status;});
+        if(!list.length){box.innerHTML='<div class="freefire-tab-panel" style="padding:22px 14px"><div class="ff-panel-icon">🏆</div><h3>No '+status.charAt(0).toUpperCase()+status.slice(1)+' Tournaments</h3><p>Your participated tournaments will appear here.</p></div>';return;}
+        box.innerHTML=list.map(function(r){
+          const room=r.status==='ongoing'&&r.roomId?`<button type="button" class="ff-tournament-action ff-my-room" data-room-id="${esc(r.roomId)}" data-room-pass="${esc(r.roomPassword||'')}">ROOM CODE</button>`:'';
+          const cleanPrize=String(r.prize||'0').replace(/<[^>]*>/g,'').replace(/\s*Prize Pool\s*$/i,'').trim()||'0';
+          const joinedCount=Math.max(1,Number(r.joinedCount||1)),slotLimit=Math.max(1,parseInt(r.slotLimit||r.slots,10)||50);
+          const seatProgress=Math.min(100,(joinedCount/slotLimit)*100);
+          return `<div class="ff-tournament-card"><div class="ff-tournament-info"><span class="ff-tournament-status">${String(r.status||'upcoming').toUpperCase()}</span><div class="ff-tournament-name">${esc(r.name||'Free Fire Tournament')}</div><div class="ff-tournament-meta">${esc(r.mode||'Free Fire')} • ${esc(r.meta||'')}</div><button type="button" class="ff-tournament-prize ff-prize-click" data-prize="${esc(cleanPrize+' Prize Pool')}" data-first-prize="${esc(r.firstPrize||'0')}" data-second-prize="${esc(r.secondPrize||'0')}" data-third-prize="${esc(r.thirdPrize||'0')}" data-per-kill="${esc(r.perKill||'0')}" onclick="showFFPrize(this)">${esc(cleanPrize)} <span class="ff-gold-coin" style="width:16px;height:16px;font-size:7px;display:inline-flex;vertical-align:middle;"><i class="fa-solid fa-coins"></i></span> Prize Pool</button><div class="ff-seats">👥 Seats: ${joinedCount}/${slotLimit} • <span style="color:#22c55e">JOINED</span></div><span class="ff-seat-progress"><span style="width:${seatProgress}%"></span></span>${room}</div><div class="ff-entry-fee-wrap" style="margin-left:24px!important"><span class="ff-entry-fee-label">ENTRY FEE</span><button type="button" class="ff-tournament-action ff-joined-action" disabled style="pointer-events:none!important;opacity:1!important;background:#22c55e!important;color:#fff!important;box-shadow:0 0 14px rgba(34,197,94,.28)!important;">✓ JOINED</button></div></div>`;
+        }).join('');
       });
-    }).catch(function(err){console.warn('Free Fire My Tournament load failed:',err);});
+      document.querySelectorAll('.ff-my-room').forEach(function(btn){btn.addEventListener('click',function(){document.getElementById('ff-room-id').textContent=btn.getAttribute('data-room-id')||'';document.getElementById('ff-room-password').textContent=btn.getAttribute('data-room-pass')||'';openFFRoom();});});
+    }
+    // Paint local data first so My Tournament never depends on a Firestore query completing.
+    paint(localRecords);
+    if(typeof db==='undefined')return;
+    const uref=db.collection('users').doc(uid);
+    uref.collection('ff_joined_tournaments').get().then(function(joinedSnap){
+      const records=[]; const localById={}; localRecords.forEach(function(r){localById[String(r.id)]=r;});
+      joinedSnap.forEach(function(doc){const r=doc.data()||{};if(r.id){const id=String(r.id);records.push({...localById[id],...r,id:id});}});
+      const merged=localRecords.slice(); const idx={}; merged.forEach(function(r,i){idx[String(r.id)]=i;});
+      records.forEach(function(r){const id=String(r.id);if(idx[id]!==undefined)merged[idx[id]]={...merged[idx[id]],...r};else{idx[id]=merged.length;merged.push(r);}});
+      // Refresh tournament status/details, but never discard the locally saved joined record on a failed read.
+      return Promise.all(merged.map(function(r){
+        return db.collection(FF_COLLECTION).doc(String(r.id)).get().then(function(s){
+          if(!s.exists)return r;
+          const d=s.data()||{};
+          return {...r,mode:modeLabel(d.mode||r.mode)||r.mode||'Free Fire',status:effectiveStatus(d),name:String(d.name||r.name||'Free Fire Tournament'),meta:dateTimeText(d)||r.meta||'',prize:String(d.prize||r.prize||'0'),entryFee:Number(d.entryFee||r.entryFee||1),firstPrize:String(d.firstPrize||r.firstPrize||'0'),secondPrize:String(d.secondPrize||r.secondPrize||'0'),thirdPrize:String(d.thirdPrize||r.thirdPrize||'0'),perKill:String(d.perKill||r.perKill||'0'),roomId:String(d.roomId||r.roomId||''),roomPassword:String(d.roomPassword||r.roomPassword||''),joinedCount:Number(d.joinedCount||r.joinedCount||1),slotLimit:Number(d.slotLimit||d.slots||r.slotLimit||r.slots||50),freeFireId:String(r.freeFireId||r.ffUid||r.uid||d.freeFireId||''),freeFireNickname:String(r.freeFireNickname||r.ffNickname||r.nickname||d.freeFireNickname||''),telegramId:String(r.telegramId||r.userId||d.telegramId||uid||''),displayName:String(r.displayName||r.username||d.displayName||'Telegram User')};
+        }).catch(function(){return r;});
+      })).then(paint);
+    }).catch(function(){
+      // Firestore permission/network errors leave the already-painted local joined card visible.
+      paint(localRecords);
+    });
   };
-
   const originalRefresh=window.refreshUserFreeFireTournaments;
   window.addEventListener('DOMContentLoaded',function(){
     setTimeout(function(){
