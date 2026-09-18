@@ -3834,27 +3834,92 @@ window.joinFFTournament=function(el,event){
   if(btn.disabled || btn.dataset.joining==='1' || btn.dataset.joined==='1')return false;
   if(typeof userId==='undefined' || !userId){ffFinishBalanceNotification(btn,'❌ <b>Unable to join!</b><br>User not found.','error');return false;}
   if(typeof db==='undefined'){ffFinishBalanceNotification(btn,'❌ <b>Unable to join!</b><br>Database not ready.','error');return false;}
-  const fee=Math.max(1,parseInt(btn.getAttribute('data-entry-fee'),10)||1);
   const tournamentId=String(btn.getAttribute('data-tournament-id')||'');
+  if(!tournamentId){ffFinishBalanceNotification(btn,'❌ <b>Unable to join!</b><br>Tournament not found.','error');return false;}
+  const feeFromButton=Math.max(1,parseInt(btn.getAttribute('data-entry-fee'),10)||1);
   btn.dataset.joining='1';
   ffStartBalanceLoading(btn);
   const userRef=db.collection('users').doc(String(userId));
+  const tournamentRef=db.collection(FF_COLLECTION).doc(tournamentId);
+  const joinedRef=userRef.collection('ff_joined_tournaments').doc(tournamentId);
+  const joinedPlayerRef=tournamentRef.collection('joined_players').doc(String(userId));
   const card=btn.closest('.ff-tournament-card');
+  const ffProfile=(typeof getFFPlayerProfile==='function'&&getFFPlayerProfile())||{};
+  const tgProfile=(typeof getFFTelegramProfile==='function'&&getFFTelegramProfile())||{};
+  let result=null, tdata=null, record=null;
+  const now=Date.now();
 
-  // Same balance flow as the original working demo: read the user first,
-  // then deduct the exact admin-set fee. No tournament read can block the result.
-  userRef.get().then(function(userDoc){
-    const data=userDoc.exists?userDoc.data():{};
-    const serverGems=Number(data.gems||0);
-    if(!Number.isFinite(serverGems) || serverGems<fee)throw new Error('INSUFFICIENT_DIAMONDS');
-    return userRef.set({userId:String(userId),gems:firebase.firestore.FieldValue.increment(-fee),lastActive:Date.now()},{merge:true}).then(function(){
-      return {remaining:serverGems-fee};
-    });
-  }).then(function(result){
-    userGems=Math.max(0,Number(result.remaining));
-    updateUIBalances();
+  db.runTransaction(async function(tx){
+    // Read every required document before making any writes so Firestore can
+    // safely retry the transaction when another user joins at the same time.
+    const userDoc=await tx.get(userRef);
+    const tournamentDoc=await tx.get(tournamentRef);
+    const alreadyDoc=await tx.get(joinedRef);
+    if(!tournamentDoc.exists)throw new Error('TOURNAMENT_NOT_FOUND');
+    tdata=tournamentDoc.data()||{};
+    if(alreadyDoc.exists)throw new Error('ALREADY_JOINED');
+    if(tdata.ended===true || effectiveStatus(tdata)==='previous')throw new Error('TOURNAMENT_CLOSED');
 
-    // Show the result immediately after the balance deduction succeeds.
+    const slots=Math.max(1,parseInt(tdata.slotLimit||tdata.slots,10)||50);
+    const joined=Math.max(0,parseInt(tdata.joinedCount,10)||0);
+    if(joined>=slots)throw new Error('TOURNAMENT_FULL');
+    const fee=Math.max(1,parseInt(tdata.entryFee,10)||feeFromButton);
+    const userData=userDoc.exists?(userDoc.data()||{}):{};
+    const gems=Number(userData.gems||0);
+    if(!Number.isFinite(gems)||gems<fee)throw new Error('INSUFFICIENT_DIAMONDS');
+
+    const nextJoined=joined+1;
+    const player={
+      id:tournamentId,
+      mode:modeLabel(tdata.mode)||'Free Fire',
+      status:effectiveStatus(tdata),
+      name:String(tdata.name||'Free Fire Tournament'),
+      meta:dateTimeText({id:tournamentId,...tdata}),
+      prize:String(tdata.prize||'0'),
+      entryFee:fee,
+      firstPrize:String(tdata.firstPrize||'0'),
+      secondPrize:String(tdata.secondPrize||'0'),
+      thirdPrize:String(tdata.thirdPrize||'0'),
+      perKill:String(tdata.perKill||'0'),
+      roomId:String(tdata.roomId||''),
+      roomPassword:String(tdata.roomPassword||''),
+      joinedCount:nextJoined,
+      slotLimit:slots,
+      joinedAt:now,
+      freeFireId:String(ffProfile.uid||''),
+      freeFireNickname:String(ffProfile.nickname||''),
+      telegramId:String(tgProfile.id||tgProfile.telegramId||ffProfile.telegramId||userId||''),
+      displayName:String(tgProfile.name||((typeof telegramDisplayName!=='undefined'&&telegramDisplayName)||((typeof username!=='undefined'&&username)||'Telegram User'))),
+      telegramPhotoUrl:String(tgProfile.photoUrl||((typeof userPhotoUrl!=='undefined'&&userPhotoUrl)||''))
+    };
+    const joinedPlayers=(tdata.joinedPlayers&&typeof tdata.joinedPlayers==='object')?Object.assign({},tdata.joinedPlayers):{};
+    joinedPlayers[String(userId)]={
+      freeFireId:player.freeFireId,
+      freeFireNickname:player.freeFireNickname,
+      telegramId:player.telegramId,
+      displayName:player.displayName,
+      telegramPhotoUrl:player.telegramPhotoUrl,
+      joinedAt:now
+    };
+
+    tx.set(userRef,{userId:String(userId),gems:gems-fee,lastActive:now},{merge:true});
+    tx.set(joinedRef,player,{merge:true});
+    tx.set(joinedPlayerRef,player,{merge:true});
+    tx.set(tournamentRef,{joinedCount:nextJoined,joinedPlayers:joinedPlayers,updatedAt:now},{merge:true});
+    result={remaining:gems-fee,joined:nextJoined,slots:slots,fee:fee,player:player};
+    record=player;
+  }).then(function(){
+    try{userGems=Math.max(0,Number(result.remaining));updateUIBalances();}catch(e){}
+    try{localStorage.setItem('zylobet_ff_joined_player_'+tournamentId,JSON.stringify(record));}catch(e){}
+    try{localStorage.setItem('zylobet_ff_admin_joined_'+tournamentId,'1');}catch(e){}
+    try{
+      const my=JSON.parse(localStorage.getItem('zylobet_ff_my_tournaments_v1')||'[]');
+      const ix=my.findIndex(function(x){return String(x.id)===tournamentId});
+      if(ix>=0)my[ix]=record;else my.push(record);
+      localStorage.setItem('zylobet_ff_my_tournaments_v1',JSON.stringify(my));
+    }catch(e){}
+    try{userRef.collection('gem_history').add({title:'Free Fire Tournament Entry Fee',amount:'-'+result.fee+' Diamond'+(result.fee===1?'':'s'),type:'gem',time:now,status:'Success'}).catch(function(){});}catch(e){}
+
     btn.dataset.joined='1';
     btn.classList.add('ff-joined-action');
     btn.disabled=true;
@@ -3866,94 +3931,19 @@ window.joinFFTournament=function(el,event){
     btn.style.setProperty('border','0','important');
     btn.style.setProperty('box-shadow','0 0 14px rgba(34,197,94,.28)','important');
     btn.innerHTML='<span style="font-size:9px;font-weight:1000;color:#fff!important;display:inline-flex;align-items:center;gap:3px">✓ JOINED</span>';
-    ffFinishBalanceNotification(btn,'🎉 <b>Joined successfully!</b><br>'+fee+' Diamond'+(fee===1?'':'s')+' deducted.','success');
-
-    // Existing bookkeeping only; it cannot delay the notification.
-    try{userRef.collection('gem_history').add({title:'Free Fire Tournament Entry Fee',amount:'-'+fee+' Diamond'+(fee===1?'':'s'),type:'gem',time:Date.now(),status:'Success'}).catch(function(){});}catch(e){}
-    if(tournamentId){
-      // Keep the joined state visible immediately, even if a background Firestore write is delayed.
-      try{
-        const ffNow=(typeof getFFPlayerProfile==='function'&&getFFPlayerProfile())||{};
-        const tgNow=(typeof getFFTelegramProfile==='function'&&getFFTelegramProfile())||{};
-        const modePage0=btn.closest('.ff-mode-page');
-        const modeId0=modePage0?modePage0.id.replace('ff-mode-',''):'';
-        const modeName0=modeId0==='battle'?'Battle Royale':modeId0==='clash'?'Clash Squad':modeId0==='lone'?'Lone Wolf 1 VS 1':(modeId0||'Free Fire');
-        const statusEl0=card&&card.querySelector('.ff-tournament-status');
-        const nameEl0=card&&card.querySelector('.ff-tournament-name');
-        const prizeEl0=card&&card.querySelector('.ff-tournament-prize');
-        const localPlayer={id:tournamentId,mode:modeName0,status:String(statusEl0&&statusEl0.textContent||'UPCOMING').toLowerCase(),name:String(nameEl0&&nameEl0.textContent||'Free Fire Tournament'),meta:String(card&&card.querySelector('.ff-tournament-meta')&&card.querySelector('.ff-tournament-meta').textContent||''),prize:String(prizeEl0&&prizeEl0.getAttribute('data-prize')||'0').replace(/\s*Prize Pool\s*$/i,''),entryFee:fee,joinedCount:1,slotLimit:50,freeFireId:String(ffNow.uid||''),freeFireNickname:String(ffNow.nickname||''),telegramId:String(tgNow.id||userId||''),displayName:String(tgNow.name||((typeof telegramDisplayName!=='undefined'&&telegramDisplayName)||((typeof username!=='undefined'&&username)||'Telegram User'))),telegramPhotoUrl:String(tgNow.photoUrl||((typeof userPhotoUrl!=='undefined'&&userPhotoUrl)||'')),joinedAt:Date.now()};
-        localStorage.setItem('zylobet_ff_joined_player_'+tournamentId,JSON.stringify(localPlayer));
-        try{const my=JSON.parse(localStorage.getItem('zylobet_ff_my_tournaments_v1')||'[]');const ix=my.findIndex(function(x){return String(x.id)===tournamentId});if(ix>=0)my[ix]=localPlayer;else my.push(localPlayer);localStorage.setItem('zylobet_ff_my_tournaments_v1',JSON.stringify(my));}catch(e){}
-        localStorage.setItem('zylobet_ff_admin_joined_'+tournamentId,'1');
-      }catch(e){}
-      try{
-        const visibleSeats=card&&card.querySelector('.ff-seats'),visibleProgress=card&&card.querySelector('.ff-seat-progress span');
-        if(visibleSeats)visibleSeats.innerHTML='👥 Seats: 1/50 • <span style="color:#22c55e">JOINED</span>';
-        if(visibleProgress)visibleProgress.style.width='2%';
-      }catch(e){}
-      // Background tournament bookkeeping: never delay the balance result.
-      (async function(){
-        try{
-          const tref=db.collection(FF_COLLECTION).doc(tournamentId);
-          let td={};
-          let slots=50;
-          let joined=1;
-          await db.runTransaction(async function(tx){
-            const ts=await tx.get(tref);
-            if(!ts.exists)throw new Error('TOURNAMENT_NOT_FOUND');
-            td=ts.data()||{};
-            slots=Math.max(1,parseInt(td.slotLimit||td.slots,10)||50);
-            const current=Math.max(0,parseInt(td.joinedCount,10)||0);
-            joined=Math.min(slots,current+1);
-            // Store the actual player details on the tournament document as well.
-            // The Joined Players screen can then read the same tournament record
-            // without depending on cross-user subcollection permissions.
-            const ffJoinProfile=(typeof getFFPlayerProfile==='function'&&getFFPlayerProfile())||{};
-            const tgJoinProfile=(typeof getFFTelegramProfile==='function'&&getFFTelegramProfile())||{};
-            const joinedPlayers=(td.joinedPlayers&&typeof td.joinedPlayers==='object')?Object.assign({},td.joinedPlayers):{};
-            joinedPlayers[String(userId)]={
-              freeFireId:String(ffJoinProfile.uid||''),
-              freeFireNickname:String(ffJoinProfile.nickname||''),
-              telegramId:String(tgJoinProfile.id||tgJoinProfile.telegramId||ffJoinProfile.telegramId||userId||''),
-              displayName:String(tgJoinProfile.name||((typeof telegramDisplayName!=='undefined'&&telegramDisplayName)||((typeof username!=='undefined'&&username)||'Telegram User'))),
-              telegramPhotoUrl:String(tgJoinProfile.photoUrl||((typeof userPhotoUrl!=='undefined'&&userPhotoUrl)||'')),
-              joinedAt:Date.now()
-            };
-            tx.set(tref,{joinedCount:joined,joinedPlayers:joinedPlayers,updatedAt:Date.now()},{merge:true});
-          });
-          try{
-            const seatEl0=card&&card.querySelector('.ff-seats'),progressEl0=card&&card.querySelector('.ff-seat-progress span');
-            if(seatEl0)seatEl0.innerHTML='👥 Seats: '+joined+'/'+slots+' • <span style="color:#22c55e">JOINED</span>';
-            if(progressEl0)progressEl0.style.width=Math.min(100,(joined/slots)*100)+'%';
-          }catch(e){}
-          const ffProfile=(typeof getFFPlayerProfile==='function'&&getFFPlayerProfile())||{};
-          const tgProfile=(typeof getFFTelegramProfile==='function'&&getFFTelegramProfile())||{};
-          const modePage=btn.closest('.ff-mode-page');
-          const modeId=modePage?modePage.id.replace('ff-mode-',''):'';
-          const modeName=modeId==='battle'?'Battle Royale':modeId==='clash'?'Clash Squad':modeId==='lone'?'Lone Wolf 1 VS 1':(modeId||'Free Fire');
-          const rec={id:tournamentId,mode:modeName,status:effectiveStatus(td),name:String(td.name||'Free Fire Tournament'),meta:dateTimeText({id:tournamentId,...td}),prize:String(td.prize||'0'),entryFee:fee,firstPrize:String(td.firstPrize||'0'),secondPrize:String(td.secondPrize||'0'),thirdPrize:String(td.thirdPrize||'0'),perKill:String(td.perKill||'0'),roomId:String(td.roomId||''),roomPassword:String(td.roomPassword||''),joinedCount:joined,slotLimit:slots,joinedAt:Date.now(),freeFireId:String(ffProfile.uid||''),freeFireNickname:String(ffProfile.nickname||''),telegramId:String(tgProfile.id||ffProfile.telegramId||userId||''),displayName:String(tgProfile.name||((typeof telegramDisplayName!=='undefined'&&telegramDisplayName)||((typeof username!=='undefined'&&username)||'Telegram User'))),telegramPhotoUrl:String(tgProfile.photoUrl||((typeof userPhotoUrl!=='undefined'&&userPhotoUrl)||''))};
-          try{localStorage.setItem('zylobet_ff_joined_player_'+tournamentId,JSON.stringify(rec));}catch(e){}
-          await userRef.collection('ff_joined_tournaments').doc(tournamentId).set(rec,{merge:true});
-          try{await db.collection(FF_COLLECTION).doc(tournamentId).collection('joined_players').doc(String(userId)).set(rec,{merge:true});}catch(playerWriteErr){console.warn('FF joined player mirror:',playerWriteErr)}
-          try{localStorage.setItem('zylobet_ff_admin_joined_'+tournamentId,'1');}catch(e){}
-          // Update the visible seat line only after the user's joined record is saved.
-          // Do not depend on a tournament subcollection write, so security rules cannot block the UI update.
-          const seatEl=card&&card.querySelector('.ff-seats'),progressEl=card&&card.querySelector('.ff-seat-progress span');
-          if(seatEl)seatEl.innerHTML='👥 Seats: '+joined+'/'+slots+' • <span style="color:#22c55e">JOINED</span>';
-          if(progressEl)progressEl.style.width=Math.min(100,(joined/slots)*100)+'%';
-          try{renderFFMyTournaments();}catch(e){}
-
-        }catch(e){console.warn('FF tournament bookkeeping:',e)}
-      })();
-    }
+    const seatEl=card&&card.querySelector('.ff-seats'),progressEl=card&&card.querySelector('.ff-seat-progress span');
+    if(seatEl)seatEl.innerHTML='👥 Seats: '+result.joined+'/'+result.slots+' • <span style="color:#22c55e">JOINED</span>';
+    if(progressEl)progressEl.style.width=Math.min(100,(result.joined/result.slots)*100)+'%';
     try{renderFFMyTournaments();}catch(e){}
+    ffFinishBalanceNotification(btn,'🎉 <b>Joined successfully!</b><br>'+result.fee+' Diamond'+(result.fee===1?'':'s')+' deducted.','success');
+    if(card&&card.querySelector('.ff-tournament-status')&&card.querySelector('.ff-tournament-status').textContent.trim().toLowerCase()==='ongoing')openFFRoom();
   }).catch(function(err){
-    if(err&&err.message==='INSUFFICIENT_DIAMONDS'){
-      ffFinishBalanceNotification(btn,'❌ <b>Insufficient Diamonds!</b><br>You need '+fee+' Diamond'+(fee===1?'':'s')+' to join.','error');
-    }else{
-      console.error('Free Fire Tournament Join Error:',err);
-      ffFinishBalanceNotification(btn,'❌ <b>Tournament join failed!</b><br>Please try again.','error');
-    }
+    const m=err&&err.message||'';
+    if(m==='ALREADY_JOINED')ffFinishBalanceNotification(btn,'ℹ️ <b>You already joined this tournament!</b>','info');
+    else if(m==='INSUFFICIENT_DIAMONDS'){const fee=(tdata&&Math.max(1,parseInt(tdata.entryFee,10)||1))||feeFromButton;ffFinishBalanceNotification(btn,'❌ <b>Insufficient Diamonds!</b><br>You need '+fee+' Diamond'+(fee===1?'':'s')+' to join.','error');}
+    else if(m==='TOURNAMENT_FULL')ffFinishBalanceNotification(btn,'❌ <b>Tournament slots are full!</b>','error');
+    else if(m==='TOURNAMENT_CLOSED')ffFinishBalanceNotification(btn,'❌ <b>Tournament has ended!</b>','error');
+    else {console.error('Free Fire Tournament Join Error:',err);ffFinishBalanceNotification(btn,'❌ <b>Tournament join failed!</b><br>Please try again.','error');}
   }).finally(function(){btn.dataset.joining='0';});
   return false;
 };
@@ -4417,24 +4407,52 @@ body.ff-notification-open .ff-entry-fee-wrap{visibility:hidden!important;}
 
   window.refreshUserFreeFireTournaments=function(){
     if(typeof db==='undefined')return;
-    ['battle','clash','lone'].forEach(function(mode){
-      const up=document.getElementById('ff-'+mode+'-upcoming'), on=document.getElementById('ff-'+mode+'-ongoing'), prev=document.getElementById('ff-'+mode+'-previous');
-      if(up)up.querySelectorAll('[data-admin-ff-id]').forEach(x=>x.remove());
-      if(on)on.querySelectorAll('[data-admin-ff-id]').forEach(x=>x.remove());
-      if(prev)prev.querySelectorAll('[data-admin-ff-id]').forEach(x=>x.remove());
-    });
-    const joinedPromise=(userId?db.collection('users').doc(String(userId)).collection('ff_joined_tournaments').get():Promise.resolve(null));
-    Promise.all([db.collection(FF_COLLECTION).get(),joinedPromise]).then(function(results){
-      const snap=results[0], joinedSnap=results[1];
+    // Keep one realtime listener per page. The tournament document's joinedCount
+    // is the shared source of truth, so every user's screen receives the same seat count.
+    try{if(window.__ffTournamentUnsub){window.__ffTournamentUnsub();window.__ffTournamentUnsub=null;}}catch(e){}
+    try{if(window.__ffUserJoinedUnsub){window.__ffUserJoinedUnsub();window.__ffUserJoinedUnsub=null;}}catch(e){}
+
+    const paint=function(snap,joinedSnap){
+      ['battle','clash','lone'].forEach(function(mode){
+        const up=document.getElementById('ff-'+mode+'-upcoming'), on=document.getElementById('ff-'+mode+'-ongoing'), prev=document.getElementById('ff-'+mode+'-previous');
+        if(up)up.querySelectorAll('[data-admin-ff-id]').forEach(function(x){x.remove();});
+        if(on)on.querySelectorAll('[data-admin-ff-id]').forEach(function(x){x.remove();});
+        if(prev)prev.querySelectorAll('[data-admin-ff-id]').forEach(function(x){x.remove();});
+      });
       const joinedIds={};
       if(joinedSnap)joinedSnap.forEach(function(doc){joinedIds[String(doc.id)]=doc.data()||{};});
       snap.forEach(function(doc){
-        const d={id:doc.id,...doc.data()}; const st=effectiveStatus(d);
+        const d={id:doc.id,...doc.data()};
+        const st=effectiveStatus(d);
         const panel=document.getElementById('ff-'+d.mode+'-'+st);
-        if(panel && !panel.querySelector('[data-admin-ff-id=\"'+String(d.id).replace(/\"/g,'&quot;')+'\"]'))panel.insertAdjacentHTML('afterbegin',tournamentCardHTML(d,joinedIds[String(d.id)]));
+        if(panel)panel.insertAdjacentHTML('afterbegin',tournamentCardHTML(d,joinedIds[String(d.id)]));
       });
       bindAdminFFTournamentClicks();
-      renderFFMyTournaments();
+      try{renderFFMyTournaments();}catch(e){}
+    };
+
+    const userRef=(userId?db.collection('users').doc(String(userId)).collection('ff_joined_tournaments'):null);
+    const firstJoined= userRef ? userRef.get().catch(function(){return null;}) : Promise.resolve(null);
+    db.collection(FF_COLLECTION).get().then(function(firstSnap){
+      return firstJoined.then(function(firstJoinedSnap){
+        paint(firstSnap,firstJoinedSnap);
+        // Realtime tournament listener: all users see Seats 1, 2, 3... as soon as
+        // another user joins the same tournament.
+        try{
+          window.__ffTournamentUnsub=db.collection(FF_COLLECTION).onSnapshot(function(liveSnap){
+            const joinedRead=userRef ? userRef.get().catch(function(){return null;}) : Promise.resolve(null);
+            joinedRead.then(function(js){paint(liveSnap,js);});
+          },function(err){console.warn('FF tournament realtime sync:',err);});
+        }catch(e){console.warn('FF tournament realtime listener unavailable:',e);}
+        // Keep the current user's Joined state live too.
+        if(userRef){
+          try{
+            window.__ffUserJoinedUnsub=userRef.onSnapshot(function(js){
+              db.collection(FF_COLLECTION).get().then(function(fs){paint(fs,js);}).catch(function(){});
+            },function(err){console.warn('FF user joined realtime sync:',err);});
+          }catch(e){}
+        }
+      });
     }).catch(function(err){console.warn('FF tournament sync skipped:',err);});
   };
 
