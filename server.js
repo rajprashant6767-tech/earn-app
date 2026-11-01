@@ -8,6 +8,55 @@ const CHANNEL_LINK = process.env.TELEGRAM_CHANNEL_LINK || "";
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "*";
 app.use((req, res, next) => { res.setHeader("Access-Control-Allow-Origin", ALLOWED_ORIGIN); res.setHeader("Vary", "Origin"); res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS"); res.setHeader("Access-Control-Allow-Headers", "Content-Type"); if (req.method === "OPTIONS") return res.sendStatus(204); next(); });
 app.get("/", (_req,res)=>res.json({ok:true,service:"ZyloBet Telegram membership API"}));
+// Supabase connection test
+const SUPABASE_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
+const SUPABASE_SECRET_KEY = process.env.SUPABASE_SECRET_KEY || "";
+
+app.get("/supabase/health", async (_req, res) => {
+  if (!SUPABASE_URL || !SUPABASE_SECRET_KEY) {
+    return res.status(503).json({
+      ok: false,
+      connected: false,
+      error: "SUPABASE_ENV_MISSING"
+    });
+  }
+
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/firestore_documents?select=id&limit=1`,
+      {
+        headers: {
+          apikey: SUPABASE_SECRET_KEY,
+          Authorization: `Bearer ${SUPABASE_SECRET_KEY}`,
+          Accept: "application/json"
+        }
+      }
+    );
+
+    if (!response.ok) {
+      console.error("Supabase error:", response.status, await response.text());
+      return res.status(502).json({
+        ok: false,
+        connected: false,
+        error: "SUPABASE_CONNECTION_FAILED",
+        status: response.status
+      });
+    }
+
+    return res.json({
+      ok: true,
+      connected: true,
+      database: "supabase"
+    });
+  } catch (error) {
+    console.error("Supabase error:", error.message);
+    return res.status(502).json({
+      ok: false,
+      connected: false,
+      error: "SUPABASE_CONNECTION_FAILED"
+    });
+  }
+});
 app.get("/config", (_req,res)=>res.json({channelLink:CHANNEL_LINK}));
 function getChatIdFromLink(link){try{const u=new URL(link);if(!['t.me','www.t.me'].includes(u.hostname.toLowerCase()))return null;const slug=u.pathname.split('/').filter(Boolean)[0];if(!slug||slug==='s'||slug==='c'||slug.startsWith('+'))return null;return '@'+slug;}catch{return null;}}
 async function telegram(method,body){const r=await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/${method}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return {http:r.status,data:await r.json()};}
